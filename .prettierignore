@@ -12,3 +12,5 @@ docs/
 # Dane startowe z pakietu, 1:1 z czatem
 seed/prokomgaming/
 tests/fixtures/
+# Rewritten by Claude Code itself (permission prompts), in its own format
+.claude/settings.json

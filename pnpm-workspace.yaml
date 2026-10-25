@@ -1,0 +1,6 @@
+# pnpm settings (pnpm 11 reads them from here, not from package.json).
+# Only these dependencies may run install/build scripts.
+allowBuilds:
+  esbuild: true
+  sharp: true
+  unrs-resolver: true

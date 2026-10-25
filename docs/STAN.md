@@ -1,13 +1,17 @@
 # STAN — prokom-gaming
 
-Ostatnia aktualizacja: 25.10.2026 (sesja G0 — dokumenty i decyzje).
+Ostatnia aktualizacja: 25.10.2026 (sesja G1 — szkielet).
 
 ## W toku
-- Gałąź: `docs/g0-decyzje` (z `develop`), commit lokalny, **niewypchnięta**.
-- Repo na GitHubie **jeszcze nie istnieje** — Krystian zakłada je i wypycha `main` i `develop` ręcznie (PRZEKAZANIE §1; `.claude/settings.json` celowo blokuje Claude'owi push tych gałęzi). Potem: ochrona `main`/`develop`, tylko Squash merging, domyślna gałąź `develop`, znaczek „Verified” na pierwszym commicie.
-- Następny krok: wypchnąć `docs/g0-decyzje` i otworzyć PR do `develop` (`/pr`), scalić, potem **G1** — `/zadanie G1 — szkielet` (prompt: `docs/zadania/prokomgaming.md` §3.3 G1).
+- Gałąź: `feat/g1-szkielet` (z `develop`), podpisane commity, **niewypchnięta**.
+- Zrobione w G1: wszystko z zakresu (niżej w „Zrobione”); lokalnie zielone `lint`, `typecheck`, `format:check`, `test` (37), `test:e2e` (14: 1440 + 414), `build`, `docker build` + `/api/health` = 200 z kontenera. `.env` lokalny założony, `pnpm seed` przeszedł.
+- `/przeglad` (recenzent): „gotowe do PR”; poprawione: GraphQL wyłączony (+ test e2e), komentarze `requestId`/`env`, `tsconfig` bez `docs/`, `global-error` z `error: unknown`. Dwa ryzyka na G16 w „Uwagach” niżej. Zbędne zmienne w jobie `checks` w CI zostają (zgodność z `prokom-web`).
+- Niedokończone: CI jeszcze nie uruchomione (gałąź niewypchnięta).
+- Następny krok: push gałęzi → `/pr` (tytuł `feat(g1): szkielet aplikacji Next.js + Payload, CI i Docker`) → CI zielone → squash do `develop` → **G2** (`/zadanie G2 — wygląd i powłoka`).
 
 ## Zrobione
+- 25.10.2026 — **G1 (szkielet):** Next 16.4.2 + Payload 3.91.0 (szablon `blank`, Postgres), wersje 1:1 z ADR-G001, pnpm 11.28.2, Node 24.22.0 (`.nvmrc`); `lib/env.ts` (Zod, tylko zmienne czytane dziś), `lib/logger.ts`, `lib/requestId.ts`, polityka haseł (12 znaków); `users` (5 prób, blokada 15 min, sesja 2 h, bez ról); `push: false` + migracja `initial` (up → down → up czyste); `pnpm seed` (admin, idempotentny); `/api/health`; Tailwind 4 (bez kolorów do G2); tymczasowa strona główna (`TODO` G7); `docker/compose.dev.yml` (`prokom-gaming-dev`: 54321, Mailpit 1026/8026 — działa obok `prokom-web-dev`); Vitest; Playwright `desktop-1440` + `mobile-414` z axe; husky + lint-staged + gitleaks; CI (`ci.yml`, `pr-title.yml`), Dependabot; `Dockerfile` (standalone); `scripts/start.ps1`, `koniec.ps1`, `dev.mjs` (domyślnie 3100). `.claude/settings.json` wyłączony z Prettiera (Claude Code sam go przepisuje).
+- 25.10.2026 — **G0** scalone do `develop` (PR #1).
 - 25.10.2026 — **G0:** przegląd pakietu, decyzje Krystiana wpisane do dokumentów:
   - ADR-G005 **przyjęta** (opcja A: zapytania, egzemplarze, zamówienia i konto w Payload za stałym kontraktem); dwie osobne kolekcje z logowaniem: `users` (panel) i `customers` (klienci).
   - ADR-G002 §8.7 + spec. §27.2 + `jakosc.md` + CLAUDE.md + recenzent: test „żaden `internalModel` w HTML/API” obejmuje części poziomu mocy, RAM i dyski; **obudowy i chłodzenia wyłączone** (pokazujemy je z pełną nazwą; w 39 z 46 `internalModel` = `publicLabel`). `cost`/`costAtPublish` sprawdzane dla wszystkich typów.
@@ -29,7 +33,11 @@ G1 → G2 → G3 → G4 → G5 → G6 → G7 → G8 → G9 → (kontrola 8.11) �
 
 ## Uwagi do kolejnych sesji (ryzyka z G0)
 - **Kalendarz:** ok. 25,5 wieczoru na ok. 25 dostępnych, bez bufora, równolegle produkcja Biznesu w `prokom-web` — kontrole 8.11 i 13.11 traktować serio.
-- **G1:** dużo części naraz (CI, Docker, husky, gitleaks, Playwright) — kopiować 1:1 z `docs/wzorce-prokom-web/`. Globalnie pnpm 12.14, repo wymaga 11.28.2 (`packageManager`) — sprawdzić przed pierwszym `pnpm install`.
+- **pnpm/Node:** globalnie pnpm 12.14 — w repo sam przełącza się na 11.28.2 z `packageManager` (sprawdzone w G1). Node 24.22.0 przez `fnm` (`start.ps1` robi `fnm use`).
+- **Payload:** 3.91.0 nie ma jeszcze skilla w paczce (`node_modules/payload/skills/`) — dokumentacja: `llms-full.txt` + typy `.d.ts`. `create-payload-app` generuje szablon z najnowszego Payload (3.92) — wersje zawsze przypinamy ręcznie wg ADR-G001.
+- **G16 — pierwszy admin na produkcji (przegląd G1):** dopóki `users` jest pusta, Payload wpuszcza każdego na `/admin/create-first-user` (sprawdzone w `registerFirstUser.js`). Produkcja startuje z pustą bazą (migracje przy starcie, seed zablokowany), a staging chroni hasło w Nginx, produkcji nic. Przed otwarciem ruchu: admin zakładany jednorazowym skryptem w kontenerze albo blokada tej ścieżki w Nginx — rozstrzygnąć w `docs/wdrozenia.md`.
+- **G16 — CI testuje `next start`, produkcja `node server.js` ze `standalone` (przegląd G1):** dodać do pipeline'u test dymny zbudowanego obrazu (`/api/health` = 200 z kontenera; lokalnie sprawdzone ręcznie w G1).
+- **Dependabot (25.10.2026):** 2 alerty `vitest` 4.0.18 (GHSA-5xrq-8626-4rwp, GHSA-82fw-gwwq-j7x9) — dotyczą Vitest UI / trybu przeglądarkowego / `mockerPlugin`, których nie używamy. Podnieść do ≥ 4.1.11 razem z `prokom-web` (ten sam PR wersji w obu repo).
 - **Wydajność:** sceny 2880 px i 4 kroje przy Lighthouse mobile ≥ 90 — zmierzyć LCP już w G2 (powłoka + jedna scena), nie dopiero w G15.
 - **Blokery spoza kodu** (blokują produkcję, nie budowę): pytania [SZEF] niżej, prawnik, zdjęcia egzemplarzy, zakup domeny i DNS przed G16.
 
