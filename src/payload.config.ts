@@ -6,7 +6,15 @@ import { buildConfig } from 'payload'
 import sharp from 'sharp'
 import { fileURLToPath } from 'url'
 
+import { Builds } from './collections/Builds'
+import { Media } from './collections/Media'
+import { Options } from './collections/Options'
+import { PowerLevels } from './collections/PowerLevels'
+import { PriceHistory } from './collections/PriceHistory'
+import { PublishedPrices } from './collections/PublishedPrices'
 import { Users } from './collections/Users'
+import { PricingSettings } from './globals/PricingSettings'
+import { SiteSettings } from './globals/SiteSettings'
 import { getEnv } from './lib/env'
 import { migrations } from './migrations'
 
@@ -23,7 +31,8 @@ export default buildConfig({
   },
   // New collections go at the end: Payload names compound indexes after their columns only,
   // so inserting earlier can renumber them in a later migration.
-  collections: [Users],
+  collections: [Users, Media, Options, PowerLevels, Builds, PublishedPrices, PriceHistory],
+  globals: [PricingSettings, SiteSettings],
   editor: lexicalEditor(),
   // The panel and the site use REST only. A second public API would need its own field-access
   // checks for costs and internal models (ADR-G002 §8.7), so GraphQL is off and its routes removed.

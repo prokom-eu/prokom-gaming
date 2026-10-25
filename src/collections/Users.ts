@@ -2,6 +2,7 @@ import { ValidationError } from 'payload'
 import type { CollectionBeforeOperationHook, CollectionConfig } from 'payload'
 
 import { passwordProblem } from '../lib/auth/password'
+import { GROUP_ADMIN } from './shared'
 
 // `updateByID` runs `beforeOperation` with `operation: 'update'`.
 const PASSWORD_OPERATIONS = new Set(['create', 'update', 'resetPassword'])
@@ -33,6 +34,7 @@ export const Users: CollectionConfig = {
   slug: 'users',
   labels: { singular: 'Użytkownik panelu', plural: 'Użytkownicy panelu' },
   admin: {
+    group: GROUP_ADMIN,
     useAsTitle: 'email',
   },
   // ADR-G001 §3: login attempt limit and a short session.
