@@ -10,3 +10,9 @@ test-results/
 *.tsbuildinfo
 .DS_Store
 .claude/settings.local.json
+*.log
+blob-report/
+playwright/.cache/
+.claude/worktrees/
+# Next.js (generated)
+next-env.d.ts
