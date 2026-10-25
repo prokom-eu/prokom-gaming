@@ -9,6 +9,10 @@ const dirname = path.dirname(__filename)
 const nextConfig: NextConfig = {
   // Docker image (ADR-G001 §5): `.next/standalone` holds the server and only the traced node_modules.
   output: 'standalone',
+  // Scenes and photos as AVIF with WebP fallback, in screen sizes (ADR-G003 §3, §6).
+  images: {
+    formats: ['image/avif', 'image/webp'],
+  },
   webpack: (webpackConfig) => {
     webpackConfig.resolve.extensionAlias = {
       '.cjs': ['.cts', '.cjs'],
