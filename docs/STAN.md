@@ -37,6 +37,7 @@ G1 → G2 → G3 → G4 → G5 → G6 → G7 → G8 → G9 → (kontrola 8.11) �
 - **Payload:** 3.91.0 nie ma jeszcze skilla w paczce (`node_modules/payload/skills/`) — dokumentacja: `llms-full.txt` + typy `.d.ts`. `create-payload-app` generuje szablon z najnowszego Payload (3.92) — wersje zawsze przypinamy ręcznie wg ADR-G001.
 - **G16 — pierwszy admin na produkcji (przegląd G1):** dopóki `users` jest pusta, Payload wpuszcza każdego na `/admin/create-first-user` (sprawdzone w `registerFirstUser.js`). Produkcja startuje z pustą bazą (migracje przy starcie, seed zablokowany), a staging chroni hasło w Nginx, produkcji nic. Przed otwarciem ruchu: admin zakładany jednorazowym skryptem w kontenerze albo blokada tej ścieżki w Nginx — rozstrzygnąć w `docs/wdrozenia.md`.
 - **G16 — CI testuje `next start`, produkcja `node server.js` ze `standalone` (przegląd G1):** dodać do pipeline'u test dymny zbudowanego obrazu (`/api/health` = 200 z kontenera; lokalnie sprawdzone ręcznie w G1).
+- **Dependabot (25.10.2026):** 2 alerty `vitest` 4.0.18 (GHSA-5xrq-8626-4rwp, GHSA-82fw-gwwq-j7x9) — dotyczą Vitest UI / trybu przeglądarkowego / `mockerPlugin`, których nie używamy. Podnieść do ≥ 4.1.11 razem z `prokom-web` (ten sam PR wersji w obu repo).
 - **Wydajność:** sceny 2880 px i 4 kroje przy Lighthouse mobile ≥ 90 — zmierzyć LCP już w G2 (powłoka + jedna scena), nie dopiero w G15.
 - **Blokery spoza kodu** (blokują produkcję, nie budowę): pytania [SZEF] niżej, prawnik, zdjęcia egzemplarzy, zakup domeny i DNS przed G16.
 
