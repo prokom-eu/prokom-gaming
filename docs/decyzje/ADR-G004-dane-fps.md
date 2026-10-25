@@ -1,6 +1,6 @@
 # ADR-G004: Dane FPS — prawdziwe testy z etykietą źródła, strona nie liczy klatek
 
-- **Status:** przyjęta
+- **Status:** przyjęta (uzupełnienie G0 25.10.2026: źródło rekordów `p`, §5)
 - **Data:** 2026-10-25
 - **Dane:** `seed/prokomgaming/fps.json` (wartości) i `seed/prokomgaming/fps-sources.json` (źródło każdej liczby); arkusz kontrolny u Krystiana: `dane/PRO-KOM_FPS_zestawow_2026-10-25.xlsx`.
 
@@ -30,6 +30,7 @@ Stan 25.10.2026 (po przeglądzie): 33 gry × 16 zestawów × 3 rozdzielczości =
 - `games`: `name`, `slug`, `kind` (esport | aaa | capped), `fpsCap`, `setting`, `popularRank`, `seoPage`, `requirements { min, recommended, max, source, checkedAt }` (puste do uzupełnienia ze strony gry).
 - `fps-results`: `build`, `game`, `resolution` (fullhd | qhd | uhd), `fps`, `kind` (p | m | r | e), `sourceLabel`, `sourceUrl`, `setting`, `measuredAt` i `unit` (dla `p`). Import z `fps-sources.json`: `source` → `sourceLabel`, `url` → `sourceUrl`, `game` (nazwa) → relacja do `games` po `name`, `build` (slug) → relacja do `builds`; pola `cpu`, `gpu` tylko do podglądu w panelu.
 - Priorytet wyświetlania: `p` > `m` > `r` > `e` (najnowszy `p` wygrywa). Funkcja `lib/fps.ts → fpsFor(build, game, resolution)`.
+- **Skąd `p` (G0, 25.10.2026):** rekord `p` dla zestawu powstaje tylko z egzemplarza (`units`, ADR-G005), którego konfiguracja jest **identyczna z przepisem zestawu** (poziom, obudowa, chłodzenie, RAM, dysk). Pomiar egzemplarza ze zmianami (np. inny RAM) zostaje wyłącznie na jego metryce. Powód: jeden egzemplarz zmieniony pod klienta nie może przestawić liczb na stronie zestawu dla wszystkich.
 - Konfigurator: klatki poziomu = klatki jego zestawu wiodącego (`power-levels.leadBuild`); obudowa, chłodzenie, RAM i dysk nie zmieniają klatek.
 
 ## 6. Na stronie

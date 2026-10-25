@@ -1,6 +1,6 @@
 # ADR-G005: Zapytania, egzemplarze (metryka), zamówienia (warsztat), konto klienta — w Payload, za stałym kontraktem
 
-- **Status:** proponowana — do przyjęcia przez Krystiana w G0
+- **Status:** przyjęta (decyzja Krystiana 25.10.2026, sesja G0 — opcja A)
 - **Data:** 2026-10-25
 - **Decyduje:** Krystian
 
@@ -14,15 +14,17 @@ Pełny zakres na 20.11 (decyzja Krystiana 25.10.2026) obejmuje: zapytania, metry
 | B. Django (zalążek Strefy Klienta) od razu | dane od początku w docelowym miejscu | druga aplikacja w najciaśniejszym miesiącu; panel i logowanie od zera |
 | C. Bez konta i metryki na start | najmniej pracy | wbrew decyzji o pełnym zakresie |
 
-## Decyzja (proponowana)
+## Decyzja
 **Opcja A** — tak jak `prokom-web` zrobił ze skrzynką zapytań (ADR-003 tam): stabilna ma być **granica i schemat**, nie miejsce zapisu. Wszystkie modele poniżej mają pola 1:1 z przyszłymi modelami Django; w 2027 jednorazowy skrypt przenosi rekordy, a strona przełącza się na API.
+
+**Dwie kolekcje z logowaniem (G0):** `users` (panel: role `admin`, `serwis`; `admin.user` w konfiguracji Payload) i `customers` (klienci strony). Klient nigdy nie loguje się do panelu, a konto panelu nie jest kontem klienta — osobne sesje, osobne reguły dostępu, osobne limity prób logowania. Dzięki temu błąd w regułach dostępu klienta nie otwiera panelu, a migracja klientów do Django w 2027 nie dotyka kont zespołu.
 
 ### Kolekcje systemowe
 | Kolekcja | Pola (najważniejsze) | Dostęp |
 |---|---|---|
 | `inquiries` | `number` (`PKG-RRRR-NNNN`), `type` (build \| config \| advice [„Pomóżcie mi dobrać”] \| custom_list [„Mam własną listę”] \| compare \| contact \| voucher \| ready), `config` (kody: level, case, cooler, ram, ssd + `customCase`/`customCooler` tekst), `build`, `priceAtInquiry`, `games[]`, `monitor`, `refresh`, `extras[]`, `pickup` (courier \| rabka \| zakopane), `invoice` + `nip` (suma kontrolna), `name`, `email`, `phone` (co najmniej jedno), `preferredContact`, `message`, `consent { accepted, clauseVersion, acceptedAt }`, `marketingConsent`, `source` (URL, UTM), `status` (new → in_progress → offer_sent → won \| lost \| closed) | panel: odczyt + `status`; publicznie tylko `POST /api/inquiry` |
 | `orders` | `inquiry`, `customer?`, `build?` / `config`, `stage` (offer → paid → parts → assembly → test → metric_ready → shipped → delivered), `stageHistory[] { stage, at }`, `publicLabel` (nazwa zestawu i kolor — jedyne, co widać na tablicy), `unit?`, `trackingNumber?` | panel: serwis i admin; publicznie: tylko `GET /api/warsztat` (nazwa, kolor, etap, bez danych osobowych) |
-| `units` (egzemplarze, metryka) | `code` (losowy, ≥ 12 znaków, nieodgadniony), `build`, `serial`, `parts[] { role, manufacturer, model, serial, warrantyUntil }`, `stressTest { minutes, errors }`, `temps { cpuMax, gpuMax }`, `fps[] { game, resolution, fps }` (3 gry → `fps-results` rodzaj `p`), `assembledBy` (imię, za zgodą), `testedAt`, `warrantyUntil`, `customer?`, `published` | publicznie: `/metryka/<code>` bez danych klienta; PDF do pudełka |
+| `units` (egzemplarze, metryka) | `code` (losowy, ≥ 12 znaków, nieodgadniony), `build`, `serial`, `parts[] { role, manufacturer, model, serial, warrantyUntil }`, `stressTest { minutes, errors }`, `temps { cpuMax, gpuMax }`, `fps[] { game, resolution, fps }` (3 gry → `fps-results` rodzaj `p` **tylko, gdy konfiguracja egzemplarza = przepis zestawu**, ADR-G004 §5), `assembledBy` (imię, za zgodą), `testedAt`, `warrantyUntil`, `customer?`, `published` | publicznie: `/metryka/<code>` bez danych klienta; PDF do pudełka |
 | `customers` (konto) | Payload `auth` (e-mail + hasło, weryfikacja e-maila, reset hasła, `maxLoginAttempts`), `name`, `phone?`, `savedConfigs[] { label, config, createdAt }`, `favorites[]` | klient widzi tylko swoje `orders`, `units`, `tickets` (reguły dostępu + test) |
 | `tickets` (zgłoszenia) | `unit`, `customer?`, `category` (gra się zacina \| nie włącza się \| głośno lub gorąco \| inne), `description`, `remoteHelpConsent`, `status`, `history[]` | klient: tworzy i czyta swoje; panel: serwis |
 | `stock` (Gotowe od ręki) | `unit` albo `build` + `config`, `location` (rabka \| zakopane), `condition` (nowy \| pokazowy \| po zwrocie — z opisem), `price` (z `lib/pricing/` dla `config`, z ewentualnym rabatem wg ADR-G002 §7), `reservedUntil` | publicznie: lista; rezerwacja = zapytanie `type: ready`, 24 h |
@@ -32,7 +34,7 @@ Pełny zakres na 20.11 (decyzja Krystiana 25.10.2026) obejmuje: zapytania, metry
 ### Przepływy
 1. **Zapytanie:** formularz (4 kroki) → `POST /api/inquiry` → `submitInquiry()`: Zod, honeypot, minimalny czas, limit na IP (bez zapisu pełnego IP), ponowne przeliczenie ceny i zgodności po stronie serwera (`lib/pricing/`, `lib/compat.ts`) → zapis → mail do skrzynki Gaming (`Reply-To` klienta, w temacie numer i typ) + potwierdzenie dla klienta (numer, konfiguracja, „odpiszemy zwykle w godzinę, codziennie 8–22”). Odpowiedź 201 `{ ok, number }`.
 2. **Zamówienie:** Krystian w panelu zamienia zapytanie w `order` po akceptacji oferty; serwis przesuwa etapy → tablica „Teraz w warsztacie” na głównej i oś statusu w koncie.
-3. **Metryka:** serwis wpisuje SN, test, temperatury, klatki → `/metryka/<code>` + PDF + naklejka QR; pomiary trafiają do `fps-results` jako `p`.
+3. **Metryka:** serwis wpisuje SN, test, temperatury, klatki → `/metryka/<code>` + PDF + naklejka QR; pomiary zawsze są na metryce egzemplarza, a do `fps-results` jako `p` trafiają tylko z egzemplarzy złożonych dokładnie wg przepisu zestawu (inaczej zostają tylko na metryce).
 4. **Konto:** klient zakłada konto (opcjonalnie) albo dostaje zaproszenie mailem przy zamówieniu; widzi komputery, etap, metrykę, gwarancje, zgłoszenia, zapisane konfiguracje.
 
 ### RODO i bezpieczeństwo
