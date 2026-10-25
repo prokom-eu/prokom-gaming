@@ -1,0 +1,30 @@
+{
+  "_info": "Global `site-settings` (spec. §1). Wartości startowe z tabeli spec. §1. Pola ze statusem [SZEF] w spec. §1 mają wartości startowe ze specyfikacji (decyzja Krystiana 25.10.2026: pokazujemy je do czasu zmiany w panelu): telefon i e-mail Gaming, odpowiedź na zapytanie („zwykle w godzinę, codziennie 8–22” — szef ustala, kto zastępuje Krystiana) i test egzemplarza (60 min — serwis potwierdza długość testu). Puste pole = element nie renderuje się na stronie (BLIK, firma kurierska, najbliższy termin montażu, ocena Google, profile). Zwrot opisany neutralnie (art. 7 pkt 10 UPNPR). Bez rat.",
+  "company": {
+    "name": "PRO-KOM Tadeusz Wójciak",
+    "address": "ul. Orkana 16B, 34-700 Rabka-Zdrój",
+    "nip": "735-251-14-47"
+  },
+  "salonAddress": "ul. Staszica 8, Zakopane",
+  "phone": "+48 18 267 65 11",
+  "email": "gaming@pro-kom.eu",
+  "responseTime": "zwykle w godzinę, codziennie 8–22",
+  "since": "od 2004 roku",
+  "offerTerms": "ważna 48 h, imienna lista części, cena brutto, termin",
+  "fulfilment": "5–10 dni roboczych od wpłaty",
+  "nextFreeSlot": "",
+  "payment": "przelew albo BLIK na podstawie faktury pro forma; bez pobrania",
+  "blikMethod": "",
+  "delivery": "kurier z ubezpieczeniem w cenie albo odbiór: Rabka-Zdrój / Zakopane",
+  "courier": "",
+  "warranty": "24 mies. na cały komputer, kurier odbiera od klienta na koszt PRO-KOM, najpierw pomoc zdalna (za zgodą), rozbudowa RAM/dysku bez utraty gwarancji",
+  "returns": "14 dni dla wszystkich komputerów (także konfiguracji), koszt odesłania po stronie klienta",
+  "unitTest": "60 min obciążenia, 3 gry zmierzone, test pamięci, aktualny BIOS i sterowniki",
+  "googleRating": null,
+  "googleReviewCount": null,
+  "social": {
+    "facebookUrl": "",
+    "tiktokUrl": ""
+  },
+  "cookieBannerEnabled": false
+}

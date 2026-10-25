@@ -1,7 +1,9 @@
 import creaturesSeed from '../../seed/prokomgaming/creatures.json'
 
-// Shell data until the `site-settings` global and `builds` exist.
-// TODO(krystian): G3 — read company, contact and the cookie flag from `site-settings`
+// Shell data, static for now. The `site-settings` global and `builds` exist since G3 (seed values
+// = these), but reading them in the layout changes how pages render (`docker build` has no
+// database), so it waits for the first page with data.
+// TODO(krystian): G7 — read company, contact and the cookie flag from `site-settings`
 // (spec. §1), creatures from `builds`. Phone and e-mail are spec. §1 start values still marked
 // [SZEF]; they are shown until the boss confirms or changes them in the panel.
 

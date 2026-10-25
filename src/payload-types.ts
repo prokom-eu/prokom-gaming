@@ -68,6 +68,12 @@ export interface Config {
   blocks: {};
   collections: {
     users: User;
+    media: Media;
+    options: Option;
+    'power-levels': PowerLevel;
+    builds: Build;
+    'published-prices': PublishedPrice;
+    'price-history': PriceHistory;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -76,6 +82,12 @@ export interface Config {
   collectionsJoins: {};
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
+    media: MediaSelect<false> | MediaSelect<true>;
+    options: OptionsSelect<false> | OptionsSelect<true>;
+    'power-levels': PowerLevelsSelect<false> | PowerLevelsSelect<true>;
+    builds: BuildsSelect<false> | BuildsSelect<true>;
+    'published-prices': PublishedPricesSelect<false> | PublishedPricesSelect<true>;
+    'price-history': PriceHistorySelect<false> | PriceHistorySelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -85,8 +97,14 @@ export interface Config {
     defaultIDType: number;
   };
   fallbackLocale: null;
-  globals: {};
-  globalsSelect: {};
+  globals: {
+    'pricing-settings': PricingSetting;
+    'site-settings': SiteSetting;
+  };
+  globalsSelect: {
+    'pricing-settings': PricingSettingsSelect<false> | PricingSettingsSelect<true>;
+    'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
+  };
   locale: null;
   widgets: {
     collections: CollectionsWidget;
@@ -143,6 +161,201 @@ export interface User {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media".
+ */
+export interface Media {
+  id: number;
+  alt: string;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "options".
+ */
+export interface Option {
+  id: number;
+  type: 'case' | 'cooler' | 'ram' | 'ssd';
+  code: string;
+  active?: boolean | null;
+  /**
+   * Obudowy i chłodzenia z producentem; RAM i dyski tylko klasa.
+   */
+  publicLabel: string;
+  internalModel: string;
+  ean?: string | null;
+  cost: number;
+  image?: (number | null) | Media;
+  description?: string | null;
+  gpuMaxMm?: number | null;
+  coolerMaxMm?: number | null;
+  aio360?: ('none' | 'front' | 'top_only' | 'side' | 'yes') | null;
+  kind?: ('air' | 'aio360') | null;
+  heightMm?: number | null;
+  radiatorThicknessMm?: number | null;
+  class?: number | null;
+  color?: ('czarny' | 'szary' | 'biały') | null;
+  ramType?: ('DDR4' | 'DDR5') | null;
+  capacityGb?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "power-levels".
+ */
+export interface PowerLevel {
+  id: number;
+  code: string;
+  tier: number;
+  tierRoman: string;
+  tierLabel: string;
+  tierLead?: boolean | null;
+  targetResolution: 'fullhd' | 'qhd' | 'uhd';
+  monitorFilters: ('fullhd' | 'qhd' | 'uhd')[];
+  variant?: ('GeForce' | 'Radeon' | 'Intel' | 'biały GeForce' | 'biały Radeon' | 'premium') | null;
+  publicLabel: string;
+  platform: 'AM4' | 'AM5' | 'LGA1700' | 'LGA1851';
+  ramType: 'DDR4' | 'DDR5';
+  color: 'czarny' | 'biały';
+  gpuLengthMm: number;
+  requiresAio?: boolean | null;
+  components?:
+    | {
+        role: 'cpu' | 'gpu' | 'mobo' | 'psu';
+        publicLabel: string;
+        internalModel: string;
+        ean?: string | null;
+        cost: number;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Wartości z planszy — potwierdzić z modelem płyty (część „Płyta główna”) przed publikacją kart.
+   */
+  upgrade?: {
+    freeRamSlots?: number | null;
+    freeM2Slots?: string | null;
+    psuW?: number | null;
+    socket?: string | null;
+    socketNote?: string | null;
+  };
+  markupClass: 'fullhd' | 'qhd' | 'uhd' | 'flagship';
+  /**
+   * Jawny wyjątek od klasy, np. 0,168. Puste = narzut klasy.
+   */
+  markupOverride?: number | null;
+  minRamGb: number;
+  minSsdGb: number;
+  /**
+   * 1 podst. powietrze, 2 wieża, 3 AIO 360
+   */
+  minCoolerClass: number;
+  /**
+   * 1 podst., 2 średnia, 3 premium
+   */
+  minCaseClass: number;
+  /**
+   * Klatki poziomu = klatki tego zestawu (ADR-G004).
+   */
+  leadBuild?: (number | null) | Build;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "builds".
+ */
+export interface Build {
+  id: number;
+  name: string;
+  /**
+   * /zestawy/<slug>
+   */
+  slug: string;
+  level: number | PowerLevel;
+  case: number | Option;
+  cooler: number | Option;
+  ram: number | Option;
+  ssd: number | Option;
+  creature: {
+    /**
+     * Nazwa plików pieczęci i scen w /public, np. „baba” dla Baby Jagi.
+     */
+    key: string;
+    accusative: string;
+    genitive: string;
+    epithet: string;
+    shell: 'dark' | 'white';
+    biome: string;
+    look: string;
+    short: string;
+    motto: string;
+    myth: string;
+    why: string;
+    giftTitle: string;
+    gift: string;
+    legend: string;
+    legendSource: {
+      title: string;
+      url: string;
+    };
+  };
+  /**
+   * Tylko prawdziwe zdjęcia naszego egzemplarza (ADR-G003 §3).
+   */
+  photos?: (number | Media)[] | null;
+  internalRef?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Ceny publikuje ekran „Ceny” (G4) po sprawdzeniu marży. Ręcznej edycji nie ma.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "published-prices".
+ */
+export interface PublishedPrice {
+  id: number;
+  batch: number;
+  itemType: 'level' | 'option' | 'service' | 'level_from';
+  itemCode: string;
+  sellPrice: number;
+  costAtPublish?: number | null;
+  publishedAt: string;
+  publishedBy?: (number | null) | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "price-history".
+ */
+export interface PriceHistory {
+  id: number;
+  batch: number;
+  itemType: 'level' | 'option' | 'service' | 'level_from';
+  itemCode: string;
+  sellPrice: number;
+  validFrom: string;
+  /**
+   * Puste = cena obowiązuje.
+   */
+  validTo?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -164,10 +377,35 @@ export interface PayloadKv {
  */
 export interface PayloadLockedDocument {
   id: number;
-  document?: {
-    relationTo: 'users';
-    value: number | User;
-  } | null;
+  document?:
+    | ({
+        relationTo: 'users';
+        value: number | User;
+      } | null)
+    | ({
+        relationTo: 'media';
+        value: number | Media;
+      } | null)
+    | ({
+        relationTo: 'options';
+        value: number | Option;
+      } | null)
+    | ({
+        relationTo: 'power-levels';
+        value: number | PowerLevel;
+      } | null)
+    | ({
+        relationTo: 'builds';
+        value: number | Build;
+      } | null)
+    | ({
+        relationTo: 'published-prices';
+        value: number | PublishedPrice;
+      } | null)
+    | ({
+        relationTo: 'price-history';
+        value: number | PriceHistory;
+      } | null);
   globalSlug?: string | null;
   user: {
     relationTo: 'users';
@@ -235,6 +473,169 @@ export interface UsersSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media_select".
+ */
+export interface MediaSelect<T extends boolean = true> {
+  alt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "options_select".
+ */
+export interface OptionsSelect<T extends boolean = true> {
+  type?: T;
+  code?: T;
+  active?: T;
+  publicLabel?: T;
+  internalModel?: T;
+  ean?: T;
+  cost?: T;
+  image?: T;
+  description?: T;
+  gpuMaxMm?: T;
+  coolerMaxMm?: T;
+  aio360?: T;
+  kind?: T;
+  heightMm?: T;
+  radiatorThicknessMm?: T;
+  class?: T;
+  color?: T;
+  ramType?: T;
+  capacityGb?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "power-levels_select".
+ */
+export interface PowerLevelsSelect<T extends boolean = true> {
+  code?: T;
+  tier?: T;
+  tierRoman?: T;
+  tierLabel?: T;
+  tierLead?: T;
+  targetResolution?: T;
+  monitorFilters?: T;
+  variant?: T;
+  publicLabel?: T;
+  platform?: T;
+  ramType?: T;
+  color?: T;
+  gpuLengthMm?: T;
+  requiresAio?: T;
+  components?:
+    | T
+    | {
+        role?: T;
+        publicLabel?: T;
+        internalModel?: T;
+        ean?: T;
+        cost?: T;
+        id?: T;
+      };
+  upgrade?:
+    | T
+    | {
+        freeRamSlots?: T;
+        freeM2Slots?: T;
+        psuW?: T;
+        socket?: T;
+        socketNote?: T;
+      };
+  markupClass?: T;
+  markupOverride?: T;
+  minRamGb?: T;
+  minSsdGb?: T;
+  minCoolerClass?: T;
+  minCaseClass?: T;
+  leadBuild?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "builds_select".
+ */
+export interface BuildsSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  level?: T;
+  case?: T;
+  cooler?: T;
+  ram?: T;
+  ssd?: T;
+  creature?:
+    | T
+    | {
+        key?: T;
+        accusative?: T;
+        genitive?: T;
+        epithet?: T;
+        shell?: T;
+        biome?: T;
+        look?: T;
+        short?: T;
+        motto?: T;
+        myth?: T;
+        why?: T;
+        giftTitle?: T;
+        gift?: T;
+        legend?: T;
+        legendSource?:
+          | T
+          | {
+              title?: T;
+              url?: T;
+            };
+      };
+  photos?: T;
+  internalRef?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "published-prices_select".
+ */
+export interface PublishedPricesSelect<T extends boolean = true> {
+  batch?: T;
+  itemType?: T;
+  itemCode?: T;
+  sellPrice?: T;
+  costAtPublish?: T;
+  publishedAt?: T;
+  publishedBy?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "price-history_select".
+ */
+export interface PriceHistorySelect<T extends boolean = true> {
+  batch?: T;
+  itemType?: T;
+  itemCode?: T;
+  sellPrice?: T;
+  validFrom?: T;
+  validTo?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv_select".
  */
 export interface PayloadKvSelect<T extends boolean = true> {
@@ -272,6 +673,174 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pricing-settings".
+ */
+export interface PricingSetting {
+  id: number;
+  minMargin: number;
+  publishThreshold: number;
+  autoPublish?: boolean | null;
+  serviceCost: number;
+  caseCoolerBuffer: number;
+  whiteSurcharge: number;
+  roundingStep: number;
+  categoryMarkup: {
+    case: number;
+    cooler: number;
+    ram: number;
+    ssd: number;
+    service: number;
+  };
+  /**
+   * Klucze = „Klasa narzutu” poziomu mocy.
+   */
+  levelMarkupByClass: {
+    fullhd: number;
+    qhd: number;
+    uhd: number;
+    flagship: number;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings".
+ */
+export interface SiteSetting {
+  id: number;
+  company: {
+    name: string;
+    nip: string;
+    address: string;
+  };
+  salonAddress?: string | null;
+  /**
+   * Puste = element nie pokazuje się na stronie.
+   */
+  phone?: string | null;
+  /**
+   * Puste = element nie pokazuje się na stronie.
+   */
+  email?: string | null;
+  responseTime?: string | null;
+  since?: string | null;
+  offerTerms?: string | null;
+  fulfilment?: string | null;
+  /**
+   * Puste = element nie pokazuje się na stronie.
+   */
+  nextFreeSlot?: string | null;
+  payment?: string | null;
+  /**
+   * Puste = element nie pokazuje się na stronie.
+   */
+  blikMethod?: string | null;
+  delivery?: string | null;
+  /**
+   * Puste = element nie pokazuje się na stronie.
+   */
+  courier?: string | null;
+  warranty?: string | null;
+  returns?: string | null;
+  unitTest?: string | null;
+  /**
+   * Puste = sekcja opinii ukryta.
+   */
+  googleRating?: number | null;
+  googleReviewCount?: number | null;
+  social?: {
+    /**
+     * Puste = element nie pokazuje się na stronie.
+     */
+    facebookUrl?: string | null;
+    /**
+     * Puste = element nie pokazuje się na stronie.
+     */
+    tiktokUrl?: string | null;
+  };
+  /**
+   * Włączać tylko z narzędziami wymagającymi zgody (spec. §24).
+   */
+  cookieBannerEnabled?: boolean | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pricing-settings_select".
+ */
+export interface PricingSettingsSelect<T extends boolean = true> {
+  minMargin?: T;
+  publishThreshold?: T;
+  autoPublish?: T;
+  serviceCost?: T;
+  caseCoolerBuffer?: T;
+  whiteSurcharge?: T;
+  roundingStep?: T;
+  categoryMarkup?:
+    | T
+    | {
+        case?: T;
+        cooler?: T;
+        ram?: T;
+        ssd?: T;
+        service?: T;
+      };
+  levelMarkupByClass?:
+    | T
+    | {
+        fullhd?: T;
+        qhd?: T;
+        uhd?: T;
+        flagship?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings_select".
+ */
+export interface SiteSettingsSelect<T extends boolean = true> {
+  company?:
+    | T
+    | {
+        name?: T;
+        nip?: T;
+        address?: T;
+      };
+  salonAddress?: T;
+  phone?: T;
+  email?: T;
+  responseTime?: T;
+  since?: T;
+  offerTerms?: T;
+  fulfilment?: T;
+  nextFreeSlot?: T;
+  payment?: T;
+  blikMethod?: T;
+  delivery?: T;
+  courier?: T;
+  warranty?: T;
+  returns?: T;
+  unitTest?: T;
+  googleRating?: T;
+  googleReviewCount?: T;
+  social?:
+    | T
+    | {
+        facebookUrl?: T;
+        tiktokUrl?: T;
+      };
+  cookieBannerEnabled?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
