@@ -1,0 +1,90 @@
+/* PRO-KOM Gaming — tokeny wizualizacji v36 (25.10.2026). Źródło: plansze .dc.html (BASE_CSS).
+   Do przeniesienia 1:1 do src/styles/tokens.css (ADR-G003). Nazwy słowiańskie jak w planszach;
+   w kodzie można dodać aliasy semantyczne (--bg, --text, --accent), ale wartości zostają. */
+:root {
+  /* tło i powierzchnie */
+  --smola: #040706; /* tło strony */
+  --noc: #07100e; /* sekcje */
+  --mech: #0c1613; /* karty, panele */
+  --panel-from: #0c1512;
+  --panel-to: #070c0a; /* gradient paneli */
+  --foot: #030504; /* stopka */
+  /* tekst */
+  --kosc: #ece4d0; /* tekst główny */
+  --kosc2: #cdc3ab; /* tekst drugorzędny jasny */
+  --mgla: #9a9583; /* tekst pomocniczy (min. AA na --smola) */
+  --line: rgba(236, 228, 208, 0.13);
+  /* akcja: złoto Grom — tylko przyciski, aktywne stany i droga „od Skrzata do Peruna” */
+  --grom: #f2c230;
+  --grom2: #ffe08a; /* jasny koniec gradientu przycisku */
+  --on-grom: #1a1305; /* tekst na złotym */
+  /* etykiety źródeł klatek (ADR-G004) */
+  --src-pk: #5bc23e;
+  --src-pk-text: #7fd56a; /* zmierzone w PRO-KOM */
+  --src-ind: #6e9bf2;
+  --src-ind-text: #8fb0f5; /* test niezależny, przeliczone z testów */
+  --src-est: #a8b0ba;
+  --src-est-text: #b6bcc4; /* szacunek */
+  /* kroje (next/font ustawia zmienne) */
+  --font-name: 'Cinzel', Georgia, serif; /* imiona istot, liczby rytualne */
+  --font-head: 'Cormorant Garamond', Georgia, serif; /* nagłówki, podania (kursywa) */
+  --font-text: 'Manrope', system-ui, sans-serif; /* interfejs i tekst */
+  --font-logo: 'Archivo', sans-serif; /* tylko znak PRO-KOM (szerokość 118, 800) */
+  /* kształt */
+  --cut: 14px; /* ścięcie narożników kart (.cut) */
+  --radius-pill: 999px;
+  --radius-sheet: 24px;
+  --tabbar-h: 66px; /* dolny pasek telefonu (+ env(safe-area-inset-bottom)) */
+  --container: 1440px;
+  --gutter-desktop: 80px;
+  --gutter-mobile: 22px;
+  /* kolory 16 istot (seed/prokomgaming/creatures.json) */
+  --c-skrzat: #e0a64b; /* Skrzat */
+  --c-licho: #7cf26b; /* Licho */
+  --c-bies: #c3f25b; /* Bies */
+  --c-wodnik: #7fb6ff; /* Wodnik */
+  --c-strzyga: #ff4d8d; /* Strzyga */
+  --c-kikimora: #b26bff; /* Kikimora */
+  --c-zmora: #ff6a55; /* Zmora */
+  --c-rusalka: #9fe7ff; /* Rusałka */
+  --c-baba-jaga: #b26bff; /* Baba Jaga */
+  --c-bazyliszek: #59e0c5; /* Bazyliszek */
+  --c-pani-zimy: #9fe7ff; /* Pani Zimy */
+  --c-wilkolak: #c0c7d1; /* Wilkołak */
+  --c-wampir: #e0322b; /* Wampir */
+  --c-weles: #ffb04d; /* Weles */
+  --c-zmij: #ff7a1a; /* Żmij */
+  --c-perun: #f2c230; /* Perun */
+}
+
+/* ---------------------------------------------------------------------------------------------
+   Uzupełnienie (G2): wartości wpisane wprost w planszach .dc.html (BASE_CSS, nawigacja, stopka,
+   menu, baner cookies), których nie ma w bloku wyżej. Tylko wartości z planszy — bez nowych kolorów.
+   Wyjątek dostępności: pasek prawny stopki na planszy ma #77746a (kontrast 4,37 na --foot, poniżej
+   AA przy 13 px), więc używa --foot-text (5,9).
+   --------------------------------------------------------------------------------------------- */
+:root {
+  /* tekst */
+  --kosc-hi: #f6efdd; /* nagłówki na scenach (h1 404, nagłówki podstron) */
+  --kosc-strong: #f2ead6; /* pogrubienia w panelach, kafelki menu, baner */
+  --nav-text: #d6cdb7; /* linki nagłówka, chipy, linki menu */
+  --link-text: #d8cfb8; /* linki z podkreśleniem (404) */
+  --lead: #c4bba5; /* tekst pod nagłówkiem */
+  --banner-text: #b4ab95; /* tekst banera cookies */
+  --muted: #a49e8a; /* podpisy w menu (ceny, opisy kontaktu) */
+  --tab-off: #8f8a79; /* nieaktywna karta dolnego paska */
+  --nphone: #bdb39b; /* „Odpowiadamy w godzinę” w nagłówku */
+  --foot-head: #ddd4bf; /* nagłówki kolumn stopki */
+  --foot-text: #8d8a7c; /* opis i pasek prawny stopki */
+  /* tła */
+  --nav-solid-from: #030605;
+  --nav-solid-to: #06100d; /* nagłówek pełny (.nav.solid) */
+  --sheet-from: #0e1915; /* arkusz menu (gradient do --panel-to) */
+  --scene-bg: #030505; /* tło kontenera sceny */
+  --scene-fade: #050807; /* dolne wygaszenie sceny */
+  --tabbar-bg: rgba(6, 10, 9, 0.9);
+  --tabbar-ring: #060a09; /* obwódka złotego koła „Konfigurator” */
+  --banner-bg: rgba(7, 12, 10, 0.96);
+  --backdrop: rgba(2, 4, 3, 0.62); /* tło pod arkuszem */
+  --shadow: #000;
+}
