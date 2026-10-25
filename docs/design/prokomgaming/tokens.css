@@ -1,0 +1,52 @@
+/* PRO-KOM Gaming — tokeny wizualizacji v36 (25.10.2026). Źródło: plansze .dc.html (BASE_CSS).
+   Do przeniesienia 1:1 do src/styles/tokens.css (ADR-G003). Nazwy słowiańskie jak w planszach;
+   w kodzie można dodać aliasy semantyczne (--bg, --text, --accent), ale wartości zostają. */
+:root {
+  /* tło i powierzchnie */
+  --smola: #040706;   /* tło strony */
+  --noc: #07100e;     /* sekcje */
+  --mech: #0c1613;    /* karty, panele */
+  --panel-from: #0c1512; --panel-to: #070c0a; /* gradient paneli */
+  --foot: #030504;    /* stopka */
+  /* tekst */
+  --kosc: #ece4d0;    /* tekst główny */
+  --kosc2: #cdc3ab;   /* tekst drugorzędny jasny */
+  --mgla: #9a9583;    /* tekst pomocniczy (min. AA na --smola) */
+  --line: rgba(236, 228, 208, .13);
+  /* akcja: złoto Grom — tylko przyciski, aktywne stany i droga „od Skrzata do Peruna” */
+  --grom: #F2C230;
+  --grom2: #FFE08A;   /* jasny koniec gradientu przycisku */
+  --on-grom: #1a1305; /* tekst na złotym */
+  /* etykiety źródeł klatek (ADR-G004) */
+  --src-pk: #5BC23E;  --src-pk-text: #7fd56a;   /* zmierzone w PRO-KOM */
+  --src-ind: #6E9BF2; --src-ind-text: #8fb0f5;  /* test niezależny, przeliczone z testów */
+  --src-est: #A8B0BA; --src-est-text: #b6bcc4;  /* szacunek */
+  /* kroje (next/font ustawia zmienne) */
+  --font-name: 'Cinzel', Georgia, serif;               /* imiona istot, liczby rytualne */
+  --font-head: 'Cormorant Garamond', Georgia, serif;   /* nagłówki, podania (kursywa) */
+  --font-text: 'Manrope', system-ui, sans-serif;       /* interfejs i tekst */
+  --font-logo: 'Archivo', sans-serif;                  /* tylko znak PRO-KOM (szerokość 118, 800) */
+  /* kształt */
+  --cut: 14px;        /* ścięcie narożników kart (.cut) */
+  --radius-pill: 999px;
+  --radius-sheet: 24px;
+  --tabbar-h: 66px;   /* dolny pasek telefonu (+ env(safe-area-inset-bottom)) */
+  --container: 1440px; --gutter-desktop: 80px; --gutter-mobile: 22px;
+  /* kolory 16 istot (seed/prokomgaming/creatures.json) */
+  --c-skrzat: #E0A64B; /* Skrzat */
+  --c-licho: #7CF26B; /* Licho */
+  --c-bies: #C3F25B; /* Bies */
+  --c-wodnik: #7FB6FF; /* Wodnik */
+  --c-strzyga: #FF4D8D; /* Strzyga */
+  --c-kikimora: #B26BFF; /* Kikimora */
+  --c-zmora: #FF6A55; /* Zmora */
+  --c-rusalka: #9FE7FF; /* Rusałka */
+  --c-baba-jaga: #B26BFF; /* Baba Jaga */
+  --c-bazyliszek: #59E0C5; /* Bazyliszek */
+  --c-pani-zimy: #9FE7FF; /* Pani Zimy */
+  --c-wilkolak: #C0C7D1; /* Wilkołak */
+  --c-wampir: #E0322B; /* Wampir */
+  --c-weles: #FFB04D; /* Weles */
+  --c-zmij: #FF7A1A; /* Żmij */
+  --c-perun: #F2C230; /* Perun */
+}

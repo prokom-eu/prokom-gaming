@@ -1,0 +1,28 @@
+{
+  "_info": "Global `pricing-settings` (ADR-G002 §2). Wartości z zakładki „Ustawienia” arkusza PRO-KOM_cennik_konfiguratora_2026-10-25.xlsx. Uwaga: tekst „Zasada 4” w zakładce „Jak to działa” arkusza ma stare narzuty (16,5/14,5/13,5/13%) — obowiązują wartości z „Ustawień” (17/16/14,5/13,5%).",
+  "minMargin": 0.11,
+  "categoryMarkup": {
+    "case": 0,
+    "cooler": 0,
+    "ram": 0.15,
+    "ssd": 0.15,
+    "service": 0.15
+  },
+  "caseCoolerBuffer": 20,
+  "serviceCost": 150,
+  "serviceCostBreakdown": {
+    "windows": 90,
+    "shippingAndPackaging": 60
+  },
+  "roundingStep": 10,
+  "whiteSurcharge": 300,
+  "levelMarkupByClass": {
+    "FullHD": 0.17,
+    "2K": 0.16,
+    "4K": 0.145,
+    "flagowiec": 0.135
+  },
+  "publishThreshold": 0.03,
+  "autoPublish": false,
+  "priceDate": "2026-10-25"
+}

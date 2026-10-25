@@ -1,0 +1,278 @@
+# CI: every PR to develop/main and every push to them must pass this.
+# Actions are pinned to commit SHAs (tag in the comment); Dependabot keeps them current.
+
+name: CI
+
+on:
+  pull_request:
+    branches: [develop, main]
+  push:
+    branches: [develop, main]
+
+# A newer push to the same branch/PR cancels the older run.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  COREPACK_ENABLE_DOWNLOAD_PROMPT: '0'
+  NEXT_TELEMETRY_DISABLED: '1'
+
+jobs:
+  # Does the PR touch anything besides documentation? A docs-only PR skips build · e2e; pushes to
+  # develop/main always run everything. `docs/design/` is not documentation here: the seed reads
+  # its images. `seed/prokomsoftware/` is not read by code until SW3 — remove it from DOCS_ONLY
+  # then (docs/zadania/prokomsoftware.md, SW3).
+  changes:
+    name: changes
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    outputs:
+      code: ${{ steps.diff.outputs.code }}
+    steps:
+      # The PR's merge commit and its first parent (the current base) are enough for the diff.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 2
+
+      - id: diff
+        env:
+          DOCS_ONLY: '^(docs/|\.claude/|seed/prokomsoftware/)|\.md$'
+          ALWAYS_CODE: '^docs/design/'
+        run: |
+          if [ "${{ github.event_name }}" != "pull_request" ]; then
+            echo "code=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # --no-renames: a file moved from src/ to docs/ also lists its old path.
+          files=$(git diff --no-renames --name-only HEAD^1 HEAD)
+          echo "$files"
+          if [ -n "$files" ] && ! echo "$files" | grep -Ev "$DOCS_ONLY" >/dev/null \
+            && ! echo "$files" | grep -E "$ALWAYS_CODE" >/dev/null; then
+            echo "Only documentation changed: build · e2e skipped."
+            echo "code=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "code=true" >> "$GITHUB_OUTPUT"
+          fi
+
+  # Fast feedback (~1.5 min): most mistakes show up here, next to the slower e2e job.
+  checks:
+    name: lint · typecheck · test
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      DATABASE_URL: postgresql://prokom:prokom@127.0.0.1:5432/prokom_web
+      PANEL_HOST: panel.localhost
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+
+      # pnpm in the exact version from package.json "packageManager".
+      - name: Enable pnpm (Corepack)
+        run: |
+          corepack enable
+          pnpm --version
+          echo "PNPM_STORE=$(pnpm store path --silent)" >> "$GITHUB_ENV"
+
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ env.PNPM_STORE }}
+          key: pnpm-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: pnpm-${{ runner.os }}-
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      # Throwaway secret generated per run, so no secret-looking value lives in the repo.
+      - name: Test-only environment
+        run: |
+          echo "PAYLOAD_SECRET=$(openssl rand -hex 32)" >> "$GITHUB_ENV"
+          echo "SEED_ADMIN_PASSWORD=$(openssl rand -hex 16)" >> "$GITHUB_ENV"
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Format check
+        run: pnpm format:check
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Unit tests
+        run: pnpm test
+
+  e2e:
+    name: build · e2e
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+
+    # Database for the build and Playwright (same version as docker/compose.dev.yml).
+    services:
+      postgres:
+        image: postgres:17.11-alpine
+        env:
+          POSTGRES_USER: prokom
+          POSTGRES_PASSWORD: prokom
+          POSTGRES_DB: prokom_web
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U prokom -d prokom_web"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+      # Catches inquiry e-mails for Playwright (same version as docker/compose.dev.yml).
+      mailpit:
+        image: axllent/mailpit:v1.31.6
+        ports:
+          - 1025:1025
+          - 8025:8025
+
+    env:
+      DATABASE_URL: postgresql://prokom:prokom@127.0.0.1:5432/prokom_web
+      PANEL_HOST: panel.localhost
+      SEED_ADMIN_EMAIL: ci-admin@example.test
+      SMTP_HOST: 127.0.0.1
+      SMTP_PORT: '1025'
+      MAIL_FROM_ADDRESS: formularz@example.test
+      # At most 2 gallery photos per product (384 of 567): e2e needs the first, B6 thumbnails a second.
+      SEED_GALLERY_LIMIT: '2'
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+
+      # pnpm in the exact version from package.json "packageManager".
+      - name: Enable pnpm (Corepack)
+        run: |
+          corepack enable
+          pnpm --version
+          echo "PNPM_STORE=$(pnpm store path --silent)" >> "$GITHUB_ENV"
+
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ env.PNPM_STORE }}
+          key: pnpm-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: pnpm-${{ runner.os }}-
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      # Throwaway secret generated per run, so no secret-looking value lives in the repo.
+      - name: Test-only environment
+        run: |
+          echo "PAYLOAD_SECRET=$(openssl rand -hex 32)" >> "$GITHUB_ENV"
+          echo "SEED_ADMIN_PASSWORD=$(openssl rand -hex 16)" >> "$GITHUB_ENV"
+
+      # ADR-009: push is disabled, so the empty CI database gets its schema from migrations only.
+      - name: Migrate database
+        run: pnpm payload migrate
+
+      # Tenants biznes / instalacje / software on *.localhost — the e2e tests depend on them.
+      - name: Seed database
+        run: pnpm seed
+
+      # Next's build cache: unchanged modules are not compiled again. Restored from the newest
+      # run when the sources changed (the usual case); a stale cache only costs a full build.
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .next/cache
+          key: next-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ hashFiles('src/**', 'next.config.ts') }}
+          restore-keys: next-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-
+
+      - name: Build
+        run: pnpm build
+
+      # Chromium of the pinned Playwright version; system libraries are installed every time.
+      - id: playwright-cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+
+      - name: Install Playwright (Chromium only)
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: pnpm exec playwright install chromium
+
+      # System libraries for Chromium come from apt. The Ubuntu mirror is sometimes very slow
+      # (8–12 min instead of ~12 s), so the downloaded .deb files are cached: apt keeps them in
+      # ~/apt-archives (its own directory, so the runner's clean-up does not delete them) and
+      # installs from disk next time. Killing a slow apt does not help — it keeps the dpkg lock.
+      - id: apt-cache
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/apt-archives
+          key: apt-playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: apt-playwright-${{ runner.os }}-
+
+      - name: Install Playwright system dependencies
+        timeout-minutes: 15
+        run: |
+          mkdir -p ~/apt-archives/partial
+          printf '%s\n' \
+            "Dir::Cache::Archives \"$HOME/apt-archives\";" \
+            'APT::Keep-Downloaded-Packages "true";' \
+            'Acquire::Retries "3";' \
+            | sudo tee /etc/apt/apt.conf.d/99ci >/dev/null
+          pnpm exec playwright install-deps chromium
+          # apt wrote the files as root; the cache step reads them as the runner user.
+          sudo rm -rf ~/apt-archives/partial ~/apt-archives/lock
+          sudo chown -R "$(id -u):$(id -g)" ~/apt-archives
+
+      - if: steps.apt-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/apt-archives
+          key: apt-playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+
+      # On the build above (`pnpm start`, playwright.config.ts): no route compiling on first visit.
+      - name: E2E tests
+        run: pnpm test:e2e
+        env:
+          E2E_SERVER: start
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
+
+  gitleaks:
+    name: gitleaks (secrets)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      GITLEAKS_VERSION: 8.30.1
+      # SHA256 of gitleaks_<version>_linux_x64.tar.gz from the release checksums file.
+      GITLEAKS_SHA256: 551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0 # full history: a secret removed in a later commit is still a leak
+
+      # Binary instead of gitleaks-action: the action needs a paid license for organizations.
+      - name: Install gitleaks
+        run: |
+          archive="gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          curl -sSfL -o "$archive" "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/${archive}"
+          echo "${GITLEAKS_SHA256}  ${archive}" | sha256sum --check --strict
+          tar -xzf "$archive" gitleaks
+          ./gitleaks version
+
+      - name: Scan repository history
+        run: ./gitleaks git --redact --no-banner --verbose .

@@ -1,0 +1,533 @@
+{
+  "_info": "33 gry (kolejność = popularność na stronie). `slug` → /komputer-do/<slug>. `requirements` puste: wymagania producenta uzupełnić ze strony gry z datą (TODO przed publikacją strony gry), bez logotypów i okładek gier.",
+  "items": [
+    {
+      "name": "Counter-Strike 2",
+      "slug": "counter-strike-2",
+      "kind": "esport",
+      "fpsCap": null,
+      "setting": "najwyższe ustawienia, natywnie",
+      "popularRank": 1,
+      "seoPage": true,
+      "requirements": {
+        "min": null,
+        "recommended": null,
+        "max": null,
+        "source": null,
+        "checkedAt": null
+      }
+    },
+    {
+      "name": "Fortnite",
+      "slug": "fortnite",
+      "kind": "esport",
+      "fpsCap": null,
+      "setting": "szacunek",
+      "popularRank": 2,
+      "seoPage": true,
+      "requirements": {
+        "min": null,
+        "recommended": null,
+        "max": null,
+        "source": null,
+        "checkedAt": null
+      }
+    },
+    {
+      "name": "Valorant",
+      "slug": "valorant",
+      "kind": "esport",
+      "fpsCap": null,
+      "setting": "szacunek",
+      "popularRank": 3,
+      "seoPage": true,
+      "requirements": {
+        "min": null,
+        "recommended": null,
+        "max": null,
+        "source": null,
+        "checkedAt": null
+      }
+    },
+    {
+      "name": "League of Legends",
+      "slug": "league-of-legends",
+      "kind": "esport",
+      "fpsCap": null,
+      "setting": "szacunek",
+      "popularRank": 4,
+      "seoPage": true,
+      "requirements": {
+        "min": null,
+        "recommended": null,
+        "max": null,
+        "source": null,
+        "checkedAt": null
+      }
+    },
+    {
+      "name": "Minecraft",
+      "slug": "minecraft",
+      "kind": "esport",
+      "fpsCap": null,
+      "setting": "szacunek",
+      "popularRank": 5,
+      "seoPage": true,
+      "requirements": {
+        "min": null,
+        "recommended": null,
+        "max": null,
+        "source": null,
+        "checkedAt": null
+      }
+    },
+    {
+      "name": "Roblox",
+      "slug": "roblox",
+      "kind": "esport",
+      "fpsCap": null,
+      "setting": "szacunek",
+      "popularRank": 6,
+      "seoPage": true,
+      "requirements": {
+        "min": null,
+        "recommended": null,
+        "max": null,
+        "source": null,
+        "checkedAt": null
+      }
+    },
+    {
+      "name": "Apex Legends",
+      "slug": "apex-legends",
+      "kind": "esport",
+      "fpsCap": null,
+      "setting": "szacunek",
+      "popularRank": 7,
+      "seoPage": true,
+      "requirements": {
+        "min": null,
+        "recommended": null,
+        "max": null,
+        "source": null,
+        "checkedAt": null
+      }
+    },
+    {
+      "name": "PUBG",
+      "slug": "pubg",
+      "kind": "esport",
+      "fpsCap": null,
+      "setting": "szacunek",
+      "popularRank": 8,
+      "seoPage": true,
+      "requirements": {
+        "min": null,
+        "recommended": null,
+        "max": null,
+        "source": null,
+        "checkedAt": null
+      }
+    },
+    {
+      "name": "Call of Duty: Warzone",
+      "slug": "call-of-duty-warzone",
+      "kind": "aaa",
+      "fpsCap": null,
+      "setting": "Extreme, natywnie (Black Ops 7)",
+      "popularRank": 9,
+      "seoPage": true,
+      "requirements": {
+        "min": null,
+        "recommended": null,
+        "max": null,
+        "source": null,
+        "checkedAt": null
+      }
+    },
+    {
+      "name": "Battlefield 6",
+      "slug": "battlefield-6",
+      "kind": "aaa",
+      "fpsCap": null,
+      "setting": "Overkill, natywnie",
+      "popularRank": 10,
+      "seoPage": true,
+      "requirements": {
+        "min": null,
+        "recommended": null,
+        "max": null,
+        "source": null,
+        "checkedAt": null
+      }
+    },
+    {
+      "name": "ARC Raiders",
+      "slug": "arc-raiders",
+      "kind": "aaa",
+      "fpsCap": null,
+      "setting": "Epic, natywnie (bez RT)",
+      "popularRank": 11,
+      "seoPage": true,
+      "requirements": {
+        "min": null,
+        "recommended": null,
+        "max": null,
+        "source": null,
+        "checkedAt": null
+      }
+    },
+    {
+      "name": "EA Sports FC 27",
+      "slug": "ea-sports-fc-27",
+      "kind": "esport",
+      "fpsCap": null,
+      "setting": "szacunek",
+      "popularRank": 12,
+      "seoPage": true,
+      "requirements": {
+        "min": null,
+        "recommended": null,
+        "max": null,
+        "source": null,
+        "checkedAt": null
+      }
+    },
+    {
+      "name": "Rust",
+      "slug": "rust",
+      "kind": "aaa",
+      "fpsCap": null,
+      "setting": "szacunek",
+      "popularRank": 13,
+      "seoPage": true,
+      "requirements": {
+        "min": null,
+        "recommended": null,
+        "max": null,
+        "source": null,
+        "checkedAt": null
+      }
+    },
+    {
+      "name": "GTA V",
+      "slug": "gta-v",
+      "kind": "aaa",
+      "fpsCap": null,
+      "setting": "szacunek",
+      "popularRank": 14,
+      "seoPage": true,
+      "requirements": {
+        "min": null,
+        "recommended": null,
+        "max": null,
+        "source": null,
+        "checkedAt": null
+      }
+    },
+    {
+      "name": "Red Dead Redemption 2",
+      "slug": "red-dead-redemption-2",
+      "kind": "aaa",
+      "fpsCap": null,
+      "setting": "Ultra",
+      "popularRank": 15,
+      "seoPage": true,
+      "requirements": {
+        "min": null,
+        "recommended": null,
+        "max": null,
+        "source": null,
+        "checkedAt": null
+      }
+    },
+    {
+      "name": "Wiedźmin 3",
+      "slug": "wiedzmin-3",
+      "kind": "aaa",
+      "fpsCap": null,
+      "setting": "najwyższe ustawienia, natywnie",
+      "popularRank": 16,
+      "seoPage": true,
+      "requirements": {
+        "min": null,
+        "recommended": null,
+        "max": null,
+        "source": null,
+        "checkedAt": null
+      }
+    },
+    {
+      "name": "The Blood of Dawnwalker",
+      "slug": "the-blood-of-dawnwalker",
+      "kind": "aaa",
+      "fpsCap": null,
+      "setting": "Ultra, natywnie",
+      "popularRank": 17,
+      "seoPage": true,
+      "requirements": {
+        "min": null,
+        "recommended": null,
+        "max": null,
+        "source": null,
+        "checkedAt": null
+      }
+    },
+    {
+      "name": "Gothic 1 Remake",
+      "slug": "gothic-1-remake",
+      "kind": "aaa",
+      "fpsCap": null,
+      "setting": "bardzo wysokie, z DLSS/FSR Balanced",
+      "popularRank": 18,
+      "seoPage": true,
+      "requirements": {
+        "min": null,
+        "recommended": null,
+        "max": null,
+        "source": null,
+        "checkedAt": null
+      }
+    },
+    {
+      "name": "God of War Ragnarök",
+      "slug": "god-of-war-ragnarok",
+      "kind": "aaa",
+      "fpsCap": null,
+      "setting": "najwyższe ustawienia, natywnie",
+      "popularRank": 19,
+      "seoPage": true,
+      "requirements": {
+        "min": null,
+        "recommended": null,
+        "max": null,
+        "source": null,
+        "checkedAt": null
+      }
+    },
+    {
+      "name": "007 First Light",
+      "slug": "007-first-light",
+      "kind": "aaa",
+      "fpsCap": null,
+      "setting": "Ultra, natywnie",
+      "popularRank": 20,
+      "seoPage": true,
+      "requirements": {
+        "min": null,
+        "recommended": null,
+        "max": null,
+        "source": null,
+        "checkedAt": null
+      }
+    },
+    {
+      "name": "Black Myth: Wukong",
+      "slug": "black-myth-wukong",
+      "kind": "aaa",
+      "fpsCap": null,
+      "setting": "najwyższe ustawienia, natywnie",
+      "popularRank": 21,
+      "seoPage": true,
+      "requirements": {
+        "min": null,
+        "recommended": null,
+        "max": null,
+        "source": null,
+        "checkedAt": null
+      }
+    },
+    {
+      "name": "Assassin's Creed Shadows",
+      "slug": "assassins-creed-shadows",
+      "kind": "aaa",
+      "fpsCap": null,
+      "setting": "najwyższe ustawienia, natywnie",
+      "popularRank": 22,
+      "seoPage": true,
+      "requirements": {
+        "min": null,
+        "recommended": null,
+        "max": null,
+        "source": null,
+        "checkedAt": null
+      }
+    },
+    {
+      "name": "Kingdom Come II",
+      "slug": "kingdom-come-ii",
+      "kind": "aaa",
+      "fpsCap": null,
+      "setting": "najwyższe ustawienia, natywnie",
+      "popularRank": 23,
+      "seoPage": true,
+      "requirements": {
+        "min": null,
+        "recommended": null,
+        "max": null,
+        "source": null,
+        "checkedAt": null
+      }
+    },
+    {
+      "name": "Expedition 33",
+      "slug": "expedition-33",
+      "kind": "aaa",
+      "fpsCap": null,
+      "setting": "Epic, natywnie",
+      "popularRank": 24,
+      "seoPage": true,
+      "requirements": {
+        "min": null,
+        "recommended": null,
+        "max": null,
+        "source": null,
+        "checkedAt": null
+      }
+    },
+    {
+      "name": "Death Stranding 2",
+      "slug": "death-stranding-2",
+      "kind": "aaa",
+      "fpsCap": null,
+      "setting": "najwyższe ustawienia, natywnie",
+      "popularRank": 25,
+      "seoPage": true,
+      "requirements": {
+        "min": null,
+        "recommended": null,
+        "max": null,
+        "source": null,
+        "checkedAt": null
+      }
+    },
+    {
+      "name": "S.T.A.L.K.E.R. 2",
+      "slug": "stalker-2",
+      "kind": "aaa",
+      "fpsCap": null,
+      "setting": "najwyższe ustawienia, natywnie",
+      "popularRank": 26,
+      "seoPage": true,
+      "requirements": {
+        "min": null,
+        "recommended": null,
+        "max": null,
+        "source": null,
+        "checkedAt": null
+      }
+    },
+    {
+      "name": "Resident Evil Requiem",
+      "slug": "resident-evil-requiem",
+      "kind": "aaa",
+      "fpsCap": null,
+      "setting": "Max, natywnie",
+      "popularRank": 27,
+      "seoPage": true,
+      "requirements": {
+        "min": null,
+        "recommended": null,
+        "max": null,
+        "source": null,
+        "checkedAt": null
+      }
+    },
+    {
+      "name": "Elden Ring",
+      "slug": "elden-ring",
+      "kind": "capped",
+      "fpsCap": 60,
+      "setting": "najwyższe ustawienia, natywnie",
+      "popularRank": 28,
+      "seoPage": true,
+      "requirements": {
+        "min": null,
+        "recommended": null,
+        "max": null,
+        "source": null,
+        "checkedAt": null
+      }
+    },
+    {
+      "name": "Baldur's Gate 3",
+      "slug": "baldurs-gate-3",
+      "kind": "aaa",
+      "fpsCap": null,
+      "setting": "najwyższe ustawienia, natywnie",
+      "popularRank": 29,
+      "seoPage": true,
+      "requirements": {
+        "min": null,
+        "recommended": null,
+        "max": null,
+        "source": null,
+        "checkedAt": null
+      }
+    },
+    {
+      "name": "Spider-Man 2",
+      "slug": "spider-man-2",
+      "kind": "aaa",
+      "fpsCap": null,
+      "setting": "najwyższe ustawienia, natywnie",
+      "popularRank": 30,
+      "seoPage": true,
+      "requirements": {
+        "min": null,
+        "recommended": null,
+        "max": null,
+        "source": null,
+        "checkedAt": null
+      }
+    },
+    {
+      "name": "Dziedzictwo Hogwartu",
+      "slug": "dziedzictwo-hogwartu",
+      "kind": "aaa",
+      "fpsCap": null,
+      "setting": "najwyższe ustawienia, natywnie",
+      "popularRank": 31,
+      "seoPage": true,
+      "requirements": {
+        "min": null,
+        "recommended": null,
+        "max": null,
+        "source": null,
+        "checkedAt": null
+      }
+    },
+    {
+      "name": "Horizon Forbidden West",
+      "slug": "horizon-forbidden-west",
+      "kind": "aaa",
+      "fpsCap": null,
+      "setting": "najwyższe ustawienia, natywnie",
+      "popularRank": 32,
+      "seoPage": true,
+      "requirements": {
+        "min": null,
+        "recommended": null,
+        "max": null,
+        "source": null,
+        "checkedAt": null
+      }
+    },
+    {
+      "name": "Cyberpunk 2077",
+      "slug": "cyberpunk-2077",
+      "kind": "aaa",
+      "fpsCap": null,
+      "setting": "najwyższe ustawienia, natywnie",
+      "popularRank": 33,
+      "seoPage": true,
+      "requirements": {
+        "min": null,
+        "recommended": null,
+        "max": null,
+        "source": null,
+        "checkedAt": null
+      }
+    }
+  ]
+}

@@ -1,0 +1,4789 @@
+{
+  "_info": "Klatki: { <build_slug>: { <gra>: { v: [FullHD, 2K, 4K], k: \"mmr\" (rodzaj każdej liczby: m test niezależny, r przeliczone z testów, e szacunek, p zmierzone w PRO-KOM), s: ustawienia } } }. Źródła każdej liczby: fps-sources.json. ADR-G004.",
+  "results": {
+    "skrzat": {
+      "Counter-Strike 2": {
+        "v": [
+          167,
+          105,
+          52
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Call of Duty: Warzone": {
+        "v": [
+          77,
+          67,
+          36
+        ],
+        "k": "rrr",
+        "s": "Extreme, natywnie (Black Ops 7)"
+      },
+      "Battlefield 6": {
+        "v": [
+          50,
+          34,
+          16
+        ],
+        "k": "mmm",
+        "s": "Overkill, natywnie"
+      },
+      "ARC Raiders": {
+        "v": [
+          64,
+          45,
+          21
+        ],
+        "k": "rmr",
+        "s": "Epic, natywnie (bez RT)"
+      },
+      "Red Dead Redemption 2": {
+        "v": [
+          75,
+          52,
+          26
+        ],
+        "k": "eee",
+        "s": "Ultra"
+      },
+      "Wiedźmin 3": {
+        "v": [
+          133,
+          96,
+          51
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "The Blood of Dawnwalker": {
+        "v": [
+          27,
+          19,
+          10
+        ],
+        "k": "eee",
+        "s": "Ultra, natywnie"
+      },
+      "Gothic 1 Remake": {
+        "v": [
+          70,
+          49,
+          21
+        ],
+        "k": "rmr",
+        "s": "bardzo wysokie, z DLSS/FSR Balanced"
+      },
+      "God of War Ragnarök": {
+        "v": [
+          57,
+          44,
+          22
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "007 First Light": {
+        "v": [
+          56,
+          33,
+          16
+        ],
+        "k": "mmm",
+        "s": "Ultra, natywnie"
+      },
+      "Black Myth: Wukong": {
+        "v": [
+          25,
+          18,
+          5
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Assassin's Creed Shadows": {
+        "v": [
+          36,
+          29,
+          19
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Kingdom Come II": {
+        "v": [
+          66,
+          44,
+          23
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Expedition 33": {
+        "v": [
+          35,
+          21,
+          16
+        ],
+        "k": "mmm",
+        "s": "Epic, natywnie"
+      },
+      "Death Stranding 2": {
+        "v": [
+          50,
+          35,
+          18
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "S.T.A.L.K.E.R. 2": {
+        "v": [
+          42,
+          30,
+          5
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Resident Evil Requiem": {
+        "v": [
+          80,
+          50,
+          22
+        ],
+        "k": "mmm",
+        "s": "Max, natywnie"
+      },
+      "Elden Ring": {
+        "v": [
+          60,
+          60,
+          34
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Baldur's Gate 3": {
+        "v": [
+          77,
+          69,
+          35
+        ],
+        "k": "rmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Spider-Man 2": {
+        "v": [
+          52,
+          34,
+          18
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Dziedzictwo Hogwartu": {
+        "v": [
+          57,
+          40,
+          22
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Horizon Forbidden West": {
+        "v": [
+          62,
+          46,
+          26
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Cyberpunk 2077": {
+        "v": [
+          79,
+          50,
+          22
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Fortnite": {
+        "v": [
+          100,
+          80,
+          60
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Valorant": {
+        "v": [
+          260,
+          210,
+          155
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "League of Legends": {
+        "v": [
+          220,
+          180,
+          130
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Minecraft": {
+        "v": [
+          150,
+          125,
+          90
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Roblox": {
+        "v": [
+          170,
+          140,
+          105
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Apex Legends": {
+        "v": [
+          115,
+          95,
+          70
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "PUBG": {
+        "v": [
+          105,
+          90,
+          65
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "EA Sports FC 27": {
+        "v": [
+          115,
+          95,
+          70
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Rust": {
+        "v": [
+          70,
+          45,
+          25
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "GTA V": {
+        "v": [
+          95,
+          65,
+          35
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      }
+    },
+    "licho": {
+      "Counter-Strike 2": {
+        "v": [
+          279,
+          189,
+          98
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Call of Duty: Warzone": {
+        "v": [
+          96,
+          94,
+          51
+        ],
+        "k": "rrr",
+        "s": "Extreme, natywnie (Black Ops 7)"
+      },
+      "Battlefield 6": {
+        "v": [
+          73,
+          49,
+          24
+        ],
+        "k": "mmm",
+        "s": "Overkill, natywnie"
+      },
+      "ARC Raiders": {
+        "v": [
+          89,
+          62,
+          31
+        ],
+        "k": "rrr",
+        "s": "Epic, natywnie (bez RT)"
+      },
+      "Red Dead Redemption 2": {
+        "v": [
+          116,
+          81,
+          40
+        ],
+        "k": "eee",
+        "s": "Ultra"
+      },
+      "Wiedźmin 3": {
+        "v": [
+          177,
+          132,
+          75
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "The Blood of Dawnwalker": {
+        "v": [
+          37,
+          26,
+          15
+        ],
+        "k": "eee",
+        "s": "Ultra, natywnie"
+      },
+      "Gothic 1 Remake": {
+        "v": [
+          84,
+          59,
+          32
+        ],
+        "k": "rmr",
+        "s": "bardzo wysokie, z DLSS/FSR Balanced"
+      },
+      "God of War Ragnarök": {
+        "v": [
+          85,
+          66,
+          39
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "007 First Light": {
+        "v": [
+          72,
+          47,
+          20
+        ],
+        "k": "mmm",
+        "s": "Ultra, natywnie"
+      },
+      "Black Myth: Wukong": {
+        "v": [
+          36,
+          27,
+          9
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Assassin's Creed Shadows": {
+        "v": [
+          37,
+          31,
+          20
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Kingdom Come II": {
+        "v": [
+          95,
+          63,
+          32
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Expedition 33": {
+        "v": [
+          47,
+          30,
+          21
+        ],
+        "k": "rrr",
+        "s": "Epic, natywnie"
+      },
+      "Death Stranding 2": {
+        "v": [
+          72,
+          52,
+          25
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "S.T.A.L.K.E.R. 2": {
+        "v": [
+          62,
+          44,
+          4
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Resident Evil Requiem": {
+        "v": [
+          109,
+          75,
+          36
+        ],
+        "k": "mmm",
+        "s": "Max, natywnie"
+      },
+      "Elden Ring": {
+        "v": [
+          60,
+          60,
+          56
+        ],
+        "k": "rmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Baldur's Gate 3": {
+        "v": [
+          97,
+          88,
+          46
+        ],
+        "k": "rmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Spider-Man 2": {
+        "v": [
+          82,
+          52,
+          21
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Dziedzictwo Hogwartu": {
+        "v": [
+          74,
+          51,
+          30
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Horizon Forbidden West": {
+        "v": [
+          84,
+          62,
+          37
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Cyberpunk 2077": {
+        "v": [
+          102,
+          62,
+          28
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Fortnite": {
+        "v": [
+          125,
+          105,
+          75
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Valorant": {
+        "v": [
+          330,
+          270,
+          195
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "League of Legends": {
+        "v": [
+          280,
+          230,
+          170
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Minecraft": {
+        "v": [
+          195,
+          160,
+          115
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Roblox": {
+        "v": [
+          220,
+          180,
+          130
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Apex Legends": {
+        "v": [
+          145,
+          120,
+          85
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "PUBG": {
+        "v": [
+          135,
+          110,
+          80
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "EA Sports FC 27": {
+        "v": [
+          145,
+          120,
+          85
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Rust": {
+        "v": [
+          95,
+          65,
+          40
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "GTA V": {
+        "v": [
+          130,
+          90,
+          55
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      }
+    },
+    "bies": {
+      "Counter-Strike 2": {
+        "v": [
+          279,
+          189,
+          98
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Call of Duty: Warzone": {
+        "v": [
+          96,
+          94,
+          51
+        ],
+        "k": "rrr",
+        "s": "Extreme, natywnie (Black Ops 7)"
+      },
+      "Battlefield 6": {
+        "v": [
+          73,
+          49,
+          24
+        ],
+        "k": "mmm",
+        "s": "Overkill, natywnie"
+      },
+      "ARC Raiders": {
+        "v": [
+          89,
+          62,
+          31
+        ],
+        "k": "rrr",
+        "s": "Epic, natywnie (bez RT)"
+      },
+      "Red Dead Redemption 2": {
+        "v": [
+          116,
+          81,
+          40
+        ],
+        "k": "eee",
+        "s": "Ultra"
+      },
+      "Wiedźmin 3": {
+        "v": [
+          177,
+          132,
+          75
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "The Blood of Dawnwalker": {
+        "v": [
+          37,
+          26,
+          15
+        ],
+        "k": "eee",
+        "s": "Ultra, natywnie"
+      },
+      "Gothic 1 Remake": {
+        "v": [
+          84,
+          59,
+          32
+        ],
+        "k": "rmr",
+        "s": "bardzo wysokie, z DLSS/FSR Balanced"
+      },
+      "God of War Ragnarök": {
+        "v": [
+          85,
+          66,
+          39
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "007 First Light": {
+        "v": [
+          72,
+          47,
+          20
+        ],
+        "k": "mmm",
+        "s": "Ultra, natywnie"
+      },
+      "Black Myth: Wukong": {
+        "v": [
+          36,
+          27,
+          9
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Assassin's Creed Shadows": {
+        "v": [
+          37,
+          31,
+          20
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Kingdom Come II": {
+        "v": [
+          95,
+          63,
+          32
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Expedition 33": {
+        "v": [
+          47,
+          30,
+          21
+        ],
+        "k": "rrr",
+        "s": "Epic, natywnie"
+      },
+      "Death Stranding 2": {
+        "v": [
+          72,
+          52,
+          25
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "S.T.A.L.K.E.R. 2": {
+        "v": [
+          62,
+          44,
+          4
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Resident Evil Requiem": {
+        "v": [
+          109,
+          75,
+          36
+        ],
+        "k": "mmm",
+        "s": "Max, natywnie"
+      },
+      "Elden Ring": {
+        "v": [
+          60,
+          60,
+          56
+        ],
+        "k": "rmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Baldur's Gate 3": {
+        "v": [
+          117,
+          88,
+          46
+        ],
+        "k": "rmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Spider-Man 2": {
+        "v": [
+          82,
+          52,
+          21
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Dziedzictwo Hogwartu": {
+        "v": [
+          74,
+          51,
+          30
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Horizon Forbidden West": {
+        "v": [
+          84,
+          62,
+          37
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Cyberpunk 2077": {
+        "v": [
+          102,
+          62,
+          28
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Fortnite": {
+        "v": [
+          150,
+          125,
+          90
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Valorant": {
+        "v": [
+          395,
+          325,
+          235
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "League of Legends": {
+        "v": [
+          335,
+          275,
+          200
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Minecraft": {
+        "v": [
+          230,
+          190,
+          140
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Roblox": {
+        "v": [
+          260,
+          215,
+          160
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Apex Legends": {
+        "v": [
+          175,
+          140,
+          105
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "PUBG": {
+        "v": [
+          165,
+          135,
+          100
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "EA Sports FC 27": {
+        "v": [
+          175,
+          140,
+          105
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Rust": {
+        "v": [
+          95,
+          65,
+          40
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "GTA V": {
+        "v": [
+          130,
+          90,
+          55
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      }
+    },
+    "wodnik": {
+      "Counter-Strike 2": {
+        "v": [
+          279,
+          189,
+          98
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Call of Duty: Warzone": {
+        "v": [
+          96,
+          94,
+          51
+        ],
+        "k": "rrr",
+        "s": "Extreme, natywnie (Black Ops 7)"
+      },
+      "Battlefield 6": {
+        "v": [
+          73,
+          49,
+          24
+        ],
+        "k": "mmm",
+        "s": "Overkill, natywnie"
+      },
+      "ARC Raiders": {
+        "v": [
+          89,
+          62,
+          31
+        ],
+        "k": "rrr",
+        "s": "Epic, natywnie (bez RT)"
+      },
+      "Red Dead Redemption 2": {
+        "v": [
+          116,
+          81,
+          40
+        ],
+        "k": "eee",
+        "s": "Ultra"
+      },
+      "Wiedźmin 3": {
+        "v": [
+          177,
+          132,
+          75
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "The Blood of Dawnwalker": {
+        "v": [
+          37,
+          26,
+          15
+        ],
+        "k": "eee",
+        "s": "Ultra, natywnie"
+      },
+      "Gothic 1 Remake": {
+        "v": [
+          84,
+          59,
+          32
+        ],
+        "k": "rmr",
+        "s": "bardzo wysokie, z DLSS/FSR Balanced"
+      },
+      "God of War Ragnarök": {
+        "v": [
+          85,
+          66,
+          39
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "007 First Light": {
+        "v": [
+          72,
+          47,
+          20
+        ],
+        "k": "mmm",
+        "s": "Ultra, natywnie"
+      },
+      "Black Myth: Wukong": {
+        "v": [
+          36,
+          27,
+          9
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Assassin's Creed Shadows": {
+        "v": [
+          37,
+          31,
+          20
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Kingdom Come II": {
+        "v": [
+          95,
+          63,
+          32
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Expedition 33": {
+        "v": [
+          47,
+          30,
+          21
+        ],
+        "k": "rrr",
+        "s": "Epic, natywnie"
+      },
+      "Death Stranding 2": {
+        "v": [
+          72,
+          52,
+          25
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "S.T.A.L.K.E.R. 2": {
+        "v": [
+          62,
+          44,
+          4
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Resident Evil Requiem": {
+        "v": [
+          109,
+          75,
+          36
+        ],
+        "k": "mmm",
+        "s": "Max, natywnie"
+      },
+      "Elden Ring": {
+        "v": [
+          60,
+          60,
+          56
+        ],
+        "k": "rmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Baldur's Gate 3": {
+        "v": [
+          97,
+          88,
+          46
+        ],
+        "k": "rmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Spider-Man 2": {
+        "v": [
+          82,
+          52,
+          21
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Dziedzictwo Hogwartu": {
+        "v": [
+          74,
+          51,
+          30
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Horizon Forbidden West": {
+        "v": [
+          84,
+          62,
+          37
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Cyberpunk 2077": {
+        "v": [
+          102,
+          62,
+          28
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Fortnite": {
+        "v": [
+          130,
+          110,
+          80
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Valorant": {
+        "v": [
+          345,
+          285,
+          210
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "League of Legends": {
+        "v": [
+          295,
+          245,
+          180
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Minecraft": {
+        "v": [
+          205,
+          165,
+          120
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Roblox": {
+        "v": [
+          230,
+          190,
+          140
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Apex Legends": {
+        "v": [
+          155,
+          125,
+          90
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "PUBG": {
+        "v": [
+          145,
+          120,
+          85
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "EA Sports FC 27": {
+        "v": [
+          155,
+          125,
+          90
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Rust": {
+        "v": [
+          95,
+          65,
+          40
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "GTA V": {
+        "v": [
+          130,
+          90,
+          55
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      }
+    },
+    "strzyga": {
+      "Counter-Strike 2": {
+        "v": [
+          307,
+          195,
+          91
+        ],
+        "k": "rrr",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Call of Duty: Warzone": {
+        "v": [
+          152,
+          137,
+          82
+        ],
+        "k": "rrr",
+        "s": "Extreme, natywnie (Black Ops 7)"
+      },
+      "Battlefield 6": {
+        "v": [
+          90,
+          65,
+          36
+        ],
+        "k": "rrr",
+        "s": "Overkill, natywnie"
+      },
+      "ARC Raiders": {
+        "v": [
+          109,
+          83,
+          46
+        ],
+        "k": "rmm",
+        "s": "Epic, natywnie (bez RT)"
+      },
+      "Red Dead Redemption 2": {
+        "v": [
+          136,
+          103,
+          60
+        ],
+        "k": "eee",
+        "s": "Ultra"
+      },
+      "Wiedźmin 3": {
+        "v": [
+          237,
+          178,
+          100
+        ],
+        "k": "rrr",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "The Blood of Dawnwalker": {
+        "v": [
+          53,
+          40,
+          23
+        ],
+        "k": "mre",
+        "s": "Ultra, natywnie"
+      },
+      "Gothic 1 Remake": {
+        "v": [
+          110,
+          83,
+          50
+        ],
+        "k": "rmm",
+        "s": "bardzo wysokie, z DLSS/FSR Balanced"
+      },
+      "God of War Ragnarök": {
+        "v": [
+          122,
+          98,
+          63
+        ],
+        "k": "rrr",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "007 First Light": {
+        "v": [
+          109,
+          75,
+          38
+        ],
+        "k": "rrr",
+        "s": "Ultra, natywnie"
+      },
+      "Black Myth: Wukong": {
+        "v": [
+          50,
+          39,
+          23
+        ],
+        "k": "rrr",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Assassin's Creed Shadows": {
+        "v": [
+          60,
+          50,
+          35
+        ],
+        "k": "rrr",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Kingdom Come II": {
+        "v": [
+          126,
+          90,
+          50
+        ],
+        "k": "rrr",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Expedition 33": {
+        "v": [
+          68,
+          43,
+          32
+        ],
+        "k": "rrr",
+        "s": "Epic, natywnie"
+      },
+      "Death Stranding 2": {
+        "v": [
+          110,
+          82,
+          50
+        ],
+        "k": "rrr",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "S.T.A.L.K.E.R. 2": {
+        "v": [
+          71,
+          52,
+          30
+        ],
+        "k": "rrr",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Resident Evil Requiem": {
+        "v": [
+          168,
+          116,
+          60
+        ],
+        "k": "rrr",
+        "s": "Max, natywnie"
+      },
+      "Elden Ring": {
+        "v": [
+          60,
+          60,
+          58
+        ],
+        "k": "rrr",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Baldur's Gate 3": {
+        "v": [
+          117,
+          117,
+          70
+        ],
+        "k": "rrr",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Spider-Man 2": {
+        "v": [
+          134,
+          95,
+          52
+        ],
+        "k": "rrr",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Dziedzictwo Hogwartu": {
+        "v": [
+          101,
+          76,
+          42
+        ],
+        "k": "rrr",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Horizon Forbidden West": {
+        "v": [
+          120,
+          92,
+          57
+        ],
+        "k": "rrr",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Cyberpunk 2077": {
+        "v": [
+          150,
+          99,
+          48
+        ],
+        "k": "rrr",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Fortnite": {
+        "v": [
+          150,
+          125,
+          90
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Valorant": {
+        "v": [
+          395,
+          325,
+          235
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "League of Legends": {
+        "v": [
+          335,
+          275,
+          200
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Minecraft": {
+        "v": [
+          230,
+          190,
+          140
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Roblox": {
+        "v": [
+          260,
+          215,
+          160
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Apex Legends": {
+        "v": [
+          175,
+          140,
+          105
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "PUBG": {
+        "v": [
+          165,
+          135,
+          100
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "EA Sports FC 27": {
+        "v": [
+          175,
+          140,
+          105
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Rust": {
+        "v": [
+          135,
+          100,
+          60
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "GTA V": {
+        "v": [
+          185,
+          135,
+          85
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      }
+    },
+    "kikimora": {
+      "Counter-Strike 2": {
+        "v": [
+          432,
+          292,
+          157
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Call of Duty: Warzone": {
+        "v": [
+          150,
+          140,
+          84
+        ],
+        "k": "rrr",
+        "s": "Extreme, natywnie (Black Ops 7)"
+      },
+      "Battlefield 6": {
+        "v": [
+          112,
+          78,
+          43
+        ],
+        "k": "mmm",
+        "s": "Overkill, natywnie"
+      },
+      "ARC Raiders": {
+        "v": [
+          142,
+          107,
+          57
+        ],
+        "k": "rmm",
+        "s": "Epic, natywnie (bez RT)"
+      },
+      "Red Dead Redemption 2": {
+        "v": [
+          155,
+          116,
+          68
+        ],
+        "k": "eee",
+        "s": "Ultra"
+      },
+      "Wiedźmin 3": {
+        "v": [
+          291,
+          224,
+          128
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "The Blood of Dawnwalker": {
+        "v": [
+          57,
+          43,
+          26
+        ],
+        "k": "eee",
+        "s": "Ultra, natywnie"
+      },
+      "Gothic 1 Remake": {
+        "v": [
+          108,
+          81,
+          54
+        ],
+        "k": "rmm",
+        "s": "bardzo wysokie, z DLSS/FSR Balanced"
+      },
+      "God of War Ragnarök": {
+        "v": [
+          131,
+          106,
+          67
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "007 First Light": {
+        "v": [
+          104,
+          74,
+          38
+        ],
+        "k": "mmm",
+        "s": "Ultra, natywnie"
+      },
+      "Black Myth: Wukong": {
+        "v": [
+          55,
+          43,
+          26
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Assassin's Creed Shadows": {
+        "v": [
+          61,
+          48,
+          33
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Kingdom Come II": {
+        "v": [
+          144,
+          102,
+          54
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Expedition 33": {
+        "v": [
+          71,
+          45,
+          35
+        ],
+        "k": "mrm",
+        "s": "Epic, natywnie"
+      },
+      "Death Stranding 2": {
+        "v": [
+          111,
+          84,
+          50
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "S.T.A.L.K.E.R. 2": {
+        "v": [
+          88,
+          67,
+          39
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Resident Evil Requiem": {
+        "v": [
+          162,
+          114,
+          61
+        ],
+        "k": "mmm",
+        "s": "Max, natywnie"
+      },
+      "Elden Ring": {
+        "v": [
+          60,
+          60,
+          60
+        ],
+        "k": "rrm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Baldur's Gate 3": {
+        "v": [
+          117,
+          117,
+          77
+        ],
+        "k": "rrm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Spider-Man 2": {
+        "v": [
+          134,
+          96,
+          53
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Dziedzictwo Hogwartu": {
+        "v": [
+          118,
+          85,
+          49
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Horizon Forbidden West": {
+        "v": [
+          126,
+          99,
+          60
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Cyberpunk 2077": {
+        "v": [
+          160,
+          105,
+          50
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Fortnite": {
+        "v": [
+          150,
+          125,
+          90
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Valorant": {
+        "v": [
+          395,
+          325,
+          235
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "League of Legends": {
+        "v": [
+          335,
+          275,
+          200
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Minecraft": {
+        "v": [
+          230,
+          190,
+          140
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Roblox": {
+        "v": [
+          260,
+          215,
+          160
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Apex Legends": {
+        "v": [
+          175,
+          140,
+          105
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "PUBG": {
+        "v": [
+          165,
+          135,
+          100
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "EA Sports FC 27": {
+        "v": [
+          175,
+          140,
+          105
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Rust": {
+        "v": [
+          145,
+          105,
+          70
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "GTA V": {
+        "v": [
+          200,
+          145,
+          95
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      }
+    },
+    "zmora": {
+      "Counter-Strike 2": {
+        "v": [
+          379,
+          252,
+          120
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Call of Duty: Warzone": {
+        "v": [
+          176,
+          162,
+          98
+        ],
+        "k": "rrr",
+        "s": "Extreme, natywnie (Black Ops 7)"
+      },
+      "Battlefield 6": {
+        "v": [
+          109,
+          80,
+          44
+        ],
+        "k": "mmm",
+        "s": "Overkill, natywnie"
+      },
+      "ARC Raiders": {
+        "v": [
+          132,
+          100,
+          56
+        ],
+        "k": "rmm",
+        "s": "Epic, natywnie (bez RT)"
+      },
+      "Red Dead Redemption 2": {
+        "v": [
+          168,
+          127,
+          75
+        ],
+        "k": "eee",
+        "s": "Ultra"
+      },
+      "Wiedźmin 3": {
+        "v": [
+          274,
+          214,
+          125
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "The Blood of Dawnwalker": {
+        "v": [
+          61,
+          47,
+          28
+        ],
+        "k": "eee",
+        "s": "Ultra, natywnie"
+      },
+      "Gothic 1 Remake": {
+        "v": [
+          126,
+          95,
+          60
+        ],
+        "k": "rmm",
+        "s": "bardzo wysokie, z DLSS/FSR Balanced"
+      },
+      "God of War Ragnarök": {
+        "v": [
+          145,
+          118,
+          74
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "007 First Light": {
+        "v": [
+          126,
+          89,
+          47
+        ],
+        "k": "mmm",
+        "s": "Ultra, natywnie"
+      },
+      "Black Myth: Wukong": {
+        "v": [
+          58,
+          45,
+          27
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Assassin's Creed Shadows": {
+        "v": [
+          70,
+          62,
+          44
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Kingdom Come II": {
+        "v": [
+          140,
+          102,
+          56
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Expedition 33": {
+        "v": [
+          76,
+          51,
+          38
+        ],
+        "k": "mmm",
+        "s": "Epic, natywnie"
+      },
+      "Death Stranding 2": {
+        "v": [
+          121,
+          94,
+          59
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "S.T.A.L.K.E.R. 2": {
+        "v": [
+          86,
+          65,
+          38
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Resident Evil Requiem": {
+        "v": [
+          204,
+          142,
+          76
+        ],
+        "k": "mmm",
+        "s": "Max, natywnie"
+      },
+      "Elden Ring": {
+        "v": [
+          60,
+          60,
+          60
+        ],
+        "k": "rmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Baldur's Gate 3": {
+        "v": [
+          129,
+          129,
+          87
+        ],
+        "k": "rrm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Spider-Man 2": {
+        "v": [
+          155,
+          111,
+          61
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Dziedzictwo Hogwartu": {
+        "v": [
+          117,
+          90,
+          53
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Horizon Forbidden West": {
+        "v": [
+          139,
+          109,
+          70
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Cyberpunk 2077": {
+        "v": [
+          172,
+          117,
+          57
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Fortnite": {
+        "v": [
+          165,
+          135,
+          100
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Valorant": {
+        "v": [
+          440,
+          360,
+          265
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "League of Legends": {
+        "v": [
+          375,
+          305,
+          225
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Minecraft": {
+        "v": [
+          255,
+          210,
+          155
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Roblox": {
+        "v": [
+          290,
+          240,
+          175
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Apex Legends": {
+        "v": [
+          195,
+          160,
+          115
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "PUBG": {
+        "v": [
+          180,
+          150,
+          110
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "EA Sports FC 27": {
+        "v": [
+          195,
+          160,
+          115
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Rust": {
+        "v": [
+          160,
+          115,
+          75
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "GTA V": {
+        "v": [
+          215,
+          160,
+          105
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      }
+    },
+    "rusalka": {
+      "Counter-Strike 2": {
+        "v": [
+          432,
+          292,
+          157
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Call of Duty: Warzone": {
+        "v": [
+          150,
+          140,
+          84
+        ],
+        "k": "rrr",
+        "s": "Extreme, natywnie (Black Ops 7)"
+      },
+      "Battlefield 6": {
+        "v": [
+          112,
+          78,
+          43
+        ],
+        "k": "mmm",
+        "s": "Overkill, natywnie"
+      },
+      "ARC Raiders": {
+        "v": [
+          142,
+          107,
+          57
+        ],
+        "k": "rmm",
+        "s": "Epic, natywnie (bez RT)"
+      },
+      "Red Dead Redemption 2": {
+        "v": [
+          155,
+          116,
+          68
+        ],
+        "k": "eee",
+        "s": "Ultra"
+      },
+      "Wiedźmin 3": {
+        "v": [
+          291,
+          224,
+          128
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "The Blood of Dawnwalker": {
+        "v": [
+          57,
+          43,
+          26
+        ],
+        "k": "eee",
+        "s": "Ultra, natywnie"
+      },
+      "Gothic 1 Remake": {
+        "v": [
+          108,
+          81,
+          54
+        ],
+        "k": "rmm",
+        "s": "bardzo wysokie, z DLSS/FSR Balanced"
+      },
+      "God of War Ragnarök": {
+        "v": [
+          131,
+          106,
+          67
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "007 First Light": {
+        "v": [
+          104,
+          74,
+          38
+        ],
+        "k": "mmm",
+        "s": "Ultra, natywnie"
+      },
+      "Black Myth: Wukong": {
+        "v": [
+          55,
+          43,
+          26
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Assassin's Creed Shadows": {
+        "v": [
+          61,
+          48,
+          33
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Kingdom Come II": {
+        "v": [
+          144,
+          102,
+          54
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Expedition 33": {
+        "v": [
+          71,
+          45,
+          35
+        ],
+        "k": "mrm",
+        "s": "Epic, natywnie"
+      },
+      "Death Stranding 2": {
+        "v": [
+          111,
+          84,
+          50
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "S.T.A.L.K.E.R. 2": {
+        "v": [
+          88,
+          67,
+          39
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Resident Evil Requiem": {
+        "v": [
+          162,
+          114,
+          61
+        ],
+        "k": "mmm",
+        "s": "Max, natywnie"
+      },
+      "Elden Ring": {
+        "v": [
+          60,
+          60,
+          60
+        ],
+        "k": "rrm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Baldur's Gate 3": {
+        "v": [
+          117,
+          117,
+          77
+        ],
+        "k": "rrm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Spider-Man 2": {
+        "v": [
+          134,
+          96,
+          53
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Dziedzictwo Hogwartu": {
+        "v": [
+          118,
+          85,
+          49
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Horizon Forbidden West": {
+        "v": [
+          126,
+          99,
+          60
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Cyberpunk 2077": {
+        "v": [
+          160,
+          105,
+          50
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Fortnite": {
+        "v": [
+          150,
+          125,
+          90
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Valorant": {
+        "v": [
+          395,
+          325,
+          235
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "League of Legends": {
+        "v": [
+          335,
+          275,
+          200
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Minecraft": {
+        "v": [
+          230,
+          190,
+          140
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Roblox": {
+        "v": [
+          260,
+          215,
+          160
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Apex Legends": {
+        "v": [
+          175,
+          140,
+          105
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "PUBG": {
+        "v": [
+          165,
+          135,
+          100
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "EA Sports FC 27": {
+        "v": [
+          175,
+          140,
+          105
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Rust": {
+        "v": [
+          145,
+          105,
+          70
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "GTA V": {
+        "v": [
+          200,
+          145,
+          95
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      }
+    },
+    "baba-jaga": {
+      "Counter-Strike 2": {
+        "v": [
+          432,
+          292,
+          157
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Call of Duty: Warzone": {
+        "v": [
+          150,
+          140,
+          84
+        ],
+        "k": "rrr",
+        "s": "Extreme, natywnie (Black Ops 7)"
+      },
+      "Battlefield 6": {
+        "v": [
+          112,
+          78,
+          43
+        ],
+        "k": "mmm",
+        "s": "Overkill, natywnie"
+      },
+      "ARC Raiders": {
+        "v": [
+          142,
+          107,
+          57
+        ],
+        "k": "rmm",
+        "s": "Epic, natywnie (bez RT)"
+      },
+      "Red Dead Redemption 2": {
+        "v": [
+          155,
+          116,
+          68
+        ],
+        "k": "eee",
+        "s": "Ultra"
+      },
+      "Wiedźmin 3": {
+        "v": [
+          291,
+          224,
+          128
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "The Blood of Dawnwalker": {
+        "v": [
+          57,
+          43,
+          26
+        ],
+        "k": "eee",
+        "s": "Ultra, natywnie"
+      },
+      "Gothic 1 Remake": {
+        "v": [
+          108,
+          81,
+          54
+        ],
+        "k": "rmm",
+        "s": "bardzo wysokie, z DLSS/FSR Balanced"
+      },
+      "God of War Ragnarök": {
+        "v": [
+          131,
+          106,
+          67
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "007 First Light": {
+        "v": [
+          104,
+          74,
+          38
+        ],
+        "k": "mmm",
+        "s": "Ultra, natywnie"
+      },
+      "Black Myth: Wukong": {
+        "v": [
+          55,
+          43,
+          26
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Assassin's Creed Shadows": {
+        "v": [
+          61,
+          48,
+          33
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Kingdom Come II": {
+        "v": [
+          144,
+          102,
+          54
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Expedition 33": {
+        "v": [
+          71,
+          45,
+          35
+        ],
+        "k": "mrm",
+        "s": "Epic, natywnie"
+      },
+      "Death Stranding 2": {
+        "v": [
+          111,
+          84,
+          50
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "S.T.A.L.K.E.R. 2": {
+        "v": [
+          88,
+          67,
+          39
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Resident Evil Requiem": {
+        "v": [
+          162,
+          114,
+          61
+        ],
+        "k": "mmm",
+        "s": "Max, natywnie"
+      },
+      "Elden Ring": {
+        "v": [
+          60,
+          60,
+          60
+        ],
+        "k": "rmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Baldur's Gate 3": {
+        "v": [
+          177,
+          142,
+          77
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Spider-Man 2": {
+        "v": [
+          134,
+          96,
+          53
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Dziedzictwo Hogwartu": {
+        "v": [
+          118,
+          85,
+          49
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Horizon Forbidden West": {
+        "v": [
+          126,
+          99,
+          60
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Cyberpunk 2077": {
+        "v": [
+          160,
+          105,
+          50
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Fortnite": {
+        "v": [
+          200,
+          165,
+          120
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Valorant": {
+        "v": [
+          520,
+          430,
+          315
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "League of Legends": {
+        "v": [
+          445,
+          365,
+          265
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Minecraft": {
+        "v": [
+          305,
+          250,
+          185
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Roblox": {
+        "v": [
+          350,
+          285,
+          210
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Apex Legends": {
+        "v": [
+          230,
+          190,
+          140
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "PUBG": {
+        "v": [
+          215,
+          175,
+          130
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "EA Sports FC 27": {
+        "v": [
+          230,
+          190,
+          140
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Rust": {
+        "v": [
+          145,
+          105,
+          70
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "GTA V": {
+        "v": [
+          200,
+          145,
+          95
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      }
+    },
+    "bazyliszek": {
+      "Counter-Strike 2": {
+        "v": [
+          395,
+          258,
+          121
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Call of Duty: Warzone": {
+        "v": [
+          210,
+          204,
+          128
+        ],
+        "k": "rrr",
+        "s": "Extreme, natywnie (Black Ops 7)"
+      },
+      "Battlefield 6": {
+        "v": [
+          120,
+          85,
+          48
+        ],
+        "k": "mmm",
+        "s": "Overkill, natywnie"
+      },
+      "ARC Raiders": {
+        "v": [
+          140,
+          108,
+          60
+        ],
+        "k": "rmm",
+        "s": "Epic, natywnie (bez RT)"
+      },
+      "Red Dead Redemption 2": {
+        "v": [
+          180,
+          138,
+          83
+        ],
+        "k": "rrm",
+        "s": "Ultra"
+      },
+      "Wiedźmin 3": {
+        "v": [
+          303,
+          235,
+          136
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "The Blood of Dawnwalker": {
+        "v": [
+          66,
+          50,
+          32
+        ],
+        "k": "eem",
+        "s": "Ultra, natywnie"
+      },
+      "Gothic 1 Remake": {
+        "v": [
+          137,
+          105,
+          67
+        ],
+        "k": "rmm",
+        "s": "bardzo wysokie, z DLSS/FSR Balanced"
+      },
+      "God of War Ragnarök": {
+        "v": [
+          156,
+          127,
+          81
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "007 First Light": {
+        "v": [
+          140,
+          99,
+          53
+        ],
+        "k": "mmm",
+        "s": "Ultra, natywnie"
+      },
+      "Black Myth: Wukong": {
+        "v": [
+          63,
+          50,
+          30
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Assassin's Creed Shadows": {
+        "v": [
+          79,
+          67,
+          48
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Kingdom Come II": {
+        "v": [
+          150,
+          111,
+          62
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Expedition 33": {
+        "v": [
+          85,
+          57,
+          43
+        ],
+        "k": "mmm",
+        "s": "Epic, natywnie"
+      },
+      "Death Stranding 2": {
+        "v": [
+          133,
+          103,
+          67
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "S.T.A.L.K.E.R. 2": {
+        "v": [
+          89,
+          68,
+          41
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Resident Evil Requiem": {
+        "v": [
+          219,
+          156,
+          84
+        ],
+        "k": "mmm",
+        "s": "Max, natywnie"
+      },
+      "Elden Ring": {
+        "v": [
+          60,
+          60,
+          60
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Baldur's Gate 3": {
+        "v": [
+          173,
+          171,
+          98
+        ],
+        "k": "rmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Spider-Man 2": {
+        "v": [
+          168,
+          123,
+          68
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Dziedzictwo Hogwartu": {
+        "v": [
+          119,
+          94,
+          57
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Horizon Forbidden West": {
+        "v": [
+          146,
+          118,
+          75
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Cyberpunk 2077": {
+        "v": [
+          184,
+          127,
+          63
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Fortnite": {
+        "v": [
+          200,
+          165,
+          120
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Valorant": {
+        "v": [
+          520,
+          430,
+          315
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "League of Legends": {
+        "v": [
+          445,
+          365,
+          265
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Minecraft": {
+        "v": [
+          305,
+          250,
+          185
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Roblox": {
+        "v": [
+          350,
+          285,
+          210
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Apex Legends": {
+        "v": [
+          230,
+          190,
+          140
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "PUBG": {
+        "v": [
+          215,
+          175,
+          130
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "EA Sports FC 27": {
+        "v": [
+          230,
+          190,
+          140
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Rust": {
+        "v": [
+          170,
+          125,
+          85
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "GTA V": {
+        "v": [
+          230,
+          175,
+          115
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      }
+    },
+    "pani-zimy": {
+      "Counter-Strike 2": {
+        "v": [
+          395,
+          258,
+          121
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Call of Duty: Warzone": {
+        "v": [
+          210,
+          204,
+          128
+        ],
+        "k": "rrr",
+        "s": "Extreme, natywnie (Black Ops 7)"
+      },
+      "Battlefield 6": {
+        "v": [
+          120,
+          85,
+          48
+        ],
+        "k": "mmm",
+        "s": "Overkill, natywnie"
+      },
+      "ARC Raiders": {
+        "v": [
+          140,
+          108,
+          60
+        ],
+        "k": "rmm",
+        "s": "Epic, natywnie (bez RT)"
+      },
+      "Red Dead Redemption 2": {
+        "v": [
+          180,
+          138,
+          83
+        ],
+        "k": "rrm",
+        "s": "Ultra"
+      },
+      "Wiedźmin 3": {
+        "v": [
+          303,
+          235,
+          136
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "The Blood of Dawnwalker": {
+        "v": [
+          66,
+          50,
+          32
+        ],
+        "k": "eem",
+        "s": "Ultra, natywnie"
+      },
+      "Gothic 1 Remake": {
+        "v": [
+          137,
+          105,
+          67
+        ],
+        "k": "rmm",
+        "s": "bardzo wysokie, z DLSS/FSR Balanced"
+      },
+      "God of War Ragnarök": {
+        "v": [
+          156,
+          127,
+          81
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "007 First Light": {
+        "v": [
+          140,
+          99,
+          53
+        ],
+        "k": "mmm",
+        "s": "Ultra, natywnie"
+      },
+      "Black Myth: Wukong": {
+        "v": [
+          63,
+          50,
+          30
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Assassin's Creed Shadows": {
+        "v": [
+          79,
+          67,
+          48
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Kingdom Come II": {
+        "v": [
+          150,
+          111,
+          62
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Expedition 33": {
+        "v": [
+          85,
+          57,
+          43
+        ],
+        "k": "mmm",
+        "s": "Epic, natywnie"
+      },
+      "Death Stranding 2": {
+        "v": [
+          133,
+          103,
+          67
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "S.T.A.L.K.E.R. 2": {
+        "v": [
+          89,
+          68,
+          41
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Resident Evil Requiem": {
+        "v": [
+          219,
+          156,
+          84
+        ],
+        "k": "mmm",
+        "s": "Max, natywnie"
+      },
+      "Elden Ring": {
+        "v": [
+          60,
+          60,
+          60
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Baldur's Gate 3": {
+        "v": [
+          173,
+          171,
+          98
+        ],
+        "k": "rmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Spider-Man 2": {
+        "v": [
+          168,
+          123,
+          68
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Dziedzictwo Hogwartu": {
+        "v": [
+          119,
+          94,
+          57
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Horizon Forbidden West": {
+        "v": [
+          146,
+          118,
+          75
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Cyberpunk 2077": {
+        "v": [
+          184,
+          127,
+          63
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Fortnite": {
+        "v": [
+          200,
+          165,
+          120
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Valorant": {
+        "v": [
+          520,
+          430,
+          315
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "League of Legends": {
+        "v": [
+          445,
+          365,
+          265
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Minecraft": {
+        "v": [
+          305,
+          250,
+          185
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Roblox": {
+        "v": [
+          350,
+          285,
+          210
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Apex Legends": {
+        "v": [
+          230,
+          190,
+          140
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "PUBG": {
+        "v": [
+          215,
+          175,
+          130
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "EA Sports FC 27": {
+        "v": [
+          230,
+          190,
+          140
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Rust": {
+        "v": [
+          170,
+          125,
+          85
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "GTA V": {
+        "v": [
+          230,
+          175,
+          115
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      }
+    },
+    "wilkolak": {
+      "Counter-Strike 2": {
+        "v": [
+          506,
+          362,
+          194
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Call of Duty: Warzone": {
+        "v": [
+          174,
+          165,
+          98
+        ],
+        "k": "rrr",
+        "s": "Extreme, natywnie (Black Ops 7)"
+      },
+      "Battlefield 6": {
+        "v": [
+          134,
+          96,
+          53
+        ],
+        "k": "mmm",
+        "s": "Overkill, natywnie"
+      },
+      "ARC Raiders": {
+        "v": [
+          166,
+          126,
+          73
+        ],
+        "k": "rmm",
+        "s": "Epic, natywnie (bez RT)"
+      },
+      "Red Dead Redemption 2": {
+        "v": [
+          183,
+          138,
+          86
+        ],
+        "k": "eee",
+        "s": "Ultra"
+      },
+      "Wiedźmin 3": {
+        "v": [
+          339,
+          266,
+          158
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "The Blood of Dawnwalker": {
+        "v": [
+          67,
+          51,
+          32
+        ],
+        "k": "eee",
+        "s": "Ultra, natywnie"
+      },
+      "Gothic 1 Remake": {
+        "v": [
+          127,
+          96,
+          66
+        ],
+        "k": "rmm",
+        "s": "bardzo wysokie, z DLSS/FSR Balanced"
+      },
+      "God of War Ragnarök": {
+        "v": [
+          157,
+          130,
+          84
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "007 First Light": {
+        "v": [
+          130,
+          94,
+          50
+        ],
+        "k": "mmm",
+        "s": "Ultra, natywnie"
+      },
+      "Black Myth: Wukong": {
+        "v": [
+          65,
+          52,
+          33
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Assassin's Creed Shadows": {
+        "v": [
+          72,
+          63,
+          42
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Kingdom Come II": {
+        "v": [
+          170,
+          124,
+          69
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Expedition 33": {
+        "v": [
+          88,
+          59,
+          45
+        ],
+        "k": "mmm",
+        "s": "Epic, natywnie"
+      },
+      "Death Stranding 2": {
+        "v": [
+          129,
+          104,
+          65
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "S.T.A.L.K.E.R. 2": {
+        "v": [
+          102,
+          78,
+          48
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Resident Evil Requiem": {
+        "v": [
+          200,
+          142,
+          82
+        ],
+        "k": "mmm",
+        "s": "Max, natywnie"
+      },
+      "Elden Ring": {
+        "v": [
+          60,
+          60,
+          60
+        ],
+        "k": "rrm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Baldur's Gate 3": {
+        "v": [
+          146,
+          146,
+          100
+        ],
+        "k": "rrm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Spider-Man 2": {
+        "v": [
+          170,
+          126,
+          72
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Dziedzictwo Hogwartu": {
+        "v": [
+          132,
+          98,
+          58
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Horizon Forbidden West": {
+        "v": [
+          144,
+          116,
+          74
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Cyberpunk 2077": {
+        "v": [
+          189,
+          126,
+          60
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Fortnite": {
+        "v": [
+          180,
+          145,
+          105
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Valorant": {
+        "v": [
+          470,
+          385,
+          280
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "League of Legends": {
+        "v": [
+          400,
+          330,
+          240
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Minecraft": {
+        "v": [
+          275,
+          225,
+          165
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Roblox": {
+        "v": [
+          315,
+          255,
+          190
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Apex Legends": {
+        "v": [
+          205,
+          170,
+          125
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "PUBG": {
+        "v": [
+          195,
+          160,
+          115
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "EA Sports FC 27": {
+        "v": [
+          205,
+          170,
+          125
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Rust": {
+        "v": [
+          175,
+          130,
+          85
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "GTA V": {
+        "v": [
+          235,
+          180,
+          120
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      }
+    },
+    "wampir": {
+      "Counter-Strike 2": {
+        "v": [
+          506,
+          362,
+          194
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Call of Duty: Warzone": {
+        "v": [
+          174,
+          165,
+          98
+        ],
+        "k": "rrr",
+        "s": "Extreme, natywnie (Black Ops 7)"
+      },
+      "Battlefield 6": {
+        "v": [
+          134,
+          96,
+          53
+        ],
+        "k": "mmm",
+        "s": "Overkill, natywnie"
+      },
+      "ARC Raiders": {
+        "v": [
+          166,
+          126,
+          73
+        ],
+        "k": "rmm",
+        "s": "Epic, natywnie (bez RT)"
+      },
+      "Red Dead Redemption 2": {
+        "v": [
+          183,
+          138,
+          86
+        ],
+        "k": "eee",
+        "s": "Ultra"
+      },
+      "Wiedźmin 3": {
+        "v": [
+          339,
+          266,
+          158
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "The Blood of Dawnwalker": {
+        "v": [
+          67,
+          51,
+          32
+        ],
+        "k": "eee",
+        "s": "Ultra, natywnie"
+      },
+      "Gothic 1 Remake": {
+        "v": [
+          127,
+          96,
+          66
+        ],
+        "k": "rmm",
+        "s": "bardzo wysokie, z DLSS/FSR Balanced"
+      },
+      "God of War Ragnarök": {
+        "v": [
+          157,
+          130,
+          84
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "007 First Light": {
+        "v": [
+          130,
+          94,
+          50
+        ],
+        "k": "mmm",
+        "s": "Ultra, natywnie"
+      },
+      "Black Myth: Wukong": {
+        "v": [
+          65,
+          52,
+          33
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Assassin's Creed Shadows": {
+        "v": [
+          72,
+          63,
+          42
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Kingdom Come II": {
+        "v": [
+          170,
+          124,
+          69
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Expedition 33": {
+        "v": [
+          88,
+          59,
+          45
+        ],
+        "k": "mmm",
+        "s": "Epic, natywnie"
+      },
+      "Death Stranding 2": {
+        "v": [
+          129,
+          104,
+          65
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "S.T.A.L.K.E.R. 2": {
+        "v": [
+          102,
+          78,
+          48
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Resident Evil Requiem": {
+        "v": [
+          200,
+          142,
+          82
+        ],
+        "k": "mmm",
+        "s": "Max, natywnie"
+      },
+      "Elden Ring": {
+        "v": [
+          60,
+          60,
+          60
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Baldur's Gate 3": {
+        "v": [
+          199,
+          172,
+          100
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Spider-Man 2": {
+        "v": [
+          170,
+          126,
+          72
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Dziedzictwo Hogwartu": {
+        "v": [
+          132,
+          98,
+          58
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Horizon Forbidden West": {
+        "v": [
+          144,
+          116,
+          74
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Cyberpunk 2077": {
+        "v": [
+          189,
+          126,
+          60
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Fortnite": {
+        "v": [
+          225,
+          185,
+          135
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Valorant": {
+        "v": [
+          590,
+          480,
+          355
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "League of Legends": {
+        "v": [
+          500,
+          410,
+          300
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Minecraft": {
+        "v": [
+          345,
+          285,
+          205
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Roblox": {
+        "v": [
+          390,
+          320,
+          235
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Apex Legends": {
+        "v": [
+          260,
+          210,
+          155
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "PUBG": {
+        "v": [
+          245,
+          200,
+          145
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "EA Sports FC 27": {
+        "v": [
+          260,
+          210,
+          155
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Rust": {
+        "v": [
+          175,
+          130,
+          85
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "GTA V": {
+        "v": [
+          235,
+          180,
+          120
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      }
+    },
+    "weles": {
+      "Counter-Strike 2": {
+        "v": [
+          564,
+          417,
+          224
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Call of Duty: Warzone": {
+        "v": [
+          206,
+          194,
+          130
+        ],
+        "k": "rrr",
+        "s": "Extreme, natywnie (Black Ops 7)"
+      },
+      "Battlefield 6": {
+        "v": [
+          150,
+          109,
+          61
+        ],
+        "k": "mmm",
+        "s": "Overkill, natywnie"
+      },
+      "ARC Raiders": {
+        "v": [
+          191,
+          145,
+          85
+        ],
+        "k": "rmm",
+        "s": "Epic, natywnie (bez RT)"
+      },
+      "Red Dead Redemption 2": {
+        "v": [
+          199,
+          152,
+          97
+        ],
+        "k": "eee",
+        "s": "Ultra"
+      },
+      "Wiedźmin 3": {
+        "v": [
+          384,
+          310,
+          188
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "The Blood of Dawnwalker": {
+        "v": [
+          74,
+          57,
+          36
+        ],
+        "k": "eem",
+        "s": "Ultra, natywnie"
+      },
+      "Gothic 1 Remake": {
+        "v": [
+          135,
+          103,
+          76
+        ],
+        "k": "rmm",
+        "s": "bardzo wysokie, z DLSS/FSR Balanced"
+      },
+      "God of War Ragnarök": {
+        "v": [
+          176,
+          146,
+          96
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "007 First Light": {
+        "v": [
+          142,
+          105,
+          59
+        ],
+        "k": "mmm",
+        "s": "Ultra, natywnie"
+      },
+      "Black Myth: Wukong": {
+        "v": [
+          72,
+          59,
+          37
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Assassin's Creed Shadows": {
+        "v": [
+          80,
+          69,
+          47
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Kingdom Come II": {
+        "v": [
+          187,
+          140,
+          80
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Expedition 33": {
+        "v": [
+          96,
+          67,
+          52
+        ],
+        "k": "mmm",
+        "s": "Epic, natywnie"
+      },
+      "Death Stranding 2": {
+        "v": [
+          135,
+          113,
+          74
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "S.T.A.L.K.E.R. 2": {
+        "v": [
+          112,
+          85,
+          54
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Resident Evil Requiem": {
+        "v": [
+          215,
+          160,
+          92
+        ],
+        "k": "mmm",
+        "s": "Max, natywnie"
+      },
+      "Elden Ring": {
+        "v": [
+          60,
+          60,
+          60
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Baldur's Gate 3": {
+        "v": [
+          205,
+          183,
+          110
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Spider-Man 2": {
+        "v": [
+          184,
+          140,
+          80
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Dziedzictwo Hogwartu": {
+        "v": [
+          143,
+          109,
+          66
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Horizon Forbidden West": {
+        "v": [
+          158,
+          129,
+          84
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Cyberpunk 2077": {
+        "v": [
+          209,
+          143,
+          71
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Fortnite": {
+        "v": [
+          225,
+          185,
+          135
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Valorant": {
+        "v": [
+          590,
+          480,
+          355
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "League of Legends": {
+        "v": [
+          500,
+          410,
+          300
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Minecraft": {
+        "v": [
+          345,
+          285,
+          205
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Roblox": {
+        "v": [
+          390,
+          320,
+          235
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Apex Legends": {
+        "v": [
+          260,
+          210,
+          155
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "PUBG": {
+        "v": [
+          245,
+          200,
+          145
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "EA Sports FC 27": {
+        "v": [
+          260,
+          210,
+          155
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Rust": {
+        "v": [
+          190,
+          145,
+          100
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "GTA V": {
+        "v": [
+          260,
+          200,
+          135
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      }
+    },
+    "zmij": {
+      "Counter-Strike 2": {
+        "v": [
+          564,
+          417,
+          224
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Call of Duty: Warzone": {
+        "v": [
+          206,
+          194,
+          130
+        ],
+        "k": "rrr",
+        "s": "Extreme, natywnie (Black Ops 7)"
+      },
+      "Battlefield 6": {
+        "v": [
+          150,
+          109,
+          61
+        ],
+        "k": "mmm",
+        "s": "Overkill, natywnie"
+      },
+      "ARC Raiders": {
+        "v": [
+          191,
+          145,
+          85
+        ],
+        "k": "rmm",
+        "s": "Epic, natywnie (bez RT)"
+      },
+      "Red Dead Redemption 2": {
+        "v": [
+          199,
+          152,
+          97
+        ],
+        "k": "eee",
+        "s": "Ultra"
+      },
+      "Wiedźmin 3": {
+        "v": [
+          384,
+          310,
+          188
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "The Blood of Dawnwalker": {
+        "v": [
+          74,
+          57,
+          36
+        ],
+        "k": "eem",
+        "s": "Ultra, natywnie"
+      },
+      "Gothic 1 Remake": {
+        "v": [
+          135,
+          103,
+          76
+        ],
+        "k": "rmm",
+        "s": "bardzo wysokie, z DLSS/FSR Balanced"
+      },
+      "God of War Ragnarök": {
+        "v": [
+          176,
+          146,
+          96
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "007 First Light": {
+        "v": [
+          142,
+          105,
+          59
+        ],
+        "k": "mmm",
+        "s": "Ultra, natywnie"
+      },
+      "Black Myth: Wukong": {
+        "v": [
+          72,
+          59,
+          37
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Assassin's Creed Shadows": {
+        "v": [
+          80,
+          69,
+          47
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Kingdom Come II": {
+        "v": [
+          187,
+          140,
+          80
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Expedition 33": {
+        "v": [
+          96,
+          67,
+          52
+        ],
+        "k": "mmm",
+        "s": "Epic, natywnie"
+      },
+      "Death Stranding 2": {
+        "v": [
+          135,
+          113,
+          74
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "S.T.A.L.K.E.R. 2": {
+        "v": [
+          112,
+          85,
+          54
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Resident Evil Requiem": {
+        "v": [
+          215,
+          160,
+          92
+        ],
+        "k": "mmm",
+        "s": "Max, natywnie"
+      },
+      "Elden Ring": {
+        "v": [
+          60,
+          60,
+          60
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Baldur's Gate 3": {
+        "v": [
+          205,
+          183,
+          110
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Spider-Man 2": {
+        "v": [
+          184,
+          140,
+          80
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Dziedzictwo Hogwartu": {
+        "v": [
+          143,
+          109,
+          66
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Horizon Forbidden West": {
+        "v": [
+          158,
+          129,
+          84
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Cyberpunk 2077": {
+        "v": [
+          209,
+          143,
+          71
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Fortnite": {
+        "v": [
+          230,
+          190,
+          140
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Valorant": {
+        "v": [
+          605,
+          495,
+          365
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "League of Legends": {
+        "v": [
+          515,
+          425,
+          310
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Minecraft": {
+        "v": [
+          355,
+          290,
+          215
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Roblox": {
+        "v": [
+          405,
+          330,
+          240
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Apex Legends": {
+        "v": [
+          265,
+          220,
+          160
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "PUBG": {
+        "v": [
+          250,
+          205,
+          150
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "EA Sports FC 27": {
+        "v": [
+          265,
+          220,
+          160
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Rust": {
+        "v": [
+          190,
+          145,
+          100
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "GTA V": {
+        "v": [
+          260,
+          200,
+          135
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      }
+    },
+    "perun": {
+      "Counter-Strike 2": {
+        "v": [
+          736,
+          573,
+          355
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Call of Duty: Warzone": {
+        "v": [
+          237,
+          214,
+          158
+        ],
+        "k": "rrr",
+        "s": "Extreme, natywnie (Black Ops 7)"
+      },
+      "Battlefield 6": {
+        "v": [
+          210,
+          160,
+          95
+        ],
+        "k": "mmm",
+        "s": "Overkill, natywnie"
+      },
+      "ARC Raiders": {
+        "v": [
+          231,
+          195,
+          127
+        ],
+        "k": "rmm",
+        "s": "Epic, natywnie (bez RT)"
+      },
+      "Red Dead Redemption 2": {
+        "v": [
+          270,
+          227,
+          151
+        ],
+        "k": "eee",
+        "s": "Ultra"
+      },
+      "Wiedźmin 3": {
+        "v": [
+          535,
+          450,
+          301
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "The Blood of Dawnwalker": {
+        "v": [
+          96,
+          81,
+          57
+        ],
+        "k": "eee",
+        "s": "Ultra, natywnie"
+      },
+      "Gothic 1 Remake": {
+        "v": [
+          148,
+          125,
+          102
+        ],
+        "k": "rmm",
+        "s": "bardzo wysokie, z DLSS/FSR Balanced"
+      },
+      "God of War Ragnarök": {
+        "v": [
+          203,
+          201,
+          148
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "007 First Light": {
+        "v": [
+          176,
+          155,
+          93
+        ],
+        "k": "mmm",
+        "s": "Ultra, natywnie"
+      },
+      "Black Myth: Wukong": {
+        "v": [
+          99,
+          82,
+          57
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Assassin's Creed Shadows": {
+        "v": [
+          112,
+          95,
+          70
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Kingdom Come II": {
+        "v": [
+          242,
+          196,
+          122
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Expedition 33": {
+        "v": [
+          125,
+          95,
+          78
+        ],
+        "k": "mmm",
+        "s": "Epic, natywnie"
+      },
+      "Death Stranding 2": {
+        "v": [
+          171,
+          157,
+          113
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "S.T.A.L.K.E.R. 2": {
+        "v": [
+          143,
+          115,
+          77
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Resident Evil Requiem": {
+        "v": [
+          278,
+          234,
+          148
+        ],
+        "k": "mmm",
+        "s": "Max, natywnie"
+      },
+      "Elden Ring": {
+        "v": [
+          60,
+          60,
+          60
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Baldur's Gate 3": {
+        "v": [
+          206,
+          204,
+          177
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Spider-Man 2": {
+        "v": [
+          225,
+          193,
+          125
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Dziedzictwo Hogwartu": {
+        "v": [
+          182,
+          148,
+          100
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Horizon Forbidden West": {
+        "v": [
+          198,
+          175,
+          126
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Cyberpunk 2077": {
+        "v": [
+          247,
+          205,
+          108
+        ],
+        "k": "mmm",
+        "s": "najwyższe ustawienia, natywnie"
+      },
+      "Fortnite": {
+        "v": [
+          230,
+          190,
+          140
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Valorant": {
+        "v": [
+          605,
+          495,
+          365
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "League of Legends": {
+        "v": [
+          515,
+          425,
+          310
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Minecraft": {
+        "v": [
+          355,
+          290,
+          215
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Roblox": {
+        "v": [
+          405,
+          330,
+          240
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Apex Legends": {
+        "v": [
+          265,
+          220,
+          160
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "PUBG": {
+        "v": [
+          250,
+          205,
+          150
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "EA Sports FC 27": {
+        "v": [
+          265,
+          220,
+          160
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "Rust": {
+        "v": [
+          245,
+          205,
+          155
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      },
+      "GTA V": {
+        "v": [
+          335,
+          280,
+          210
+        ],
+        "k": "eee",
+        "s": "szacunek"
+      }
+    }
+  }
+}

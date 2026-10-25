@@ -1,0 +1,277 @@
+{
+  "_info": "Kolekcja `builds` = przepisy (ADR-G002 §2). BRAK pola ceny: cena = price(level, case, cooler, ram, ssd). `_check` = wynik arkusza (cena, koszt, marża) do testów G4. `creature` = slug rekordu z creatures.json — jego pola importujesz do zestawu (1:1, ADR-G002 §2). `internalRef` (porównanie z GoblinPC) tylko w panelu. Adres: /zestawy/<slug>.",
+  "items": [
+    {
+      "slug": "skrzat",
+      "name": "Skrzat",
+      "creature": "skrzat",
+      "level": "P01",
+      "case": "SIG3A",
+      "cooler": "SPARTAN",
+      "ram": "R16D4",
+      "ssd": "PXL512",
+      "internalRef": "brak (GoblinPC zaczyna od 6 270 zł)",
+      "_check": {
+        "price": 4990,
+        "cost": 4272,
+        "margin": 0.143888,
+        "service": 180
+      }
+    },
+    {
+      "slug": "licho",
+      "name": "Licho",
+      "creature": "licho",
+      "level": "P02",
+      "case": "VEN2A",
+      "cooler": "T102",
+      "ram": "R16D4",
+      "ssd": "PX1",
+      "internalRef": "brak (GoblinPC zaczyna od 6 270 zł)",
+      "_check": {
+        "price": 5950,
+        "cost": 5101,
+        "margin": 0.142689,
+        "service": 180
+      }
+    },
+    {
+      "slug": "bies",
+      "name": "Bies",
+      "creature": "bies",
+      "level": "P03",
+      "case": "EXO",
+      "cooler": "AK400",
+      "ram": "R16",
+      "ssd": "PX1",
+      "internalRef": "Utopiec (słabszy RTX 5050) (6 270 zł)",
+      "_check": {
+        "price": 6710,
+        "cost": 5759,
+        "margin": 0.141729,
+        "service": 180
+      }
+    },
+    {
+      "slug": "wodnik",
+      "name": "Wodnik",
+      "creature": "wodnik",
+      "level": "P04",
+      "case": "REG4",
+      "cooler": "T102",
+      "ram": "R16",
+      "ssd": "PX1",
+      "internalRef": "brak (GoblinPC nie ma Intela)",
+      "_check": {
+        "price": 6870,
+        "cost": 5894,
+        "margin": 0.142067,
+        "service": 180
+      }
+    },
+    {
+      "slug": "strzyga",
+      "name": "Strzyga",
+      "creature": "strzyga",
+      "level": "P05",
+      "case": "PANO130",
+      "cooler": "AK400",
+      "ram": "R16",
+      "ssd": "PX1",
+      "internalRef": "Goblin (RTX 5060) (8 690 zł)",
+      "_check": {
+        "price": 7400,
+        "cost": 6358,
+        "margin": 0.140811,
+        "service": 180
+      }
+    },
+    {
+      "slug": "kikimora",
+      "name": "Kikimora",
+      "creature": "kikimora",
+      "level": "P06",
+      "case": "STEL5",
+      "cooler": "LE360",
+      "ram": "R16",
+      "ssd": "PX1",
+      "internalRef": "Goblin (RTX 5060) (8 690 zł)",
+      "_check": {
+        "price": 9220,
+        "cost": 7999,
+        "margin": 0.13243,
+        "service": 180
+      }
+    },
+    {
+      "slug": "zmora",
+      "name": "Zmora",
+      "creature": "zmora",
+      "level": "P07",
+      "case": "PANO100",
+      "cooler": "NAV360",
+      "ram": "R32",
+      "ssd": "NM1",
+      "internalRef": "Kobold (RX 9060 XT) (9 740 zł)",
+      "_check": {
+        "price": 10110,
+        "cost": 8778,
+        "margin": 0.131751,
+        "service": 180
+      }
+    },
+    {
+      "slug": "rusalka",
+      "name": "Rusałka",
+      "creature": "rusalka",
+      "level": "P08",
+      "case": "SPACEW",
+      "cooler": "A13W",
+      "ram": "R32WP",
+      "ssd": "PX1",
+      "internalRef": "Widmo (9600X + RTX 5060) (9 680 zł)",
+      "_check": {
+        "price": 10950,
+        "cost": 9262,
+        "margin": 0.154155,
+        "service": 180
+      }
+    },
+    {
+      "slug": "baba-jaga",
+      "name": "Baba Jaga",
+      "creature": "baba-jaga",
+      "level": "P09",
+      "case": "ARX7",
+      "cooler": "NAV360",
+      "ram": "R32",
+      "ssd": "NM1",
+      "internalRef": "Mimic (11 810 zł)",
+      "_check": {
+        "price": 11650,
+        "cost": 10103,
+        "margin": 0.13279,
+        "service": 180
+      }
+    },
+    {
+      "slug": "bazyliszek",
+      "name": "Bazyliszek",
+      "creature": "bazyliszek",
+      "level": "P10",
+      "case": "SPXL",
+      "cooler": "ARC",
+      "ram": "R32",
+      "ssd": "NM1",
+      "internalRef": "Minotaur (12 360 zł)",
+      "_check": {
+        "price": 11930,
+        "cost": 10366,
+        "margin": 0.131098,
+        "service": 180
+      }
+    },
+    {
+      "slug": "pani-zimy",
+      "name": "Pani Zimy",
+      "creature": "pani-zimy",
+      "level": "P11",
+      "case": "4500XW",
+      "cooler": "NAUTW",
+      "ram": "R32WP",
+      "ssd": "NM1",
+      "internalRef": "Południca (12 960 zł)",
+      "_check": {
+        "price": 12240,
+        "cost": 10410,
+        "margin": 0.14951,
+        "service": 180
+      }
+    },
+    {
+      "slug": "wilkolak",
+      "name": "Wilkołak",
+      "creature": "wilkolak",
+      "level": "P12",
+      "case": "4500XB",
+      "cooler": "NAUTB",
+      "ram": "R32",
+      "ssd": "NM1",
+      "internalRef": "brak",
+      "_check": {
+        "price": 14440,
+        "cost": 12651,
+        "margin": 0.123892,
+        "service": 180
+      }
+    },
+    {
+      "slug": "wampir",
+      "name": "Wampir",
+      "creature": "wampir",
+      "level": "P13",
+      "case": "LB500",
+      "cooler": "PL3LX",
+      "ram": "R32",
+      "ssd": "NM1",
+      "internalRef": "Kraken (7800X3D) (14 880 zł)",
+      "_check": {
+        "price": 14540,
+        "cost": 12752,
+        "margin": 0.122971,
+        "service": 180
+      }
+    },
+    {
+      "slug": "weles",
+      "name": "Weles",
+      "creature": "weles",
+      "level": "P14",
+      "case": "FISH",
+      "cooler": "LM360",
+      "ram": "R32",
+      "ssd": "NM2",
+      "internalRef": "brak (Goblin skacze z 14 880 na 20 340 zł)",
+      "_check": {
+        "price": 17100,
+        "cost": 14962,
+        "margin": 0.125029,
+        "service": 180
+      }
+    },
+    {
+      "slug": "zmij",
+      "name": "Żmij",
+      "creature": "zmij",
+      "level": "P15",
+      "case": "H9",
+      "cooler": "KRAKEN",
+      "ram": "R32RGB",
+      "ssd": "NM2",
+      "internalRef": "Hydra (9800X3D) (20 340 zł)",
+      "_check": {
+        "price": 19840,
+        "cost": 17469,
+        "margin": 0.119506,
+        "service": 180
+      }
+    },
+    {
+      "slug": "perun",
+      "name": "Perun",
+      "creature": "perun",
+      "level": "P16",
+      "case": "H9",
+      "cooler": "KRAKEN",
+      "ram": "R64",
+      "ssd": "NM2",
+      "internalRef": "brak",
+      "_check": {
+        "price": 53900,
+        "cost": 47556,
+        "margin": 0.117699,
+        "service": 180
+      }
+    }
+  ]
+}

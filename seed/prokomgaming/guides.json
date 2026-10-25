@@ -1,0 +1,82 @@
+{
+  "_info": "Poradniki (lista z planszy Poradniki). Gotowy do publikacji tylko „rodzice” — treść przenosisz 1:1 z planszy Poradnik (spis treści, ściągawka, polecane istoty, „Czytaj dalej”). Pozostałe 6 = szkice (draft, treść do napisania w czacie). Data publikacji ustawiana w panelu przy publikacji.",
+  "items": [
+    {
+      "slug": "rodzice",
+      "category": "Dla rodziców",
+      "title": "Jak kupić komputer do gier dla dziecka i nie przepłacić",
+      "lead": "Pięć pytań, które warto zadać sobie przed zakupem, i trzy rzeczy, na których sprzedawcy zarabiają najwięcej.",
+      "readingTime": "8 min",
+      "creature": "skrzat",
+      "author": "Zespół PRO-KOM Gaming",
+      "status": "ready",
+      "contentSource": "boards/Poradnik.dc.html (treść 1:1; kwoty w treści sprawdzić z aktualnym cennikiem przed publikacją)"
+    },
+    {
+      "slug": "fortnite",
+      "category": "Gry",
+      "title": "Jaki komputer do Fortnite w 2026 roku",
+      "lead": "Ile klatek naprawdę potrzebujesz, kiedy wystarczy FullHD i od którego poziomu mocy gra działa płynnie na monitorze 144 Hz.",
+      "readingTime": "6 min",
+      "creature": "strzyga",
+      "author": "Zespół PRO-KOM Gaming",
+      "status": "draft",
+      "contentSource": null
+    },
+    {
+      "slug": "rozdzielczosc",
+      "category": "Wybór sprzętu",
+      "title": "FullHD, 2K czy 4K: jaki monitor do jakiego komputera",
+      "lead": "Dlaczego komputer i monitor trzeba dobierać razem i ile mocy potrzeba na każdą rozdzielczość.",
+      "readingTime": "7 min",
+      "creature": "wampir",
+      "author": "Zespół PRO-KOM Gaming",
+      "status": "draft",
+      "contentSource": null
+    },
+    {
+      "slug": "x3d",
+      "category": "Wybór sprzętu",
+      "title": "Co to jest procesor X3D i czy warto dopłacić",
+      "lead": "Dodatkowa pamięć podręczna, która w grach daje więcej klatek, prostym językiem.",
+      "readingTime": "5 min",
+      "creature": "baba-jaga",
+      "author": "Zespół PRO-KOM Gaming",
+      "status": "draft",
+      "contentSource": null
+    },
+    {
+      "slug": "pierwsze",
+      "category": "Po zakupie",
+      "title": "Pierwsze uruchomienie: co zrobić, gdy komputer przyjedzie",
+      "lead": "Od kartonu do pierwszej gry w piętnaście minut. Co podłączyć, co zdjąć i co sprawdzić.",
+      "readingTime": "4 min",
+      "creature": "rusalka",
+      "author": "Zespół PRO-KOM Gaming",
+      "status": "draft",
+      "contentSource": null
+    },
+    {
+      "slug": "fps",
+      "category": "Gry",
+      "title": "Ile klatek to płynnie? 60, 144 czy 240",
+      "lead": "Czym różnią się klatki średnie od najniższych i dlaczego monitor ma znaczenie.",
+      "readingTime": "6 min",
+      "creature": "perun",
+      "author": "Zespół PRO-KOM Gaming",
+      "status": "draft",
+      "contentSource": null
+    },
+    {
+      "slug": "zasilacz",
+      "category": "Wybór sprzętu",
+      "title": "Zasilacz: część, na której nie warto oszczędzać",
+      "lead": "Co oznacza certyfikat 80+ Gold, ile mocy naprawdę potrzeba i dlaczego tani zasilacz bywa najdroższy.",
+      "readingTime": "5 min",
+      "creature": "zmij",
+      "author": "Zespół PRO-KOM Gaming",
+      "status": "draft",
+      "contentSource": null
+    }
+  ]
+}

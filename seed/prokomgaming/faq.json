@@ -1,0 +1,171 @@
+{
+  "_info": "Pytania i odpowiedzi. Grupy 1–5 = strona /pytania (21 pytań, plansza FAQ). Grupa „Na stronie głównej” (onHomeOnly) = 6 pytań sekcji „Zanim zapytasz” na głównej (plansza Main; osobne sformułowania, nie pokazujemy ich na /pytania). Bez rat jako oferty — pytanie „Czy mogę kupić na raty?” zostaje z odpowiedzią „Na razie nie prowadzimy sprzedaży ratalnej…”.",
+  "items": [
+    {
+      "group": "Zakup i płatność",
+      "items": [
+        {
+          "q": "Dlaczego nie ma przycisku „Kup”?",
+          "a": "Ceny części zmieniają się codziennie. Wysyłasz zapytanie, odpisujemy z imienną listą części, aktualną ceną i terminem. Płacisz dopiero, gdy zaakceptujesz ofertę.",
+          "onHome": false
+        },
+        {
+          "q": "Jak szybko dostanę ofertę?",
+          "a": "Zwykle w ciągu godziny, codziennie od 8 do 22. Zapytania wysłane w nocy czytamy rano.",
+          "onHome": false
+        },
+        {
+          "q": "Jak mogę zapłacić?",
+          "a": "Przelewem albo BLIK-iem, na podstawie faktury pro forma. Nie wysyłamy za pobraniem.",
+          "onHome": false
+        },
+        {
+          "q": "Czy mogę kupić na raty?",
+          "a": "Na razie nie prowadzimy sprzedaży ratalnej. Płacisz przelewem albo BLIK-iem na podstawie faktury pro forma.",
+          "onHome": false
+        },
+        {
+          "q": "Wystawiacie fakturę na firmę?",
+          "a": "Tak. Zaznacz to w zapytaniu i podaj NIP.",
+          "onHome": false
+        },
+        {
+          "q": "Ile jest ważna oferta?",
+          "a": "48 godzin. Po tym czasie sprawdzamy ceny jeszcze raz, bo mogły się zmienić.",
+          "onHome": false
+        }
+      ]
+    },
+    {
+      "group": "Dostawa i odbiór",
+      "items": [
+        {
+          "q": "Jak długo czekam na komputer?",
+          "a": "Od 5 do 10 dni roboczych od zaksięgowania wpłaty. Dokładny termin podajemy w ofercie.",
+          "onHome": false
+        },
+        {
+          "q": "Ile kosztuje wysyłka?",
+          "a": "Nic, jest w cenie komputera. Wysyłamy kurierem z ubezpieczeniem i numerem śledzenia.",
+          "onHome": false
+        },
+        {
+          "q": "Mogę odebrać osobiście?",
+          "a": "Tak, w sklepie w Rabce-Zdroju, a po umówieniu w Zakopanem. Przy odbiorze włączymy komputer przy Tobie.",
+          "onHome": false
+        },
+        {
+          "q": "Jak zapakowany jest komputer?",
+          "a": "W podwójnym kartonie z pianką, z wypełnieniem w środku obudowy, żeby karta graficzna nie pracowała w transporcie.",
+          "onHome": false
+        }
+      ]
+    },
+    {
+      "group": "Zwroty i gwarancja",
+      "items": [
+        {
+          "q": "Mogę zwrócić komputer?",
+          "a": "Tak, w ciągu 14 dni od odbioru, bez podania przyczyny, także gdy składaliśmy go według Twojej specyfikacji. Koszt odesłania pokrywasz Ty.",
+          "onHome": false
+        },
+        {
+          "q": "Jaka jest gwarancja?",
+          "a": "2 lata gwarancji PRO-KOM na cały komputer. Gdy coś nie działa, najpierw pomagamy zdalnie, a jeśli trzeba, kurier odbiera komputer na nasz koszt.",
+          "onHome": false
+        },
+        {
+          "q": "Stracę gwarancję, jeśli dołożę RAM albo dysk?",
+          "a": "Nie. Gwarancja nie obejmuje tylko uszkodzeń powstałych przy samodzielnej rozbudowie.",
+          "onHome": false
+        },
+        {
+          "q": "Co, jeśli komputer przyjedzie uszkodzony?",
+          "a": "Zadzwoń albo napisz tego samego dnia. Jeśli to szkoda w transporcie, odbieramy go kurierem i naprawiamy w pierwszej kolejności.",
+          "onHome": false
+        }
+      ]
+    },
+    {
+      "group": "Technika i klatki",
+      "items": [
+        {
+          "q": "Skąd wiecie, ile klatek będzie w mojej grze?",
+          "a": "Z niezależnych testów (TechPowerUp, ComputerBase i inne) przy najwyższych ustawieniach. Gdzie testu z naszą kartą brak, podajemy szacunek i tak go oznaczamy. Po złożeniu mierzymy klatki każdego egzemplarza.",
+          "onHome": false
+        },
+        {
+          "q": "Gwarantujecie liczbę klatek?",
+          "a": "Nie, bo zależy też od aktualizacji gry, sterowników i ustawień. Pokazujemy uczciwe średnie z testów, z oznaczonym źródłem.",
+          "onHome": false
+        },
+        {
+          "q": "Czy Windows jest w zestawie?",
+          "a": "Tak, Windows 11 zainstalowany, zaktualizowany i aktywowany, ze sterownikami.",
+          "onHome": false
+        },
+        {
+          "q": "Dlaczego nie podajecie producentów części?",
+          "a": "Bo ceny i dostępność zmieniają się co tydzień. Pilnujemy klasy i minimalnych parametrów, a dokładne modele widzisz w ofercie przed wpłatą.",
+          "onHome": false
+        }
+      ]
+    },
+    {
+      "group": "Dla rodziców",
+      "items": [
+        {
+          "q": "Nie znam się na komputerach. Od czego zacząć?",
+          "a": "Napisz, w co gra dziecko i na jakim monitorze. Resztę dobierzemy i wytłumaczymy bez żargonu.",
+          "onHome": false
+        },
+        {
+          "q": "Jak sprawdzić, że jesteście prawdziwą firmą?",
+          "a": "PRO-KOM działa od 2004 roku, NIP 735-251-14-47. Sprawdzisz nas w CEIDG i na białej liście VAT, a sklepy odwiedzisz w Rabce i Zakopanem.",
+          "onHome": false
+        },
+        {
+          "q": "Mogę pokazać ofertę komuś, kto się zna?",
+          "a": "Oczywiście. Oferta ma imienną listę części, a porównanie zestawów wyślesz jednym linkiem.",
+          "onHome": false
+        }
+      ]
+    },
+    {
+      "group": "Na stronie głównej",
+      "onHomeOnly": true,
+      "items": [
+        {
+          "q": "Dlaczego nie ma przycisku „Kup”?",
+          "a": "Ceny części zmieniają się teraz codziennie. Wysyłasz zapytanie, a my odpisujemy z imienną listą części, aktualną ceną i terminem. Oferta jest ważna 48 godzin, a płacisz dopiero, gdy ją zaakceptujesz.",
+          "onHome": true
+        },
+        {
+          "q": "Skąd wiecie, ile klatek będzie w mojej grze?",
+          "a": "Mierzymy w serwisie w Rabce na naszych zestawach. Gdy pomiaru jeszcze nie ma, pokazujemy wynik z niezależnego testu z linkiem do źródła, a gdy testu z naszą kartą brak, uczciwy szacunek. Każdy wynik ma kolorowe oznaczenie.",
+          "onHome": true
+        },
+        {
+          "q": "Jak długo czekam na komputer?",
+          "a": "Zwykle 5–10 dni roboczych od wpłaty. Etap sprawdzisz na tablicy warsztatu i w swoim koncie.",
+          "onHome": true
+        },
+        {
+          "q": "Mogę zwrócić komputer?",
+          "a": "Tak. Przy zakupie na odległość masz 14 dni na odstąpienie od umowy. Koszt odesłania pokrywasz Ty. Szczegóły są w regulaminie.",
+          "onHome": true
+        },
+        {
+          "q": "Co, jeśli coś przestanie działać?",
+          "a": "Najpierw pomagamy zdalnie. Jeśli trzeba, kurier odbiera komputer od Ciebie na nasz koszt. Gwarancja PRO-KOM obejmuje cały komputer przez 2 lata.",
+          "onHome": true
+        },
+        {
+          "q": "Mogę sam dołożyć RAM albo dysk?",
+          "a": "Tak. Gwarancja zostaje, nie obejmuje tylko uszkodzeń powstałych przy rozbudowie.",
+          "onHome": true
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,70 @@
+# Production stack (ADR-004): the app from the GHCR image + PostgreSQL. Nginx is a separate stack
+# shared with staging (compose.proxy.yml); it reaches the app as `prokom-prod-app-1` on the
+# `prokom-proxy` network. Staging = this file + compose.staging.yml.
+# Start (from the repo root, with the environment file next to it — never committed):
+#   docker compose --env-file .env.prod -f docker/compose.prod.yml up -d
+# `.env.prod` holds the app variables (.env.example) plus APP_IMAGE_TAG and POSTGRES_PASSWORD;
+# DATABASE_URL must point at the `postgres` service with that password.
+# Rollback = previous APP_IMAGE_TAG + `up -d app` (docs/wdrozenia.md).
+
+name: prokom-prod
+
+x-logging: &logging # Docker keeps the JSON logs; rotation so they never fill the disk.
+  driver: json-file
+  options:
+    max-size: '10m'
+    max-file: '5'
+
+services:
+  app:
+    image: ghcr.io/prokom-eu/prokom-web:${APP_IMAGE_TAG:?set APP_IMAGE_TAG (commit SHA)}
+    restart: unless-stopped
+    # Relative to this file; ENV_FILE overrides it (e.g. a local test with another file).
+    env_file: ${ENV_FILE:-../.env.prod}
+    environment:
+      NODE_ENV: production
+      MEDIA_DIR: /app/media
+    networks: [default, proxy]
+    ports:
+      # Only on the loopback (smoke test on the server); the public entry is Nginx.
+      - '127.0.0.1:${APP_PORT:-3000}:3000'
+    volumes:
+      - media:/app/media
+    depends_on:
+      postgres:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 1536m
+    logging: *logging
+
+  postgres:
+    image: postgres:17.11-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: prokom
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+      POSTGRES_DB: prokom_prod
+    # No published port: only the app (same network) and `docker compose exec` reach it.
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U prokom -d prokom_prod']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    deploy:
+      resources:
+        limits:
+          memory: 768m
+    logging: *logging
+
+networks:
+  proxy:
+    name: prokom-proxy
+    external: true
+
+volumes:
+  pgdata:
+  media:

@@ -1,0 +1,72 @@
+# Reverse proxy for both app stacks on the server (ADR-004, S9b): nginx + certbot.
+# One-time: docker network create prokom-proxy
+# Start (from the repo root, environment file next to it — never committed):
+#   docker compose --env-file .env.proxy -f docker/compose.proxy.yml up -d
+# `.env.proxy`: domains and the staging password file (.env.example, section "Proxy").
+# First certificates and renewals: docs/wdrozenia.md.
+
+name: prokom-proxy
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: '10m'
+    max-file: '5'
+
+services:
+  nginx:
+    image: nginx:1.30.6-alpine
+    restart: unless-stopped
+    ports:
+      - '${HTTP_PORT:-80}:80'
+      - '${HTTPS_PORT:-443}:443'
+    environment:
+      # Rendered templates go here (nginx.conf includes only this directory).
+      NGINX_ENVSUBST_OUTPUT_DIR: /etc/nginx/sites
+      PROD_SITE_HOSTS: ${PROD_SITE_HOSTS:?set PROD_SITE_HOSTS}
+      PROD_PANEL_HOST: ${PROD_PANEL_HOST:?set PROD_PANEL_HOST}
+      STAGING_SITE_HOSTS: ${STAGING_SITE_HOSTS:?set STAGING_SITE_HOSTS}
+      STAGING_PANEL_HOST: ${STAGING_PANEL_HOST:?set STAGING_PANEL_HOST}
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/snippets:/etc/nginx/snippets:ro
+      - ./nginx/templates:/etc/nginx/templates:ro
+      - ./nginx/reload-certs.sh:/docker-entrypoint.d/90-reload-certs.sh:ro
+      - ${STAGING_HTPASSWD_FILE:?set STAGING_HTPASSWD_FILE}:/etc/nginx/auth/staging.htpasswd:ro
+      - ${LETSENCRYPT_DIR:-letsencrypt}:/etc/letsencrypt:ro
+      - acme:/var/www/certbot:ro
+    tmpfs:
+      - /etc/nginx/sites # rendered at every start
+    networks: [proxy]
+    deploy:
+      resources:
+        limits:
+          memory: 128m
+    logging: *logging
+
+  # Renews certificates twice a day (webroot through nginx); nginx reloads every 6 h.
+  certbot:
+    image: certbot/certbot:v5.7.0
+    restart: unless-stopped
+    entrypoint:
+      - /bin/sh
+      - -c
+      - trap exit TERM; while :; do certbot renew --webroot -w /var/www/certbot --quiet; sleep 12h & wait $${!}; done
+    volumes:
+      - ${LETSENCRYPT_DIR:-letsencrypt}:/etc/letsencrypt
+      - acme:/var/www/certbot
+    deploy:
+      resources:
+        limits:
+          memory: 128m
+    logging: *logging
+
+networks:
+  # Shared with the app stacks (compose.prod.yml); nginx finds `prokom-<stack>-app-1` on it.
+  proxy:
+    name: prokom-proxy
+    external: true
+
+volumes:
+  letsencrypt:
+  acme:

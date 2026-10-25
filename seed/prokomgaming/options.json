@@ -1,0 +1,974 @@
+{
+  "_info": "Kolekcja `options` (ADR-G002 §2): obudowy (24), chłodzenia (22), RAM (7), dyski (4). Obudowy i chłodzenia pokazujemy z pełną nazwą (`publicLabel`) i zdjęciem; RAM i dyski tylko klasą (`publicLabel`, bez producenta). `internalModel` tylko w panelu. Zdjęcia: seed/prokomgaming/media/<image>. `aio360`: none | front | top_only | side | yes (`aio360Raw` = tekst z arkusza, tylko informacyjnie, nie importować). `active` domyślnie true. `ean` opcjonalny (dziś brak). `_check.sell` = cena z arkusza do testów.",
+  "items": [
+    {
+      "type": "case",
+      "code": "SIG3A",
+      "publicLabel": "Endorfy Signum 300 ARGB",
+      "internalModel": "Endorfy Signum 300 ARGB",
+      "cost": 223,
+      "color": "czarny",
+      "class": 1,
+      "gpuMaxMm": 325,
+      "coolerMaxMm": 161,
+      "aio360": "front",
+      "aio360Raw": "TAK (przód)",
+      "description": "4 wentylatory ARGB, szkło",
+      "image": "options/SIG3A.webp",
+      "_check": {
+        "sell": 250
+      },
+      "active": true
+    },
+    {
+      "type": "case",
+      "code": "VEN2A",
+      "publicLabel": "Endorfy Ventum 200 ARGB",
+      "internalModel": "Endorfy Ventum 200 ARGB",
+      "cost": 199,
+      "color": "czarny",
+      "class": 1,
+      "gpuMaxMm": 315,
+      "coolerMaxMm": 161,
+      "aio360": "front",
+      "aio360Raw": "TAK (przód)",
+      "description": "4 wentylatory ARGB, siatka z przodu",
+      "image": "options/VEN2A.webp",
+      "_check": {
+        "sell": 220
+      },
+      "active": true
+    },
+    {
+      "type": "case",
+      "code": "EXO",
+      "publicLabel": "Krux Exo RGB czarna",
+      "internalModel": "Krux Exo RGB czarna (KRXD004)",
+      "cost": 259,
+      "color": "czarny",
+      "class": 2,
+      "gpuMaxMm": 405,
+      "coolerMaxMm": 181,
+      "aio360": "top_only",
+      "aio360Raw": "TAK (góra)",
+      "description": "szkło panoramiczne, 4 wentylatory RGB",
+      "image": "options/EXO.webp",
+      "_check": {
+        "sell": 280
+      },
+      "active": true
+    },
+    {
+      "type": "case",
+      "code": "REG4",
+      "publicLabel": "Endorfy Regnum 400 ARGB",
+      "internalModel": "Endorfy Regnum 400 ARGB",
+      "cost": 265,
+      "color": "czarny",
+      "class": 2,
+      "gpuMaxMm": 370,
+      "coolerMaxMm": 162,
+      "aio360": "front",
+      "aio360Raw": "TAK (przód)",
+      "description": "4 wentylatory ARGB, siatka",
+      "image": "options/REG4.webp",
+      "_check": {
+        "sell": 290
+      },
+      "active": true
+    },
+    {
+      "type": "case",
+      "code": "VEN4",
+      "publicLabel": "Endorfy Ventum 400 ARGB",
+      "internalModel": "Endorfy Ventum 400 ARGB",
+      "cost": 309,
+      "color": "czarny",
+      "class": 2,
+      "gpuMaxMm": 345,
+      "coolerMaxMm": 164,
+      "aio360": "front",
+      "aio360Raw": "TAK (przód)",
+      "description": "4 wentylatory ARGB, siatka",
+      "image": "options/VEN4.webp",
+      "_check": {
+        "sell": 330
+      },
+      "active": true
+    },
+    {
+      "type": "case",
+      "code": "PANO130",
+      "publicLabel": "MSI MAG PANO 130R PZ czarna",
+      "internalModel": "MSI MAG PANO 130R PZ czarna",
+      "cost": 319,
+      "color": "czarny",
+      "class": 2,
+      "gpuMaxMm": 400,
+      "coolerMaxMm": 165,
+      "aio360": "yes",
+      "aio360Raw": "TAK",
+      "description": "szkło panoramiczne, 4× ARGB",
+      "image": "options/PANO130.webp",
+      "_check": {
+        "sell": 340
+      },
+      "active": true
+    },
+    {
+      "type": "case",
+      "code": "STEL5",
+      "publicLabel": "Modecom Volcano Stellar ARGB 5F czarna",
+      "internalModel": "Modecom Volcano Stellar ARGB 5F czarna",
+      "cost": 399,
+      "color": "czarny",
+      "class": 2,
+      "gpuMaxMm": 420,
+      "coolerMaxMm": 175,
+      "aio360": "top_only",
+      "aio360Raw": "TAK (tylko góra)",
+      "description": "szkło panoramiczne, 5× ARGB",
+      "image": "options/STEL5.webp",
+      "_check": {
+        "sell": 420
+      },
+      "active": true
+    },
+    {
+      "type": "case",
+      "code": "STP5",
+      "publicLabel": "Modecom Volcano Stellar Plus ARGB 5F czarna",
+      "internalModel": "Modecom Volcano Stellar Plus ARGB 5F czarna",
+      "cost": 399,
+      "color": "czarny",
+      "class": 2,
+      "gpuMaxMm": 420,
+      "coolerMaxMm": 175,
+      "aio360": "yes",
+      "aio360Raw": "TAK",
+      "description": "szkło panoramiczne, 5× ARGB, AIO z boku",
+      "image": "options/STP5.webp",
+      "_check": {
+        "sell": 420
+      },
+      "active": true
+    },
+    {
+      "type": "case",
+      "code": "PANO100",
+      "publicLabel": "MSI MAG PANO 100R PZ czarna",
+      "internalModel": "MSI MAG PANO 100R PZ czarna",
+      "cost": 419,
+      "color": "czarny",
+      "class": 2,
+      "gpuMaxMm": 380,
+      "coolerMaxMm": 166,
+      "aio360": "yes",
+      "aio360Raw": "TAK",
+      "description": "szkło panoramiczne, 4× ARGB, hub",
+      "image": "options/PANO100.webp",
+      "_check": {
+        "sell": 440
+      },
+      "active": true
+    },
+    {
+      "type": "case",
+      "code": "ARX5",
+      "publicLabel": "Endorfy Arx 500 ARGB",
+      "internalModel": "Endorfy Arx 500 ARGB",
+      "cost": 360,
+      "color": "czarny",
+      "class": 2,
+      "gpuMaxMm": 350,
+      "coolerMaxMm": 179,
+      "aio360": "front",
+      "aio360Raw": "TAK (przód)",
+      "description": "siatka z przodu, ARGB",
+      "image": "options/ARX5.webp",
+      "_check": {
+        "sell": 380
+      },
+      "active": true
+    },
+    {
+      "type": "case",
+      "code": "ARX7",
+      "publicLabel": "Endorfy Arx 700 ARGB",
+      "internalModel": "Endorfy Arx 700 ARGB",
+      "cost": 402,
+      "color": "czarny",
+      "class": 2,
+      "gpuMaxMm": 410,
+      "coolerMaxMm": 179,
+      "aio360": "yes",
+      "aio360Raw": "TAK",
+      "description": "duża, siatka, ARGB",
+      "image": "options/ARX7.webp",
+      "_check": {
+        "sell": 430
+      },
+      "active": true
+    },
+    {
+      "type": "case",
+      "code": "ARX7A",
+      "publicLabel": "Endorfy Arx 700 Air",
+      "internalModel": "Endorfy Arx 700 Air",
+      "cost": 379,
+      "color": "czarny",
+      "class": 2,
+      "gpuMaxMm": 410,
+      "coolerMaxMm": 179,
+      "aio360": "yes",
+      "aio360Raw": "TAK",
+      "description": "duża, siatka, 5 wentylatorów",
+      "image": "options/ARX7A.webp",
+      "_check": {
+        "sell": 400
+      },
+      "active": true
+    },
+    {
+      "type": "case",
+      "code": "F4000D",
+      "publicLabel": "Corsair FRAME 4000D RS ARGB czarna",
+      "internalModel": "Corsair FRAME 4000D RS ARGB czarna (CC-9011296-WW)",
+      "cost": 460,
+      "color": "czarny",
+      "class": 2,
+      "gpuMaxMm": 430,
+      "coolerMaxMm": 170,
+      "aio360": "yes",
+      "aio360Raw": "TAK",
+      "description": "siatka z przodu, 3× ARGB",
+      "image": "options/F4000D.webp",
+      "_check": {
+        "sell": 480
+      },
+      "active": true
+    },
+    {
+      "type": "case",
+      "code": "PANOR5",
+      "publicLabel": "Modecom Volcano Panorama APEX ARGB 5F szara",
+      "internalModel": "Modecom Volcano Panorama APEX ARGB 5F szara",
+      "cost": 389,
+      "color": "szary",
+      "class": 2,
+      "gpuMaxMm": 400,
+      "coolerMaxMm": 175,
+      "aio360": "yes",
+      "aio360Raw": "TAK",
+      "description": "szkło panoramiczne, 5× ARGB",
+      "image": "options/PANOR5.webp",
+      "_check": {
+        "sell": 410
+      },
+      "active": true
+    },
+    {
+      "type": "case",
+      "code": "SPACE",
+      "publicLabel": "Modecom Volcano Space APEX ARGB czarna",
+      "internalModel": "Modecom Volcano Space APEX ARGB czarna",
+      "cost": 500,
+      "color": "czarny",
+      "class": 2,
+      "gpuMaxMm": 430,
+      "coolerMaxMm": 183,
+      "aio360": "yes",
+      "aio360Raw": "TAK",
+      "description": "szkło panoramiczne, 4×140 ARGB",
+      "image": "options/SPACE.webp",
+      "_check": {
+        "sell": 520
+      },
+      "active": true
+    },
+    {
+      "type": "case",
+      "code": "SPACEW",
+      "publicLabel": "Modecom Volcano Space APEX ARGB biała",
+      "internalModel": "Modecom Volcano Space APEX ARGB biała",
+      "cost": 520,
+      "color": "biały",
+      "class": 2,
+      "gpuMaxMm": 430,
+      "coolerMaxMm": 183,
+      "aio360": "yes",
+      "aio360Raw": "TAK",
+      "description": "biała, szkło panoramiczne, 4×140 ARGB",
+      "image": "options/SPACEW.webp",
+      "_check": {
+        "sell": 540
+      },
+      "active": true
+    },
+    {
+      "type": "case",
+      "code": "SPXL",
+      "publicLabel": "Modecom Volcano Space XL ARGB 5F czarna (Full Tower)",
+      "internalModel": "Modecom Volcano Space XL ARGB 5F czarna (Full Tower)",
+      "cost": 525,
+      "color": "czarny",
+      "class": 2,
+      "gpuMaxMm": 440,
+      "coolerMaxMm": 180,
+      "aio360": "yes",
+      "aio360Raw": "TAK",
+      "description": "Full Tower, 5×140 ARGB",
+      "image": "options/SPXL.webp",
+      "_check": {
+        "sell": 550
+      },
+      "active": true
+    },
+    {
+      "type": "case",
+      "code": "AQ500",
+      "publicLabel": "Modecom Volcano AQ500 ARGB czarna",
+      "internalModel": "Modecom Volcano AQ500 ARGB czarna",
+      "cost": 449,
+      "color": "czarny",
+      "class": 2,
+      "gpuMaxMm": 400,
+      "coolerMaxMm": 180,
+      "aio360": "top_only",
+      "aio360Raw": "TAK (tylko góra)",
+      "description": "szkło panoramiczne, 4× ARGB",
+      "image": "options/AQ500.webp",
+      "_check": {
+        "sell": 470
+      },
+      "active": true
+    },
+    {
+      "type": "case",
+      "code": "AQ",
+      "publicLabel": "Endorfy Aquarius 8000 Corona",
+      "internalModel": "Endorfy Aquarius 8000 Corona",
+      "cost": 449,
+      "color": "czarny",
+      "class": 2,
+      "gpuMaxMm": 450,
+      "coolerMaxMm": 179,
+      "aio360": "yes",
+      "aio360Raw": "TAK",
+      "description": "szkło panoramiczne, ARGB",
+      "image": "options/AQ.webp",
+      "_check": {
+        "sell": 470
+      },
+      "active": true
+    },
+    {
+      "type": "case",
+      "code": "FISH",
+      "publicLabel": "Endorfy Fishtank 6000 Corona",
+      "internalModel": "Endorfy Fishtank 6000 Corona",
+      "cost": 389,
+      "color": "czarny",
+      "class": 2,
+      "gpuMaxMm": 445,
+      "coolerMaxMm": 182,
+      "aio360": "yes",
+      "aio360Raw": "TAK",
+      "description": "szkło panoramiczne, ARGB",
+      "image": "options/FISH.webp",
+      "_check": {
+        "sell": 410
+      },
+      "active": true
+    },
+    {
+      "type": "case",
+      "code": "LB500",
+      "publicLabel": "be quiet! Light Base 500 LX czarna",
+      "internalModel": "be quiet! Light Base 500 LX czarna (BGW85)",
+      "cost": 559,
+      "color": "czarny",
+      "class": 3,
+      "gpuMaxMm": 400,
+      "coolerMaxMm": 185,
+      "aio360": "top_only",
+      "aio360Raw": "TAK (tylko góra)",
+      "description": "szkło panoramiczne, 4× ARGB, cicha",
+      "image": "options/LB500.webp",
+      "_check": {
+        "sell": 580
+      },
+      "active": true
+    },
+    {
+      "type": "case",
+      "code": "4500XB",
+      "publicLabel": "Corsair FRAME 4500X RS-R ARGB czarna",
+      "internalModel": "Corsair FRAME 4500X RS-R ARGB czarna (CC-9011314-WW)",
+      "cost": 406,
+      "color": "czarny",
+      "class": 3,
+      "gpuMaxMm": 460,
+      "coolerMaxMm": 185,
+      "aio360": "yes",
+      "aio360Raw": "TAK",
+      "description": "szkło panoramiczne, 3× ARGB, 2× AIO 360",
+      "image": "options/4500XB.webp",
+      "_check": {
+        "sell": 430
+      },
+      "active": true
+    },
+    {
+      "type": "case",
+      "code": "4500XW",
+      "publicLabel": "Corsair FRAME 4500X RS-R ARGB biała",
+      "internalModel": "Corsair FRAME 4500X RS-R ARGB biała (CC-9011315-WW)",
+      "cost": 550,
+      "color": "biały",
+      "class": 3,
+      "gpuMaxMm": 460,
+      "coolerMaxMm": 185,
+      "aio360": "yes",
+      "aio360Raw": "TAK",
+      "description": "biała, szkło panoramiczne, 3× ARGB",
+      "image": "options/4500XW.webp",
+      "_check": {
+        "sell": 570
+      },
+      "active": true
+    },
+    {
+      "type": "case",
+      "code": "H9",
+      "publicLabel": "NZXT H9 Flow RGB+ czarna",
+      "internalModel": "NZXT H9 Flow RGB+ czarna",
+      "cost": 850,
+      "color": "czarny",
+      "class": 3,
+      "gpuMaxMm": 459,
+      "coolerMaxMm": 165,
+      "aio360": "yes",
+      "aio360Raw": "TAK",
+      "description": "premium, szkło panoramiczne, RGB",
+      "image": "options/H9.webp",
+      "_check": {
+        "sell": 870
+      },
+      "active": true
+    },
+    {
+      "type": "cooler",
+      "code": "SPARTAN",
+      "publicLabel": "Endorfy Spartan 5 ARGB",
+      "internalModel": "Endorfy Spartan 5 ARGB",
+      "cost": 59,
+      "color": "czarny",
+      "class": 1,
+      "kind": "air",
+      "description": "wieża 120 mm, ARGB",
+      "image": "options/SPARTAN.webp",
+      "_check": {
+        "sell": 80
+      },
+      "heightMm": 146,
+      "active": true
+    },
+    {
+      "type": "cooler",
+      "code": "T101",
+      "publicLabel": "Modecom Volcano 0C T101 ARGB 120",
+      "internalModel": "Modecom Volcano 0C T101 ARGB 120",
+      "cost": 89,
+      "color": "czarny",
+      "class": 1,
+      "kind": "air",
+      "description": "wieża 120 mm, ARGB",
+      "image": "options/T101.webp",
+      "_check": {
+        "sell": 110
+      },
+      "heightMm": 153,
+      "active": true
+    },
+    {
+      "type": "cooler",
+      "code": "T102",
+      "publicLabel": "Modecom Volcano 0C T102 LCD ARGB 120 czarne",
+      "internalModel": "Modecom Volcano 0C T102 LCD ARGB 120 czarne",
+      "cost": 125,
+      "color": "czarny",
+      "class": 1,
+      "kind": "air",
+      "description": "wieża 120 mm, ekran temperatury",
+      "image": "options/T102.webp",
+      "_check": {
+        "sell": 150
+      },
+      "heightMm": 153,
+      "active": true
+    },
+    {
+      "type": "cooler",
+      "code": "AK400",
+      "publicLabel": "Deepcool AK400 Digital SE",
+      "internalModel": "Deepcool AK400 Digital SE",
+      "cost": 123,
+      "color": "czarny",
+      "class": 2,
+      "kind": "air",
+      "description": "wieża 120 mm, wyświetlacz",
+      "image": "options/AK400.webp",
+      "_check": {
+        "sell": 150
+      },
+      "heightMm": 157,
+      "active": true
+    },
+    {
+      "type": "cooler",
+      "code": "FERA",
+      "publicLabel": "Endorfy Fera 5",
+      "internalModel": "Endorfy Fera 5",
+      "cost": 95,
+      "color": "czarny",
+      "class": 2,
+      "kind": "air",
+      "description": "wieża 120 mm, 6 ciepłowodów",
+      "image": "options/FERA.webp",
+      "_check": {
+        "sell": 120
+      },
+      "heightMm": 155,
+      "active": true
+    },
+    {
+      "type": "cooler",
+      "code": "FORTIS",
+      "publicLabel": "Endorfy Fortis 5",
+      "internalModel": "Endorfy Fortis 5",
+      "cost": 139,
+      "color": "czarny",
+      "class": 2,
+      "kind": "air",
+      "description": "wieża 140 mm",
+      "image": "options/FORTIS.webp",
+      "_check": {
+        "sell": 160
+      },
+      "heightMm": 159,
+      "active": true
+    },
+    {
+      "type": "cooler",
+      "code": "AK620",
+      "publicLabel": "Deepcool AK620 Digital SE",
+      "internalModel": "Deepcool AK620 Digital SE",
+      "cost": 208,
+      "color": "czarny",
+      "class": 2,
+      "kind": "air",
+      "description": "dwie wieże, wyświetlacz",
+      "image": "options/AK620.webp",
+      "_check": {
+        "sell": 230
+      },
+      "heightMm": 161,
+      "active": true
+    },
+    {
+      "type": "cooler",
+      "code": "LE360",
+      "publicLabel": "Deepcool LE360 V2",
+      "internalModel": "Deepcool LE360 V2",
+      "cost": 274,
+      "color": "czarny",
+      "class": 3,
+      "kind": "aio360",
+      "description": "360 mm, ARGB",
+      "image": "options/LE360.webp",
+      "_check": {
+        "sell": 300
+      },
+      "radiatorThicknessMm": 27,
+      "active": true
+    },
+    {
+      "type": "cooler",
+      "code": "NAV360",
+      "publicLabel": "Endorfy Navis F360 ARGB",
+      "internalModel": "Endorfy Navis F360 ARGB",
+      "cost": 285,
+      "color": "czarny",
+      "class": 3,
+      "kind": "aio360",
+      "description": "360 mm, ARGB, nr 1 w Polsce",
+      "image": "options/NAV360.webp",
+      "_check": {
+        "sell": 310
+      },
+      "radiatorThicknessMm": 28,
+      "active": true
+    },
+    {
+      "type": "cooler",
+      "code": "A13",
+      "publicLabel": "MSI MAG CoreLiquid A13 360 czarny",
+      "internalModel": "MSI MAG CoreLiquid A13 360 czarny",
+      "cost": 299,
+      "color": "czarny",
+      "class": 3,
+      "kind": "aio360",
+      "description": "360 mm, ARGB",
+      "image": "options/A13.webp",
+      "_check": {
+        "sell": 320
+      },
+      "radiatorThicknessMm": 27,
+      "active": true
+    },
+    {
+      "type": "cooler",
+      "code": "A13W",
+      "publicLabel": "MSI MAG CoreLiquid A13 360 White",
+      "internalModel": "MSI MAG CoreLiquid A13 360 White",
+      "cost": 301,
+      "color": "biały",
+      "class": 3,
+      "kind": "aio360",
+      "description": "360 mm, białe, ARGB",
+      "image": "options/A13W.webp",
+      "_check": {
+        "sell": 330
+      },
+      "radiatorThicknessMm": 27,
+      "active": true
+    },
+    {
+      "type": "cooler",
+      "code": "ARC",
+      "publicLabel": "Arctic Liquid Freezer III Pro 360",
+      "internalModel": "Arctic Liquid Freezer III Pro 360",
+      "cost": 325,
+      "color": "czarny",
+      "class": 3,
+      "kind": "aio360",
+      "description": "360 mm, gruba chłodnica, bardzo wydajne",
+      "image": "options/ARC.webp",
+      "_check": {
+        "sell": 350
+      },
+      "radiatorThicknessMm": 38,
+      "active": true
+    },
+    {
+      "type": "cooler",
+      "code": "ARCA",
+      "publicLabel": "Arctic Liquid Freezer III Pro 360 A-RGB",
+      "internalModel": "Arctic Liquid Freezer III Pro 360 A-RGB",
+      "cost": 374,
+      "color": "czarny",
+      "class": 3,
+      "kind": "aio360",
+      "description": "360 mm, A-RGB, bardzo wydajne",
+      "image": "options/ARCA.webp",
+      "_check": {
+        "sell": 400
+      },
+      "radiatorThicknessMm": 38,
+      "active": true
+    },
+    {
+      "type": "cooler",
+      "code": "ARCAW",
+      "publicLabel": "Arctic Liquid Freezer III Pro 360 A-RGB White",
+      "internalModel": "Arctic Liquid Freezer III Pro 360 A-RGB White",
+      "cost": 459,
+      "color": "biały",
+      "class": 3,
+      "kind": "aio360",
+      "description": "360 mm, białe, A-RGB",
+      "image": "options/ARCAW.webp",
+      "_check": {
+        "sell": 480
+      },
+      "radiatorThicknessMm": 38,
+      "active": true
+    },
+    {
+      "type": "cooler",
+      "code": "CMNEX",
+      "publicLabel": "Cooler Master MasterLiquid Core Nex Digital 360 ARGB",
+      "internalModel": "Cooler Master MasterLiquid Core Nex Digital 360 ARGB",
+      "cost": 384,
+      "color": "czarny",
+      "class": 3,
+      "kind": "aio360",
+      "description": "360 mm, panel z temperaturą",
+      "image": "options/CMNEX.webp",
+      "_check": {
+        "sell": 410
+      },
+      "radiatorThicknessMm": 27,
+      "active": true
+    },
+    {
+      "type": "cooler",
+      "code": "PL3LX",
+      "publicLabel": "be quiet! Pure Loop 3 LX 360 mm",
+      "internalModel": "be quiet! Pure Loop 3 LX 360 mm",
+      "cost": 417,
+      "color": "czarny",
+      "class": 3,
+      "kind": "aio360",
+      "description": "360 mm, ARGB, ciche",
+      "image": "options/PL3LX.webp",
+      "_check": {
+        "sell": 440
+      },
+      "radiatorThicknessMm": 27,
+      "active": true
+    },
+    {
+      "type": "cooler",
+      "code": "LM360",
+      "publicLabel": "Deepcool LM360 (ekran LCD 2,4\")",
+      "internalModel": "Deepcool LM360 (ekran LCD 2,4\")",
+      "cost": 453,
+      "color": "czarny",
+      "class": 3,
+      "kind": "aio360",
+      "description": "360 mm, ekran LCD na pompie",
+      "image": "options/LM360.webp",
+      "_check": {
+        "sell": 480
+      },
+      "radiatorThicknessMm": 27,
+      "active": true
+    },
+    {
+      "type": "cooler",
+      "code": "NAUTB",
+      "publicLabel": "Corsair Nautilus 360 RS ARGB czarny",
+      "internalModel": "Corsair Nautilus 360 RS ARGB czarny (CW-9060093-WW)",
+      "cost": 490,
+      "color": "czarny",
+      "class": 3,
+      "kind": "aio360",
+      "description": "360 mm, ARGB premium",
+      "image": "options/NAUTB.webp",
+      "_check": {
+        "sell": 510
+      },
+      "radiatorThicknessMm": 27,
+      "active": true
+    },
+    {
+      "type": "cooler",
+      "code": "NAUTW",
+      "publicLabel": "Corsair Nautilus 360 RS ARGB biały",
+      "internalModel": "Corsair Nautilus 360 RS ARGB biały (CW-9060095-WW)",
+      "cost": 524,
+      "color": "biały",
+      "class": 3,
+      "kind": "aio360",
+      "description": "360 mm, białe, ARGB premium",
+      "image": "options/NAUTW.webp",
+      "_check": {
+        "sell": 550
+      },
+      "radiatorThicknessMm": 27,
+      "active": true
+    },
+    {
+      "type": "cooler",
+      "code": "LL360",
+      "publicLabel": "be quiet! Light Loop 360 ARGB czarny",
+      "internalModel": "be quiet! Light Loop 360 ARGB czarny",
+      "cost": 499,
+      "color": "czarny",
+      "class": 3,
+      "kind": "aio360",
+      "description": "360 mm, ARGB premium",
+      "image": "options/LL360.webp",
+      "_check": {
+        "sell": 520
+      },
+      "radiatorThicknessMm": 27,
+      "active": true
+    },
+    {
+      "type": "cooler",
+      "code": "LL360W",
+      "publicLabel": "be quiet! Light Loop 360 ARGB White",
+      "internalModel": "be quiet! Light Loop 360 ARGB White",
+      "cost": 499,
+      "color": "biały",
+      "class": 3,
+      "kind": "aio360",
+      "description": "360 mm, białe, ARGB premium",
+      "image": "options/LL360W.webp",
+      "_check": {
+        "sell": 520
+      },
+      "radiatorThicknessMm": 27,
+      "active": true
+    },
+    {
+      "type": "cooler",
+      "code": "KRAKEN",
+      "publicLabel": "NZXT Kraken Plus 360 RGB (LCD)",
+      "internalModel": "NZXT Kraken Plus 360 RGB (LCD)",
+      "cost": 859,
+      "color": "czarny",
+      "class": 3,
+      "kind": "aio360",
+      "description": "360 mm, ekran LCD premium",
+      "image": "options/KRAKEN.webp",
+      "_check": {
+        "sell": 880
+      },
+      "radiatorThicknessMm": 27,
+      "active": true
+    },
+    {
+      "type": "ram",
+      "code": "R16D4",
+      "publicLabel": "16 GB DDR4 3200 (2x8)",
+      "internalModel": "G.SKILL Aegis DDR4 16 GB (2x8) 3200 CL16",
+      "cost": 594,
+      "ramType": "DDR4",
+      "capacityGb": 16,
+      "_check": {
+        "sell": 690
+      },
+      "active": true
+    },
+    {
+      "type": "ram",
+      "code": "R32D4",
+      "publicLabel": "32 GB DDR4 3200 (2x16)",
+      "internalModel": "G.SKILL Aegis DDR4 32 GB (2x16) 3200 CL16",
+      "cost": 948,
+      "ramType": "DDR4",
+      "capacityGb": 32,
+      "_check": {
+        "sell": 1100
+      },
+      "active": true
+    },
+    {
+      "type": "ram",
+      "code": "R16",
+      "publicLabel": "16 GB DDR5 6000 (2x8)",
+      "internalModel": "Lexar THOR DDR5 16 GB (2x8) 6000 CL38",
+      "cost": 1080,
+      "ramType": "DDR5",
+      "capacityGb": 16,
+      "_check": {
+        "sell": 1250
+      },
+      "active": true
+    },
+    {
+      "type": "ram",
+      "code": "R32",
+      "publicLabel": "32 GB DDR5 6000 CL30 (2x16)",
+      "internalModel": "GOODRAM IRDM DDR5 32 GB (2x16) 6000 CL30",
+      "cost": 2219,
+      "ramType": "DDR5",
+      "capacityGb": 32,
+      "_check": {
+        "sell": 2560
+      },
+      "active": true
+    },
+    {
+      "type": "ram",
+      "code": "R32RGB",
+      "publicLabel": "32 GB DDR5 6000 RGB (2x16)",
+      "internalModel": "GOODRAM IRDM RGB DDR5 32 GB (2x16) 6000",
+      "cost": 2300,
+      "ramType": "DDR5",
+      "capacityGb": 32,
+      "_check": {
+        "sell": 2650
+      },
+      "active": true
+    },
+    {
+      "type": "ram",
+      "code": "R32WP",
+      "publicLabel": "32 GB DDR5 6000 CL30 RGB biała (2x16)",
+      "internalModel": "Patriot Viper Elite 5 RGB White DDR5 32 GB (2x16) 6000 CL30",
+      "cost": 2197,
+      "ramType": "DDR5",
+      "capacityGb": 32,
+      "_check": {
+        "sell": 2530
+      },
+      "active": true
+    },
+    {
+      "type": "ram",
+      "code": "R64",
+      "publicLabel": "64 GB DDR5 6000 (2x32)",
+      "internalModel": "GOODRAM IRDM DDR5 64 GB (2x32) 6000",
+      "cost": 4999,
+      "ramType": "DDR5",
+      "capacityGb": 64,
+      "_check": {
+        "sell": 5750
+      },
+      "active": true
+    },
+    {
+      "type": "ssd",
+      "code": "PXL512",
+      "publicLabel": "512 GB NVMe PCIe 4.0",
+      "internalModel": "GOODRAM PX600 Lite 512 GB NVMe PCIe 4.0",
+      "cost": 399,
+      "capacityGb": 512,
+      "_check": {
+        "sell": 460
+      },
+      "active": true
+    },
+    {
+      "type": "ssd",
+      "code": "PX1",
+      "publicLabel": "1 TB NVMe PCIe 4.0",
+      "internalModel": "GOODRAM PX600 1 TB NVMe PCIe 4.0",
+      "cost": 650,
+      "capacityGb": 1000,
+      "_check": {
+        "sell": 750
+      },
+      "active": true
+    },
+    {
+      "type": "ssd",
+      "code": "NM1",
+      "publicLabel": "1 TB NVMe PCIe 4.0, szybki (do 7 400 MB/s)",
+      "internalModel": "Lexar NM790 1 TB NVMe PCIe 4.0",
+      "cost": 849,
+      "capacityGb": 1000,
+      "_check": {
+        "sell": 980
+      },
+      "active": true
+    },
+    {
+      "type": "ssd",
+      "code": "NM2",
+      "publicLabel": "2 TB NVMe PCIe 4.0, szybki (do 7 400 MB/s)",
+      "internalModel": "Lexar NM790 2 TB NVMe PCIe 4.0",
+      "cost": 1377,
+      "capacityGb": 2000,
+      "_check": {
+        "sell": 1590
+      },
+      "active": true
+    }
+  ]
+}

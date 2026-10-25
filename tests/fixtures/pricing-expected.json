@@ -1,0 +1,465 @@
+{
+  "_info": "Oczekiwane wyniki dla testów G4 (lib/pricing/, lib/compat.ts). Wyliczone niezależnie z seed/prokomgaming/*.json i zgodne z arkuszem PRO-KOM_cennik_konfiguratora_2026-10-25.xlsx (zakładki Zestawy, Testy, Ceny „od”, Gwarancja marży). Kody błędów zgodności: gpu_too_long, cooler_too_tall, no_aio_mount, ram_type, requires_aio, ram_too_small, ssd_too_small, cooler_class_too_low, case_class_too_low; ostrzeżenie: thick_radiator_top_only. Zasady: `errors[]` zawiera WSZYSTKIE złamane reguły w kolejności tabeli ADR-G002 §5 (porównuj jako zbiór albo w tej kolejności). `rejectedByReason` liczy każdy powód osobno — jedna konfiguracja może być policzona kilka razy (suma 242 224 przy 151 410 odrzuconych); powody bez trafień (cooler_too_tall, no_aio_mount) są pominięte. Pełna lista konfiguracji nie jest zapisana — test G4 generuje ją sam (16 × 24 × 22 × 7 × 4).",
+  "serviceSell": 180,
+  "builds": [
+    {
+      "slug": "skrzat",
+      "name": "Skrzat",
+      "config": {
+        "level": "P01",
+        "case": "SIG3A",
+        "cooler": "SPARTAN",
+        "ram": "R16D4",
+        "ssd": "PXL512"
+      },
+      "price": 4990,
+      "cost": 4272,
+      "margin": 0.143888,
+      "errors": []
+    },
+    {
+      "slug": "licho",
+      "name": "Licho",
+      "config": {
+        "level": "P02",
+        "case": "VEN2A",
+        "cooler": "T102",
+        "ram": "R16D4",
+        "ssd": "PX1"
+      },
+      "price": 5950,
+      "cost": 5101,
+      "margin": 0.142689,
+      "errors": []
+    },
+    {
+      "slug": "bies",
+      "name": "Bies",
+      "config": {
+        "level": "P03",
+        "case": "EXO",
+        "cooler": "AK400",
+        "ram": "R16",
+        "ssd": "PX1"
+      },
+      "price": 6710,
+      "cost": 5759,
+      "margin": 0.141729,
+      "errors": []
+    },
+    {
+      "slug": "wodnik",
+      "name": "Wodnik",
+      "config": {
+        "level": "P04",
+        "case": "REG4",
+        "cooler": "T102",
+        "ram": "R16",
+        "ssd": "PX1"
+      },
+      "price": 6870,
+      "cost": 5894,
+      "margin": 0.142067,
+      "errors": []
+    },
+    {
+      "slug": "strzyga",
+      "name": "Strzyga",
+      "config": {
+        "level": "P05",
+        "case": "PANO130",
+        "cooler": "AK400",
+        "ram": "R16",
+        "ssd": "PX1"
+      },
+      "price": 7400,
+      "cost": 6358,
+      "margin": 0.140811,
+      "errors": []
+    },
+    {
+      "slug": "kikimora",
+      "name": "Kikimora",
+      "config": {
+        "level": "P06",
+        "case": "STEL5",
+        "cooler": "LE360",
+        "ram": "R16",
+        "ssd": "PX1"
+      },
+      "price": 9220,
+      "cost": 7999,
+      "margin": 0.13243,
+      "errors": []
+    },
+    {
+      "slug": "zmora",
+      "name": "Zmora",
+      "config": {
+        "level": "P07",
+        "case": "PANO100",
+        "cooler": "NAV360",
+        "ram": "R32",
+        "ssd": "NM1"
+      },
+      "price": 10110,
+      "cost": 8778,
+      "margin": 0.131751,
+      "errors": []
+    },
+    {
+      "slug": "rusalka",
+      "name": "Rusałka",
+      "config": {
+        "level": "P08",
+        "case": "SPACEW",
+        "cooler": "A13W",
+        "ram": "R32WP",
+        "ssd": "PX1"
+      },
+      "price": 10950,
+      "cost": 9262,
+      "margin": 0.154155,
+      "errors": []
+    },
+    {
+      "slug": "baba-jaga",
+      "name": "Baba Jaga",
+      "config": {
+        "level": "P09",
+        "case": "ARX7",
+        "cooler": "NAV360",
+        "ram": "R32",
+        "ssd": "NM1"
+      },
+      "price": 11650,
+      "cost": 10103,
+      "margin": 0.13279,
+      "errors": []
+    },
+    {
+      "slug": "bazyliszek",
+      "name": "Bazyliszek",
+      "config": {
+        "level": "P10",
+        "case": "SPXL",
+        "cooler": "ARC",
+        "ram": "R32",
+        "ssd": "NM1"
+      },
+      "price": 11930,
+      "cost": 10366,
+      "margin": 0.131098,
+      "errors": []
+    },
+    {
+      "slug": "pani-zimy",
+      "name": "Pani Zimy",
+      "config": {
+        "level": "P11",
+        "case": "4500XW",
+        "cooler": "NAUTW",
+        "ram": "R32WP",
+        "ssd": "NM1"
+      },
+      "price": 12240,
+      "cost": 10410,
+      "margin": 0.14951,
+      "errors": []
+    },
+    {
+      "slug": "wilkolak",
+      "name": "Wilkołak",
+      "config": {
+        "level": "P12",
+        "case": "4500XB",
+        "cooler": "NAUTB",
+        "ram": "R32",
+        "ssd": "NM1"
+      },
+      "price": 14440,
+      "cost": 12651,
+      "margin": 0.123892,
+      "errors": []
+    },
+    {
+      "slug": "wampir",
+      "name": "Wampir",
+      "config": {
+        "level": "P13",
+        "case": "LB500",
+        "cooler": "PL3LX",
+        "ram": "R32",
+        "ssd": "NM1"
+      },
+      "price": 14540,
+      "cost": 12752,
+      "margin": 0.122971,
+      "errors": []
+    },
+    {
+      "slug": "weles",
+      "name": "Weles",
+      "config": {
+        "level": "P14",
+        "case": "FISH",
+        "cooler": "LM360",
+        "ram": "R32",
+        "ssd": "NM2"
+      },
+      "price": 17100,
+      "cost": 14962,
+      "margin": 0.125029,
+      "errors": []
+    },
+    {
+      "slug": "zmij",
+      "name": "Żmij",
+      "config": {
+        "level": "P15",
+        "case": "H9",
+        "cooler": "KRAKEN",
+        "ram": "R32RGB",
+        "ssd": "NM2"
+      },
+      "price": 19840,
+      "cost": 17469,
+      "margin": 0.119506,
+      "errors": []
+    },
+    {
+      "slug": "perun",
+      "name": "Perun",
+      "config": {
+        "level": "P16",
+        "case": "H9",
+        "cooler": "KRAKEN",
+        "ram": "R64",
+        "ssd": "NM2"
+      },
+      "price": 53900,
+      "cost": 47556,
+      "margin": 0.117699,
+      "errors": []
+    }
+  ],
+  "scenarios": [
+    {
+      "name": "Wampir dokładnie",
+      "config": {
+        "level": "P13",
+        "case": "LB500",
+        "cooler": "PL3LX",
+        "ram": "R32",
+        "ssd": "NM1"
+      },
+      "price": 14540,
+      "margin": 0.123,
+      "errors": [],
+      "warnings": [],
+      "matchesBuild": "wampir"
+    },
+    {
+      "name": "Wampir z 16 GB RAM",
+      "config": {
+        "level": "P13",
+        "case": "LB500",
+        "cooler": "PL3LX",
+        "ram": "R16",
+        "ssd": "NM1"
+      },
+      "price": 13230,
+      "margin": 0.1222,
+      "errors": [
+        "ram_too_small"
+      ],
+      "warnings": [],
+      "matchesBuild": null
+    },
+    {
+      "name": "Wilkołak (270K) z coolerem powietrznym",
+      "config": {
+        "level": "P12",
+        "case": "4500XB",
+        "cooler": "T102",
+        "ram": "R32",
+        "ssd": "NM1"
+      },
+      "price": 14080,
+      "margin": 0.1274,
+      "errors": [
+        "requires_aio",
+        "cooler_class_too_low"
+      ],
+      "warnings": [],
+      "matchesBuild": null
+    },
+    {
+      "name": "Perun w Ventum 200",
+      "config": {
+        "level": "P16",
+        "case": "VEN2A",
+        "cooler": "KRAKEN",
+        "ram": "R64",
+        "ssd": "NM2"
+      },
+      "price": 53250,
+      "margin": 0.1192,
+      "errors": [
+        "gpu_too_long",
+        "case_class_too_low"
+      ],
+      "warnings": [],
+      "matchesBuild": null
+    },
+    {
+      "name": "Licho (AM4) z DDR5",
+      "config": {
+        "level": "P02",
+        "case": "VEN2A",
+        "cooler": "T102",
+        "ram": "R32",
+        "ssd": "PX1"
+      },
+      "price": 7820,
+      "margin": 0.1399,
+      "errors": [
+        "ram_type"
+      ],
+      "warnings": [],
+      "matchesBuild": null
+    },
+    {
+      "name": "Bies dokładnie",
+      "config": {
+        "level": "P03",
+        "case": "EXO",
+        "cooler": "AK400",
+        "ram": "R16",
+        "ssd": "PX1"
+      },
+      "price": 6710,
+      "margin": 0.1417,
+      "errors": [],
+      "warnings": [],
+      "matchesBuild": "bies"
+    },
+    {
+      "name": "Bies + 32 GB",
+      "config": {
+        "level": "P03",
+        "case": "EXO",
+        "cooler": "AK400",
+        "ram": "R32",
+        "ssd": "PX1"
+      },
+      "price": 8020,
+      "margin": 0.1399,
+      "errors": [],
+      "warnings": [],
+      "matchesBuild": null
+    },
+    {
+      "name": "Kikimora + Navis + 2 TB",
+      "config": {
+        "level": "P06",
+        "case": "STEL5",
+        "cooler": "NAV360",
+        "ram": "R16",
+        "ssd": "NM2"
+      },
+      "price": 10070,
+      "margin": 0.1324,
+      "errors": [],
+      "warnings": [],
+      "matchesBuild": null
+    },
+    {
+      "name": "Bazyliszek z Arctic w Light Base",
+      "config": {
+        "level": "P10",
+        "case": "LB500",
+        "cooler": "ARC",
+        "ram": "R32",
+        "ssd": "NM1"
+      },
+      "price": 11960,
+      "margin": 0.1304,
+      "errors": [],
+      "warnings": [
+        "thick_radiator_top_only"
+      ],
+      "matchesBuild": null
+    },
+    {
+      "name": "Skrzat dokładnie",
+      "config": {
+        "level": "P01",
+        "case": "SIG3A",
+        "cooler": "SPARTAN",
+        "ram": "R16D4",
+        "ssd": "PXL512"
+      },
+      "price": 4990,
+      "margin": 0.1439,
+      "errors": [],
+      "warnings": [],
+      "matchesBuild": "skrzat"
+    },
+    {
+      "name": "Pani Zimy dokładnie",
+      "config": {
+        "level": "P11",
+        "case": "4500XW",
+        "cooler": "NAUTW",
+        "ram": "R32WP",
+        "ssd": "NM1"
+      },
+      "price": 12240,
+      "margin": 0.1495,
+      "errors": [],
+      "warnings": [],
+      "matchesBuild": "pani-zimy"
+    }
+  ],
+  "exhaustive": {
+    "total": 236544,
+    "compatible": 85134,
+    "rejectedByReason": {
+      "ram_type": 80256,
+      "ssd_too_small": 59136,
+      "cooler_class_too_low": 27552,
+      "case_class_too_low": 24640,
+      "ram_too_small": 42240,
+      "gpu_too_long": 3696,
+      "requires_aio": 4704
+    },
+    "minMargin": 0.11092,
+    "minMarginConfig": {
+      "level": "P01",
+      "case": "H9",
+      "cooler": "KRAKEN",
+      "ram": "R16D4",
+      "ssd": "PXL512",
+      "price": 6410
+    }
+  },
+  "priceFrom": {
+    "P01": 4960,
+    "P02": 5590,
+    "P03": 6580,
+    "P04": 6730,
+    "P05": 7210,
+    "P06": 8900,
+    "P07": 8220,
+    "P08": 9200,
+    "P09": 11050,
+    "P10": 11170,
+    "P11": 11290,
+    "P12": 13820,
+    "P13": 13660,
+    "P14": 15740,
+    "P15": 17530,
+    "P16": 52880
+  }
+}

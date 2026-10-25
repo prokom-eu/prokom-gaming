@@ -1,0 +1,41 @@
+{
+  "_info": "Pytania na karcie zestawu („Pytania o {istotę}”, plansza Zestaw) — te same dla 16 zestawów; nagłówek sekcji z biernikiem istoty (`accusative`). Na końcu link do /pytania.",
+  "items": [
+    {
+      "q": "Jak długo czekam na komputer?",
+      "a": "Od 5 do 10 dni roboczych od zaksięgowania wpłaty. Dokładny termin podajemy w ofercie, a status widzisz w koncie."
+    },
+    {
+      "q": "Czy dostanę dokładnie te części, które są na zdjęciach?",
+      "a": "Dostaniesz te same klasy części i nie gorsze od minimum, które podajemy wyżej. Dokładne modele i producentów widzisz w ofercie, zanim zapłacisz, a po zakupie w metryce z numerami seryjnymi."
+    },
+    {
+      "q": "Dlaczego nie podajecie modelu każdej części?",
+      "a": "Ceny części zmieniają się codziennie. Zamiast trzymać się jednego modelu, wybieramy najlepszy dostępny w danym tygodniu, w tej samej klasie. Zawsze widzisz go w ofercie przed wpłatą."
+    },
+    {
+      "q": "Czy Windows jest legalny i aktywowany?",
+      "a": "Tak. Windows 11 jest zainstalowany, zaktualizowany i aktywowany. Licencja jest przypisana do Twojego komputera."
+    },
+    {
+      "q": "Czy ma Wi-Fi i Bluetooth?",
+      "a": "Tak, każdy nasz zestaw ma Wi-Fi i Bluetooth, z anteną w pudełku, jeśli płyta jej wymaga."
+    },
+    {
+      "q": "Czy mogę go rozbudować w przyszłości?",
+      "a": "Tak. Zostawiamy wolne gniazda na pamięć i dysk, a zasilacz ma zapas na mocniejszą kartę. Rozbudowa nie zabiera gwarancji."
+    },
+    {
+      "q": "Jak jest zapakowany i wysłany?",
+      "a": "W podwójnym kartonie z pianką, z wypełnieniem w środku obudowy. Wysyłamy kurierem z ubezpieczeniem i numerem śledzenia albo przygotowujemy do odbioru w sklepie."
+    },
+    {
+      "q": "Czy mogę zmienić kolor podświetlenia?",
+      "a": "Tak, przyciskiem na obudowie albo w programie. Kolor to znak rozpoznawczy istoty, ale komputer jest Twój."
+    },
+    {
+      "q": "Czy pociągnie gry, które dopiero wyjdą?",
+      "a": "Każdy poziom ma zapas na nowe premiery w swojej rozdzielczości. Gdy wychodzi nowa duża gra, dopisujemy jej wyniki do strony."
+    }
+  ]
+}

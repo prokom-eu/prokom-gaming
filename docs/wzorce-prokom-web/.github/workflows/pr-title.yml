@@ -1,0 +1,32 @@
+# PR title check: with squash merge the PR title becomes the commit on develop/main,
+# so it must follow Conventional Commits. Separate workflow, so editing the title
+# re-runs only this check, not the whole CI.
+
+name: PR title
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+permissions: {}
+
+jobs:
+  conventional-title:
+    name: Conventional Commits title
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      # Title passed through env, never interpolated into the script (no command injection).
+      - name: Check title
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          pattern='^(feat|fix|chore|docs|refactor|test|perf|ci|build)(\([a-z0-9._/-]+\))?!?: .+'
+          if [[ "$TITLE" =~ $pattern ]]; then
+            echo "OK: $TITLE"
+          else
+            echo "::error::PR title does not follow Conventional Commits: \"$TITLE\""
+            echo "Expected: type(scope)?: description — types: feat, fix, chore, docs, refactor, test, perf, ci, build."
+            echo "Example: feat(fundament): domain-based tenant routing"
+            exit 1
+          fi

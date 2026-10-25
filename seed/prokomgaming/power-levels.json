@@ -1,0 +1,1032 @@
+{
+  "_info": "Kolekcja `power-levels` (ADR-G002 §2). 16 poziomów mocy (P01–P16) w 9 stopniach mocy (`tier` 1–9 = „Moc I–IX”, `tierLabel` = kraina, np. „2K wysokie”). `tierLead` = poziom, którego zestaw reprezentuje stopień w tabelach 9 wierszy (FPS, medaliony). `targetResolution` = rozdzielczość poziomu (fullhd | qhd | uhd) do kart i SEO. `monitorFilters` = do których filtrów „Monitor” należy (reguła z planszy Zestawy: FullHD = Moc I–IV, 2K = Moc IV–VII, 4K = Moc VII–IX). `components[].publicLabel` = klasa części na stronie; `internalModel` i koszty tylko w panelu, NIGDY na stronie. `upgrade` = „Miejsce na rozbudowę” (do potwierdzenia, pole `_verify`). `_check` = wynik arkusza do testów (nie importować). `leadBuild` = zestaw wiodący poziomu (klatki poziomu = klatki tego zestawu, ADR-G004).",
+  "items": [
+    {
+      "tier": 1,
+      "tierRoman": "I",
+      "tierLead": true,
+      "targetResolution": "fullhd",
+      "monitorFilters": [
+        "fullhd"
+      ],
+      "upgrade": {
+        "freeRamSlots": 2,
+        "freeM2Slots": "1+",
+        "socket": "AM4",
+        "socketNote": "procesory do Ryzen 7 5800X3D",
+        "psuW": 750,
+        "_verify": "wartości z planszy; potwierdzić z modelem płyty (components.mobo.internalModel) przed publikacją"
+      },
+      "code": "P01",
+      "tierLabel": "FullHD start",
+      "variant": "",
+      "publicLabel": "Ryzen 5 5500 + RX 7600 8 GB, płyta B550 Wi-Fi, zasilacz 750 W 80+ Bronze ATX 3.1",
+      "platform": "AM4",
+      "ramType": "DDR4",
+      "color": "czarny",
+      "gpuLengthMm": 282,
+      "requiresAio": false,
+      "components": [
+        {
+          "role": "cpu",
+          "publicLabel": "Ryzen 5 5500",
+          "internalModel": "AMD Ryzen 5 5500 BOX (z chłodzeniem)",
+          "cost": 399
+        },
+        {
+          "role": "gpu",
+          "publicLabel": "RX 7600 8 GB",
+          "internalModel": "Gigabyte Radeon RX 7600 GAMING OC 8G",
+          "cost": 1699
+        },
+        {
+          "role": "mobo",
+          "publicLabel": "płyta B550 Wi-Fi",
+          "internalModel": "MSI B550 GAMING WIFI",
+          "cost": 500
+        },
+        {
+          "role": "psu",
+          "publicLabel": "zasilacz 750 W 80+ Bronze ATX 3.1",
+          "internalModel": "Endorfy Vero L6 750 W Bronze ATX 3.1",
+          "cost": 249
+        }
+      ],
+      "markupClass": "FullHD",
+      "markupOverride": 0.168,
+      "minRamGb": 16,
+      "minSsdGb": 512,
+      "minCoolerClass": 1,
+      "minCaseClass": 1,
+      "leadBuild": "skrzat",
+      "_check": {
+        "cost": 2847,
+        "effectiveMarkup": 0.168,
+        "sell": 3330
+      }
+    },
+    {
+      "tier": 2,
+      "tierRoman": "II",
+      "tierLead": true,
+      "targetResolution": "fullhd",
+      "monitorFilters": [
+        "fullhd"
+      ],
+      "upgrade": {
+        "freeRamSlots": 2,
+        "freeM2Slots": "1+",
+        "socket": "AM4",
+        "socketNote": "procesory do Ryzen 7 5800X3D",
+        "psuW": 750,
+        "_verify": "wartości z planszy; potwierdzić z modelem płyty (components.mobo.internalModel) przed publikacją"
+      },
+      "code": "P02",
+      "tierLabel": "FullHD",
+      "variant": "",
+      "publicLabel": "Ryzen 5 5600 + RTX 5060 8 GB, płyta B550 Wi-Fi, zasilacz 750 W 80+ Bronze ATX 3.1",
+      "platform": "AM4",
+      "ramType": "DDR4",
+      "color": "czarny",
+      "gpuLengthMm": 197,
+      "requiresAio": false,
+      "components": [
+        {
+          "role": "cpu",
+          "publicLabel": "Ryzen 5 5600",
+          "internalModel": "AMD Ryzen 5 5600 Tray",
+          "cost": 484
+        },
+        {
+          "role": "gpu",
+          "publicLabel": "RTX 5060 8 GB",
+          "internalModel": "MSI GeForce RTX 5060 8G VENTUS 2X OC",
+          "cost": 2150
+        },
+        {
+          "role": "mobo",
+          "publicLabel": "płyta B550 Wi-Fi",
+          "internalModel": "MSI B550 GAMING WIFI",
+          "cost": 500
+        },
+        {
+          "role": "psu",
+          "publicLabel": "zasilacz 750 W 80+ Bronze ATX 3.1",
+          "internalModel": "Endorfy Vero L6 750 W Bronze ATX 3.1",
+          "cost": 249
+        }
+      ],
+      "markupClass": "FullHD",
+      "markupOverride": null,
+      "minRamGb": 16,
+      "minSsdGb": 512,
+      "minCoolerClass": 1,
+      "minCaseClass": 1,
+      "leadBuild": "licho",
+      "_check": {
+        "cost": 3383,
+        "effectiveMarkup": 0.17,
+        "sell": 3960
+      }
+    },
+    {
+      "tier": 3,
+      "tierRoman": "III",
+      "tierLead": true,
+      "targetResolution": "fullhd",
+      "monitorFilters": [
+        "fullhd"
+      ],
+      "upgrade": {
+        "freeRamSlots": 2,
+        "freeM2Slots": "1+",
+        "socket": "AM5",
+        "socketNote": "wymiana procesora bez nowej płyty",
+        "psuW": 750,
+        "_verify": "wartości z planszy; potwierdzić z modelem płyty (components.mobo.internalModel) przed publikacją"
+      },
+      "code": "P03",
+      "tierLabel": "FullHD wysokie",
+      "variant": "GeForce",
+      "publicLabel": "Ryzen 5 7500F + RTX 5060 8 GB, płyta B650 Wi-Fi, zasilacz 750 W 80+ Gold ATX 3.1",
+      "platform": "AM5",
+      "ramType": "DDR5",
+      "color": "czarny",
+      "gpuLengthMm": 197,
+      "requiresAio": false,
+      "components": [
+        {
+          "role": "cpu",
+          "publicLabel": "Ryzen 5 7500F",
+          "internalModel": "AMD Ryzen 5 7500F Tray",
+          "cost": 527
+        },
+        {
+          "role": "gpu",
+          "publicLabel": "RTX 5060 8 GB",
+          "internalModel": "MSI GeForce RTX 5060 8G VENTUS 2X OC",
+          "cost": 2150
+        },
+        {
+          "role": "mobo",
+          "publicLabel": "płyta B650 Wi-Fi",
+          "internalModel": "Gigabyte B650 GAMING X AX V2",
+          "cost": 510
+        },
+        {
+          "role": "psu",
+          "publicLabel": "zasilacz 750 W 80+ Gold ATX 3.1",
+          "internalModel": "Modecom Volcano HEX 750 W Gold ATX 3.1",
+          "cost": 310
+        }
+      ],
+      "markupClass": "FullHD",
+      "markupOverride": null,
+      "minRamGb": 16,
+      "minSsdGb": 1000,
+      "minCoolerClass": 1,
+      "minCaseClass": 1,
+      "leadBuild": "bies",
+      "_check": {
+        "cost": 3497,
+        "effectiveMarkup": 0.17,
+        "sell": 4100
+      }
+    },
+    {
+      "tier": 3,
+      "tierRoman": "III",
+      "tierLead": false,
+      "targetResolution": "fullhd",
+      "monitorFilters": [
+        "fullhd"
+      ],
+      "upgrade": {
+        "freeRamSlots": 2,
+        "freeM2Slots": "1+",
+        "socket": "LGA",
+        "socketNote": "gniazdo Intel, wymiana w tej generacji",
+        "psuW": 750,
+        "_verify": "wartości z planszy; potwierdzić z modelem płyty (components.mobo.internalModel) przed publikacją"
+      },
+      "code": "P04",
+      "tierLabel": "FullHD wysokie",
+      "variant": "Intel",
+      "publicLabel": "Core i5-14400F + RTX 5060 8 GB, płyta B760 Wi-Fi DDR5, zasilacz 750 W 80+ Gold ATX 3.1",
+      "platform": "LGA1700",
+      "ramType": "DDR5",
+      "color": "czarny",
+      "gpuLengthMm": 228,
+      "requiresAio": false,
+      "components": [
+        {
+          "role": "cpu",
+          "publicLabel": "Core i5-14400F",
+          "internalModel": "Intel Core i5-14400F Tray",
+          "cost": 639
+        },
+        {
+          "role": "gpu",
+          "publicLabel": "RTX 5060 8 GB",
+          "internalModel": "ASUS Dual GeForce RTX 5060 OC 8 GB",
+          "cost": 2146
+        },
+        {
+          "role": "mobo",
+          "publicLabel": "płyta B760 Wi-Fi DDR5",
+          "internalModel": "MSI B760 GAMING PLUS WIFI (wersja DDR5)",
+          "cost": 529
+        },
+        {
+          "role": "psu",
+          "publicLabel": "zasilacz 750 W 80+ Gold ATX 3.1",
+          "internalModel": "Modecom Volcano HEX 750 W Gold ATX 3.1",
+          "cost": 310
+        }
+      ],
+      "markupClass": "FullHD",
+      "markupOverride": null,
+      "minRamGb": 16,
+      "minSsdGb": 1000,
+      "minCoolerClass": 1,
+      "minCaseClass": 1,
+      "leadBuild": "wodnik",
+      "_check": {
+        "cost": 3624,
+        "effectiveMarkup": 0.17,
+        "sell": 4250
+      }
+    },
+    {
+      "tier": 4,
+      "tierRoman": "IV",
+      "tierLead": true,
+      "targetResolution": "qhd",
+      "monitorFilters": [
+        "fullhd",
+        "qhd"
+      ],
+      "upgrade": {
+        "freeRamSlots": 2,
+        "freeM2Slots": "1+",
+        "socket": "AM5",
+        "socketNote": "wymiana procesora bez nowej płyty",
+        "psuW": 750,
+        "_verify": "wartości z planszy; potwierdzić z modelem płyty (components.mobo.internalModel) przed publikacją"
+      },
+      "code": "P05",
+      "tierLabel": "FullHD ultra / 2K",
+      "variant": "",
+      "publicLabel": "Ryzen 5 7500F + RX 9070 GRE 12 GB, płyta B650 Wi-Fi, zasilacz 750 W 80+ Gold ATX 3.1",
+      "platform": "AM5",
+      "ramType": "DDR5",
+      "color": "czarny",
+      "gpuLengthMm": 288,
+      "requiresAio": false,
+      "components": [
+        {
+          "role": "cpu",
+          "publicLabel": "Ryzen 5 7500F",
+          "internalModel": "AMD Ryzen 5 7500F Tray",
+          "cost": 527
+        },
+        {
+          "role": "gpu",
+          "publicLabel": "RX 9070 GRE 12 GB",
+          "internalModel": "Gigabyte Radeon RX 9070 GRE GAMING OC 12G",
+          "cost": 2689
+        },
+        {
+          "role": "mobo",
+          "publicLabel": "płyta B650 Wi-Fi",
+          "internalModel": "Gigabyte B650 GAMING X AX V2",
+          "cost": 510
+        },
+        {
+          "role": "psu",
+          "publicLabel": "zasilacz 750 W 80+ Gold ATX 3.1",
+          "internalModel": "Modecom Volcano HEX 750 W Gold ATX 3.1",
+          "cost": 310
+        }
+      ],
+      "markupClass": "FullHD",
+      "markupOverride": null,
+      "minRamGb": 16,
+      "minSsdGb": 1000,
+      "minCoolerClass": 1,
+      "minCaseClass": 1,
+      "leadBuild": "strzyga",
+      "_check": {
+        "cost": 4036,
+        "effectiveMarkup": 0.17,
+        "sell": 4730
+      }
+    },
+    {
+      "tier": 5,
+      "tierRoman": "V",
+      "tierLead": true,
+      "targetResolution": "qhd",
+      "monitorFilters": [
+        "qhd"
+      ],
+      "upgrade": {
+        "freeRamSlots": 2,
+        "freeM2Slots": "1+",
+        "socket": "AM5",
+        "socketNote": "wymiana procesora bez nowej płyty",
+        "psuW": 750,
+        "_verify": "wartości z planszy; potwierdzić z modelem płyty (components.mobo.internalModel) przed publikacją"
+      },
+      "code": "P06",
+      "tierLabel": "2K",
+      "variant": "GeForce",
+      "publicLabel": "Ryzen 5 7500F + RTX 5070 12 GB, płyta B650 Wi-Fi, zasilacz 750 W 80+ Gold ATX 3.1",
+      "platform": "AM5",
+      "ramType": "DDR5",
+      "color": "czarny",
+      "gpuLengthMm": 282,
+      "requiresAio": false,
+      "components": [
+        {
+          "role": "cpu",
+          "publicLabel": "Ryzen 5 7500F",
+          "internalModel": "AMD Ryzen 5 7500F Tray",
+          "cost": 527
+        },
+        {
+          "role": "gpu",
+          "publicLabel": "RTX 5070 12 GB",
+          "internalModel": "Gigabyte GeForce RTX 5070 WINDFORCE OC SFF 12G",
+          "cost": 4099
+        },
+        {
+          "role": "mobo",
+          "publicLabel": "płyta B650 Wi-Fi",
+          "internalModel": "Gigabyte B650 GAMING X AX V2",
+          "cost": 510
+        },
+        {
+          "role": "psu",
+          "publicLabel": "zasilacz 750 W 80+ Gold ATX 3.1",
+          "internalModel": "Modecom Volcano HEX 750 W Gold ATX 3.1",
+          "cost": 310
+        }
+      ],
+      "markupClass": "2K",
+      "markupOverride": null,
+      "minRamGb": 16,
+      "minSsdGb": 1000,
+      "minCoolerClass": 2,
+      "minCaseClass": 2,
+      "leadBuild": "kikimora",
+      "_check": {
+        "cost": 5446,
+        "effectiveMarkup": 0.16,
+        "sell": 6320
+      }
+    },
+    {
+      "tier": 5,
+      "tierRoman": "V",
+      "tierLead": false,
+      "targetResolution": "qhd",
+      "monitorFilters": [
+        "qhd"
+      ],
+      "upgrade": {
+        "freeRamSlots": 2,
+        "freeM2Slots": "1+",
+        "socket": "AM5",
+        "socketNote": "wymiana procesora bez nowej płyty",
+        "psuW": 850,
+        "_verify": "wartości z planszy; potwierdzić z modelem płyty (components.mobo.internalModel) przed publikacją"
+      },
+      "code": "P07",
+      "tierLabel": "2K",
+      "variant": "Radeon",
+      "publicLabel": "Ryzen 5 9600X + RX 9070 16 GB, płyta B650 Wi-Fi, zasilacz 850 W 80+ Gold ATX 3.1, modularny",
+      "platform": "AM5",
+      "ramType": "DDR5",
+      "color": "czarny",
+      "gpuLengthMm": 304,
+      "requiresAio": false,
+      "components": [
+        {
+          "role": "cpu",
+          "publicLabel": "Ryzen 5 9600X",
+          "internalModel": "AMD Ryzen 5 9600X BOX (bez chłodzenia)",
+          "cost": 810
+        },
+        {
+          "role": "gpu",
+          "publicLabel": "RX 9070 16 GB",
+          "internalModel": "ASUS Prime Radeon RX 9070 OC EVO 16 GB",
+          "cost": 3147
+        },
+        {
+          "role": "mobo",
+          "publicLabel": "płyta B650 Wi-Fi",
+          "internalModel": "Gigabyte B650 GAMING X AX V2",
+          "cost": 510
+        },
+        {
+          "role": "psu",
+          "publicLabel": "zasilacz 850 W 80+ Gold ATX 3.1, modularny",
+          "internalModel": "Gigabyte UD850GM PG5 V2 850 W Gold ATX 3.1",
+          "cost": 389
+        }
+      ],
+      "markupClass": "2K",
+      "markupOverride": null,
+      "minRamGb": 16,
+      "minSsdGb": 1000,
+      "minCoolerClass": 2,
+      "minCaseClass": 2,
+      "leadBuild": "zmora",
+      "_check": {
+        "cost": 4856,
+        "effectiveMarkup": 0.16,
+        "sell": 5640
+      }
+    },
+    {
+      "tier": 5,
+      "tierRoman": "V",
+      "tierLead": false,
+      "targetResolution": "qhd",
+      "monitorFilters": [
+        "qhd"
+      ],
+      "upgrade": {
+        "freeRamSlots": 2,
+        "freeM2Slots": "1+",
+        "socket": "AM5",
+        "socketNote": "wymiana procesora bez nowej płyty",
+        "psuW": 750,
+        "_verify": "wartości z planszy; potwierdzić z modelem płyty (components.mobo.internalModel) przed publikacją"
+      },
+      "code": "P08",
+      "tierLabel": "2K",
+      "variant": "biały GeForce",
+      "publicLabel": "Ryzen 5 7500F + RTX 5070 12 GB (biała), płyta B650E Wi-Fi (biała), zasilacz 750 W 80+ Gold ATX 3.1, biały",
+      "platform": "AM5",
+      "ramType": "DDR5",
+      "color": "biały",
+      "gpuLengthMm": 282,
+      "requiresAio": false,
+      "components": [
+        {
+          "role": "cpu",
+          "publicLabel": "Ryzen 5 7500F",
+          "internalModel": "AMD Ryzen 5 7500F Tray",
+          "cost": 527
+        },
+        {
+          "role": "gpu",
+          "publicLabel": "RTX 5070 12 GB (biała)",
+          "internalModel": "Gigabyte GeForce RTX 5070 EAGLE OC ICE SFF 12G (biała)",
+          "cost": 3999
+        },
+        {
+          "role": "mobo",
+          "publicLabel": "płyta B650E Wi-Fi (biała)",
+          "internalModel": "ASUS B650E MAX GAMING WIFI W (biała)",
+          "cost": 569
+        },
+        {
+          "role": "psu",
+          "publicLabel": "zasilacz 750 W 80+ Gold ATX 3.1, biały",
+          "internalModel": "ASUS Prime 750 W Gold ATX 3.1 (boki białe)",
+          "cost": 349
+        }
+      ],
+      "markupClass": "2K",
+      "markupOverride": null,
+      "minRamGb": 16,
+      "minSsdGb": 1000,
+      "minCoolerClass": 2,
+      "minCaseClass": 2,
+      "leadBuild": "rusalka",
+      "_check": {
+        "cost": 5444,
+        "effectiveMarkup": 0.16,
+        "sell": 6620
+      }
+    },
+    {
+      "tier": 6,
+      "tierRoman": "VI",
+      "tierLead": true,
+      "targetResolution": "qhd",
+      "monitorFilters": [
+        "qhd"
+      ],
+      "upgrade": {
+        "freeRamSlots": 2,
+        "freeM2Slots": "1+",
+        "socket": "AM5",
+        "socketNote": "wymiana procesora bez nowej płyty",
+        "psuW": 850,
+        "_verify": "wartości z planszy; potwierdzić z modelem płyty (components.mobo.internalModel) przed publikacją"
+      },
+      "code": "P09",
+      "tierLabel": "2K wysokie",
+      "variant": "GeForce",
+      "publicLabel": "Ryzen 7 7800X3D + RTX 5070 12 GB, płyta B650 Wi-Fi, zasilacz 850 W 80+ Gold ATX 3.1, modularny",
+      "platform": "AM5",
+      "ramType": "DDR5",
+      "color": "czarny",
+      "gpuLengthMm": 282,
+      "requiresAio": false,
+      "components": [
+        {
+          "role": "cpu",
+          "publicLabel": "Ryzen 7 7800X3D",
+          "internalModel": "AMD Ryzen 7 7800X3D Tray",
+          "cost": 1200
+        },
+        {
+          "role": "gpu",
+          "publicLabel": "RTX 5070 12 GB",
+          "internalModel": "Gigabyte GeForce RTX 5070 WINDFORCE OC SFF 12G",
+          "cost": 4099
+        },
+        {
+          "role": "mobo",
+          "publicLabel": "płyta B650 Wi-Fi",
+          "internalModel": "Gigabyte B650 GAMING X AX V2",
+          "cost": 510
+        },
+        {
+          "role": "psu",
+          "publicLabel": "zasilacz 850 W 80+ Gold ATX 3.1, modularny",
+          "internalModel": "Gigabyte UD850GM PG5 V2 850 W Gold ATX 3.1",
+          "cost": 389
+        }
+      ],
+      "markupClass": "2K",
+      "markupOverride": null,
+      "minRamGb": 32,
+      "minSsdGb": 1000,
+      "minCoolerClass": 2,
+      "minCaseClass": 2,
+      "leadBuild": "baba-jaga",
+      "_check": {
+        "cost": 6198,
+        "effectiveMarkup": 0.16,
+        "sell": 7190
+      }
+    },
+    {
+      "tier": 6,
+      "tierRoman": "VI",
+      "tierLead": false,
+      "targetResolution": "qhd",
+      "monitorFilters": [
+        "qhd"
+      ],
+      "upgrade": {
+        "freeRamSlots": 2,
+        "freeM2Slots": "1+",
+        "socket": "AM5",
+        "socketNote": "wymiana procesora bez nowej płyty",
+        "psuW": 850,
+        "_verify": "wartości z planszy; potwierdzić z modelem płyty (components.mobo.internalModel) przed publikacją"
+      },
+      "code": "P10",
+      "tierLabel": "2K wysokie",
+      "variant": "Radeon",
+      "publicLabel": "Ryzen 7 7800X3D + RX 9070 XT 16 GB, płyta B650 Wi-Fi, zasilacz 850 W 80+ Gold ATX 3.1, modularny",
+      "platform": "AM5",
+      "ramType": "DDR5",
+      "color": "czarny",
+      "gpuLengthMm": 288,
+      "requiresAio": false,
+      "components": [
+        {
+          "role": "cpu",
+          "publicLabel": "Ryzen 7 7800X3D",
+          "internalModel": "AMD Ryzen 7 7800X3D Tray",
+          "cost": 1200
+        },
+        {
+          "role": "gpu",
+          "publicLabel": "RX 9070 XT 16 GB",
+          "internalModel": "Gigabyte Radeon RX 9070 XT GAMING OC 16G",
+          "cost": 4199
+        },
+        {
+          "role": "mobo",
+          "publicLabel": "płyta B650 Wi-Fi",
+          "internalModel": "Gigabyte B650 GAMING X AX V2",
+          "cost": 510
+        },
+        {
+          "role": "psu",
+          "publicLabel": "zasilacz 850 W 80+ Gold ATX 3.1, modularny",
+          "internalModel": "Gigabyte UD850GM PG5 V2 850 W Gold ATX 3.1",
+          "cost": 389
+        }
+      ],
+      "markupClass": "2K",
+      "markupOverride": null,
+      "minRamGb": 32,
+      "minSsdGb": 1000,
+      "minCoolerClass": 2,
+      "minCaseClass": 2,
+      "leadBuild": "bazyliszek",
+      "_check": {
+        "cost": 6298,
+        "effectiveMarkup": 0.16,
+        "sell": 7310
+      }
+    },
+    {
+      "tier": 6,
+      "tierRoman": "VI",
+      "tierLead": false,
+      "targetResolution": "qhd",
+      "monitorFilters": [
+        "qhd"
+      ],
+      "upgrade": {
+        "freeRamSlots": 2,
+        "freeM2Slots": "1+",
+        "socket": "AM5",
+        "socketNote": "wymiana procesora bez nowej płyty",
+        "psuW": 850,
+        "_verify": "wartości z planszy; potwierdzić z modelem płyty (components.mobo.internalModel) przed publikacją"
+      },
+      "code": "P11",
+      "tierLabel": "2K wysokie",
+      "variant": "biały Radeon",
+      "publicLabel": "Ryzen 7 7800X3D + RX 9070 XT 16 GB (biała), płyta B650E Wi-Fi (biała), zasilacz 850 W 80+ Gold ATX 3.1, biały",
+      "platform": "AM5",
+      "ramType": "DDR5",
+      "color": "biały",
+      "gpuLengthMm": 288,
+      "requiresAio": false,
+      "components": [
+        {
+          "role": "cpu",
+          "publicLabel": "Ryzen 7 7800X3D",
+          "internalModel": "AMD Ryzen 7 7800X3D Tray",
+          "cost": 1200
+        },
+        {
+          "role": "gpu",
+          "publicLabel": "RX 9070 XT 16 GB (biała)",
+          "internalModel": "Gigabyte Radeon RX 9070 XT GAMING OC ICE 16G (biała)",
+          "cost": 3999
+        },
+        {
+          "role": "mobo",
+          "publicLabel": "płyta B650E Wi-Fi (biała)",
+          "internalModel": "ASUS B650E MAX GAMING WIFI W (biała)",
+          "cost": 569
+        },
+        {
+          "role": "psu",
+          "publicLabel": "zasilacz 850 W 80+ Gold ATX 3.1, biały",
+          "internalModel": "Gigabyte UD850GM PG5 V2 ICE 850 W (biały)",
+          "cost": 372
+        }
+      ],
+      "markupClass": "2K",
+      "markupOverride": null,
+      "minRamGb": 32,
+      "minSsdGb": 1000,
+      "minCoolerClass": 2,
+      "minCaseClass": 2,
+      "leadBuild": "pani-zimy",
+      "_check": {
+        "cost": 6140,
+        "effectiveMarkup": 0.16,
+        "sell": 7430
+      }
+    },
+    {
+      "tier": 7,
+      "tierRoman": "VII",
+      "tierLead": false,
+      "targetResolution": "uhd",
+      "monitorFilters": [
+        "qhd",
+        "uhd"
+      ],
+      "upgrade": {
+        "freeRamSlots": 2,
+        "freeM2Slots": "1+",
+        "socket": "LGA",
+        "socketNote": "gniazdo Intel, wymiana w tej generacji",
+        "psuW": 850,
+        "_verify": "wartości z planszy; potwierdzić z modelem płyty (components.mobo.internalModel) przed publikacją"
+      },
+      "code": "P12",
+      "tierLabel": "4K",
+      "variant": "Intel",
+      "publicLabel": "Core Ultra 7 270K Plus + RTX 5070 Ti 16 GB (3 wentylatory), płyta Z890 Wi-Fi, zasilacz 850 W 80+ Gold ATX 3.1, modularny",
+      "platform": "LGA1851",
+      "ramType": "DDR5",
+      "color": "czarny",
+      "gpuLengthMm": 338,
+      "requiresAio": true,
+      "components": [
+        {
+          "role": "cpu",
+          "publicLabel": "Core Ultra 7 270K Plus",
+          "internalModel": "Intel Core Ultra 7 270K Plus BOX",
+          "cost": 1400
+        },
+        {
+          "role": "gpu",
+          "publicLabel": "RTX 5070 Ti 16 GB (3 wentylatory)",
+          "internalModel": "MSI GeForce RTX 5070 Ti 16G GAMING TRIO OC",
+          "cost": 5899
+        },
+        {
+          "role": "mobo",
+          "publicLabel": "płyta Z890 Wi-Fi",
+          "internalModel": "ASUS PRIME Z890-P WIFI",
+          "cost": 849
+        },
+        {
+          "role": "psu",
+          "publicLabel": "zasilacz 850 W 80+ Gold ATX 3.1, modularny",
+          "internalModel": "Gigabyte UD850GM PG5 V2 850 W Gold ATX 3.1",
+          "cost": 389
+        }
+      ],
+      "markupClass": "4K",
+      "markupOverride": null,
+      "minRamGb": 32,
+      "minSsdGb": 1000,
+      "minCoolerClass": 3,
+      "minCaseClass": 2,
+      "leadBuild": "wilkolak",
+      "_check": {
+        "cost": 8537,
+        "effectiveMarkup": 0.145,
+        "sell": 9780
+      }
+    },
+    {
+      "tier": 7,
+      "tierRoman": "VII",
+      "tierLead": true,
+      "targetResolution": "uhd",
+      "monitorFilters": [
+        "qhd",
+        "uhd"
+      ],
+      "upgrade": {
+        "freeRamSlots": 2,
+        "freeM2Slots": "1+",
+        "socket": "AM5",
+        "socketNote": "wymiana procesora bez nowej płyty",
+        "psuW": 850,
+        "_verify": "wartości z planszy; potwierdzić z modelem płyty (components.mobo.internalModel) przed publikacją"
+      },
+      "code": "P13",
+      "tierLabel": "4K",
+      "variant": "GeForce",
+      "publicLabel": "Ryzen 7 9800X3D + RTX 5070 Ti 16 GB, płyta B850 Wi-Fi 6E, zasilacz 850 W 80+ Gold ATX 3.1, modularny",
+      "platform": "AM5",
+      "ramType": "DDR5",
+      "color": "czarny",
+      "gpuLengthMm": 303,
+      "requiresAio": false,
+      "components": [
+        {
+          "role": "cpu",
+          "publicLabel": "Ryzen 7 9800X3D",
+          "internalModel": "AMD Ryzen 7 9800X3D Tray",
+          "cost": 1700
+        },
+        {
+          "role": "gpu",
+          "publicLabel": "RTX 5070 Ti 16 GB",
+          "internalModel": "MSI GeForce RTX 5070 Ti 16G VENTUS 3X OC",
+          "cost": 5795
+        },
+        {
+          "role": "mobo",
+          "publicLabel": "płyta B850 Wi-Fi 6E",
+          "internalModel": "Gigabyte B850 EAGLE WIFI6E",
+          "cost": 674
+        },
+        {
+          "role": "psu",
+          "publicLabel": "zasilacz 850 W 80+ Gold ATX 3.1, modularny",
+          "internalModel": "Gigabyte UD850GM PG5 V2 850 W Gold ATX 3.1",
+          "cost": 389
+        }
+      ],
+      "markupClass": "4K",
+      "markupOverride": null,
+      "minRamGb": 32,
+      "minSsdGb": 1000,
+      "minCoolerClass": 2,
+      "minCaseClass": 2,
+      "leadBuild": "wampir",
+      "_check": {
+        "cost": 8558,
+        "effectiveMarkup": 0.145,
+        "sell": 9800
+      }
+    },
+    {
+      "tier": 8,
+      "tierRoman": "VIII",
+      "tierLead": true,
+      "targetResolution": "uhd",
+      "monitorFilters": [
+        "uhd"
+      ],
+      "upgrade": {
+        "freeRamSlots": 2,
+        "freeM2Slots": "1+",
+        "socket": "AM5",
+        "socketNote": "wymiana procesora bez nowej płyty",
+        "psuW": 850,
+        "_verify": "wartości z planszy; potwierdzić z modelem płyty (components.mobo.internalModel) przed publikacją"
+      },
+      "code": "P14",
+      "tierLabel": "4K ultra",
+      "variant": "GeForce",
+      "publicLabel": "Ryzen 7 9800X3D + RTX 5080 16 GB, płyta B850 Wi-Fi 6E, zasilacz 850 W 80+ Gold ATX 3.1, modularny",
+      "platform": "AM5",
+      "ramType": "DDR5",
+      "color": "czarny",
+      "gpuLengthMm": 303,
+      "requiresAio": false,
+      "components": [
+        {
+          "role": "cpu",
+          "publicLabel": "Ryzen 7 9800X3D",
+          "internalModel": "AMD Ryzen 7 9800X3D Tray",
+          "cost": 1700
+        },
+        {
+          "role": "gpu",
+          "publicLabel": "RTX 5080 16 GB",
+          "internalModel": "MSI GeForce RTX 5080 16G VENTUS 3X OC",
+          "cost": 7513
+        },
+        {
+          "role": "mobo",
+          "publicLabel": "płyta B850 Wi-Fi 6E",
+          "internalModel": "Gigabyte B850 EAGLE WIFI6E",
+          "cost": 674
+        },
+        {
+          "role": "psu",
+          "publicLabel": "zasilacz 850 W 80+ Gold ATX 3.1, modularny",
+          "internalModel": "Endorfy Supremo FM6 850 W Gold ATX 3.1",
+          "cost": 487
+        }
+      ],
+      "markupClass": "4K",
+      "markupOverride": null,
+      "minRamGb": 32,
+      "minSsdGb": 1000,
+      "minCoolerClass": 2,
+      "minCaseClass": 2,
+      "leadBuild": "weles",
+      "_check": {
+        "cost": 10374,
+        "effectiveMarkup": 0.145,
+        "sell": 11880
+      }
+    },
+    {
+      "tier": 8,
+      "tierRoman": "VIII",
+      "tierLead": false,
+      "targetResolution": "uhd",
+      "monitorFilters": [
+        "uhd"
+      ],
+      "upgrade": {
+        "freeRamSlots": 2,
+        "freeM2Slots": "1+",
+        "socket": "AM5",
+        "socketNote": "wymiana procesora bez nowej płyty",
+        "psuW": 1000,
+        "_verify": "wartości z planszy; potwierdzić z modelem płyty (components.mobo.internalModel) przed publikacją"
+      },
+      "code": "P15",
+      "tierLabel": "4K ultra",
+      "variant": "premium",
+      "publicLabel": "Ryzen 7 9850X3D + RTX 5080 16 GB (3 wentylatory, premium), płyta X870 Wi-Fi 7, zasilacz 1000 W 80+ Platinum ATX 3.1",
+      "platform": "AM5",
+      "ramType": "DDR5",
+      "color": "czarny",
+      "gpuLengthMm": 338,
+      "requiresAio": false,
+      "components": [
+        {
+          "role": "cpu",
+          "publicLabel": "Ryzen 7 9850X3D",
+          "internalModel": "AMD Ryzen 7 9850X3D Tray",
+          "cost": 1829
+        },
+        {
+          "role": "gpu",
+          "publicLabel": "RTX 5080 16 GB (3 wentylatory, premium)",
+          "internalModel": "MSI GeForce RTX 5080 16G GAMING TRIO OC",
+          "cost": 8499
+        },
+        {
+          "role": "mobo",
+          "publicLabel": "płyta X870 Wi-Fi 7",
+          "internalModel": "Gigabyte X870 EAGLE WIFI7",
+          "cost": 888
+        },
+        {
+          "role": "psu",
+          "publicLabel": "zasilacz 1000 W 80+ Platinum ATX 3.1",
+          "internalModel": "be quiet! Power Zone 2 1000 W Platinum ATX 3.1",
+          "cost": 717
+        }
+      ],
+      "markupClass": "4K",
+      "markupOverride": null,
+      "minRamGb": 32,
+      "minSsdGb": 1000,
+      "minCoolerClass": 2,
+      "minCaseClass": 2,
+      "leadBuild": "zmij",
+      "_check": {
+        "cost": 11933,
+        "effectiveMarkup": 0.145,
+        "sell": 13670
+      }
+    },
+    {
+      "tier": 9,
+      "tierRoman": "IX",
+      "tierLead": true,
+      "targetResolution": "uhd",
+      "monitorFilters": [
+        "uhd"
+      ],
+      "upgrade": {
+        "freeRamSlots": 2,
+        "freeM2Slots": "1+",
+        "socket": "AM5",
+        "socketNote": "wymiana procesora bez nowej płyty",
+        "psuW": 1000,
+        "_verify": "wartości z planszy; potwierdzić z modelem płyty (components.mobo.internalModel) przed publikacją"
+      },
+      "code": "P16",
+      "tierLabel": "Bez kompromisów",
+      "variant": "",
+      "publicLabel": "Ryzen 7 9850X3D + RTX 5090 32 GB, płyta X870 Wi-Fi 7, zasilacz 1000 W 80+ Platinum ATX 3.1",
+      "platform": "AM5",
+      "ramType": "DDR5",
+      "color": "czarny",
+      "gpuLengthMm": 342,
+      "requiresAio": false,
+      "components": [
+        {
+          "role": "cpu",
+          "publicLabel": "Ryzen 7 9850X3D",
+          "internalModel": "AMD Ryzen 7 9850X3D Tray",
+          "cost": 1829
+        },
+        {
+          "role": "gpu",
+          "publicLabel": "RTX 5090 32 GB",
+          "internalModel": "Gigabyte GeForce RTX 5090 GAMING OC 32G",
+          "cost": 35887
+        },
+        {
+          "role": "mobo",
+          "publicLabel": "płyta X870 Wi-Fi 7",
+          "internalModel": "Gigabyte X870 EAGLE WIFI7",
+          "cost": 888
+        },
+        {
+          "role": "psu",
+          "publicLabel": "zasilacz 1000 W 80+ Platinum ATX 3.1",
+          "internalModel": "be quiet! Power Zone 2 1000 W Platinum ATX 3.1",
+          "cost": 717
+        }
+      ],
+      "markupClass": "flagowiec",
+      "markupOverride": null,
+      "minRamGb": 64,
+      "minSsdGb": 2000,
+      "minCoolerClass": 3,
+      "minCaseClass": 3,
+      "leadBuild": "perun",
+      "_check": {
+        "cost": 39321,
+        "effectiveMarkup": 0.135,
+        "sell": 44630
+      }
+    }
+  ]
+}
