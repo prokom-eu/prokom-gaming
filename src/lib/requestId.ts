@@ -1,4 +1,4 @@
-/** Request header carrying the id; also returned in the response. */
+/** Request header carrying the id from the reverse proxy (Nginx `$request_id`); read for log lines. */
 export const REQUEST_ID_HEADER = 'x-request-id'
 
 // Nginx `$request_id` (32 hex) or a UUID; anything else from the client is replaced, because the

@@ -1,7 +1,8 @@
 import { z } from 'zod'
 
-// Only variables the app reads today. INQUIRY_NOTIFY_EMAIL, ALERT_EMAIL, INQUIRY_RETENTION_MONTHS
-// and SITE_URL (.env.example) join the schema in the session that starts using them (G4/G6/G15).
+// Variables the app reads or the image sets (MEDIA_DIR, SITE_ENV: Dockerfile, compose in G16).
+// INQUIRY_NOTIFY_EMAIL, ALERT_EMAIL, INQUIRY_RETENTION_MONTHS and SITE_URL (.env.example) join the
+// schema in the session that starts using them (G4/G6/G15).
 const envSchema = z
   .object({
     NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),

@@ -25,6 +25,9 @@ export default buildConfig({
   // so inserting earlier can renumber them in a later migration.
   collections: [Users],
   editor: lexicalEditor(),
+  // The panel and the site use REST only. A second public API would need its own field-access
+  // checks for costs and internal models (ADR-G002 §8.7), so GraphQL is off and its routes removed.
+  graphQL: { disable: true },
   // SMTP from env; locally Mailpit. Transport options are always given, so the adapter never
   // falls back to its ethereal.email test account. No verify at start: `build` must not need a
   // mail server; a broken SMTP shows up in the logs of the first send.

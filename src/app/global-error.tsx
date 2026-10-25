@@ -2,11 +2,19 @@
 
 import './(site)/globals.css'
 
-type Props = { error: Error & { digest?: string }; retry: () => void }
+// `unknown`: a value thrown in a Client Component arrives as it is and may not be an `Error`
+// (Next docs, error.md), so `digest` is read only after narrowing.
+type Props = { error: unknown; retry: () => void }
+
+function digestOf(error: unknown): string | undefined {
+  if (!(error instanceof Error) || !('digest' in error)) return undefined
+  return typeof error.digest === 'string' ? error.digest : undefined
+}
 
 // Error in a root layout: replaces the whole document (Next docs), so no header and no shell.
 // Kept minimal on purpose; nothing here can fail. TODO(krystian): colours from tokens.css in G2.
 export default function GlobalError({ error, retry }: Props) {
+  const digest = digestOf(error)
   return (
     <html lang="pl">
       <body>
@@ -16,7 +24,7 @@ export default function GlobalError({ error, retry }: Props) {
           <p className="mt-4 text-lg leading-relaxed">
             Nie udało się wyświetlić strony. Spróbuj ponownie za chwilę.
           </p>
-          {error.digest && <p className="mt-2 text-sm">Kod błędu: {error.digest}</p>}
+          {digest && <p className="mt-2 text-sm">Kod błędu: {digest}</p>}
           <button
             type="button"
             onClick={() => retry()}
