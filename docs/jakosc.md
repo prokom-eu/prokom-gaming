@@ -8,7 +8,7 @@
 
 ## Pieniądze i dane
 - [ ] Ceny tylko z `lib/pricing/` i `published-prices`; testy z `tests/fixtures/pricing-expected.json` zielone.
-- [ ] Żaden `internalModel`, koszt, `components` ani marża nie trafiają do HTML ani API publicznego (test porównuje z listą `internalModel` z bazy).
+- [ ] Żaden `internalModel`, koszt, `components` ani marża nie trafiają do HTML ani API publicznego (test porównuje z listą `internalModel` z bazy: części poziomu, RAM i dyski — obudowy i chłodzenia wyłączone, ADR-G002 §8.7).
 - [ ] Klatki tylko z `fps-results`, każda z etykietą źródła.
 - [ ] Brak oferty rat i słowa „Santander”; „raty” jako całe słowo tylko w pytaniu FAQ „Czy mogę kupić na raty?” (test na całe słowa).
 

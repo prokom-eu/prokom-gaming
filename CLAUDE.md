@@ -63,7 +63,7 @@ tests/fixtures/              # oczekiwane ceny i wyniki zgodności (testy G4)
 
 ## Zasady kodu
 - TypeScript strict, bez `any` (wyjątek z komentarzem dla typów z zewnętrznych bibliotek). Server Components domyślnie; `"use client"` tylko przy interakcji (konfigurator, filtry, arkusze, porównywarka, formularze).
-- **Ceny:** strona liczy wyłącznie z `published-prices` (`lib/pricing/snapshot.ts`), nigdy z kosztów. `lib/pricing/cost.ts` tylko na serwerze (panel). Koszty, modele wewnętrzne (`internalModel`) i marże **nigdy** nie trafiają do HTML, JSON-a strony ani do API publicznego (test porównuje z listą `internalModel` z bazy).
+- **Ceny:** strona liczy wyłącznie z `published-prices` (`lib/pricing/snapshot.ts`), nigdy z kosztów. `lib/pricing/cost.ts` tylko na serwerze (panel). Koszty, modele wewnętrzne (`internalModel`) i marże **nigdy** nie trafiają do HTML, JSON-a strony ani do API publicznego (test porównuje z listą `internalModel` z bazy: części poziomu, RAM i dyski; obudowy i chłodzenia pokazujemy z pełną nazwą celowo — ADR-G002 §8.7).
 - **Producentów części poziomu mocy (procesor, karta, płyta, zasilacz) ani RAM i dysku nie pokazujemy** — tylko klasa (`publicLabel`). Wyjątek: obudowy i chłodzenia (pełna nazwa, zdjęcie, cena).
 - **Klatki:** każda liczba z etykietą źródła (test niezależny / przeliczone z testów / szacunek / zmierzone w PRO-KOM). Nigdy „gwarantujemy X FPS”.
 - **Bez rat** (decyzja 25.10.2026): żadnej oferty rat, kalkulatora ani wzmianki o banku. Wyjątek: pytanie w FAQ „Czy mogę kupić na raty?” z odpowiedzią „Na razie nie…”. Płatność: przelew albo BLIK po fakturze pro forma. Brak płatności na stronie.

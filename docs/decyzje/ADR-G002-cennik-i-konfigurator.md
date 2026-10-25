@@ -1,6 +1,6 @@
 # ADR-G002: Cennik i konfigurator — jedna funkcja ceny, gwarancja marży, reguły zgodności
 
-- **Status:** przyjęta (cennik: decyzje Krystiana 25.10.2026; spec. v3.1)
+- **Status:** przyjęta (cennik: decyzje Krystiana 25.10.2026; spec. v3.1; uzupełnienie G0: zakres testu `internalModel`, §8.7)
 - **Data:** 2026-10-25
 - **Źródło liczb:** `dane/PRO-KOM_cennik_konfiguratora_2026-10-25.xlsx` (poza repo, u Krystiana) → `seed/prokomgaming/*.json`. Wzory arkusza są wzorcem dla kodu; `tests/fixtures/pricing-expected.json` to wynik, który kod musi odtworzyć co do złotówki.
 
@@ -98,7 +98,7 @@ Rabat kwotowy albo procentowy na **poziom albo opcję**, nigdy na sam zestaw (ob
 4. 11 scenariuszy z arkusza (błędy i ostrzeżenia).
 5. Addytywność: losowe pary różniące się jedną opcją → różnica ceny == różnica cen opcji.
 6. `ceil10` z zabezpieczeniem zmiennoprzecinkowym.
-7. Żaden ciąg `internalModel` ani pola `cost`, `costAtPublish`, `components` nie występują w HTML ani w odpowiedziach publicznych (test e2e na stronie zestawu, konfiguratora i w API; porównujemy z listą `internalModel` z bazy — nie z listą marek, bo nazwy układów, np. „RTX 5070”, i producenci obudów są na stronie celowo).
+7. Żaden ciąg `internalModel` ani pola `cost`, `costAtPublish`, `components` nie występują w HTML ani w odpowiedziach publicznych (test e2e na stronie zestawu, konfiguratora i w API; porównujemy z listą `internalModel` z bazy — nie z listą marek, bo nazwy układów, np. „RTX 5070”, i producenci obudów są na stronie celowo). **Zakres listy (G0, 25.10.2026):** `internalModel` części poziomu mocy (`power-levels.components[]`: cpu, gpu, mobo, psu) oraz opcji `ram` i `ssd`. **Obudowy i chłodzenia są wyłączone** — pokazujemy je z pełną nazwą celowo (§1.3), a w 39 z 46 ich `internalModel` jest identyczny z `publicLabel`, więc test dawałby fałszywe alarmy. Pola `cost` i `costAtPublish` sprawdzamy dla wszystkich typów, także obudów i chłodzeń.
 8. `lib/pricing/cost.ts` nie trafia do paczki przeglądarki (`server-only`).
 
 ## 9. Poza zakresem v1

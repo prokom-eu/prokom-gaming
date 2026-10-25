@@ -81,7 +81,7 @@ Kolejność sekcji (plansza Main, telefon: Telefon):
 9. **Kupujesz komputer dla dziecka?** (jasna sekcja) — Prawdziwa firma od 2004 roku · Przyjedź i zobacz · Odpisuje człowiek, nie bot · Gwarancja z odbiorem od Ciebie; „Przewodnik dla rodziców”.
 10. **Baba Jaga czy Wampir?** — zapowiedź porównywarki (3 istoty, słupki klatek), „Otwórz porównywarkę”.
 11. **W cenie każdego komputera** — 10 pozycji (Windows 11, montaż, test, pomiar klatek, metryka, Wi-Fi i Bluetooth, sterowniki i BIOS, podstawowe programy, wysyłka, gwarancja 2 lata). Telefon: 2 kolumny.
-12. **Zanim zapytasz** — 6 pytań z `faq.json`, grupa „Na stronie głównej” (`onHome`).
+12. **Zanim zapytasz** — 6 pytań z `faq.json`, grupa „Na stronie głównej” (`onHomeOnly`).
 13. **Napisz, w co grasz** — końcowe wezwanie, 16 pieczęci, „Dobierz komputer” i „Zadaj pytanie”.
 
 ## 5. Wszystkie zestawy `/zestawy` (G9)
@@ -185,7 +185,7 @@ Zwrot 14 dni neutralnie (nie atut) · gwarancja PRO-KOM odróżniona od rękojmi
 
 ## 27. Kryteria odbioru całości
 1. Ceny 16 zestawów na stronie = `tests/fixtures/pricing-expected.json`; cena tej samej konfiguracji identyczna na karcie, w konfiguratorze, porównywarce, zapytaniu i mailu.
-2. Żaden `internalModel`, koszt ani marża nie występuje w HTML ani w API publicznym (test porównuje z listą `internalModel` z bazy; nazwy układów, np. „RTX 5070”, i producenci obudów oraz chłodzeń są na stronie celowo).
+2. Żaden `internalModel`, koszt ani marża nie występuje w HTML ani w API publicznym (test porównuje z listą `internalModel` z bazy — części poziomu mocy, RAM i dysków, bez obudów i chłodzeń, ADR-G002 §8.7; nazwy układów, np. „RTX 5070”, i producenci obudów oraz chłodzeń są na stronie celowo).
 3. Każda liczba klatek ma etykietę źródła; „Jak liczymy?” z linkami.
 4. Zapytanie z każdej ścieżki (zestaw, konfiguracja, porównanie, kontakt, bon, gotowe) zapisuje rekord, wysyła 2 maile i pokazuje numer.
 5. Wszystkie strony zgodne ze zrzutami 1440 i 414; dolny pasek, menu i arkusze działają na Androidzie i iPhonie; klawiatura i axe bez błędów.
