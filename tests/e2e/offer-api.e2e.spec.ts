@@ -132,6 +132,11 @@ test.describe('public offer API', () => {
       '/api/options?where[cost][less_than]=1000',
       '/api/options?sort=cost',
       '/api/published-prices?sort=-costAtPublish',
+      '/api/options?where[internalModel][like]=a',
+      '/api/builds?where[internalRef][exists]=true',
+      // Through a relation: the related collection's field access applies too.
+      '/api/builds?where[level.components.cost][greater_than]=0',
+      '/api/builds?where[ram.internalModel][like]=a',
     ]) {
       expect((await request.get(path)).status(), path).toBe(400)
     }

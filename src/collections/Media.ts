@@ -18,7 +18,8 @@ export const Media: CollectionConfig = {
   upload: {
     // Relative values are resolved against the app's working directory, once, here.
     staticDir: path.resolve(getEnv().MEDIA_DIR),
-    mimeTypes: ['image/*'],
+    // No SVG: it can carry scripts and is served from the panel's domain.
+    mimeTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/avif'],
   },
   fields: [{ name: 'alt', label: 'Tekst alternatywny', type: 'text', required: true }],
 }

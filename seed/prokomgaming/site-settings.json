@@ -1,5 +1,5 @@
 {
-  "_info": "Global `site-settings` (spec. §1). Wartości startowe z tabeli spec. §1. Telefon i e-mail Gaming to wartości startowe do potwierdzenia przez szefa [SZEF] (decyzja Krystiana 25.10.2026: pokazujemy je do czasu zmiany w panelu). Puste pole = element nie renderuje się na stronie (BLIK, firma kurierska, najbliższy termin montażu, ocena Google, profile). Zwrot opisany neutralnie (art. 7 pkt 10 UPNPR). Bez rat.",
+  "_info": "Global `site-settings` (spec. §1). Wartości startowe z tabeli spec. §1. Pola ze statusem [SZEF] w spec. §1 mają wartości startowe ze specyfikacji (decyzja Krystiana 25.10.2026: pokazujemy je do czasu zmiany w panelu): telefon i e-mail Gaming, odpowiedź na zapytanie („zwykle w godzinę, codziennie 8–22” — szef ustala, kto zastępuje Krystiana) i test egzemplarza (60 min — serwis potwierdza długość testu). Puste pole = element nie renderuje się na stronie (BLIK, firma kurierska, najbliższy termin montażu, ocena Google, profile). Zwrot opisany neutralnie (art. 7 pkt 10 UPNPR). Bez rat.",
   "company": {
     "name": "PRO-KOM Tadeusz Wójciak",
     "address": "ul. Orkana 16B, 34-700 Rabka-Zdrój",

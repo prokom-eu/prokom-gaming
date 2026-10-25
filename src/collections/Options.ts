@@ -3,19 +3,22 @@ import type { Access, CollectionConfig, Condition } from 'payload'
 import { number, select } from 'payload/shared'
 
 import { isPanelUser, panelField, panelOnly } from '../access/panel'
-import { GROUP_OFFER, RAM_TYPES, requiredFor } from './shared'
+import { GROUP_OFFER, RAM_TYPES, requiredFor, requiredWhen } from './shared'
 
 const forTypes =
   (...types: string[]): Condition =>
   (_data, siblingData) =>
     types.includes((siblingData as { type?: string }).type ?? '')
 
+const isCooler =
+  (kind: 'air' | 'aio360') =>
+  (s: { type?: string; kind?: string }): boolean =>
+    s.type === 'cooler' && s.kind === kind
+
 const forCooler =
   (kind: 'air' | 'aio360'): Condition =>
-  (_data, siblingData) => {
-    const s = siblingData as { type?: string; kind?: string }
-    return s.type === 'cooler' && s.kind === kind
-  }
+  (_data, siblingData) =>
+    isCooler(kind)(siblingData as { type?: string; kind?: string })
 
 // Visitors see only active options; the panel sees all of them.
 const readActive: Access = ({ req }) => isPanelUser(req) || { active: { equals: true } }
@@ -148,6 +151,8 @@ export const Options: CollectionConfig = {
           label: 'Wysokość (mm)',
           type: 'number',
           min: 0,
+          // Compatibility rules (G4) compare it with the case clearance.
+          validate: requiredWhen(isCooler('air'), number),
           admin: { condition: forCooler('air') },
         },
         {
@@ -155,6 +160,7 @@ export const Options: CollectionConfig = {
           label: 'Grubość chłodnicy (mm)',
           type: 'number',
           min: 0,
+          validate: requiredWhen(isCooler('aio360'), number),
           admin: { condition: forCooler('aio360') },
         },
       ],
