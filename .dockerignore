@@ -1,0 +1,22 @@
+# Keep the build context small and free of secrets and local data.
+.git
+.github
+.claude
+.husky
+.next
+node_modules
+media
+backups
+docs
+seed
+tests
+playwright-report
+test-results
+coverage
+.env
+.env.*
+!.env.example
+*.log
+Dockerfile
+docker
+scripts
