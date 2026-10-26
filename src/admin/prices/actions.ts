@@ -10,15 +10,23 @@ import { isPanelUser } from '../../access/panel'
 import { errorFields, log } from '../../lib/logger'
 import { CatalogError } from '../../lib/pricing/catalog'
 import { planPublication, problemMessage } from '../../lib/pricing/publish'
-import { loadBatch, loadOffer, writeBatch } from '../../lib/pricing/store'
+import { loadBatch, loadOffer, StalePublicationError, writeBatch } from '../../lib/pricing/store'
 import type { User } from '../../payload-types'
 
 export type PublishResult =
   { ok: true; batch: number; changed: number } | { ok: false; messages: string[] }
 
 const input = z.object({
-  // `level:P01`, `option:R16`, `service:SERVICE`: only keys, never prices.
-  keys: z.array(z.string().regex(/^(level|option|service):[A-Za-z0-9_-]{1,40}$/)).max(500),
+  // `level:P01`, `option:R16`, `service:SERVICE`: only keys, never prices. The code part is not
+  // restricted further — codes are free text in the panel; unknown keys end as a stale queue.
+  keys: z
+    .array(
+      z
+        .string()
+        .max(120)
+        .regex(/^(level|option|service):.+$/),
+    )
+    .max(500),
 })
 
 /**
@@ -44,7 +52,7 @@ export async function publishPrices(raw: unknown): Promise<PublishResult> {
       return { ok: false, messages: plan.problems.map((p) => problemMessage(p, minMargin)) }
     }
 
-    const { batch } = await writeBatch(payload, plan, user as User)
+    const { batch } = await writeBatch(payload, plan, user as User, current.snapshot.batch)
     log.info(
       { batch, rows: plan.rows.length, changed: plan.changes.length, userId: user.id },
       'prices published',
@@ -53,10 +61,25 @@ export async function publishPrices(raw: unknown): Promise<PublishResult> {
     return { ok: true, batch, changed: plan.changes.length }
   } catch (error) {
     if (error instanceof CatalogError) return { ok: false, messages: [error.message] }
+    if (error instanceof StalePublicationError || isUniqueViolation(error)) {
+      return { ok: false, messages: [STALE] }
+    }
     log.error({ ...errorFields(error) }, 'price publication failed')
     return {
       ok: false,
       messages: ['Publikacja nie powiodła się — nic nie zmieniono. Szczegóły w logach.'],
     }
   }
+}
+
+const STALE =
+  'W międzyczasie ktoś opublikował ceny — nic nie zmieniono. Odśwież stronę i sprawdź kolejkę jeszcze raz.'
+
+/** Postgres unique violation (23505) anywhere in the cause chain: an exact race of two publications. */
+function isUniqueViolation(error: unknown): boolean {
+  for (let e: unknown = error, depth = 0; e && depth < 5; depth++) {
+    if ((e as { code?: unknown }).code === '23505') return true
+    e = (e as { cause?: unknown }).cause
+  }
+  return false
 }
