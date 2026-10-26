@@ -88,3 +88,12 @@
   --backdrop: rgba(2, 4, 3, 0.62); /* tło pod arkuszem */
   --shadow: #000;
 }
+
+/* ---------------------------------------------------------------------------------------------
+   Uzupełnienie (G5): lista klatek — wartości wpisane wprost w planszach Zestaw i Gra.
+   --------------------------------------------------------------------------------------------- */
+:root {
+  --note: #8d8a7c; /* opis pod nagłówkiem sekcji (.muted) */
+  --fps-row-line: rgba(236, 228, 208, 0.07); /* linia między wierszami listy klatek */
+  --fps-track: rgba(236, 228, 208, 0.08); /* tor paska klatek */
+}

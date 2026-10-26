@@ -274,6 +274,11 @@ a {
   background: var(--grom);
   color: var(--on-grom);
 }
+/* A choice without data (e.g. no FPS in 4K): visible, not selectable. */
+.seg button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
 
 /* ---------- sigil (CSS mask: colour = currentColor) ---------- */
 .sigil {
@@ -1092,4 +1097,193 @@ html:has(dialog[open]) {
     flex-direction: column;
     align-items: center;
   }
+}
+
+/* ---------- FPS list (board Zestaw „Ile klatek”, panels of board Gra) ---------- */
+.src {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.src i {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+.src--pk {
+  color: var(--src-pk-text);
+}
+.src--pk i {
+  background: var(--src-pk);
+}
+.src--ind {
+  color: var(--src-ind-text);
+}
+.src--ind i {
+  background: var(--src-ind);
+}
+.src--est {
+  color: var(--src-est-text);
+}
+.src--est i {
+  background: var(--src-est);
+}
+.fps h2 {
+  margin: 0;
+  font-size: 40px;
+}
+.fps__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+.fps__note {
+  margin: 10px 0 0;
+  font-size: 14px;
+  color: var(--note);
+}
+.fps__list {
+  margin: 20px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.fps__row {
+  display: grid;
+  grid-template-columns: 220px 1fr 130px 170px;
+  gap: 18px;
+  align-items: center;
+  padding: 11px 0;
+  border-top: 1px solid var(--fps-row-line);
+}
+.fps__game {
+  font-size: 15px;
+  font-weight: 600;
+}
+.fps__game small {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--mgla);
+}
+.fps__bar {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--fps-track);
+}
+.fps__bar s {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+  background: var(--c);
+  box-shadow: 0 0 12px var(--c);
+  transition: width 0.6s;
+}
+.fps__row b {
+  text-align: right;
+  font-size: 15px;
+}
+.fps__row .src {
+  justify-content: flex-end;
+}
+.fps__how {
+  margin-top: 16px;
+  /* `.lnk` look on a <button>: only the bottom line, 44 px touch height. */
+  min-height: 44px;
+  padding: 0 0 3px;
+  border-top: 0;
+  border-left: 0;
+  border-right: 0;
+  background: none;
+  cursor: pointer;
+}
+@media (max-width: 1000px) {
+  .fps__row {
+    grid-template-columns: 1fr auto;
+    gap: 6px 12px;
+    padding: 12px 0;
+  }
+  /* Board order on a phone: game | FPS, then the bar, then the source label under it. */
+  .fps__game {
+    order: 1;
+  }
+  .fps__row b {
+    order: 2;
+  }
+  .fps__bar {
+    order: 3;
+    grid-column: 1 / -1;
+  }
+  .fps__row .src {
+    order: 4;
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+    font-size: 11.5px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fps__bar s {
+    transition: none;
+  }
+}
+.how h3 {
+  margin: 28px 0 0;
+  font-size: 28px;
+}
+.how h3:first-child {
+  margin-top: 0;
+}
+.how__note {
+  margin: 6px 0 10px;
+  font-size: 14px;
+  color: var(--note);
+}
+.how dl {
+  margin: 0;
+}
+.how dl div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+  font-size: 14px;
+}
+.how dt {
+  color: var(--mgla);
+}
+.how dd {
+  margin: 0;
+  text-align: right;
+  font-weight: 600;
+}
+.how p.src {
+  display: flex;
+  align-items: baseline;
+  margin: 10px 0 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.how__sources {
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 14px;
+}
+.how__sources li {
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+}
+.how__sources b {
+  display: block;
+}
+.how__sources span {
+  color: var(--mgla);
+}
+.how__sources a {
+  color: var(--link-text);
+  border-bottom: 1px solid var(--line);
 }
