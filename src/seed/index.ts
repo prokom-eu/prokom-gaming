@@ -17,6 +17,7 @@ import { fileURLToPath } from 'url'
 
 import config from '../payload.config'
 import { assertSeedAllowed, parseSeedEnv } from './config'
+import { fpsSeed, mapFpsResult, mapGame, planFpsResults, type ExistingFpsResult } from './fps'
 import {
   firstBatch,
   firstBatchPublishedAt,
@@ -59,7 +60,7 @@ async function findIdBy(
 }
 
 /** Create the document, or update it to the seed values when one with this key exists. */
-async function upsert<S extends 'options' | 'power-levels' | 'builds'>(
+async function upsert<S extends 'options' | 'power-levels' | 'builds' | 'games'>(
   payload: Payload,
   collection: S,
   field: 'code' | 'slug',
@@ -219,12 +220,75 @@ async function seedFirstBatch(payload: Payload, adminId: number): Promise<void> 
   }
 }
 
+/** 33 games, upserted by `slug` (ADR-G004 §5). */
+async function seedGames(payload: Payload): Promise<void> {
+  for (const game of fpsSeed.games) await upsert(payload, 'games', 'slug', mapGame(game))
+  payload.logger.info(`Seed: ${fpsSeed.games.length} games.`)
+}
+
+/**
+ * 1 584 FPS results: one read of the existing test numbers, then only new or changed slots are
+ * written, in one transaction (a half-imported table would show some builds without numbers).
+ * PRO-KOM measurements (`p`) are never read or touched.
+ */
+async function seedFpsResults(payload: Payload): Promise<void> {
+  const all = { pagination: false, ...asSeed } as const
+  const builds = new Map(
+    (await payload.find({ collection: 'builds', select: { slug: true }, ...all })).docs.map((b) => [
+      b.slug,
+      b.id,
+    ]),
+  )
+  const games = new Map(
+    (await payload.find({ collection: 'games', select: { name: true }, ...all })).docs.map((g) => [
+      g.name,
+      g.id,
+    ]),
+  )
+  const requireId = (ids: Map<string, number>, key: string) => {
+    const id = ids.get(key)
+    if (id === undefined) throw new Error(`Seed: unknown ${key} in fps-sources.json.`)
+    return id
+  }
+  const wanted = fpsSeed.results.map((row) =>
+    mapFpsResult(row, { build: requireId(builds, row.build), game: requireId(games, row.game) }),
+  )
+  const existing = await payload.find({
+    collection: 'fps-results',
+    where: { kind: { not_equals: 'p' } },
+    pagination: false,
+    ...asSeed,
+  })
+  const plan = planFpsResults(wanted, existing.docs as ExistingFpsResult[])
+
+  const req = await createLocalReq({}, payload)
+  await initTransaction(req)
+  try {
+    for (const data of plan.create) {
+      await payload.create({ collection: 'fps-results', data, req, ...asSeed })
+    }
+    for (const { id, data } of plan.update) {
+      await payload.update({ collection: 'fps-results', id, data, req, ...asSeed })
+    }
+    await commitTransaction(req)
+  } catch (error) {
+    await killTransaction(req)
+    throw error
+  }
+  payload.logger.info(
+    `Seed: FPS results — ${plan.create.length} created, ${plan.update.length} updated, ` +
+      `${wanted.length - plan.create.length - plan.update.length} unchanged.`,
+  )
+}
+
 const payload = await getPayload({ config })
 
 try {
   const adminId = await seedAdmin(payload)
   await seedOffer(payload)
   await seedFirstBatch(payload, adminId)
+  await seedGames(payload)
+  await seedFpsResults(payload)
 } finally {
   await payload.destroy()
 }
