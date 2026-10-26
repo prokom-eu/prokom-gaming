@@ -11,7 +11,7 @@ import { describe, expect, it } from 'vitest'
 const here = path.dirname(fileURLToPath(import.meta.url))
 const src = path.resolve(here, '../..')
 
-const SERVER_ONLY_MODULES = ['catalog.ts', 'cost.ts', 'publish.ts', 'store.ts']
+const SERVER_ONLY_MODULES = ['catalog.ts', 'cost.ts', 'csv.ts', 'publish.ts', 'store.ts']
 
 function sourceFiles(dir: string): string[] {
   return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
