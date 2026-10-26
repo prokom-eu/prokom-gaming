@@ -1,0 +1,78 @@
+/* Prices screen in the panel: Payload's own theme variables, so light and dark mode follow it. */
+
+.page {
+  padding-block: var(--base) calc(var(--base) * 3);
+}
+
+.lead {
+  color: var(--theme-elevation-650);
+  margin-bottom: calc(var(--base) * 1.5);
+}
+
+.section {
+  margin-bottom: calc(var(--base) * 2);
+}
+
+.section h2 {
+  margin-bottom: calc(var(--base) * 0.75);
+}
+
+/* Wide tables scroll sideways on a phone instead of squeezing the columns. */
+.tableWrap {
+  overflow-x: auto;
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: var(--style-radius-s);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.table th,
+.table td {
+  padding: calc(var(--base) * 0.5) calc(var(--base) * 0.75);
+  text-align: left;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--theme-elevation-100);
+}
+
+.table thead th {
+  font-weight: 600;
+  background: var(--theme-elevation-50);
+}
+
+.table tbody tr:last-child > * {
+  border-bottom: 0;
+}
+
+.urgent > * {
+  background: var(--theme-error-50);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: calc(var(--base) * 0.75);
+  margin-block: var(--base);
+}
+
+.actions :global(.btn) {
+  margin: 0;
+}
+
+.hint {
+  color: var(--theme-elevation-650);
+  font-size: 0.875rem;
+}
+
+.empty {
+  color: var(--theme-elevation-650);
+}
+
+.problems {
+  margin: calc(var(--base) * 0.5) 0 0;
+  padding-left: calc(var(--base) * 1.25);
+}

@@ -11,7 +11,7 @@ import { describe, expect, it } from 'vitest'
 const here = path.dirname(fileURLToPath(import.meta.url))
 const src = path.resolve(here, '../..')
 
-const SERVER_ONLY_MODULES = ['catalog.ts', 'cost.ts']
+const SERVER_ONLY_MODULES = ['catalog.ts', 'cost.ts', 'publish.ts', 'store.ts']
 
 function sourceFiles(dir: string): string[] {
   return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
@@ -27,12 +27,19 @@ describe('cost layer stays on the server', () => {
     expect(code.trimStart().startsWith("import 'server-only'")).toBe(true)
   })
 
-  it('no "use client" module imports the cost layer', () => {
+  it('no "use client" module imports the cost layer (types only are fine — they vanish)', () => {
+    const valueImport =
+      /^import (?!type\b)[^\n]*from ['"][^'"]*pricing\/(cost|catalog|publish|store)['"]/m
     const offenders = sourceFiles(src).filter((file) => {
       const code = readFileSync(file, 'utf8')
       const isClient = /^\s*['"]use client['"]/.test(code)
-      return isClient && /from ['"][^'"]*pricing\/(cost|catalog)['"]/.test(code)
+      return isClient && valueImport.test(code)
     })
     expect(offenders).toEqual([])
+  })
+
+  it('the Payload config never imports the prices screen (it is referenced by path)', () => {
+    const config = readFileSync(path.join(src, 'payload.config.ts'), 'utf8')
+    expect(config).not.toMatch(/from ['"][^'"]*(admin\/prices|lib\/pricing)/)
   })
 })

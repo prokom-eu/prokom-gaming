@@ -15,7 +15,8 @@ export const PublishedPrices: CollectionConfig = {
     group: GROUP_OFFER,
     useAsTitle: 'itemCode',
     defaultColumns: ['batch', 'itemType', 'itemCode', 'sellPrice', 'publishedAt'],
-    description: 'Ceny publikuje ekran „Ceny” (G4) po sprawdzeniu marży. Ręcznej edycji nie ma.',
+    description:
+      'Ceny publikuje ekran „Ceny — publikacja i marże” (/admin/ceny, na końcu menu) po sprawdzeniu marży. Ręcznej edycji nie ma.',
   },
   defaultSort: '-batch',
   access: { read: anyone, create: nobody, update: nobody, delete: nobody },
