@@ -8,6 +8,8 @@ import { fileURLToPath } from 'url'
 
 import { isPanelUser } from './access/panel'
 import { Builds } from './collections/Builds'
+import { FpsResults } from './collections/FpsResults'
+import { Games } from './collections/Games'
 import { Media } from './collections/Media'
 import { Options } from './collections/Options'
 import { PowerLevels } from './collections/PowerLevels'
@@ -41,7 +43,17 @@ export default buildConfig({
   },
   // New collections go at the end: Payload names compound indexes after their columns only,
   // so inserting earlier can renumber them in a later migration.
-  collections: [Users, Media, Options, PowerLevels, Builds, PublishedPrices, PriceHistory],
+  collections: [
+    Users,
+    Media,
+    Options,
+    PowerLevels,
+    Builds,
+    PublishedPrices,
+    PriceHistory,
+    Games,
+    FpsResults,
+  ],
   globals: [PricingSettings, SiteSettings],
   // Background jobs (ADR-G002 §4.4: margin alarm; later G6 retention). Run inside the Next process
   // (one VPS, not serverless) every minute; the cron starts with the first panel/API request.

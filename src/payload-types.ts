@@ -74,6 +74,8 @@ export interface Config {
     builds: Build;
     'published-prices': PublishedPrice;
     'price-history': PriceHistory;
+    games: Game;
+    'fps-results': FpsResult;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
     'payload-locked-documents': PayloadLockedDocument;
@@ -89,6 +91,8 @@ export interface Config {
     builds: BuildsSelect<false> | BuildsSelect<true>;
     'published-prices': PublishedPricesSelect<false> | PublishedPricesSelect<true>;
     'price-history': PriceHistorySelect<false> | PriceHistorySelect<true>;
+    games: GamesSelect<false> | GamesSelect<true>;
+    'fps-results': FpsResultsSelect<false> | FpsResultsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -364,6 +368,67 @@ export interface PriceHistory {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "games".
+ */
+export interface Game {
+  id: number;
+  name: string;
+  /**
+   * /komputer-do/<slug>
+   */
+  slug: string;
+  kind: 'esport' | 'aaa' | 'capped';
+  /**
+   * Tylko gry z limitem, np. Elden Ring: 60.
+   */
+  fpsCap?: number | null;
+  popularRank: number;
+  setting: string;
+  /**
+   * Tylko gdy ustawienia odbiegają od standardu (np. „ze skalowaniem DLSS/FSR Balanced”). Puste = brak dopisku (ADR-G004 §6).
+   */
+  settingNote?: string | null;
+  seoPage?: boolean | null;
+  /**
+   * Ze strony gry, z datą sprawdzenia. Puste = blok ukryty na stronie.
+   */
+  requirements?: {
+    min?: string | null;
+    recommended?: string | null;
+    max?: string | null;
+    source?: string | null;
+    checkedAt?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Liczby z testów (ADR-G004). Nowa karta albo procesor w ofercie = nowy seed z czatu. Ręcznie dodajemy tylko pomiary PRO-KOM.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "fps-results".
+ */
+export interface FpsResult {
+  id: number;
+  build: number | Build;
+  game: number | Game;
+  resolution: 'fullhd' | 'qhd' | 'uhd';
+  fps: number;
+  kind: 'p' | 'm' | 'r' | 'e';
+  sourceLabel: string;
+  sourceUrl?: string | null;
+  setting: string;
+  /**
+   * Dla pomiarów PRO-KOM — najnowszy wygrywa.
+   */
+  measuredAt?: string | null;
+  cpu?: string | null;
+  gpu?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -505,6 +570,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'price-history';
         value: number | PriceHistory;
+      } | null)
+    | ({
+        relationTo: 'games';
+        value: number | Game;
+      } | null)
+    | ({
+        relationTo: 'fps-results';
+        value: number | FpsResult;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -731,6 +804,50 @@ export interface PriceHistorySelect<T extends boolean = true> {
   sellPrice?: T;
   validFrom?: T;
   validTo?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "games_select".
+ */
+export interface GamesSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  kind?: T;
+  fpsCap?: T;
+  popularRank?: T;
+  setting?: T;
+  settingNote?: T;
+  seoPage?: T;
+  requirements?:
+    | T
+    | {
+        min?: T;
+        recommended?: T;
+        max?: T;
+        source?: T;
+        checkedAt?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "fps-results_select".
+ */
+export interface FpsResultsSelect<T extends boolean = true> {
+  build?: T;
+  game?: T;
+  resolution?: T;
+  fps?: T;
+  kind?: T;
+  sourceLabel?: T;
+  sourceUrl?: T;
+  setting?: T;
+  measuredAt?: T;
+  cpu?: T;
+  gpu?: T;
   updatedAt?: T;
   createdAt?: T;
 }

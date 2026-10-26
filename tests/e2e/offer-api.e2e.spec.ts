@@ -5,7 +5,8 @@ import type { APIRequestContext } from '@playwright/test'
  * Costs, internal models, EANs and markups never reach the public REST API (ADR-G002 §8.7,
  * spec. §27.2). The list of internal models is read from the database through the panel account
  * (power-level parts, RAM and SSD; cases and coolers are shown by full name on purpose) — the same
- * account is the positive control: it does see the hidden fields.
+ * account is the positive control: it does see the hidden fields. FPS results (G5) carry the
+ * names of the level's CPU and GPU (`cpu`, `gpu`) — panel only as well.
  */
 
 // The API does not depend on the viewport: one project is enough.
@@ -21,6 +22,8 @@ const HIDDEN_KEYS = [
   'markupClass',
   'markupOverride',
   'publishedBy',
+  'cpu',
+  'gpu',
 ]
 
 const PUBLIC_LISTS = [
@@ -28,6 +31,8 @@ const PUBLIC_LISTS = [
   { path: '/api/options?limit=100&depth=1', count: 57 },
   { path: '/api/builds?limit=100&depth=2', count: 16 },
   { path: '/api/media?limit=100', count: 46 },
+  { path: '/api/games?limit=100', count: 33 },
+  { path: '/api/fps-results?limit=2000&depth=1', count: 1584 },
 ]
 
 type Doc = Record<string, unknown>
@@ -50,7 +55,8 @@ function expectNothingHidden(path: string, body: string): void {
   // exact empty value is tolerated; any element still fails below.
   const withoutEmptyParts = body.replaceAll('"components":[]', '')
   for (const key of HIDDEN_KEYS) {
-    expect(withoutEmptyParts, `${path}: key ${key}`).not.toContain(`"${key}"`)
+    // As a key (`"cpu":`), not a value: a part's `role` may be "cpu".
+    expect(withoutEmptyParts, `${path}: key ${key}`).not.toContain(`"${key}":`)
   }
   for (const model of internalModels) expect(body, `${path}: ${model}`).not.toContain(model)
 }
@@ -84,6 +90,11 @@ test.describe('public offer API', () => {
         .map((d) => d.internalModel as string),
     ]
     expect(internalModels).toHaveLength(16 * 4 + 7 + 4)
+
+    const fps = (await (
+      await panel.get('/api/fps-results?limit=1&depth=0', { headers })
+    ).json()) as List
+    expect(fps.docs[0]?.gpu).toEqual(expect.any(String))
 
     const settings = await panel.get('/api/globals/pricing-settings', { headers })
     expect(settings.status()).toBe(200)
@@ -138,6 +149,14 @@ test.describe('public offer API', () => {
     expectNothingHidden(path, await response.text())
   })
 
+  test('a single FPS result with deep population shows nothing hidden', async ({ request }) => {
+    const list = (await (await request.get('/api/fps-results?limit=1&depth=0')).json()) as List
+    const path = `/api/fps-results/${String(list.docs[0]?.id)}?depth=3`
+    const response = await request.get(path)
+    expect(response.status()).toBe(200)
+    expectNothingHidden(path, await response.text())
+  })
+
   test('hidden fields cannot be filtered or sorted on', async ({ request }) => {
     for (const path of [
       '/api/power-levels?where[components.cost][greater_than]=0',
@@ -151,6 +170,9 @@ test.describe('public offer API', () => {
       // Through a relation: the related collection's field access applies too.
       '/api/builds?where[level.components.cost][greater_than]=0',
       '/api/builds?where[ram.internalModel][like]=a',
+      '/api/fps-results?where[gpu][like]=RTX',
+      '/api/fps-results?sort=cpu',
+      '/api/fps-results?where[build.level.components.internalModel][like]=a',
     ]) {
       expect((await request.get(path)).status(), path).toBe(400)
     }
@@ -172,5 +194,7 @@ test.describe('public offer API', () => {
   test('visitors cannot change the offer', async ({ request }) => {
     expect((await request.post('/api/options', { data: { code: 'X' } })).status()).toBe(403)
     expect((await request.post('/api/published-prices', { data: {} })).status()).toBe(403)
+    expect((await request.post('/api/games', { data: { name: 'X' } })).status()).toBe(403)
+    expect((await request.post('/api/fps-results', { data: { fps: 999 } })).status()).toBe(403)
   })
 })

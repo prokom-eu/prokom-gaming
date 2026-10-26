@@ -4,7 +4,9 @@ import type { APIRequestContext } from '@playwright/test'
 /**
  * The panel cannot break a build recipe or the pricing rules (review notes of G3/G4): a part used
  * in a build cannot be deleted or switched off, and pricing settings reject values the formulas
- * cannot work with. Each test puts things back if a guard ever lets a change through.
+ * cannot work with. Games and builds with FPS results cannot be deleted, and one build × game ×
+ * resolution keeps a single test number (G5). Each test puts things back if a guard ever lets a
+ * change through.
  */
 
 test.skip(({ isMobile }) => isMobile, 'API test runs in the desktop project only')
@@ -112,5 +114,49 @@ test('pricing settings reject a zero rounding step and a margin above 50%', asyn
       headers,
       data: { roundingStep: settings.roundingStep, minMargin: settings.minMargin },
     })
+  }
+})
+
+test('a game or build with FPS results cannot be deleted (message instead of a 500)', async () => {
+  // 16 builds × 3 resolutions for a game, 33 games × 3 for a build.
+  for (const [collection, field, value, results] of [
+    ['games', 'slug', 'fortnite', 48],
+    ['builds', 'slug', 'wampir', 99],
+  ] as const) {
+    const doc = await findOne(collection, field, value)
+    const response = await panel.delete(`/api/${collection}/${doc.id}`, { headers })
+    expect(response.status(), `${collection} ${value}`).toBe(400)
+    expect(await response.text()).toContain(`${results} wyników FPS`)
+    await findOne(collection, field, value) // still there
+  }
+})
+
+test('one test number per build × game × resolution; measurements need a date', async () => {
+  const test = (await (
+    await panel.get('/api/fps-results?limit=1&depth=0&where[kind][equals]=m', { headers })
+  ).json()) as List
+  const { build, game, resolution } = test.docs[0]!
+  const base = { build, game, resolution, fps: 1, sourceLabel: 'e2e', setting: 'e2e' }
+  const created: number[] = []
+  try {
+    const second = await panel.post('/api/fps-results', { headers, data: { ...base, kind: 'e' } })
+    if (second.ok()) created.push(((await second.json()) as { doc: Doc }).doc.id)
+    expect(second.status()).toBe(400)
+    expect(await second.text()).toContain('ma już wynik z testu albo szacunek')
+
+    const undated = await panel.post('/api/fps-results', { headers, data: { ...base, kind: 'p' } })
+    if (undated.ok()) created.push(((await undated.json()) as { doc: Doc }).doc.id)
+    expect(undated.status()).toBe(400)
+    expect(await undated.text()).toContain('Pomiar PRO-KOM musi mieć datę.')
+
+    // A dated measurement is accepted next to the test number (the site then prefers it).
+    const measured = await panel.post('/api/fps-results', {
+      headers,
+      data: { ...base, kind: 'p', measuredAt: '2026-11-25T10:00:00.000Z' },
+    })
+    if (measured.ok()) created.push(((await measured.json()) as { doc: Doc }).doc.id)
+    expect(measured.status()).toBe(201)
+  } finally {
+    for (const id of created) await panel.delete(`/api/fps-results/${id}`, { headers })
   }
 })
