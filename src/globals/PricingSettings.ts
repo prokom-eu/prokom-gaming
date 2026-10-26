@@ -3,21 +3,21 @@ import type { Field, GlobalConfig } from 'payload'
 import { panelOnly } from '../access/panel'
 import { GROUP_OFFER } from '../collections/shared'
 
-const share = (name: string, label: string): Field => ({
+const share = (name: string, label: string, max = 1): Field => ({
   name,
   label,
   type: 'number',
   required: true,
   min: 0,
-  max: 1,
+  max,
 })
 
-const zl = (name: string, label: string): Field => ({
+const zl = (name: string, label: string, min = 0): Field => ({
   name,
   label,
   type: 'number',
   required: true,
-  min: 0,
+  min,
 })
 
 /**
@@ -33,7 +33,8 @@ export const PricingSettings: GlobalConfig = {
     {
       type: 'row',
       fields: [
-        share('minMargin', 'Minimalna marża (np. 0,11)'),
+        // ≤ 0.5: at 1 the markup floor m / (1 − m) is infinite (lib/pricing/cost.ts).
+        share('minMargin', 'Minimalna marża (np. 0,11)', 0.5),
         share('publishThreshold', 'Próg zmiany do zatwierdzenia (np. 0,03)'),
         {
           name: 'autoPublish',
@@ -49,7 +50,8 @@ export const PricingSettings: GlobalConfig = {
         zl('serviceCost', 'Koszt usługi (zł): Windows, wysyłka i opakowanie'),
         zl('caseCoolerBuffer', 'Bufor obudów i chłodzeń (zł)'),
         zl('whiteSurcharge', 'Dopłata za biały poziom (zł)'),
-        zl('roundingStep', 'Krok zaokrąglenia (zł)'),
+        // ≥ 1: prices are rounded up to a multiple of it; 0 cannot round anything.
+        zl('roundingStep', 'Krok zaokrąglenia (zł)', 1),
       ],
     },
     {

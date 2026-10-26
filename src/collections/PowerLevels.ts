@@ -2,6 +2,7 @@ import type { CollectionConfig } from 'payload'
 
 import { anyone, panelField, panelOnly } from '../access/panel'
 import { GROUP_OFFER, MARKUP_CLASSES, RAM_TYPES, RESOLUTIONS } from './shared'
+import { blockDeleteWhenUsed } from './usage'
 
 const CLASS_1_3 = { type: 'number', required: true, min: 1, max: 3 } as const
 
@@ -21,6 +22,9 @@ export const PowerLevels: CollectionConfig = {
   },
   defaultSort: 'code',
   access: { read: anyone, create: panelOnly, update: panelOnly, delete: panelOnly },
+  hooks: {
+    beforeDelete: [blockDeleteWhenUsed(['level'], 'Zmień najpierw poziom w tym zestawie.')],
+  },
   fields: [
     { name: 'code', label: 'Kod', type: 'text', required: true, unique: true },
     {
