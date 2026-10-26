@@ -76,6 +76,15 @@ export type OptionDoc = Pick<
   | 'capacityGb'
 >
 
+/** One row of a price batch as publication writes it (`published-prices`). */
+export type PriceRow = {
+  itemType: 'level' | 'option' | 'service' | 'level_from'
+  itemCode: string
+  sellPrice: number
+  /** Panel only. Empty for "price from" in the seed batch (no single cost). */
+  costAtPublish: number | null
+}
+
 /** Thrown when a document lacks a field the price or the rules need (a data error in the panel). */
 export class CatalogError extends Error {
   constructor(message: string) {

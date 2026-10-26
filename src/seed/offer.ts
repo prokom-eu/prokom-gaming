@@ -4,6 +4,8 @@
  * Seed-only keys are never copied: `_check` (sheet results for tests), `_verify` (a note shown as
  * the panel description of `upgrade`), `aio360Raw` and `serviceCostBreakdown` (informational).
  */
+import type { PriceRow } from '../lib/pricing/catalog'
+import { SERVICE_CODE } from '../lib/pricing/types'
 import type { Build, Option, PowerLevel, PricingSetting, SiteSetting } from '../payload-types'
 import pricingExpected from '../../tests/fixtures/pricing-expected.json'
 import buildsSeed from '../../seed/prokomgaming/builds.json'
@@ -255,14 +257,9 @@ export function mapSiteSettings(s: typeof siteSettingsSeed): DocData<SiteSetting
 
 // --- First price publication (ADR-G002 §2) ---
 
-export const SERVICE_CODE = 'SERVICE'
-
-export type PriceRow = {
-  itemType: 'level' | 'option' | 'service' | 'level_from'
-  itemCode: string
-  sellPrice: number
-  costAtPublish: number | null
-}
+// Shared with price publication in the panel (G4): one code for the service, one row shape.
+export { SERVICE_CODE }
+export type { PriceRow }
 
 /**
  * The first batch of published prices, as of `pricing-settings.priceDate` (25.10.2026). Sell
