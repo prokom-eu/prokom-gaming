@@ -13,7 +13,8 @@ Ostatnia aktualizacja: 26.10.2026 (sesja G4, PR 2a — ekran „Ceny”).
   - `SERVICE_CODE` i `PriceRow` przeniesione do `lib/pricing` (seed re-eksportuje).
 - Sprawdzone lokalnie: `lint`, `typecheck`, `format:check`, `test` (170), pełne `test:e2e` (51), `build`; warstwa kosztów tylko w `.next/server` (0 trafień w `.next/static`); `payload migrate:status` i `generate:importmap` działają (config nie importuje ekranu). Zrzuty `/admin/ceny` 1440 i 414 obejrzane (panel nie ma planszy we wzorcu).
 - e2e `prices-panel` publikuje naprawdę (P01 +12% kosztu, R32 +300 zł → blokada → publikacja → sprzątanie do cen z seeda): lokalna baza ma przez to kolejne partie (ceny = seed). `offer-api` liczy tylko najnowszą partię.
-- Niedokończone: `/przeglad`, CI (gałąź niewypchnięta), zrzuty do opisu PR.
+- `/przeglad` (recenzent): „poprawki wymagane” → za zgodą Krystiana poprawione: wyścig dwóch publikacji (partia = bazowa + 1, kontrola w transakcji, „W międzyczasie ktoś opublikował ceny”), strażnik zawsze z naprawą (zatwierdź poziom / „Wyjątek narzutu” min. X — najmniejszy, liczony tą samą funkcją ceny / popraw dane; przypadek: chłodzenie +10 zł bez niczego w kolejce), błędy masowej aktualizacji `price-history` przerywają zapis, zestaw tylko z aktywnymi opcjami (`filterOptions`), drobiazgi (luźniejszy wzorzec klucza, autor partii jednym zapytaniem, błędy danych jako baner, stały region `aria-live`, pilne zaznaczane po odświeżeniu, ścieżka linku z configu, jedno formatowanie w `lib/pricing/format.ts`).
+- Niedokończone: CI (gałąź niewypchnięta), zrzuty do opisu PR. Prawdziwego wyścigu dwóch publikacji nie testuje e2e (nie da się tego zrobić stabilnie) — sprawdza go kontrola w `writeBatch` + unikalny indeks.
 - Następny krok: `/przeglad` → poprawki → push → `/pr` (tytuł `feat(g4): ekran „Ceny” — kolejka, strażnik marży i publikacja`) → CI → squash → PR 2b `feat/g4-import-kosztow` (uwagi niżej). Stare gałęzie `feat/g1…g4-cennik` (upstream usunięty) można skasować.
 
 ## Uwagi do PR 2b (G4 — import kosztów i alarm)
@@ -23,6 +24,9 @@ Ostatnia aktualizacja: 26.10.2026 (sesja G4, PR 2a — ekran „Ceny”).
 - `autoPublish` (dziś `false`): po imporcie publikuje kolejkę, jeśli przejdzie strażnik.
 - Serwer dev nie przeładowuje zmian w globalach Payload (walidacja `pricing-settings` zadziałała dopiero po restarcie) — po zmianie configu restartować `pnpm dev`.
 - `review.belowMinMargin[...].minLevelPrice === null` = brakujący koszt/cena — komunikat już to obsługuje („popraw dane”).
+
+## Na później (Omnibus, G9+)
+- **Pozycja usunięta z oferty zostawia otwarty wpis `price-history`** (jest w partii N, nie ma jej w N+1, `writeBatch` jej nie zamyka). Dziś nieszkodliwe — części z zestawu nie da się usunąć — ale przed liczeniem „najniższej ceny z 30 dni” zamykać wpisy pozycji, których nie ma w nowej partii.
 
 ## Zrobione
 - 26.10.2026 — **G4 PR 1 (cennik i zgodność)** scalony do `develop` (#12): `lib/pricing/snapshot.ts` (przeglądarka: `ceilTo`/`ceil10`, `priceFromSnapshot`, `surcharge`, `lookupPrice` po własnych kluczach, `snapshotFromRows`), `lib/compat.ts` (9 reguł + ostrzeżenie, komunikaty 1:1), `lib/pricing/catalog.ts` + `cost.ts` (`server-only`, `evaluate`, `reviewAll` ok. 55 ms na 236 544 kombinacji). Testy z fixtures: 90 cen partii 1 = kod, 16 zestawów, 11 scenariuszy, 85 134 zgodnych, min. 11,092%, `priceFrom`, addytywność, mutacje. `vitest.config.mts`: alias `server-only` (plik tylko do odczytu — zmieniony za zgodą Krystiana).
