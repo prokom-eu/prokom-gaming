@@ -6,6 +6,7 @@ import { buildConfig } from 'payload'
 import sharp from 'sharp'
 import { fileURLToPath } from 'url'
 
+import { isPanelUser } from './access/panel'
 import { Builds } from './collections/Builds'
 import { Media } from './collections/Media'
 import { Options } from './collections/Options'
@@ -15,6 +16,7 @@ import { PublishedPrices } from './collections/PublishedPrices'
 import { Users } from './collections/Users'
 import { PricingSettings } from './globals/PricingSettings'
 import { SiteSettings } from './globals/SiteSettings'
+import { MarginAlarmTask } from './jobs/marginAlarm'
 import { getEnv } from './lib/env'
 import { migrations } from './migrations'
 
@@ -41,6 +43,20 @@ export default buildConfig({
   // so inserting earlier can renumber them in a later migration.
   collections: [Users, Media, Options, PowerLevels, Builds, PublishedPrices, PriceHistory],
   globals: [PricingSettings, SiteSettings],
+  // Background jobs (ADR-G002 §4.4: margin alarm; later G6 retention). Run inside the Next process
+  // (one VPS, not serverless) every minute; the cron starts with the first panel/API request.
+  // Running and queueing through the REST API is panel-only: by default any signed-in account
+  // could, and customers (G14) sign in too. Finished jobs are removed — nothing to keep.
+  jobs: {
+    tasks: [MarginAlarmTask],
+    autoRun: [{ cron: '* * * * *', queue: 'default', limit: 5 }],
+    deleteJobOnComplete: true,
+    access: {
+      run: ({ req }) => isPanelUser(req),
+      queue: ({ req }) => isPanelUser(req),
+      cancel: ({ req }) => isPanelUser(req),
+    },
+  },
   editor: lexicalEditor(),
   // The panel and the site use REST only. A second public API would need its own field-access
   // checks for costs and internal models (ADR-G002 §8.7), so GraphQL is off and its routes removed.

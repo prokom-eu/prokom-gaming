@@ -36,8 +36,11 @@ const MEDIA_SOURCE = path.resolve(
   '../../seed/prokomgaming/media',
 )
 
-/** Every write in the seed bypasses access control: it is a trusted local script. */
-const asSeed = { overrideAccess: true, depth: 0 } as const
+/**
+ * Every write in the seed bypasses access control: it is a trusted local script. Resetting costs
+ * to the seed values must not queue margin alarms (`queueAlarmOnCostChange`).
+ */
+const asSeed = { overrideAccess: true, depth: 0, context: { skipMarginAlarm: true } } as const
 
 async function findIdBy(
   payload: Payload,

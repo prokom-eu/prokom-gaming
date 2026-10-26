@@ -38,6 +38,14 @@ describe('cost layer stays on the server', () => {
     expect(offenders).toEqual([])
   })
 
+  it('the margin-alarm task loads its cost-layer handler only when the job runs', () => {
+    const task = readFileSync(path.join(src, 'jobs/marginAlarm.ts'), 'utf8')
+    expect(task).not.toMatch(/^import [^\n]*(runMarginAlarm|lib\/pricing)/m)
+    expect(task).toContain("await import('./runMarginAlarm')")
+    const runner = readFileSync(path.join(src, 'jobs/runMarginAlarm.ts'), 'utf8')
+    expect(runner.trimStart().startsWith("import 'server-only'")).toBe(true)
+  })
+
   it('the Payload config never imports the prices screen (it is referenced by path)', () => {
     const config = readFileSync(path.join(src, 'payload.config.ts'), 'utf8')
     expect(config).not.toMatch(/from ['"][^'"]*(admin\/prices|lib\/pricing)/)

@@ -8,6 +8,7 @@ import type { Payload } from 'payload'
 import { z } from 'zod'
 
 import { isPanelUser } from '../../access/panel'
+import { queueMarginAlarm } from '../../jobs/queue'
 import { errorFields, log } from '../../lib/logger'
 import { CatalogError } from '../../lib/pricing/catalog'
 import { previewCostImport, type ImportPreview } from '../../lib/pricing/csv'
@@ -97,7 +98,8 @@ export type CostImportPreviewResult =
   { ok: true; preview: ImportPreview } | { ok: false; messages: string[] }
 
 export type CostImportResult =
-  { ok: true; options: number; levels: number } | { ok: false; messages: string[] }
+  | { ok: true; options: number; levels: number; checked: boolean }
+  | { ok: false; messages: string[] }
 
 // ~2000 rows of "code;cost" fit easily; anything bigger is not a cost list.
 const csvInput = z.object({ text: z.string().min(1).max(200_000) })
@@ -139,7 +141,17 @@ export async function importCosts(raw: unknown): Promise<CostImportResult> {
     const written = await applyCostImport(payload, preview.changes, user)
     log.info({ ...written, rows: preview.changes.length, userId: user.id }, 'costs imported')
     revalidatePath('/admin/ceny')
-    return { ok: true, ...written }
+    // Margin alarm (and autoPublish) right away, not at the next cron tick: the person who
+    // imported is looking at the screen. A failed check never undoes the saved costs.
+    let checked = true
+    try {
+      const jobId = await queueMarginAlarm(payload, 'csv import')
+      await payload.jobs.runByID({ id: jobId, overrideAccess: true })
+    } catch (error) {
+      checked = false
+      log.error({ ...errorFields(error) }, 'margin alarm after import failed')
+    }
+    return { ok: true, ...written, checked }
   } catch (error) {
     if (error instanceof CatalogError) return { ok: false, messages: [error.message] }
     log.error({ ...errorFields(error) }, 'cost import failed')

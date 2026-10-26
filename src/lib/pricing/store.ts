@@ -129,10 +129,11 @@ export class StalePublicationError extends Error {
 export async function writeBatch(
   payload: Payload,
   plan: Extract<PublicationPlan, { ok: true }>,
-  user: User,
+  /** `null` = published automatically (`autoPublish`, margin-alarm job). */
+  user: User | null,
   basedOn: number,
 ): Promise<{ batch: number; publishedAt: string }> {
-  const req = await createLocalReq({ user: { ...user, collection: 'users' } }, payload)
+  const req = await createLocalReq(user ? { user: { ...user, collection: 'users' } } : {}, payload)
   await initTransaction(req)
   try {
     const newest = await newestBatchNumber(payload, req)
@@ -143,7 +144,7 @@ export async function writeBatch(
     for (const row of plan.rows) {
       await payload.create({
         collection: 'published-prices',
-        data: { batch, ...row, publishedAt, publishedBy: user.id },
+        data: { batch, ...row, publishedAt, publishedBy: user?.id ?? null },
         overrideAccess: true,
         depth: 0,
         req,

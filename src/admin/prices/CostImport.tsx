@@ -163,8 +163,10 @@ export function CostImport() {
         )}
         {saved?.ok === true && (
           <Banner type="success">
-            Zapisano koszty: {saved.options} opcji, {saved.levels} poziomów mocy. Sprawdź kolejkę
-            niżej.
+            Zapisano koszty: {saved.options} opcji, {saved.levels} poziomów mocy.{' '}
+            {saved.checked
+              ? 'Marża sprawdzona — jeśli ceny na stronie ją łamią, poszedł alarm mailem. Sprawdź kolejkę niżej.'
+              : 'Sprawdzenie marży nie powiodło się (szczegóły w logach) — sprawdź strażnika i kolejkę niżej.'}
           </Banner>
         )}
         {saved?.ok === false && (
