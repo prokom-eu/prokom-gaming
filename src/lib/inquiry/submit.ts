@@ -1,0 +1,308 @@
+import type { Inquiry } from '../../payload-types'
+import type { CompatError } from '../compat'
+import { errorFields, type LogFields } from '../logger'
+import type { PriceSnapshot } from '../pricing/snapshot'
+import type { Config } from '../pricing/types'
+import {
+  confirmationEmail,
+  notificationEmail,
+  type ComputerForEmail,
+  type Email,
+  type InquiryForEmail,
+} from './emails'
+import { priceComputer, type InquiryOffer, type PricedComputer } from './price'
+import { inquiryFieldErrors, parseInquiryInput } from './schema'
+import {
+  checkFormToken,
+  createRateLimiter,
+  FORM_TOKEN_FIELD,
+  HONEYPOT_FIELD,
+  isHoneypotFilled,
+  rateLimitKey,
+} from './spam'
+import { CONFIG_TYPES, type InquiryType } from './types'
+
+export type SubmitResult =
+  | { ok: true; id: number; number: string }
+  | { ok: false; error: 'spam' | 'rate_limited' | 'unavailable' }
+  | { ok: false; error: 'invalid'; fields: string[]; compat?: CompatError[] }
+
+type NewInquiry = Omit<Inquiry, 'id' | 'number' | 'createdAt' | 'updatedAt' | 'statusChangedAt'>
+
+/** The offer and the newest published prices, with public names for the e-mails. */
+export type Pricing = {
+  offer: InquiryOffer
+  snapshot: PriceSnapshot
+  labels: { level: Record<string, string>; option: Record<string, string> }
+}
+
+/** Everything `submitInquiry` touches outside itself — injected, so the logic is unit-tested. */
+export type SubmitDeps = {
+  secret: string
+  now: () => number
+  limiter: { hit: (key: string) => boolean }
+  /** `null` when no price batch is published yet (a new database). */
+  loadPricing: () => Promise<Pricing | null>
+  findGames: (slugs: string[]) => Promise<{ id: number; slug: string; name: string }[]>
+  /** Returns the record after the hooks, so with its number. */
+  save: (data: NewInquiry) => Promise<{ id: number; number?: string | null }>
+  sendEmail: (email: Email) => Promise<unknown>
+  /** Gaming inbox (`INQUIRY_NOTIFY_EMAIL`); `null` locally without it. */
+  notifyTo: string | null
+  /** „Odpowiedź na zapytanie” from `site-settings`; `null` when empty or unreadable. */
+  responseTime: () => Promise<string | null>
+  panelUrl: (id: number) => string
+  // Structured fields only: ids, codes, `errorFields()` of a caught error — never form data
+  // (ADR-G005); database errors quote query parameters, SMTP errors the recipients.
+  log: Record<'info' | 'warn' | 'error', (fields: LogFields, msg: string) => void>
+}
+
+export type SubmitRequest = {
+  /** Client IP set by the reverse proxy; `null` locally (one shared limit). */
+  ip: string | null
+  body: unknown
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+const carriesComputer = (type: InquiryType) => (CONFIG_TYPES as readonly string[]).includes(type)
+
+function computerForEmail(priced: PricedComputer, pricing: Pricing): ComputerForEmail {
+  const { level, option } = pricing.labels
+  const config: Config = priced.config
+  return {
+    buildName: priced.build?.name ?? null,
+    config,
+    labels: {
+      level: level[config.level],
+      case: option[config.case],
+      cooler: option[config.cooler],
+      ram: option[config.ram],
+      ssd: option[config.ssd],
+    },
+    price: priced.price,
+    publishedAt: pricing.snapshot.publishedAt,
+  }
+}
+
+/** The one place that accepts an inquiry (ADR-G005); see `submitInquiry`. */
+export async function submitInquiryWith(
+  deps: SubmitDeps,
+  { ip, body }: SubmitRequest,
+): Promise<SubmitResult> {
+  if (!isRecord(body)) return { ok: false, error: 'invalid', fields: [] }
+
+  const now = deps.now()
+  if (
+    isHoneypotFilled(body[HONEYPOT_FIELD]) ||
+    checkFormToken(body[FORM_TOKEN_FIELD], deps.secret, now) !== 'ok'
+  ) {
+    deps.log.info({}, 'Inquiry rejected as spam')
+    return { ok: false, error: 'spam' }
+  }
+
+  // Validation first: invalid attempts save nothing, so they do not use up the limit of a person
+  // correcting the form; the limit guards what costs — records and e-mails.
+  const parsed = parseInquiryInput(body)
+  if (!parsed.success) {
+    return { ok: false, error: 'invalid', fields: inquiryFieldErrors(parsed.error) }
+  }
+  const input = parsed.data
+
+  // The computer is priced and checked here, from published prices — never taken as sent.
+  let pricing: Pricing | null = null
+  let priced: PricedComputer | null = null
+  if (carriesComputer(input.type)) {
+    try {
+      pricing = await deps.loadPricing()
+    } catch (error) {
+      deps.log.error(errorFields(error), 'Inquiry pricing lookup failed')
+      return { ok: false, error: 'unavailable' }
+    }
+    if (!pricing) {
+      deps.log.error({}, 'Inquiry with a computer, but no prices are published')
+      return { ok: false, error: 'unavailable' }
+    }
+    const result = priceComputer(input, pricing.offer, pricing.snapshot)
+    if (!result.ok) {
+      // Codes only: which rule the configuration broke, for the site to explain (G12).
+      deps.log.info({ fields: result.fields, compat: result.compat }, 'Inquiry computer rejected')
+      return { ok: false, error: 'invalid', fields: result.fields, compat: result.compat }
+    }
+    priced = result
+  }
+
+  // Unknown or removed games are dropped, like a stale list: not the customer's fault.
+  let games: { id: number; name: string }[] = []
+  if (input.games.length > 0) {
+    try {
+      const found = new Map((await deps.findGames(input.games)).map((g) => [g.slug, g]))
+      games = input.games.flatMap((slug) => {
+        const game = found.get(slug)
+        return game ? [{ id: game.id, name: game.name }] : []
+      })
+    } catch (error) {
+      deps.log.error(errorFields(error), 'Inquiry games lookup failed')
+      return { ok: false, error: 'unavailable' }
+    }
+  }
+
+  if (!deps.limiter.hit(rateLimitKey(ip ?? 'unknown', deps.secret))) {
+    deps.log.warn({}, 'Inquiry rate-limited')
+    return { ok: false, error: 'rate_limited' }
+  }
+  const acceptedAt = new Date(now).toISOString()
+
+  let saved: { id: number; number?: string | null }
+  try {
+    saved = await deps.save({
+      type: input.type,
+      status: 'new',
+      build: priced?.build?.id ?? null,
+      config: priced?.config ?? {},
+      priceAtInquiry: priced?.price ?? null,
+      priceBatch: priced?.batch ?? null,
+      forWhom: input.forWhom,
+      budget: input.budget,
+      customList: input.customList,
+      games: games.map((g) => g.id),
+      otherGames: input.otherGames,
+      monitor: input.monitor,
+      refresh: input.refresh,
+      caseColor: input.caseColor,
+      lighting: input.lighting,
+      extras: input.extras,
+      name: input.name,
+      email: input.email,
+      phone: input.phone,
+      preferredContact: input.preferredContact,
+      pickup: input.pickup,
+      invoice: input.invoice,
+      nip: input.nip,
+      message: input.message,
+      consent: { ...input.consent, acceptedAt },
+      marketingConsent: input.marketingConsent,
+      source: input.source,
+    })
+  } catch (error) {
+    deps.log.error(errorFields(error), 'Inquiry not saved')
+    return { ok: false, error: 'unavailable' }
+  }
+  const { id } = saved
+  // The collection hook always sets it; a missing number is a bug worth a loud log, not a 500.
+  const number = saved.number ?? `#${id}`
+  if (!saved.number) deps.log.error({ inquiry: id }, 'Inquiry saved without a number')
+  deps.log.info({ inquiry: id, type: input.type }, 'Inquiry saved')
+
+  // The record is the source of truth: a failed e-mail is logged, the customer still gets 201.
+  const forEmail: InquiryForEmail = {
+    ...input,
+    number,
+    computer: priced && pricing ? computerForEmail(priced, pricing) : null,
+    games: games.map((g) => g.name),
+    consent: { clauseVersion: input.consent.clauseVersion, acceptedAt },
+  }
+  const emails: { kind: string; email: Email }[] = []
+  if (deps.notifyTo) {
+    emails.push({
+      kind: 'notification',
+      email: notificationEmail(forEmail, { to: deps.notifyTo, panelUrl: deps.panelUrl(id) }),
+    })
+  } else {
+    deps.log.warn({ inquiry: id }, 'INQUIRY_NOTIFY_EMAIL not set: no notification sent')
+  }
+  const responseTime = await deps.responseTime().catch(() => null)
+  emails.push({
+    kind: 'confirmation',
+    email: confirmationEmail(forEmail, { responseTime, replyTo: deps.notifyTo }),
+  })
+
+  const results = await Promise.allSettled(emails.map(({ email }) => deps.sendEmail(email)))
+  results.forEach((result, i) => {
+    if (result.status === 'rejected') {
+      deps.log.error(
+        { inquiry: id, email: emails[i]?.kind, ...errorFields(result.reason) },
+        'Inquiry e-mail not sent',
+      )
+    }
+  })
+
+  return { ok: true, id, number }
+}
+
+// One limiter per process, shared across bundles (Next may load this module more than once).
+const LIMITER_KEY = Symbol.for('prokom-gaming.inquiryRateLimiter')
+const store = globalThis as typeof globalThis & {
+  [LIMITER_KEY]?: ReturnType<typeof createRateLimiter>
+}
+// 5 inquiries per 10 minutes from one address — plenty for a person, little for a script.
+const limiter = (store[LIMITER_KEY] ??= createRateLimiter({ limit: 5, windowMs: 10 * 60_000 }))
+
+/**
+ * Accepts an inquiry from the site (ADR-G005): spam checks, validation, the computer priced and
+ * checked on the server, save with a number, two e-mails. In 2027 `save` moves to the Django API;
+ * the forms stay as they are.
+ */
+export async function submitInquiry(
+  request: SubmitRequest,
+  context: { requestId: string },
+): Promise<SubmitResult> {
+  // Imported lazily: keeps the Payload config and the database out of unit tests.
+  const [{ getPayload }, { default: config }, { getEnv }, { log }, pricingStore] =
+    await Promise.all([
+      import('payload'),
+      import('@payload-config'),
+      import('../env'),
+      import('../logger'),
+      import('./pricingStore'),
+    ])
+  let payload: Awaited<ReturnType<typeof getPayload>>
+  let env: ReturnType<typeof getEnv>
+  try {
+    payload = await getPayload({ config })
+    env = getEnv()
+  } catch (error) {
+    // Same JSON answer as any other outage, instead of Next's default 500 page (review G6).
+    log.error({ requestId: context.requestId, ...errorFields(error) }, 'Inquiry: app not ready')
+    return { ok: false, error: 'unavailable' }
+  }
+
+  return submitInquiryWith(
+    {
+      secret: env.PAYLOAD_SECRET,
+      now: Date.now,
+      limiter,
+      loadPricing: () => pricingStore.loadInquiryPricing(payload),
+      findGames: async (slugs) => {
+        const { docs } = await payload.find({
+          collection: 'games',
+          where: { slug: { in: slugs } },
+          select: { slug: true, name: true },
+          limit: slugs.length,
+          pagination: false,
+          depth: 0,
+          overrideAccess: true,
+        })
+        return docs.map(({ id, slug, name }) => ({ id, slug, name }))
+      },
+      save: (data) =>
+        payload.create({ collection: 'inquiries', data, depth: 0, overrideAccess: true }),
+      sendEmail: (email) => payload.sendEmail(email),
+      notifyTo: env.INQUIRY_NOTIFY_EMAIL ?? null,
+      responseTime: async () => {
+        const settings = await payload.findGlobal({
+          slug: 'site-settings',
+          select: { responseTime: true },
+          depth: 0,
+          overrideAccess: true,
+        })
+        return settings.responseTime?.trim() || null
+      },
+      panelUrl: (id) => `${env.SITE_URL}/admin/collections/inquiries/${id}`,
+      log: log.child({ requestId: context.requestId }),
+    },
+    request,
+  )
+}

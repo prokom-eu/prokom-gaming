@@ -17,6 +17,8 @@ const defaults = {
   SMTP_PORT: 1026,
   SMTP_SECURE: false,
   MAIL_FROM_NAME: 'PRO-KOM Gaming',
+  SITE_URL: 'http://localhost:3100',
+  INQUIRY_RETENTION_MONTHS: 24,
 }
 
 describe('parseEnv', () => {
@@ -30,9 +32,57 @@ describe('parseEnv', () => {
     )
     expect(() => parseEnv({ ...valid, NODE_ENV: 'production' })).toThrow(/ALERT_EMAIL/)
     expect(
-      parseEnv({ ...valid, NODE_ENV: 'production', ALERT_EMAIL: 'a@example.test' }),
+      parseEnv({
+        ...valid,
+        NODE_ENV: 'production',
+        ALERT_EMAIL: 'a@example.test',
+        INQUIRY_NOTIFY_EMAIL: 'gaming@example.test',
+        SITE_URL: 'https://prokomgaming.pl',
+      }),
     ).toBeTruthy()
     expect(() => parseEnv({ ...valid, ALERT_EMAIL: 'not-an-address' })).toThrow(/ALERT_EMAIL/)
+  })
+
+  it('INQUIRY_NOTIFY_EMAIL: optional locally, required in production', () => {
+    const production = {
+      ...valid,
+      NODE_ENV: 'production',
+      ALERT_EMAIL: 'a@example.test',
+      SITE_URL: 'https://prokomgaming.pl',
+    }
+    expect(() => parseEnv(production)).toThrow(/INQUIRY_NOTIFY_EMAIL/)
+    expect(parseEnv({ ...production, INQUIRY_NOTIFY_EMAIL: 'g@example.test' })).toBeTruthy()
+    expect(() => parseEnv({ ...valid, INQUIRY_NOTIFY_EMAIL: 'nope' })).toThrow(
+      /INQUIRY_NOTIFY_EMAIL/,
+    )
+  })
+
+  it('SITE_URL: localhost by default locally, required in production', () => {
+    expect(parseEnv(valid).SITE_URL).toBe('http://localhost:3100')
+    const production = {
+      ...valid,
+      NODE_ENV: 'production',
+      ALERT_EMAIL: 'a@example.test',
+      INQUIRY_NOTIFY_EMAIL: 'g@example.test',
+    }
+    expect(() => parseEnv(production)).toThrow(/SITE_URL/)
+    expect(parseEnv({ ...production, SITE_URL: 'https://prokomgaming.pl' }).SITE_URL).toBe(
+      'https://prokomgaming.pl',
+    )
+  })
+
+  it('SITE_URL: http(s) only, trailing slash removed', () => {
+    expect(parseEnv({ ...valid, SITE_URL: 'https://prokomgaming.pl/' }).SITE_URL).toBe(
+      'https://prokomgaming.pl',
+    )
+    expect(() => parseEnv({ ...valid, SITE_URL: 'ftp://example.test' })).toThrow(/SITE_URL/)
+  })
+
+  it('INQUIRY_RETENTION_MONTHS: whole months, 1–120', () => {
+    expect(parseEnv({ ...valid, INQUIRY_RETENTION_MONTHS: '36' }).INQUIRY_RETENTION_MONTHS).toBe(36)
+    expect(() => parseEnv({ ...valid, INQUIRY_RETENTION_MONTHS: '0' })).toThrow(
+      /INQUIRY_RETENTION_MONTHS/,
+    )
   })
 
   it('requires the SMTP server and the sender address', () => {

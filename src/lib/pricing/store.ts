@@ -20,7 +20,7 @@ const trusted = { overrideAccess: true, depth: 0, pagination: false } as const
 
 export type OfferData = {
   catalog: Catalog
-  builds: { slug: string; name: string; config: Config }[]
+  builds: { id: number; slug: string; name: string; config: Config }[]
 }
 
 /** Levels, options (active or not), pricing settings and the builds as code recipes. */
@@ -44,6 +44,7 @@ export async function loadOffer(payload: Payload): Promise<OfferData> {
   return {
     catalog: toCatalog(levels.docs, options.docs, settings),
     builds: builds.docs.map((b) => ({
+      id: b.id,
       slug: b.slug,
       name: b.name,
       config: {

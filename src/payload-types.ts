@@ -76,6 +76,8 @@ export interface Config {
     'price-history': PriceHistory;
     games: Game;
     'fps-results': FpsResult;
+    inquiries: Inquiry;
+    'inquiry-deletions': InquiryDeletion;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
     'payload-locked-documents': PayloadLockedDocument;
@@ -93,6 +95,8 @@ export interface Config {
     'price-history': PriceHistorySelect<false> | PriceHistorySelect<true>;
     games: GamesSelect<false> | GamesSelect<true>;
     'fps-results': FpsResultsSelect<false> | FpsResultsSelect<true>;
+    inquiries: InquiriesSelect<false> | InquiriesSelect<true>;
+    'inquiry-deletions': InquiryDeletionsSelect<false> | InquiryDeletionsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -106,10 +110,12 @@ export interface Config {
   globals: {
     'pricing-settings': PricingSetting;
     'site-settings': SiteSetting;
+    'payload-jobs-stats': PayloadJobsStat;
   };
   globalsSelect: {
     'pricing-settings': PricingSettingsSelect<false> | PricingSettingsSelect<true>;
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
+    'payload-jobs-stats': PayloadJobsStatsSelect<false> | PayloadJobsStatsSelect<true>;
   };
   locale: null;
   widgets: {
@@ -119,6 +125,7 @@ export interface Config {
   jobs: {
     tasks: {
       'margin-alarm': TaskMarginAlarm;
+      'inquiry-retention': TaskInquiryRetention;
       inline: {
         input: unknown;
         output: unknown;
@@ -428,6 +435,81 @@ export interface FpsResult {
   createdAt: string;
 }
 /**
+ * Zapytania ze strony. Zmieniasz tylko status.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "inquiries".
+ */
+export interface Inquiry {
+  id: number;
+  number?: string | null;
+  type: 'build' | 'config' | 'advice' | 'custom_list' | 'compare' | 'contact' | 'voucher' | 'ready';
+  status: 'new' | 'in_progress' | 'offer_sent' | 'won' | 'lost' | 'closed';
+  /**
+   * Od tej daty liczy się okres przechowywania zamkniętych zapytań.
+   */
+  statusChangedAt?: string | null;
+  build?: (number | null) | Build;
+  config?: {
+    level?: string | null;
+    case?: string | null;
+    cooler?: string | null;
+    ram?: string | null;
+    ssd?: string | null;
+  };
+  /**
+   * Policzona przez serwer z opublikowanych cen.
+   */
+  priceAtInquiry?: number | null;
+  priceBatch?: number | null;
+  forWhom?: ('self' | 'child' | 'gift') | null;
+  budget?: ('upto_6k' | '6k_9k' | '9k_14k' | 'over_14k' | 'unsure') | null;
+  customList?: string | null;
+  games?: (number | Game)[] | null;
+  otherGames?: string | null;
+  monitor?: ('fullhd' | 'qhd' | 'uhd' | 'unsure') | null;
+  refresh?: ('60' | '144' | '240' | 'unsure') | null;
+  caseColor?: ('black' | 'white' | 'any') | null;
+  lighting?: ('colorful' | 'subtle' | 'none') | null;
+  extras?: ('monitor' | 'mouse_keyboard' | 'headphones' | 'office' | 'extra_drive')[] | null;
+  name: string;
+  email: string;
+  phone?: string | null;
+  preferredContact?: ('email' | 'phone') | null;
+  pickup?: ('courier' | 'rabka' | 'zakopane') | null;
+  invoice?: ('private' | 'company') | null;
+  nip?: string | null;
+  message?: string | null;
+  consent?: {
+    accepted?: boolean | null;
+    clauseVersion?: string | null;
+    acceptedAt?: string | null;
+  };
+  marketingConsent?: boolean | null;
+  source?: {
+    url?: string | null;
+    utmSource?: string | null;
+    utmMedium?: string | null;
+    utmCampaign?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "inquiry-deletions".
+ */
+export interface InquiryDeletion {
+  id: number;
+  inquiryId: number;
+  number?: string | null;
+  reason: 'request' | 'retention';
+  deletedBy?: (number | null) | User;
+  deletedByEmail?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -496,7 +578,7 @@ export interface PayloadJob {
     | {
         executedAt: string;
         completedAt: string;
-        taskSlug: 'inline' | 'margin-alarm';
+        taskSlug: 'inline' | 'margin-alarm' | 'inquiry-retention';
         taskID: string;
         input?:
           | {
@@ -529,10 +611,19 @@ export interface PayloadJob {
         id?: string | null;
       }[]
     | null;
-  taskSlug?: ('inline' | 'margin-alarm') | null;
+  taskSlug?: ('inline' | 'margin-alarm' | 'inquiry-retention') | null;
   queue?: string | null;
   waitUntil?: string | null;
   processing?: boolean | null;
+  meta?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -578,6 +669,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'fps-results';
         value: number | FpsResult;
+      } | null)
+    | ({
+        relationTo: 'inquiries';
+        value: number | Inquiry;
+      } | null)
+    | ({
+        relationTo: 'inquiry-deletions';
+        value: number | InquiryDeletion;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -853,6 +952,77 @@ export interface FpsResultsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "inquiries_select".
+ */
+export interface InquiriesSelect<T extends boolean = true> {
+  number?: T;
+  type?: T;
+  status?: T;
+  statusChangedAt?: T;
+  build?: T;
+  config?:
+    | T
+    | {
+        level?: T;
+        case?: T;
+        cooler?: T;
+        ram?: T;
+        ssd?: T;
+      };
+  priceAtInquiry?: T;
+  priceBatch?: T;
+  forWhom?: T;
+  budget?: T;
+  customList?: T;
+  games?: T;
+  otherGames?: T;
+  monitor?: T;
+  refresh?: T;
+  caseColor?: T;
+  lighting?: T;
+  extras?: T;
+  name?: T;
+  email?: T;
+  phone?: T;
+  preferredContact?: T;
+  pickup?: T;
+  invoice?: T;
+  nip?: T;
+  message?: T;
+  consent?:
+    | T
+    | {
+        accepted?: T;
+        clauseVersion?: T;
+        acceptedAt?: T;
+      };
+  marketingConsent?: T;
+  source?:
+    | T
+    | {
+        url?: T;
+        utmSource?: T;
+        utmMedium?: T;
+        utmCampaign?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "inquiry-deletions_select".
+ */
+export interface InquiryDeletionsSelect<T extends boolean = true> {
+  inquiryId?: T;
+  number?: T;
+  reason?: T;
+  deletedBy?: T;
+  deletedByEmail?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv_select".
  */
 export interface PayloadKvSelect<T extends boolean = true> {
@@ -887,6 +1057,7 @@ export interface PayloadJobsSelect<T extends boolean = true> {
   queue?: T;
   waitUntil?: T;
   processing?: T;
+  meta?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1019,6 +1190,24 @@ export interface SiteSetting {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-jobs-stats".
+ */
+export interface PayloadJobsStat {
+  id: number;
+  stats?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "pricing-settings_select".
  */
 export interface PricingSettingsSelect<T extends boolean = true> {
@@ -1092,6 +1281,16 @@ export interface SiteSettingsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-jobs-stats_select".
+ */
+export interface PayloadJobsStatsSelect<T extends boolean = true> {
+  stats?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "collections_widget".
  */
 export interface CollectionsWidget {
@@ -1120,6 +1319,16 @@ export interface TaskMarginAlarm {
       | number
       | boolean
       | null;
+  };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskInquiry-retention".
+ */
+export interface TaskInquiryRetention {
+  input?: unknown;
+  output: {
+    deleted: number;
   };
 }
 /**

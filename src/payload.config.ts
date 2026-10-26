@@ -10,6 +10,8 @@ import { isPanelUser } from './access/panel'
 import { Builds } from './collections/Builds'
 import { FpsResults } from './collections/FpsResults'
 import { Games } from './collections/Games'
+import { Inquiries } from './collections/Inquiries'
+import { InquiryDeletions } from './collections/InquiryDeletions'
 import { Media } from './collections/Media'
 import { Options } from './collections/Options'
 import { PowerLevels } from './collections/PowerLevels'
@@ -18,6 +20,7 @@ import { PublishedPrices } from './collections/PublishedPrices'
 import { Users } from './collections/Users'
 import { PricingSettings } from './globals/PricingSettings'
 import { SiteSettings } from './globals/SiteSettings'
+import { InquiryRetentionTask } from './jobs/inquiryRetention'
 import { MarginAlarmTask } from './jobs/marginAlarm'
 import { getEnv } from './lib/env'
 import { migrations } from './migrations'
@@ -53,14 +56,16 @@ export default buildConfig({
     PriceHistory,
     Games,
     FpsResults,
+    Inquiries,
+    InquiryDeletions,
   ],
   globals: [PricingSettings, SiteSettings],
-  // Background jobs (ADR-G002 §4.4: margin alarm; later G6 retention). Run inside the Next process
+  // Background jobs (ADR-G002 §4.4: margin alarm; ADR-G005: daily inquiry retention). Run inside the Next process
   // (one VPS, not serverless) every minute; the cron starts with the first panel/API request.
   // Running and queueing through the REST API is panel-only: by default any signed-in account
   // could, and customers (G14) sign in too. Finished jobs are removed — nothing to keep.
   jobs: {
-    tasks: [MarginAlarmTask],
+    tasks: [MarginAlarmTask, InquiryRetentionTask],
     autoRun: [{ cron: '* * * * *', queue: 'default', limit: 5 }],
     deleteJobOnComplete: true,
     access: {
