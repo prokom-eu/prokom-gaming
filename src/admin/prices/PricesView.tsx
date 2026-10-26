@@ -8,6 +8,7 @@ import { buildQueue, buildsOverview, problemMessage } from '../../lib/pricing/pu
 import { loadBatch, loadOffer, type BatchInfo } from '../../lib/pricing/store'
 import { percent, signedZl, zl } from '../../lib/pricing/format'
 import styles from './prices.module.css'
+import { CostImport } from './CostImport'
 import { PricesQueue } from './PricesQueue'
 
 const dateTime = (iso: string) =>
@@ -92,6 +93,11 @@ export async function PricesView({ initPageResult, params, searchParams }: Admin
             </ul>
           </Banner>
         )}
+      </section>
+
+      <section className={styles.section} aria-labelledby="import">
+        <h2 id="import">Import kosztów (CSV)</h2>
+        <CostImport />
       </section>
 
       <section className={styles.section} aria-labelledby="queue">

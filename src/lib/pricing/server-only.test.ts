@@ -29,7 +29,7 @@ describe('cost layer stays on the server', () => {
 
   it('no "use client" module imports the cost layer (types only are fine — they vanish)', () => {
     const valueImport =
-      /^import (?!type\b)[^\n]*from ['"][^'"]*pricing\/(cost|catalog|publish|store)['"]/m
+      /^import (?!type\b)[^\n]*from ['"][^'"]*pricing\/(cost|catalog|csv|publish|store)['"]/m
     const offenders = sourceFiles(src).filter((file) => {
       const code = readFileSync(file, 'utf8')
       const isClient = /^\s*['"]use client['"]/.test(code)
