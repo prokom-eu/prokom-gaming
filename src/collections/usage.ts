@@ -41,13 +41,17 @@ export function blockDeleteWhenUsed(
   return async ({ id, req }) => {
     const builds = await buildsUsing(req, slots, id)
     if (builds.length > 0) {
-      // Public message: the panel shows it instead of a generic error.
-      throw new APIError(
+      // Public message: the panel shows it instead of a generic error. Payload's REST error
+      // format reads it only with `data` set (or from `name`, which the minified production
+      // build empties) — without both, production answers "An unknown error occurred".
+      const error = new APIError(
         `Nie można usunąć — używane w zestawie: ${builds.join(', ')}. ${hint}`,
         400,
-        null,
+        { builds },
         true,
       )
+      error.name = 'APIError'
+      throw error
     }
   }
 }

@@ -25,6 +25,9 @@ describe('blockDeleteWhenUsed', () => {
     await expect(run).rejects.toMatchObject({
       status: 400,
       isPublic: true,
+      // Both kept so the message survives Payload's error format in the minified production build.
+      name: 'APIError',
+      data: { builds: ['Bies', 'Wampir'] },
       message: 'Nie można usunąć — używane w zestawie: Bies, Wampir. Zmień zestaw.',
     })
     expect(find.mock.calls[0]![0]).toMatchObject({
