@@ -230,11 +230,20 @@ test.describe('component preview (dev only)', () => {
 
   test('base components pass axe; Segmented works with arrows', async ({ page }) => {
     await page.goto('/podglad-ui')
-    const group = page.getByRole('radiogroup', { name: 'Rozdzielczość' })
+    // The first one: the FPS list below has its own resolution switch (tested separately).
+    const group = page.getByRole('radiogroup', { name: 'Rozdzielczość' }).first()
     await group.getByRole('radio', { name: 'FullHD' }).focus()
     await page.keyboard.press('ArrowRight')
     await expect(group.getByRole('radio', { name: '2K' })).toBeFocused()
     await expect(group.getByRole('radio', { name: '2K' })).toHaveAttribute('aria-checked', 'true')
+    // 4K is disabled in the preview: the arrow skips it and wraps to FullHD.
+    await expect(group.getByRole('radio', { name: '4K' })).toBeDisabled()
+    await page.keyboard.press('ArrowRight')
+    await expect(group.getByRole('radio', { name: 'FullHD' })).toBeFocused()
+    await expect(group.getByRole('radio', { name: 'FullHD' })).toHaveAttribute(
+      'aria-checked',
+      'true',
+    )
     await expect(page.getByRole('region', { name: 'Ciasteczka, ale bez podstępu' })).toBeVisible()
     expect(await axeViolations(page)).toEqual([])
 
@@ -244,5 +253,71 @@ test.describe('component preview (dev only)', () => {
     await expect(banner.getByRole('button', { name: 'Akceptuję' })).toHaveClass(/btn--ghost/)
     await banner.getByRole('button', { name: 'Odrzuć' }).click()
     await expect(banner).toBeHidden()
+  })
+})
+
+// G5: „Ile klatek w Twojej grze” for Wampir from the seeded database (board Zestaw, stany/tel-06).
+test.describe('FPS list (dev preview)', () => {
+  test.skip(process.env.E2E_SERVER === 'start', '/podglad-ui is 404 in production builds')
+
+  test('every number has its source; 2K → 4K switches the numbers; axe passes', async ({
+    page,
+  }, testInfo) => {
+    await page.goto('/podglad-ui')
+    const list = page.locator('section.fps')
+    await expect(list.getByRole('heading', { name: 'Ile klatek w Twojej grze' })).toBeVisible()
+    const rows = list.locator('.fps__row')
+    await expect(rows).toHaveCount(12)
+    for (const row of await rows.all()) {
+      await expect(row.locator('.src')).toHaveText(
+        /^(zmierzone w PRO-KOM|test niezależny|przeliczone z testów|szacunek)$/,
+      )
+    }
+
+    // Seed values for Wampir (fps-sources.json): Counter-Strike 2 362 FPS in 2K, 194 in 4K.
+    const cs2 = rows.filter({ hasText: 'Counter-Strike 2' })
+    const segments = list.getByRole('radiogroup', { name: 'Rozdzielczość' })
+    await expect(segments.getByRole('radio', { name: '2K' })).toHaveAttribute(
+      'aria-checked',
+      'true',
+    )
+    await expect(cs2.locator('b')).toHaveText('362 FPS')
+    await segments.getByRole('radio', { name: '4K' }).click()
+    await expect(cs2.locator('b')).toHaveText('194 FPS')
+    await expect(cs2.locator('.src')).toHaveText('test niezależny')
+
+    if (isPhone(testInfo.project.name)) {
+      // Phone layout (tel-06): FPS on the game's line, the label under the bar.
+      const name = await cs2.locator('.fps__game').boundingBox()
+      const fps = await cs2.locator('b').boundingBox()
+      const label = await cs2.locator('.src').boundingBox()
+      const bar = await cs2.locator('.fps__bar').boundingBox()
+      expect(Math.abs((name?.y ?? 0) - (fps?.y ?? 99))).toBeLessThan(8)
+      expect(label?.y ?? 0).toBeGreaterThan(bar?.y ?? 999)
+    }
+
+    expect(await axeViolations(page)).toEqual([])
+  })
+
+  test('„Jak liczymy?” opens a sheet with the source of every number; Esc closes it', async ({
+    page,
+  }) => {
+    await page.goto('/podglad-ui')
+    const button = page.locator('section.fps').getByRole('button', { name: 'Jak liczymy?' })
+    await button.click()
+    const sheet = page.getByRole('dialog', { name: 'Jak liczymy?' })
+    await expect(sheet).toBeVisible()
+    await expect(sheet.getByRole('heading', { name: 'Skąd są liczby' })).toBeVisible()
+    await expect(sheet.getByRole('heading', { name: 'Co znaczą kolory' })).toBeVisible()
+    await expect(sheet.locator('.how__sources li')).toHaveCount(12)
+    for (const link of await sheet.locator('.how__sources a').all()) {
+      await expect(link).toHaveAttribute('href', /^https:\/\//)
+      await expect(link).toHaveAttribute('rel', 'noopener noreferrer')
+    }
+    expect(await axeViolations(page)).toEqual([])
+
+    await page.keyboard.press('Escape')
+    await expect(sheet).toBeHidden()
+    await expect(button).toBeFocused()
   })
 })

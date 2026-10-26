@@ -12,10 +12,11 @@ import { Container } from '@/components/ui/Container'
 import { Segmented } from '@/components/ui/Segmented'
 import { menuCreatures } from '@/lib/site'
 
+// 4K disabled on purpose: shows (and lets e2e check) that arrows skip a choice without data.
 const resolutions = [
   { value: 'fullhd', label: 'FullHD' },
   { value: '2k', label: '2K' },
-  { value: '4k', label: '4K' },
+  { value: '4k', label: '4K', disabled: true },
 ] as const
 
 type Resolution = (typeof resolutions)[number]['value']

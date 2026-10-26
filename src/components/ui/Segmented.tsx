@@ -2,7 +2,19 @@
 
 import { useRef, type KeyboardEvent } from 'react'
 
-type Option<T extends string> = { value: T; label: string }
+type Option<T extends string> = {
+  value: T
+  label: string
+  /** Shown but not selectable (e.g. a resolution without data); arrows skip it. */
+  disabled?: boolean
+}
+
+const STEPS: Partial<Record<string, 1 | -1>> = {
+  ArrowRight: 1,
+  ArrowDown: 1,
+  ArrowLeft: -1,
+  ArrowUp: -1,
+}
 
 type Props<T extends string> = {
   /** Accessible name of the group, e.g. "Rozdzielczość". */
@@ -19,12 +31,22 @@ type Props<T extends string> = {
 export function Segmented<T extends string>({ label, options, value, onChange }: Props<T>) {
   const refs = useRef<(HTMLButtonElement | null)[]>([])
 
+  /** Next enabled index from `index` in direction `step` (wrapping), or undefined. */
+  function nextEnabled(index: number, step: 1 | -1): number | undefined {
+    for (let i = 1; i <= options.length; i++) {
+      const n = options.length
+      const candidate = (((index + step * i) % n) + n) % n
+      if (!options[candidate].disabled) return candidate
+    }
+    return undefined
+  }
+
   function onKeyDown(event: KeyboardEvent<HTMLButtonElement>, index: number) {
-    const step = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[event.key]
+    const step = STEPS[event.key]
     let next: number | undefined
-    if (step !== undefined) next = (index + step + options.length) % options.length
-    else if (event.key === 'Home') next = 0
-    else if (event.key === 'End') next = options.length - 1
+    if (step !== undefined) next = nextEnabled(index, step)
+    else if (event.key === 'Home') next = nextEnabled(options.length - 1, 1)
+    else if (event.key === 'End') next = nextEnabled(0, -1)
     if (next === undefined) return
     event.preventDefault()
     onChange(options[next].value)
@@ -44,6 +66,7 @@ export function Segmented<T extends string>({ label, options, value, onChange }:
             type="button"
             role="radio"
             aria-checked={checked}
+            disabled={option.disabled}
             tabIndex={checked ? 0 : -1}
             onClick={() => onChange(option.value)}
             onKeyDown={(event) => onKeyDown(event, index)}
