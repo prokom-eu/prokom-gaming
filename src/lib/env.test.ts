@@ -24,6 +24,17 @@ describe('parseEnv', () => {
     expect(parseEnv(valid)).toEqual({ ...valid, ...defaults })
   })
 
+  it('ALERT_EMAIL: optional locally, required in production, must be an address', () => {
+    expect(parseEnv({ ...valid, ALERT_EMAIL: 'alarm@example.test' }).ALERT_EMAIL).toBe(
+      'alarm@example.test',
+    )
+    expect(() => parseEnv({ ...valid, NODE_ENV: 'production' })).toThrow(/ALERT_EMAIL/)
+    expect(
+      parseEnv({ ...valid, NODE_ENV: 'production', ALERT_EMAIL: 'a@example.test' }),
+    ).toBeTruthy()
+    expect(() => parseEnv({ ...valid, ALERT_EMAIL: 'not-an-address' })).toThrow(/ALERT_EMAIL/)
+  })
+
   it('requires the SMTP server and the sender address', () => {
     expect(() => parseEnv({ ...valid, SMTP_HOST: undefined })).toThrow(/SMTP_HOST/)
     expect(() => parseEnv({ ...valid, SMTP_PORT: undefined })).toThrow(/SMTP_PORT/)

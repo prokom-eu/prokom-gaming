@@ -1,8 +1,8 @@
 import { z } from 'zod'
 
 // Variables the app reads or the image sets (MEDIA_DIR, SITE_ENV: Dockerfile, compose in G16).
-// INQUIRY_NOTIFY_EMAIL, ALERT_EMAIL, INQUIRY_RETENTION_MONTHS and SITE_URL (.env.example) join the
-// schema in the session that starts using them (G4/G6/G15).
+// INQUIRY_NOTIFY_EMAIL, INQUIRY_RETENTION_MONTHS and SITE_URL (.env.example) join the schema in
+// the session that starts using them (G6/G15).
 const envSchema = z
   .object({
     NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
@@ -27,11 +27,18 @@ const envSchema = z
     // so moving the mail provider changes no code.
     MAIL_FROM_ADDRESS: z.email(),
     MAIL_FROM_NAME: z.string().min(1).default('PRO-KOM Gaming'),
+    // Where the margin alarm goes (ADR-G002 §4.4). Required in production; locally optional —
+    // without it the alarm only logs a warning (Krystian's decision, 26.10.2026).
+    ALERT_EMAIL: z.email().optional(),
   })
   // SMTP login is both or neither: a half-set pair would fail only at the first e-mail.
   .refine((env) => Boolean(env.SMTP_USER) === Boolean(env.SMTP_PASS), {
     message: 'set both SMTP_USER and SMTP_PASS, or neither',
     path: ['SMTP_PASS'],
+  })
+  .refine((env) => env.NODE_ENV !== 'production' || Boolean(env.ALERT_EMAIL), {
+    message: 'required in production (margin alarm)',
+    path: ['ALERT_EMAIL'],
   })
 
 export type Env = z.infer<typeof envSchema>
