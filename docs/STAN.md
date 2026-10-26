@@ -1,20 +1,29 @@
 # STAN — prokom-gaming
 
-Ostatnia aktualizacja: 26.10.2026 (sesja G5, PR 2 — lista klatek).
+Ostatnia aktualizacja: 27.10.2026 (sesja G6 — zapytania: backend i maile).
 
 ## W toku
-- **G5 = dwa PR-y:** PR 1 `feat/g5-dane-klatek` (#15, scalony), **PR 2 `feat/g5-lista-klatek`** (ten) — po nim G5 zamknięta.
-- Gałąź: `feat/g5-lista-klatek` (z `develop` po scaleniu #15), podpisane commity, **niewypchnięta**.
-- Zrobione w PR 2:
-  - `SourceLabel` (kropka + etykieta, kolory `--src-*`), `FpsList` (server: wiersze dla FullHD/2K/4K liczone `lib/fps.ts → fpsRows`, do przeglądarki idą tylko gotowe wiersze) + `FpsListClient` (`Segmented`, domyślnie 2K), `HowWeMeasure` (przycisk „Jak liczymy?” → `BottomSheet`: panele „Skąd są liczby” i „Co znaczą kolory” z planszy Gra 1:1 + źródło, ustawienia i link przy każdej grze z listy).
-  - Style `.src`, `.fps__*`, `.how` z CSS planszy Zestaw/Gra; tokeny G5 (`--note`, `--fps-row-line`, `--fps-track`) w bloku uzupełnień `tokens.css`. Telefon (≤ 1000 px jak na planszy): gra | liczba, pod spodem pasek, pod nim etykieta.
-  - `/podglad-ui`: sekcja „Ile klatek w Twojej grze” dla Wampira z bazy (12 gier z planszy, kolumna 830 px jak obok panelu zakupu). G9 wstawi `FpsList` na kartę zestawu.
-  - **`TODO(krystian)` w `HowWeMeasure.tsx`:** nagłówek „Źródła wyników na tej liście” i zdanie „Karta i procesor w nazwie testu to sprzęt platformy testowej portalu, nie części naszego zestawu.” — nie ma ich na żadnej planszy, potwierdzić treść.
-- `/przeglad` (recenzent): „gotowe do PR” → za zgodą Krystiana: zestaw bez żadnej liczby nie renderuje sekcji (`fpsListRows` → `null`), rozdzielczość bez liczb = wyłączony segment (`Segmented` ma `disabled`, strzałki go przeskakują; w podglądzie 4K demonstracji wyłączone pod test klawiatury), start na pierwszej rozdzielczości z liczbami (`initialResolution`); etykiety FullHD/2K/4K w `lib/fps.ts → RESOLUTION_LABELS`; literał zamiast rzutowania; wyjątek „etykiety źródeł z nazwą platformy testowej” wpisany do ADR-G004 §6.
-- Porównanie ze wzorcem (przeglądarka, 1440 i 414): liczby, etykiety, długości pasków i wysokości wierszy = `screens/Zestaw-1440/02.jpg` i `stany/tel-06-zestaw-klatki.jpg` (dane seeda Wampira = liczby planszy). Różnice: przełącznik FullHD/2K/4K niższy niż na `tel-06` (wspólny `Segmented` z G2, cel dotyku 44 px zachowany), nagłówek łamie się w 2 linie zamiast 3 (szerokość 414 vs 390 na planszy).
-- Sprawdzone lokalnie: `lint`, `typecheck`, `format:check`, `test` (239), pełne `test:e2e` na `pnpm dev` (64, w tym axe listy i otwartego arkusza przy 1440 i 414, Esc i powrót fokusu, układ wiersza na telefonie), konsola bez błędów.
-- Niedokończone: push, CI; Lighthouse nie dotyczy (`/podglad-ui` tylko w dev) — zmierzyć na karcie zestawu w G9.
-- Następny krok: push → `/pr` (tytuł `feat(g5): lista klatek z etykietą źródła i „Jak liczymy?”`) → CI → squash → **G6** (`/zadanie G6 — zapytania: backend i maile`).
+- **G6 — zapytania: backend i maile** (jeden PR, decyzja Krystiana 27.10). Gałąź `feat/g6-zapytania` (z `develop` po scaleniu #16), podpisane commity, **niewypchnięta**.
+- Zrobione:
+  - Kolekcja `inquiries` (grupa „Sprzedaż”): pola ADR-G005 + uzupełnienie G6 (`forWhom`, `budget`, `customList`, `otherGames`, `caseColor`, `lighting`, `priceBatch`, `statusChangedAt`), słowniki 1:1 z planszy Formularz (`lib/inquiry/types.ts`). REST: brak tworzenia i odczytu publicznie; w panelu edytowalny tylko `status`. `inquiry-deletions` — ślad usunięcia (id, numer, powód, kto) bez treści.
+  - Numer `PKG-RRRR-NNNN` z licznika `inquiry_counters` (tabela dopisana ręcznie w migracji `inquiries`, upsert w transakcji zapisu → bez luk w roku, rok wg czasu polskiego).
+  - `POST /api/inquiry` → `submitInquiry()`: honeypot, podpisany `formToken`, Zod (e-mail zawsze wymagany, NIP z sumą przy fakturze na firmę), cena i zgodność z serwera (`lib/inquiry/price.ts` na `loadOffer`/`loadBatch`, koszty odcinane w `pricingStore.ts`), limit 5/10 min na skrót IP, zapis, 2 maile (powiadomienie z `Reply-To` klienta i linkiem do panelu; potwierdzenie z numerem, konfiguracją po `publicLabel`, ceną i czasem odpowiedzi z `site-settings`). Odpowiedzi: 201 `{ ok, number }`, 400 `invalid` (`fields`, przy niezgodności `compat`), 400 `rejected`, 413, 415, 429, 503.
+  - Retencja: zadanie `inquiry-retention` (codziennie 3:00) usuwa `lost`/`closed` po `INQUIRY_RETENTION_MONTHS`.
+  - Env: `SITE_URL`, `INQUIRY_NOTIFY_EMAIL` (wymagany na produkcji), `INQUIRY_RETENTION_MONTHS`; CI: `INQUIRY_NOTIFY_EMAIL` w zadaniu e2e.
+  - ADR-G005 — uzupełnienie 27.10.2026 (decyzje G6); spec. §10: e-mail wymagany.
+- Sprawdzone lokalnie: `lint`, `typecheck`, `format:check`, `test` (322), pełne `test:e2e` na `pnpm dev` (68), w tym `inquiry-api` (4: 201 + oba maile w Mailpit, kolejne numery, odmowy, brak publicznego odczytu, panel tylko status + ślad usunięcia), migracja `up → down → up`.
+- Niedokończone: `/przeglad` (recenzent — obowiązkowy: formularz, migracja, diff > 100 linii), push, `/pr`, CI. Panelu nie oglądałem w przeglądarce (sprawdzony przez API w e2e) — rzuć okiem na `/admin/collections/inquiries` (widok, zablokowane pola).
+- **`TODO(krystian)`:** treść klauzuli zgody (`lib/inquiry/consent.ts`, z planszy — potwierdzić z prawnikiem); potwierdzenie dla klienta ma tekst roboczy (`TODO(G12)`).
+- Następny krok: `/przeglad` → poprawki → push → `/pr` (tytuł `feat(g6): zapytania — backend, numer i maile`) → CI → squash → **G7** (`/zadanie G7 — strona główna: hero i taśma`).
+
+## Uwagi na później (G6)
+- **G12 — token formularza:** `POST /api/inquiry` wymaga `formToken` (`issueFormToken(PAYLOAD_SECRET)` z `lib/inquiry/spam.ts`, min. 3 s). Formularz musi go dostać z serwera: strona `/zapytanie` renderowana dynamicznie albo osobny `GET` z tokenem — decyzja w G12. Pole-pułapka: `website` (`HONEYPOT_FIELD`).
+- **G12 — komunikaty:** odpowiedź 400 ma ścieżki pól (`config.ram`, `nip`) i kody reguł zgodności (`compat`) — komunikaty z planszy mapować po nich (`compatMessage` z `lib/compat.ts`).
+- **G13:** `voucher` i `ready` odrzucane (`ACCEPTED_TYPES` w `lib/inquiry/types.ts`, `TODO(G13)`).
+- **G14:** role `admin`/`serwis` — dziś każde konto panelu może usunąć zapytanie.
+- **G16:** `INQUIRY_NOTIFY_EMAIL` i `SITE_URL` w `compose.*.yml` i `docs/wdrozenia.md` (bez `INQUIRY_NOTIFY_EMAIL` produkcja nie wystartuje). Nginx musi nadpisywać `X-Real-IP` (limit zapytań go używa). Retencja jak alarm: cron zadań rusza z pierwszym żądaniem — sprawdzić po wdrożeniu, że `inquiry-retention` się kolejkuje (`payload-jobs`).
+- **Limit zapytań w pamięci procesu** — jeden kontener; restart zeruje. Przy kilku instancjach potrzebny wspólny magazyn.
+- **Rekord na wypadek awarii poczty:** maile wysyłane po zapisie; błąd SMTP tylko w logu (rekord zostaje, klient dostaje numer).
 
 ## Uwagi na później (G5)
 - **G14 — `fps-results.unit`:** relacja do egzemplarza dla rekordów `p` (ADR-G004 §5) dopiero razem z `units`; dziś `TODO(G14)` w `FpsResults.ts`.
@@ -28,7 +37,7 @@ Ostatnia aktualizacja: 26.10.2026 (sesja G5, PR 2 — lista klatek).
 - Indeks złożony `fps_results` nazywa się `build_game_resolution_idx` (Payload nie dodaje nazwy tabeli) — inna kolekcja z polami `build, game, resolution` dałaby konflikt nazw.
 
 ## Uwagi na później (G4)
-- **Nowe zadanie w kolejce (np. retencja w G6)** = migracja: Payload trzyma `task_slug` jako enum Postgresa (`enum_payload_jobs_task_slug`) — `migrate:create` doda wartość.
+- **Nowe zadanie w kolejce** (np. `inquiry-retention` w G6) = migracja: Payload trzyma `task_slug` jako enum Postgresa (`enum_payload_jobs_task_slug`) — `migrate:create` doda wartość.
 - **Cron zadań startuje z pierwszym żądaniem panelu/API** (`initReq` z `cron: true`), nie przy starcie procesu — dla alarmu bez znaczenia (zmiana kosztu zawsze przychodzi z panelu); dla zadań okresowych (G6) sprawdzić po wdrożeniu albo dodać `jobs:run` w compose.
 - **G16 — `ALERT_EMAIL` w compose produkcji i stagingu:** wymagany przy `NODE_ENV=production`, także przy starcie kontenera — bez niego aplikacja nie wystartuje. Dopisać do `docs/wdrozenia.md` i `compose.*.yml`.
 - **Powtarzalne alarmy (przegląd PR 2b):** łączymy tylko alarmy czekające w kolejce; kilka edycji kosztu w odstępach > 1 min przy tym samym złamanym poziomie da kilka takich samych maili. Świadomie (alarm ma być głośny); jeśli przeszkadza — pamiętać zbiór poziomów z ostatniego alarmu i nie wysyłać tego samego.
@@ -39,6 +48,7 @@ Ostatnia aktualizacja: 26.10.2026 (sesja G5, PR 2 — lista klatek).
 - **Pozycja usunięta z oferty zostawia otwarty wpis `price-history`** (jest w partii N, nie ma jej w N+1, `writeBatch` jej nie zamyka). Dziś nieszkodliwe — części z zestawu nie da się usunąć — ale przed liczeniem „najniższej ceny z 30 dni” zamykać wpisy pozycji, których nie ma w nowej partii.
 
 ## Zrobione
+- 26.10.2026 — **G5 PR 2 (lista klatek)** scalony do `develop` (#16) — G5 zamknięta: `SourceLabel`, `FpsList` (FullHD/2K/4K, domyślnie 2K, wyłączone segmenty bez liczb), arkusz „Jak liczymy?”, wyjątek „platforma testowa” w ADR-G004 §6. `TODO(krystian)` w `HowWeMeasure.tsx` (dopisek o platformie testowej) nadal czeka.
 - 26.10.2026 — **G5 PR 1 (dane klatek)** scalony do `develop` (#15): kolekcje `games` i `fps-results` (`cpu`/`gpu` tylko panel, jeden wynik `m`/`r`/`e` na trójkę, link tylko `http(s)`, blokada usuwania gry/zestawu z wynikami), migracja `games_fps`, seed 33 gier i 1 584 wyników (idempotentny, `p` nietykane), `lib/fps.ts` (priorytet p > m > r > e, etykiety, pasek), `loadFpsTable()` jako gość.
 - 26.10.2026 — **G4 PR 2b (import kosztów i alarm marży)** scalony do `develop` (#14) — G4 zamknięta: import CSV „kod lub EAN; koszt” z podglądem zmian, alarm marży jako zadanie Payload `margin-alarm` (po imporcie od razu, po ręcznej zmianie kosztu z crona), `autoPublish`, `ALERT_EMAIL` wymagany na produkcji.
 - 26.10.2026 — **G4 PR 2a (ekran „Ceny”)** scalony do `develop` (#13): kolejka do zatwierdzenia, strażnik przed publikacją z naprawą (zatwierdź poziom / najmniejszy „Wyjątek narzutu” / popraw dane), publikacja partii + `price-history` w transakcji odpornej na wyścig, haki: część z zestawu nie znika i nie daje się wyłączyć, zestaw tylko z aktywnymi opcjami, granice `pricing-settings`. Błąd z CI: komunikat `APIError` znikał w buildzie produkcyjnym (pusty `data` + zminifikowana nazwa klasy) — komunikaty błędów Payload sprawdzać na `next start`.
