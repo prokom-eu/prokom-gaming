@@ -65,6 +65,36 @@ test('an option used in a build cannot be switched off', async () => {
   }
 })
 
+test('a build cannot point at an inactive option', async () => {
+  const builds = (await (await panel.get('/api/builds?depth=0&limit=100', { headers })).json()) as {
+    docs: (Doc & { ram: number })[]
+  }
+  const rams = (await (
+    await panel.get('/api/options?depth=0&limit=100&where[type][equals]=ram', { headers })
+  ).json()) as List
+  const used = new Set(builds.docs.map((b) => b.ram))
+  const unused = rams.docs.find((o) => !used.has(o.id))!
+  const build = builds.docs[0]!
+  try {
+    const off = await panel.patch(`/api/options/${unused.id}`, { headers, data: { active: false } })
+    expect(off.status()).toBe(200)
+    const response = await panel.patch(`/api/builds/${build.id}`, {
+      headers,
+      data: { ram: unused.id },
+    })
+    expect(response.status()).toBe(400)
+    const after = (await (
+      await panel.get(`/api/builds/${build.id}?depth=0`, { headers })
+    ).json()) as {
+      ram: number
+    }
+    expect(after.ram).toBe(build.ram)
+  } finally {
+    await panel.patch(`/api/builds/${build.id}`, { headers, data: { ram: build.ram } })
+    await panel.patch(`/api/options/${unused.id}`, { headers, data: { active: true } })
+  }
+})
+
 test('pricing settings reject a zero rounding step and a margin above 50%', async () => {
   const settings = (await (
     await panel.get('/api/globals/pricing-settings', { headers })
