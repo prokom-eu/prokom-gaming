@@ -134,10 +134,50 @@ describe('publication with the margin guard (ADR-G002 §4.3)', () => {
     if (problem?.kind !== 'below_min_margin') return
     expect(problem.minLevelPrice).toBeGreaterThan(snapshot.level.P01!)
 
+    // The level's new price from today's costs is enough → the fix is to approve it.
+    expect(problem.fix).toMatchObject({ kind: 'approve' })
+    if (problem.fix.kind !== 'approve') return
+    expect(problem.fix.candidate).toBeGreaterThanOrEqual(problem.minLevelPrice!)
+
     const message = problemMessage(problem, catalog.settings.minMargin)
     expect(message).toContain('Poziom P01')
     expect(message).toContain('poniżej marży 11,00%')
-    expect(message).toMatch(/podnieś ją do min\. [\d\s ]+ zł/)
+    expect(message).toMatch(/Zatwierdź nową cenę poziomu P01 \([\d\s ]+ zł\)/)
+  })
+
+  it('a dearer cooler breaks the margin with nothing to approve: the fix is the level markup', () => {
+    // KRAKEN +10 zł: its price stays after rounding, but P01 + H9 + KRAKEN had ~6 zł of headroom.
+    const broken = withOptionCost('KRAKEN', 10)
+    const queue = buildQueue(broken, snapshot)
+    expect(queue.items.find((i) => i.key === 'level:P01')).toBeUndefined()
+    const p01 = queue.brokenLevels.find((p) => p.level === 'P01')
+    expect(p01?.fix.kind).toBe('markup')
+    if (p01?.fix.kind !== 'markup') return
+
+    const message = problemMessage(p01, catalog.settings.minMargin)
+    expect(message).toMatch(/„Poziomy mocy → P01” ustaw „Wyjątek narzutu” na min\. 0,\d{4}/)
+
+    // Following the advice puts P01 in the queue, and approving it passes the guard…
+    const withMarkup = (markup: number): Catalog => ({
+      ...broken,
+      levels: broken.levels.map((l) => (l.code === 'P01' ? { ...l, markupOverride: markup } : l)),
+    })
+    const fixed = withMarkup(p01.fix.markup)
+    expect(buildQueue(fixed, snapshot).items.map((i) => i.key)).toContain('level:P01')
+    expect(planPublication(fixed, snapshot, [itemKey('level', 'P01')]).ok).toBe(true)
+
+    // …and it is the smallest such markup: 0.0001 less is not enough.
+    const less = withMarkup(Math.round((p01.fix.markup - 0.0001) * 1e4) / 1e4)
+    const lessQueue = buildQueue(less, snapshot)
+    const keys = lessQueue.items.some((i) => i.key === 'level:P01') ? [itemKey('level', 'P01')] : []
+    expect(planPublication(less, snapshot, keys).ok).toBe(false)
+  })
+
+  it('a missing cost asks to fix the data, not for a price', () => {
+    const broken = withOptionCost('KRAKEN', Number.NaN)
+    const p01 = buildQueue(broken, snapshot).brokenLevels.find((p) => p.level === 'P01')!
+    expect(p01.fix).toEqual({ kind: 'data' })
+    expect(problemMessage(p01, 0.11)).toContain('popraw dane w panelu')
   })
 
   it('approving the level as well clears the guard', () => {

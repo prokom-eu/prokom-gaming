@@ -110,6 +110,8 @@ test.describe('publication', () => {
     }
     await page.getByRole('button', { name: 'Sprawdź marżę i opublikuj' }).click()
     await expect(page.getByText(/Opublikowano partię \d+/)).toBeVisible()
+    // Wait for the refreshed screen: everything published, and no stream cut by closing the page.
+    await expect(page.getByText('Brak pozycji do zatwierdzenia.')).toBeVisible()
   }
 
   test.beforeAll(async ({ playwright, baseURL }) => {
@@ -162,7 +164,7 @@ test.describe('publication', () => {
     const blocked = page.locator('[data-prices-screen] [aria-live="polite"]')
     await expect(blocked).toContainText('Publikacja zablokowana — na stronie nic się nie zmieniło.')
     await expect(blocked).toContainText('Poziom P01')
-    await expect(blocked).toContainText(/podnieś ją do min\. [\d\s ]+ zł/)
+    await expect(blocked).toContainText(/Zatwierdź nową cenę poziomu P01 \([\d\s ]+ zł\)/)
     expect((await newestBatch(request))[0]!.batch).toBe(before[0]!.batch)
 
     // With the level approved too, the guard passes and the site gets a new batch.

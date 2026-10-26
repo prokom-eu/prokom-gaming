@@ -1,14 +1,16 @@
 import 'server-only'
 
-import type { Catalog, PriceRow } from './catalog'
+import type { Catalog, CostLevel, PriceRow } from './catalog'
 import {
   costContext,
   evaluate,
   reviewAll,
+  sellLevel,
   sellPrices,
   type PricedConfig,
   type Review,
 } from './cost'
+import { percent, share, zl } from './format'
 import { lookupPrice, type PriceList, type PriceSnapshot } from './snapshot'
 import { SERVICE_CODE, type Config } from './types'
 
@@ -50,6 +52,8 @@ export type QueueState = {
   minorChanges: number
   /** Guard over the prices on the site today, at today's costs. */
   publishedReview: Review
+  /** Levels whose published prices break the minimum margin today, each with its fix. */
+  brokenLevels: LevelBelowMinProblem[]
   /** Published prices with never-published items filled in by candidates. */
   effectivePublished: PriceList
   candidates: PriceList
@@ -146,7 +150,14 @@ export function buildQueue(catalog: Catalog, snapshot: PriceSnapshot): QueueStat
     i.reasons.includes('urgent') ? 0 : i.reasons.includes('new') ? 1 : 2
   queue.sort((a, b) => rank(a) - rank(b) || a.key.localeCompare(b.key))
 
-  return { items: queue, minorChanges, publishedReview, effectivePublished, candidates }
+  return {
+    items: queue,
+    minorChanges,
+    publishedReview,
+    brokenLevels: levelProblems(publishedReview, catalog, candidates),
+    effectivePublished,
+    candidates,
+  }
 }
 
 // --- Publication ---
@@ -154,14 +165,70 @@ export function buildQueue(catalog: Catalog, snapshot: PriceSnapshot): QueueStat
 export type PublishProblem =
   | { kind: 'nothing_selected' }
   | { kind: 'stale_queue'; keys: string[] }
-  | {
-      kind: 'below_min_margin'
-      level: string
-      count: number
-      worst: PricedConfig
-      minLevelPrice: number | null
-    }
+  | LevelBelowMinProblem
   | { kind: 'no_compatible_config'; level: string }
+
+/** How to lift a level back to the minimum margin — always something the panel can do. */
+export type LevelFix =
+  /** The level's new price from current costs is enough: tick it in the queue. */
+  | { kind: 'approve'; candidate: number }
+  /** Current costs do not give enough: raise "Wyjątek narzutu" of the level to at least this. */
+  | { kind: 'markup'; markup: number }
+  /** A cost or a price is missing: fix the data first. */
+  | { kind: 'data' }
+
+export type LevelBelowMinProblem = {
+  kind: 'below_min_margin'
+  level: string
+  count: number
+  worst: PricedConfig
+  minLevelPrice: number | null
+  fix: LevelFix
+}
+
+/**
+ * The smallest "Wyjątek narzutu" (4 decimals, as typed in the panel) whose level price reaches
+ * `minPrice` — checked with the same `sellLevel` publication uses, rounding included.
+ */
+export function minimalMarkup(
+  level: CostLevel,
+  settings: Catalog['settings'],
+  minPrice: number,
+): number {
+  const white = level.color === 'biały' ? settings.whiteSurcharge : 0
+  // sell = ceil(partsCost × (1 + m) + white) to the step: below this bound it cannot reach minPrice.
+  const lower = (minPrice - settings.roundingStep - white) / level.partsCost - 1
+  let markup = Math.max(0, Math.floor(lower * 1e4) / 1e4)
+  while (sellLevel({ ...level, markupOverride: markup }, settings) < minPrice) {
+    markup = Math.round((markup + 0.0001) * 1e4) / 1e4
+  }
+  return markup
+}
+
+/**
+ * The guard's findings as problems with a fix. A level breaks the floor also when only a case or
+ * cooler got dearer (their price often stays the same after rounding), so the queue can be empty —
+ * then the fix is the level's markup, computed here.
+ */
+function levelProblems(
+  review: Review,
+  catalog: Catalog,
+  candidates: PriceList,
+): LevelBelowMinProblem[] {
+  return Object.entries(review.belowMinMargin).map(([code, below]) => {
+    const level = catalog.levels.find((l) => l.code === code)!
+    const candidate = lookupPrice(candidates.level, code)
+    let fix: LevelFix
+    if (below.minLevelPrice === null || !(level.partsCost > 0)) {
+      fix = { kind: 'data' }
+    } else if (candidate !== undefined && candidate >= below.minLevelPrice) {
+      fix = { kind: 'approve', candidate }
+    } else {
+      fix = { kind: 'markup', markup: minimalMarkup(level, catalog.settings, below.minLevelPrice) }
+    }
+    return { kind: 'below_min_margin' as const, level: code, ...below, fix }
+  })
+}
 
 export type PublicationPlan =
   | {
@@ -199,10 +266,7 @@ export function planPublication(
   for (const item of toPublish) withPrice(prices, item, item.candidate)
 
   const review = reviewAll(costContext(catalog, prices))
-  const problems: PublishProblem[] = []
-  for (const [level, below] of Object.entries(review.belowMinMargin)) {
-    problems.push({ kind: 'below_min_margin', level, ...below })
-  }
+  const problems: PublishProblem[] = levelProblems(review, catalog, queue.candidates)
   for (const level of catalog.levels) {
     if (!review.priceFrom[level.code])
       problems.push({ kind: 'no_compatible_config', level: level.code })
@@ -235,9 +299,6 @@ export function planPublication(
   return { ok: true, rows, changes, review }
 }
 
-const zl = (value: number) => `${Math.round(value).toLocaleString('pl-PL')} zł`
-const pct = (value: number) => `${(value * 100).toFixed(2).replace('.', ',')}%`
-
 /** The message the panel shows for a blocked publication (Polish, for the PRO-KOM staff). */
 export function problemMessage(problem: PublishProblem, minMargin: number): string {
   switch (problem.kind) {
@@ -251,11 +312,21 @@ export function problemMessage(problem: PublishProblem, minMargin: number): stri
       const w = problem.worst
       const config = `${w.case} + ${w.cooler} + ${w.ram} + ${w.ssd}`
       const head =
-        `Poziom ${problem.level}: ${problem.count} konfiguracji poniżej marży ${pct(minMargin)} ` +
-        `(najgorsza: ${config}, ${zl(w.price)}, marża ${Number.isFinite(w.margin) ? pct(w.margin) : 'nieznana'}).`
-      return problem.minLevelPrice === null
-        ? `${head} Brakuje kosztu albo ceny — popraw dane w panelu.`
-        : `${head} Zatwierdź nową cenę poziomu albo podnieś ją do min. ${zl(problem.minLevelPrice)}.`
+        `Poziom ${problem.level}: ${problem.count} konfiguracji poniżej marży ${percent(minMargin)} ` +
+        `(najgorsza: ${config}, ${zl(w.price)}, marża ${Number.isFinite(w.margin) ? percent(w.margin) : 'nieznana'}).`
+      const fix = problem.fix
+      switch (fix.kind) {
+        case 'data':
+          return `${head} Brakuje kosztu albo ceny — popraw dane w panelu.`
+        case 'approve':
+          return `${head} Zatwierdź nową cenę poziomu ${problem.level} (${zl(fix.candidate)}).`
+        case 'markup':
+          return (
+            `${head} Z obecnych kosztów cena poziomu nie wystarczy: w „Poziomy mocy → ${problem.level}” ` +
+            `ustaw „Wyjątek narzutu” na min. ${share(fix.markup)} (cena poziomu min. ` +
+            `${zl(problem.minLevelPrice)}), potem zatwierdź poziom tutaj.`
+          )
+      }
     }
   }
 }

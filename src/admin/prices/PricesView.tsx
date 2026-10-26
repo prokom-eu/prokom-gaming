@@ -6,7 +6,7 @@ import { isPanelUser } from '../../access/panel'
 import { CatalogError } from '../../lib/pricing/catalog'
 import { buildQueue, buildsOverview, problemMessage } from '../../lib/pricing/publish'
 import { loadBatch, loadOffer, type BatchInfo } from '../../lib/pricing/store'
-import { percent, signedZl, zl } from './format'
+import { percent, signedZl, zl } from '../../lib/pricing/format'
 import styles from './prices.module.css'
 import { PricesQueue } from './PricesQueue'
 
@@ -60,16 +60,11 @@ export async function PricesView({ initPageResult, params, searchParams }: Admin
     </DefaultTemplate>
   )
 
-  const current = await loadBatch(payload)
-  if (!current) {
-    return template(<Banner type="error">Brak opublikowanych cen — uruchom seed.</Banner>)
-  }
-
-  const data = await loadScreen(payload, current)
+  const data = await loadScreen(payload)
   if ('error' in data) return template(<Banner type="error">{data.error}</Banner>)
 
-  const { queue, builds, minMargin, publishThreshold } = data
-  const broken = Object.entries(queue.publishedReview.belowMinMargin)
+  const { current, queue, builds, minMargin, publishThreshold } = data
+  const broken = queue.brokenLevels
 
   return template(
     <>
@@ -91,10 +86,8 @@ export async function PricesView({ initPageResult, params, searchParams }: Admin
           <Banner type="error">
             <strong>Pilne: opublikowane ceny przy dzisiejszych kosztach łamią marżę.</strong>
             <ul className={styles.problems}>
-              {broken.map(([level, below]) => (
-                <li key={level}>
-                  {problemMessage({ kind: 'below_min_margin', level, ...below }, minMargin)}
-                </li>
+              {broken.map((problem) => (
+                <li key={problem.level}>{problemMessage(problem, minMargin)}</li>
               ))}
             </ul>
           </Banner>
@@ -152,22 +145,26 @@ export async function PricesView({ initPageResult, params, searchParams }: Admin
 }
 
 type ScreenData = {
+  current: BatchInfo
   queue: ReturnType<typeof buildQueue>
   builds: ReturnType<typeof buildsOverview>
   minMargin: number
   publishThreshold: number
 }
 
-/** Everything the screen shows; a data error in the panel (missing field) becomes a message. */
-async function loadScreen(
-  payload: Payload,
-  current: BatchInfo,
-): Promise<ScreenData | { error: string }> {
+/**
+ * Everything the screen shows. A data error (missing field, broken batch) becomes a message on
+ * the screen instead of an error page.
+ */
+async function loadScreen(payload: Payload): Promise<ScreenData | { error: string }> {
   try {
+    const current = await loadBatch(payload)
+    if (!current) return { error: 'Brak opublikowanych cen — uruchom seed.' }
     const offer = await loadOffer(payload)
     const previous =
       current.snapshot.batch > 1 ? await loadBatch(payload, current.snapshot.batch - 1) : null
     return {
+      current,
       queue: buildQueue(offer.catalog, current.snapshot),
       builds: buildsOverview(
         offer.builds,
