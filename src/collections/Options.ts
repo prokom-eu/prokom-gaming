@@ -4,6 +4,7 @@ import { number, select } from 'payload/shared'
 
 import { isPanelUser, panelField, panelOnly } from '../access/panel'
 import { GROUP_OFFER, RAM_TYPES, requiredFor, requiredWhen } from './shared'
+import { blockDeactivateWhenUsed, blockDeleteWhenUsed } from './usage'
 
 const forTypes =
   (...types: string[]): Condition =>
@@ -39,6 +40,15 @@ export const Options: CollectionConfig = {
   },
   defaultSort: 'code',
   access: { read: readActive, create: panelOnly, update: panelOnly, delete: panelOnly },
+  hooks: {
+    beforeChange: [blockDeactivateWhenUsed],
+    beforeDelete: [
+      blockDeleteWhenUsed(
+        ['case', 'cooler', 'ram', 'ssd'],
+        'Zmień najpierw zestaw; opcję, której nie sprzedajemy, wyłącz („Aktywna”).',
+      ),
+    ],
+  },
   fields: [
     {
       type: 'row',

@@ -28,6 +28,14 @@ export default buildConfig({
     importMap: {
       baseDir: path.resolve(dirname),
     },
+    // Referenced by path (import map), never imported here: the prices screen uses the
+    // server-only cost layer, which must stay out of the config the Payload CLI loads.
+    components: {
+      views: {
+        prices: { Component: '/admin/prices/PricesView#PricesView', path: '/ceny', exact: true },
+      },
+      afterNavLinks: ['/admin/prices/PricesNavLink#PricesNavLink'],
+    },
   },
   // New collections go at the end: Payload names compound indexes after their columns only,
   // so inserting earlier can renumber them in a later migration.

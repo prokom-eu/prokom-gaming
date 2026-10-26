@@ -27,7 +27,6 @@ const PUBLIC_LISTS = [
   { path: '/api/power-levels?limit=100&depth=2', count: 16 },
   { path: '/api/options?limit=100&depth=1', count: 57 },
   { path: '/api/builds?limit=100&depth=2', count: 16 },
-  { path: '/api/published-prices?limit=200', count: 90 },
   { path: '/api/media?limit=100', count: 46 },
 ]
 
@@ -115,6 +114,21 @@ test.describe('public offer API', () => {
       expectNothingHidden(path, body)
     })
   }
+
+  // Every publication adds a batch (G4), so only the newest one has a known size.
+  test('the newest price batch is public: 90 prices, no costs', async ({ request }) => {
+    const newest = (await (
+      await request.get('/api/published-prices?sort=-batch&limit=1')
+    ).json()) as List
+    const batch = Number(newest.docs[0]?.batch)
+    expect(batch).toBeGreaterThanOrEqual(1)
+    const path = `/api/published-prices?limit=200&where[batch][equals]=${batch}`
+    const response = await request.get(path)
+    expect(response.status()).toBe(200)
+    const body = await response.text()
+    expect((JSON.parse(body) as List).totalDocs).toBe(90)
+    expectNothingHidden(path, body)
+  })
 
   test('a single build with deep population shows nothing hidden', async ({ request }) => {
     const list = (await (await request.get('/api/builds?limit=1&depth=0')).json()) as List

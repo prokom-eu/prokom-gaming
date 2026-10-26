@@ -3,6 +3,9 @@
  * here carries a cost or an internal model — those live only in `cost.ts` (server-only).
  */
 
+/** Item code of the service (assembly, Windows, shipping) in published prices. */
+export const SERVICE_CODE = 'SERVICE'
+
 /** A configuration = item codes: power level + case + cooler + RAM + SSD (a build is one too). */
 export type Config = {
   level: string
