@@ -32,14 +32,14 @@ export function parseCostCsv(text: string): { rows: ParsedRow[]; errors: RowErro
 
   lines.forEach((raw, index) => {
     const line = index + 1
-    const text = raw.trim()
-    if (text === '') return
+    const trimmed = raw.trim()
+    if (trimmed === '') return
     const isFirst = firstLine
     firstLine = false
-    const cells = text.split(/[;\t]/).map((c) => c.trim())
+    const cells = trimmed.split(/[;\t]/).map((c) => c.trim())
     while (cells.length > 2 && cells[cells.length - 1] === '') cells.pop() // trailing separator
     if (cells.length !== 2) {
-      errors.push({ line, text, message: 'Oczekuję dwóch kolumn: kod lub EAN; koszt.' })
+      errors.push({ line, text: trimmed, message: 'Oczekuję dwóch kolumn: kod lub EAN; koszt.' })
       return
     }
     const [key, costText] = cells as [string, string]
@@ -48,17 +48,21 @@ export function parseCostCsv(text: string): { rows: ParsedRow[]; errors: RowErro
       // Header: only the first non-empty line, and only when the cost column holds words and no
       // digits ("koszt") — a typo like "45O" stays an error.
       if (isFirst && /\p{L}/u.test(costText) && !/\d/.test(costText)) return
-      errors.push({ line, text, message: `Nieprawidłowy koszt „${costText}”.` })
+      errors.push({ line, text: trimmed, message: `Nieprawidłowy koszt „${costText}”.` })
       return
     }
     if (key === '') {
-      errors.push({ line, text, message: 'Brak kodu albo EAN.' })
+      errors.push({ line, text: trimmed, message: 'Brak kodu albo EAN.' })
       return
     }
     const normalized = normalizeKey(key)
     const first = seen.get(normalized)
     if (first !== undefined) {
-      errors.push({ line, text, message: `Powtórzony kod (pierwszy raz w wierszu ${first}).` })
+      errors.push({
+        line,
+        text: trimmed,
+        message: `Powtórzony kod (pierwszy raz w wierszu ${first}).`,
+      })
       return
     }
     seen.set(normalized, line)
@@ -150,6 +154,11 @@ export function matchCosts(
   const changes: CostChange[] = []
   const errors: RowError[] = []
   let unchanged = 0
+  // Different keys can name the same place (an option's code and its EAN, a part's EAN and its
+  // model): the first row wins the place, a later one is an error — never a silent overwrite.
+  const claimed = new Map<string, number>()
+  const place = (t: CostTarget) =>
+    t.kind === 'option' ? `option:${t.id}` : `component:${t.id}:${t.index}`
   for (const row of rows) {
     const key = normalizeKey(row.key)
     let matchedBy: CostChange['matchedBy']
@@ -181,6 +190,17 @@ export function matchCosts(
       matchedBy = 'model'
       targets = byModel.map(partTarget)
     }
+
+    const clash = targets.map((t) => claimed.get(place(t))).find((line) => line !== undefined)
+    if (clash !== undefined) {
+      errors.push({
+        line: row.line,
+        text: row.key,
+        message: `Ta sama pozycja co w wierszu ${clash} — zostaw jeden wiersz.`,
+      })
+      continue
+    }
+    for (const t of targets) claimed.set(place(t), row.line)
 
     const changed = targets.filter((t) => t.oldCost !== row.cost)
     if (changed.length === 0) {

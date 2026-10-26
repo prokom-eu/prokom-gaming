@@ -143,6 +143,40 @@ describe('matchCosts', () => {
   })
 })
 
+describe('two rows for the same place', () => {
+  const row = (key: string, cost: number, line: number) => ({ line, key, cost })
+
+  it("an option's code and its EAN: the second row is an error, not an overwrite", () => {
+    const result = matchCosts([row('R16', 410, 1), row('5901234567890', 420, 2)], options, levels)
+    expect(result.changes.map((c) => [c.line, c.newCost])).toEqual([[1, 410]])
+    expect(result.errors).toEqual([
+      {
+        line: 2,
+        text: '5901234567890',
+        message: 'Ta sama pozycja co w wierszu 1 — zostaw jeden wiersz.',
+      },
+    ])
+  })
+
+  it("a part's EAN and its model", () => {
+    const result = matchCosts(
+      [row('2222222222222', 1350, 1), row('RTX 5060 8GB Dual', 1400, 2)],
+      options,
+      levels,
+    )
+    expect(result.changes.map((c) => c.line)).toEqual([1])
+    expect(result.errors.map((e) => [e.line, e.message])).toEqual([
+      [2, 'Ta sama pozycja co w wierszu 1 — zostaw jeden wiersz.'],
+    ])
+  })
+
+  it('also when the first row does not change the cost', () => {
+    const result = matchCosts([row('R16', 400, 1), row('5901234567890', 420, 2)], options, levels)
+    expect(result.unchanged).toBe(1)
+    expect(result.errors.map((e) => e.line)).toEqual([2])
+  })
+})
+
 describe('previewCostImport', () => {
   it('joins parse and match errors in line order', () => {
     const preview = previewCostImport('NOPE;5\nR16;x\nR16;420', options, levels)
