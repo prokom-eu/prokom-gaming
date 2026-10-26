@@ -9,7 +9,10 @@ const optionOf = (name: string, label: string, type: string): Field => ({
   type: 'relationship',
   relationTo: 'options',
   required: true,
-  filterOptions: { type: { equals: type } },
+  // Active only: the margin guard reviews active options, so a build with an inactive one would
+  // drop out of it (the other side: `blockDeactivateWhenUsed` in `usage.ts`). Payload also
+  // checks `filterOptions` when saving.
+  filterOptions: { type: { equals: type }, active: { equals: true } },
 })
 
 /**
