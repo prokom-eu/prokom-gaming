@@ -13,12 +13,15 @@ Ostatnia aktualizacja: 26.10.2026 (sesja G4, PR 2b — import kosztów i alarm m
   - `ALERT_EMAIL` w `lib/env.ts`: opcjonalny lokalnie, wymagany przy `NODE_ENV=production` (`next build`/`next start` też!) — placeholder w `Dockerfile`, adres testowy w `ci.yml`.
   - Seed i import pomijają hak alarmu (`context.skipMarginAlarm`).
 - Sprawdzone lokalnie: `lint`, `typecheck`, `format:check`, `test` (191), pełne `test:e2e` (55 na `pnpm dev`, 53 na `next start`), `build` (import i alarm tylko w `.next/server`), `pnpm seed`, migracja up/down/up, ręcznie: zmiana kosztu w panelu → jeden mail alarmu w Mailpit.
-- Niedokończone: `/przeglad`, CI (gałąź niewypchnięta).
+- `/przeglad` (recenzent): „jedna poprawka przed PR” → za zgodą Krystiana: dwa wiersze CSV wskazujące tę samą pozycję (kod + EAN opcji, EAN + model części) to błąd „Ta sama pozycja co w wierszu N”, nie ciche nadpisanie (test + mutacja); komunikat po imporcie rozróżnia „sprawdzona / w toku (cron) / nie powiodło się”; nazwa zmiennej w `csv.ts`. `ALERT_EMAIL` w G16 i powtarzalne alarmy → „Uwagi na później”.
+- Niedokończone: CI (gałąź niewypchnięta).
 - Następny krok: `/przeglad` → poprawki → push → `/pr` (tytuł `feat(g4): import kosztów CSV i alarm marży`) → CI → squash → **G5** (`/zadanie G5 — gry i klatki`). Stare gałęzie `feat/g1…g4-publikacja-cen` (upstream usunięty) można skasować.
 
 ## Uwagi na później (G4)
 - **Nowe zadanie w kolejce (np. retencja w G6)** = migracja: Payload trzyma `task_slug` jako enum Postgresa (`enum_payload_jobs_task_slug`) — `migrate:create` doda wartość.
 - **Cron zadań startuje z pierwszym żądaniem panelu/API** (`initReq` z `cron: true`), nie przy starcie procesu — dla alarmu bez znaczenia (zmiana kosztu zawsze przychodzi z panelu); dla zadań okresowych (G6) sprawdzić po wdrożeniu albo dodać `jobs:run` w compose.
+- **G16 — `ALERT_EMAIL` w compose produkcji i stagingu:** wymagany przy `NODE_ENV=production`, także przy starcie kontenera — bez niego aplikacja nie wystartuje. Dopisać do `docs/wdrozenia.md` i `compose.*.yml`.
+- **Powtarzalne alarmy (przegląd PR 2b):** łączymy tylko alarmy czekające w kolejce; kilka edycji kosztu w odstępach > 1 min przy tym samym złamanym poziomie da kilka takich samych maili. Świadomie (alarm ma być głośny); jeśli przeszkadza — pamiętać zbiór poziomów z ostatniego alarmu i nie wysyłać tego samego.
 - Zmiana `pricing-settings` (np. podniesienie `minMargin`) nie odpala alarmu — strażnik na ekranie i tak to pokazuje; ewentualnie hak na globalu.
 - W lokalnym przebiegu wszystkich e2e czasem pojawia się w logu serwera „destination stream errored” (strona zamknięta w trakcie odświeżenia) — bez wpływu na wyniki.
 
