@@ -97,8 +97,11 @@ function isUniqueViolation(error: unknown): boolean {
 export type CostImportPreviewResult =
   { ok: true; preview: ImportPreview } | { ok: false; messages: string[] }
 
+/** done = checked now; pending = the cron is running this very check; failed = see the logs. */
+export type MarginCheck = 'done' | 'pending' | 'failed'
+
 export type CostImportResult =
-  | { ok: true; options: number; levels: number; checked: boolean }
+  | { ok: true; options: number; levels: number; check: MarginCheck }
   | { ok: false; messages: string[] }
 
 // ~2000 rows of "code;cost" fit easily; anything bigger is not a cost list.
@@ -143,15 +146,18 @@ export async function importCosts(raw: unknown): Promise<CostImportResult> {
     revalidatePath('/admin/ceny')
     // Margin alarm (and autoPublish) right away, not at the next cron tick: the person who
     // imported is looking at the screen. A failed check never undoes the saved costs.
-    let checked = true
+    let check: MarginCheck
     try {
       const jobId = await queueMarginAlarm(payload, 'csv import')
-      await payload.jobs.runByID({ id: jobId, overrideAccess: true })
+      const run = await payload.jobs.runByID({ id: jobId, overrideAccess: true })
+      // No status for our job = the cron picked it up first and is running it right now.
+      const status = run.jobStatus?.[String(jobId)]?.status
+      check = status === undefined ? 'pending' : status === 'success' ? 'done' : 'failed'
     } catch (error) {
-      checked = false
+      check = 'failed'
       log.error({ ...errorFields(error) }, 'margin alarm after import failed')
     }
-    return { ok: true, ...written, checked }
+    return { ok: true, ...written, check }
   } catch (error) {
     if (error instanceof CatalogError) return { ok: false, messages: [error.message] }
     log.error({ ...errorFields(error) }, 'cost import failed')

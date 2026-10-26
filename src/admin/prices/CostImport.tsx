@@ -11,6 +11,7 @@ import {
   previewCosts,
   type CostImportPreviewResult,
   type CostImportResult,
+  type MarginCheck,
 } from './actions'
 import styles from './prices.module.css'
 
@@ -18,6 +19,14 @@ const MATCHED_BY: Record<ImportPreview['changes'][number]['matchedBy'], string> 
   code: 'kod',
   ean: 'EAN',
   model: 'model części',
+}
+
+const CHECK_MESSAGE: Record<MarginCheck, string> = {
+  done: 'Marża sprawdzona — jeśli ceny na stronie ją łamią, poszedł alarm mailem. Sprawdź kolejkę niżej.',
+  pending:
+    'Sprawdzenie marży jest w toku (alarm wyśle się sam, jeśli trzeba) — za chwilę odśwież stronę.',
+  failed:
+    'Sprawdzenie marży nie powiodło się (szczegóły w logach) — sprawdź strażnika i kolejkę niżej.',
 }
 
 const ROLE: Record<string, string> = {
@@ -164,9 +173,7 @@ export function CostImport() {
         {saved?.ok === true && (
           <Banner type="success">
             Zapisano koszty: {saved.options} opcji, {saved.levels} poziomów mocy.{' '}
-            {saved.checked
-              ? 'Marża sprawdzona — jeśli ceny na stronie ją łamią, poszedł alarm mailem. Sprawdź kolejkę niżej.'
-              : 'Sprawdzenie marży nie powiodło się (szczegóły w logach) — sprawdź strażnika i kolejkę niżej.'}
+            {CHECK_MESSAGE[saved.check]}
           </Banner>
         )}
         {saved?.ok === false && (
