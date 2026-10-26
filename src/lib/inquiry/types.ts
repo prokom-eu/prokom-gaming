@@ -6,7 +6,7 @@
 
 type Choice<V extends string> = { readonly value: V; readonly label: string }
 
-const values = <V extends string>(choices: readonly Choice<V>[]) =>
+const values = <V extends string>(choices: readonly { readonly value: V }[]) =>
   choices.map((choice) => choice.value) as [V, ...V[]]
 
 /** Label of a stored value; the value itself when unknown (old record after a change). */
