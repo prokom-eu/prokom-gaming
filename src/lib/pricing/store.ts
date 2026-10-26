@@ -5,6 +5,7 @@ import type { Payload } from 'payload'
 
 import type { User } from '../../payload-types'
 import { CatalogError, toCatalog, type Catalog } from './catalog'
+import type { CostChange, ImportLevel, ImportOption } from './csv'
 import type { PublicationPlan } from './publish'
 import { snapshotFromRows, type PriceSnapshot } from './snapshot'
 import type { Config } from './types'
@@ -128,10 +129,11 @@ export class StalePublicationError extends Error {
 export async function writeBatch(
   payload: Payload,
   plan: Extract<PublicationPlan, { ok: true }>,
-  user: User,
+  /** `null` = published automatically (`autoPublish`, margin-alarm job). */
+  user: User | null,
   basedOn: number,
 ): Promise<{ batch: number; publishedAt: string }> {
-  const req = await createLocalReq({ user: { ...user, collection: 'users' } }, payload)
+  const req = await createLocalReq(user ? { user: { ...user, collection: 'users' } } : {}, payload)
   await initTransaction(req)
   try {
     const newest = await newestBatchNumber(payload, req)
@@ -142,7 +144,7 @@ export async function writeBatch(
     for (const row of plan.rows) {
       await payload.create({
         collection: 'published-prices',
-        data: { batch, ...row, publishedAt, publishedBy: user.id },
+        data: { batch, ...row, publishedAt, publishedBy: user?.id ?? null },
         overrideAccess: true,
         depth: 0,
         req,
@@ -187,6 +189,102 @@ export async function writeBatch(
     }
     await commitTransaction(req)
     return { batch, publishedAt }
+  } catch (error) {
+    await killTransaction(req)
+    throw error
+  }
+}
+
+// --- Cost import (ADR-G002 §4.1) ---
+
+/** Options and level parts as the CSV import matches them. */
+export async function loadImportData(
+  payload: Payload,
+): Promise<{ options: ImportOption[]; levels: ImportLevel[] }> {
+  const [options, levels] = await Promise.all([
+    payload.find({ collection: 'options', sort: 'code', ...trusted }),
+    payload.find({ collection: 'power-levels', sort: 'code', ...trusted }),
+  ])
+  return {
+    options: options.docs.map((o) => ({
+      id: o.id,
+      code: o.code,
+      ean: o.ean,
+      cost: o.cost,
+      publicLabel: o.publicLabel,
+    })),
+    levels: levels.docs.map((l) => ({ id: l.id, code: l.code, components: l.components })),
+  }
+}
+
+/**
+ * Write the costs of an import preview, all or nothing. Parts are matched again by position and
+ * model, so a level edited since the preview stops the import instead of costing the wrong part.
+ * Hooks are told to skip the margin alarm: the import queues one alarm for all rows.
+ */
+export async function applyCostImport(
+  payload: Payload,
+  changes: readonly CostChange[],
+  user: User,
+): Promise<{ options: number; levels: number }> {
+  const req = await createLocalReq(
+    { user: { ...user, collection: 'users' }, context: { skipMarginAlarm: true } },
+    payload,
+  )
+  const optionCosts = new Map<number, number>()
+  const partCosts = new Map<number, Map<number, { model: string; cost: number }>>()
+  for (const change of changes) {
+    for (const target of change.targets) {
+      if (target.kind === 'option') optionCosts.set(target.id, change.newCost)
+      else {
+        const parts = partCosts.get(target.id) ?? new Map()
+        parts.set(target.index, { model: target.model, cost: change.newCost })
+        partCosts.set(target.id, parts)
+      }
+    }
+  }
+
+  await initTransaction(req)
+  try {
+    for (const [id, cost] of optionCosts) {
+      await payload.update({
+        collection: 'options',
+        id,
+        data: { cost },
+        overrideAccess: true,
+        depth: 0,
+        req,
+      })
+    }
+    for (const [id, parts] of partCosts) {
+      const level = await payload.findByID({
+        collection: 'power-levels',
+        id,
+        overrideAccess: true,
+        depth: 0,
+        req,
+      })
+      const components = (level.components ?? []).map((component, index) => {
+        const next = parts.get(index)
+        if (!next) return component
+        if (component.internalModel !== next.model) {
+          throw new CatalogError(
+            `${level.code}: części zmieniły się od podglądu — odśwież podgląd importu.`,
+          )
+        }
+        return { ...component, cost: next.cost }
+      })
+      await payload.update({
+        collection: 'power-levels',
+        id,
+        data: { components },
+        overrideAccess: true,
+        depth: 0,
+        req,
+      })
+    }
+    await commitTransaction(req)
+    return { options: optionCosts.size, levels: partCosts.size }
   } catch (error) {
     await killTransaction(req)
     throw error

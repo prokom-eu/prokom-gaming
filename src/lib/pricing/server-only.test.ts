@@ -11,7 +11,7 @@ import { describe, expect, it } from 'vitest'
 const here = path.dirname(fileURLToPath(import.meta.url))
 const src = path.resolve(here, '../..')
 
-const SERVER_ONLY_MODULES = ['catalog.ts', 'cost.ts', 'publish.ts', 'store.ts']
+const SERVER_ONLY_MODULES = ['catalog.ts', 'cost.ts', 'csv.ts', 'publish.ts', 'store.ts']
 
 function sourceFiles(dir: string): string[] {
   return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
@@ -29,13 +29,21 @@ describe('cost layer stays on the server', () => {
 
   it('no "use client" module imports the cost layer (types only are fine — they vanish)', () => {
     const valueImport =
-      /^import (?!type\b)[^\n]*from ['"][^'"]*pricing\/(cost|catalog|publish|store)['"]/m
+      /^import (?!type\b)[^\n]*from ['"][^'"]*pricing\/(cost|catalog|csv|publish|store)['"]/m
     const offenders = sourceFiles(src).filter((file) => {
       const code = readFileSync(file, 'utf8')
       const isClient = /^\s*['"]use client['"]/.test(code)
       return isClient && valueImport.test(code)
     })
     expect(offenders).toEqual([])
+  })
+
+  it('the margin-alarm task loads its cost-layer handler only when the job runs', () => {
+    const task = readFileSync(path.join(src, 'jobs/marginAlarm.ts'), 'utf8')
+    expect(task).not.toMatch(/^import [^\n]*(runMarginAlarm|lib\/pricing)/m)
+    expect(task).toContain("await import('./runMarginAlarm')")
+    const runner = readFileSync(path.join(src, 'jobs/runMarginAlarm.ts'), 'utf8')
+    expect(runner.trimStart().startsWith("import 'server-only'")).toBe(true)
   })
 
   it('the Payload config never imports the prices screen (it is referenced by path)', () => {

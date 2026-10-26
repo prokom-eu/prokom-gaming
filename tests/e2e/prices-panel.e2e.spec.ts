@@ -161,7 +161,7 @@ test.describe('publication', () => {
     // Only the RAM: P01 keeps its old price and stays under the floor → blocked.
     await p01.uncheck()
     await page.getByRole('button', { name: 'Sprawdź marżę i opublikuj' }).click()
-    const blocked = page.locator('[data-prices-screen] [aria-live="polite"]')
+    const blocked = page.locator('section[aria-labelledby="queue"] [aria-live="polite"]')
     await expect(blocked).toContainText('Publikacja zablokowana — na stronie nic się nie zmieniło.')
     await expect(blocked).toContainText('Poziom P01')
     await expect(blocked).toContainText(/Zatwierdź nową cenę poziomu P01 \([\d\s ]+ zł\)/)

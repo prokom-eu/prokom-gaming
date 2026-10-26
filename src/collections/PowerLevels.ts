@@ -2,6 +2,8 @@ import type { CollectionConfig } from 'payload'
 
 import { anyone, panelField, panelOnly } from '../access/panel'
 import { GROUP_OFFER, MARKUP_CLASSES, RAM_TYPES, RESOLUTIONS } from './shared'
+import type { PowerLevel } from '../payload-types'
+import { queueAlarmOnCostChange } from './marginAlarmHook'
 import { blockDeleteWhenUsed } from './usage'
 
 const CLASS_1_3 = { type: 'number', required: true, min: 1, max: 3 } as const
@@ -23,6 +25,11 @@ export const PowerLevels: CollectionConfig = {
   defaultSort: 'code',
   access: { read: anyone, create: panelOnly, update: panelOnly, delete: panelOnly },
   hooks: {
+    afterChange: [
+      queueAlarmOnCostChange<PowerLevel>((l) =>
+        (l.components ?? []).map((c) => `${c.internalModel}:${c.cost}`).join('|'),
+      ),
+    ],
     beforeDelete: [blockDeleteWhenUsed(['level'], 'Zmień najpierw poziom w tym zestawie.')],
   },
   fields: [

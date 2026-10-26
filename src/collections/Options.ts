@@ -4,6 +4,8 @@ import { number, select } from 'payload/shared'
 
 import { isPanelUser, panelField, panelOnly } from '../access/panel'
 import { GROUP_OFFER, RAM_TYPES, requiredFor, requiredWhen } from './shared'
+import type { Option } from '../payload-types'
+import { queueAlarmOnCostChange } from './marginAlarmHook'
 import { blockDeactivateWhenUsed, blockDeleteWhenUsed } from './usage'
 
 const forTypes =
@@ -41,6 +43,7 @@ export const Options: CollectionConfig = {
   defaultSort: 'code',
   access: { read: readActive, create: panelOnly, update: panelOnly, delete: panelOnly },
   hooks: {
+    afterChange: [queueAlarmOnCostChange<Option>((o) => String(o.cost))],
     beforeChange: [blockDeactivateWhenUsed],
     beforeDelete: [
       blockDeleteWhenUsed(

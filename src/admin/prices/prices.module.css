@@ -76,3 +76,19 @@
   margin: calc(var(--base) * 0.5) 0 0;
   padding-left: calc(var(--base) * 1.25);
 }
+
+.label {
+  display: block;
+  margin-bottom: calc(var(--base) * 0.5);
+}
+
+.textarea {
+  width: 100%;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.875rem;
+  padding: calc(var(--base) * 0.5);
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: var(--style-radius-s);
+  background: var(--theme-input-bg, var(--theme-elevation-0));
+  color: var(--theme-text);
+}

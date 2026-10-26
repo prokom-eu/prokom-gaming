@@ -26,7 +26,7 @@ COPY . .
 RUN DATABASE_URL=postgresql://build:build@127.0.0.1:5432/build \
     PAYLOAD_SECRET=build-time-placeholder-not-a-secret-000 \
     SMTP_HOST=127.0.0.1 SMTP_PORT=25 \
-    MAIL_FROM_ADDRESS=build@example.invalid \
+    MAIL_FROM_ADDRESS=build@example.invalid ALERT_EMAIL=build@example.invalid \
     pnpm build
 
 # --- runtime: only the traced server, static files and public/ ---
