@@ -1,6 +1,7 @@
 import type { CollectionConfig, Field } from 'payload'
 
 import { anyone, panelField, panelOnly } from '../access/panel'
+import { blockDeleteWithFpsResults } from './FpsResults'
 import { GROUP_OFFER } from './shared'
 
 const optionOf = (name: string, label: string, type: string): Field => ({
@@ -30,6 +31,7 @@ export const Builds: CollectionConfig = {
     defaultColumns: ['name', 'slug', 'level'],
   },
   access: { read: anyone, create: panelOnly, update: panelOnly, delete: panelOnly },
+  hooks: { beforeDelete: [blockDeleteWithFpsResults('build')] },
   fields: [
     {
       type: 'row',
