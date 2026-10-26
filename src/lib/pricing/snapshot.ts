@@ -38,16 +38,24 @@ export function ceil10(value: number): number {
 }
 
 /**
+ * Price of one code, or `undefined`. Codes come from URLs and forms, so only own keys count:
+ * `prices['constructor']` must not return `Object.prototype.constructor`.
+ */
+export function lookupPrice(list: Record<string, number>, code: string): number | undefined {
+  return Object.hasOwn(list, code) ? list[code] : undefined
+}
+
+/**
  * Price of a configuration = level + case + cooler + RAM + SSD + service. `null` when any code
  * has no price in the list (unknown or unpublished item) — the caller must reject it.
  */
 export function priceFromSnapshot(config: Config, prices: PriceList): number | null {
   const items = [
-    prices.level[config.level],
-    prices.option[config.case],
-    prices.option[config.cooler],
-    prices.option[config.ram],
-    prices.option[config.ssd],
+    lookupPrice(prices.level, config.level),
+    lookupPrice(prices.option, config.case),
+    lookupPrice(prices.option, config.cooler),
+    lookupPrice(prices.option, config.ram),
+    lookupPrice(prices.option, config.ssd),
   ]
   let sum = prices.service
   for (const price of items) {
@@ -62,8 +70,8 @@ export function priceFromSnapshot(config: Config, prices: PriceList): number | n
  * sum, it does not depend on the rest of the configuration. `null` for an unknown code.
  */
 export function surcharge(prices: PriceList, fromCode: string, toCode: string): number | null {
-  const from = prices.option[fromCode]
-  const to = prices.option[toCode]
+  const from = lookupPrice(prices.option, fromCode)
+  const to = lookupPrice(prices.option, toCode)
   if (from === undefined || to === undefined) return null
   return to - from
 }

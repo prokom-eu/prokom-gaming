@@ -9,7 +9,7 @@ import {
   type OfferIndex,
 } from '../compat'
 import type { Catalog, CostLevel, CostOption, PricingSettingsInput } from './catalog'
-import { ceilTo, priceFromSnapshot, type PriceList } from './snapshot'
+import { ceilTo, lookupPrice, priceFromSnapshot, type PriceList } from './snapshot'
 import type { Config } from './types'
 
 /**
@@ -110,8 +110,11 @@ export type LevelBelowMin = {
   /** Compatible configurations of this level under `minMargin`. */
   count: number
   worst: PricedConfig
-  /** The lowest level price that lifts every configuration of the level to `minMargin`. */
-  minLevelPrice: number
+  /**
+   * The lowest level price that lifts every configuration of the level to `minMargin`; `null`
+   * when a cost or price is unusable (fix the data first).
+   */
+  minLevelPrice: number | null
 }
 
 export type Review = {
@@ -149,7 +152,7 @@ export function reviewAll(ctx: CostContext): Review {
   const ssds = byType('ssd')
 
   const priceOf = (code: string, list: Record<string, number>): number => {
-    const price = list[code]
+    const price = lookupPrice(list, code)
     if (price === undefined) throw new Error(`${code}: brak ceny do sprawdzenia.`)
     return price
   }
@@ -166,7 +169,8 @@ export function reviewAll(ctx: CostContext): Review {
 
   for (const level of catalog.levels) {
     const levelPrice = priceOf(level.code, prices.level)
-    // Largest amount by which a configuration of this level misses the margin floor.
+    // Largest amount by which a configuration of this level misses the margin floor; NaN once
+    // any configuration has no usable cost or price (then no level price can be suggested).
     let shortfall = 0
     for (const c of cases) {
       for (const cooler of coolers) {
@@ -205,14 +209,20 @@ export function reviewAll(ctx: CostContext): Review {
             const from = review.priceFrom[level.code]
             if (!from || price < from.price) review.priceFrom[level.code] = priced()
 
-            if (m < minMargin - EPSILON) {
+            // Written as "not at least the floor" so a NaN margin (missing cost, zero price) is
+            // caught instead of passing every comparison.
+            if (!(m >= minMargin - EPSILON)) {
               shortfall = Math.max(shortfall, cost / (1 - minMargin) - price)
               const below = review.belowMinMargin[level.code]
               if (!below) {
-                review.belowMinMargin[level.code] = { count: 1, worst: priced(), minLevelPrice: 0 }
+                review.belowMinMargin[level.code] = {
+                  count: 1,
+                  worst: priced(),
+                  minLevelPrice: null,
+                }
               } else {
                 below.count++
-                if (m < below.worst.margin) below.worst = priced()
+                if (!(m >= below.worst.margin)) below.worst = priced()
               }
             }
           }
@@ -220,7 +230,9 @@ export function reviewAll(ctx: CostContext): Review {
       }
     }
     const below = review.belowMinMargin[level.code]
-    if (below) below.minLevelPrice = ceilTo(levelPrice + shortfall, roundingStep)
+    if (below && Number.isFinite(shortfall)) {
+      below.minLevelPrice = ceilTo(levelPrice + shortfall, roundingStep)
+    }
   }
 
   review.durationMs = performance.now() - started

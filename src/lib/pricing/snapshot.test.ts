@@ -48,6 +48,15 @@ describe('priceFromSnapshot', () => {
     expect(priceFromSnapshot({ ...config, level: 'P99' }, prices)).toBeNull()
   })
 
+  it('treats built-in object keys from a URL as unknown codes, not prices', () => {
+    for (const code of ['constructor', 'toString', '__proto__', 'hasOwnProperty']) {
+      expect(priceFromSnapshot({ ...config, ram: code }, prices), code).toBeNull()
+      expect(priceFromSnapshot({ ...config, level: code }, prices), code).toBeNull()
+      expect(surcharge(prices, 'R16', code), code).toBeNull()
+      expect(surcharge(prices, code, 'R16'), code).toBeNull()
+    }
+  })
+
   it('surcharge = difference of option prices, the same as the price difference', () => {
     expect(surcharge(prices, 'R16', 'R32')).toBe(500)
     expect(surcharge(prices, 'R32', 'R16')).toBe(-500)

@@ -6,6 +6,7 @@ import type { Catalog } from './catalog'
 import {
   costContext,
   evaluate,
+  levelMarkup,
   markupFloor,
   reviewAll,
   sellLevel,
@@ -50,12 +51,16 @@ describe('sell prices from costs (ADR-G002 §3)', () => {
     expect(sellOption(caseOpt, low)).toBe(ceil10(caseOpt.cost + low.caseCoolerBuffer))
   })
 
-  it('white levels carry the white surcharge on top of the markup', () => {
-    const white = catalog.levels.find((l) => l.color === 'biały')!
-    const black = { ...white, color: 'czarny' as const }
-    const diff = sellLevel(white, catalog.settings) - sellLevel(black, catalog.settings)
-    expect(diff).toBeGreaterThanOrEqual(catalog.settings.whiteSurcharge - 10)
-    expect(diff).toBeLessThanOrEqual(catalog.settings.whiteSurcharge + 10)
+  it('white levels: surcharge added after the markup, before rounding', () => {
+    const s = catalog.settings
+    const whites = catalog.levels.filter((l) => l.color === 'biały')
+    expect(whites.length).toBeGreaterThan(0)
+    for (const level of whites) {
+      const markup = Math.max(levelMarkup(level, s), markupFloor(s))
+      expect(sellLevel(level, s), level.code).toBe(
+        ceil10(level.partsCost * (1 + markup) + s.whiteSurcharge),
+      )
+    }
   })
 
   it('service = 180 zł', () => {
@@ -137,8 +142,7 @@ describe('full review of every configuration (ADR-G002 §8.2–§8.3)', () => {
   })
 
   it('runs fast enough for the panel', () => {
-    // Measured locally in ms; the guard runs before every publication.
-    console.info(`reviewAll: ${review.durationMs.toFixed(0)} ms for ${review.total} combinations`)
+    // The guard runs before every publication; ~55 ms locally (docs/STAN.md).
     expect(review.durationMs).toBeLessThan(5000)
   })
 })
@@ -191,12 +195,26 @@ describe('margin guard (ADR-G002 §4.3)', () => {
     expect(p01.worst.margin).toBeLessThan(catalog.settings.minMargin)
     expect(p01.minLevelPrice).toBeGreaterThan(ctx.prices.level.P01!)
 
-    // Publishing P01 at the suggested price clears the guard.
-    const fixed = costContext(dearer, {
-      ...ctx.prices,
-      level: { ...ctx.prices.level, P01: p01.minLevelPrice },
-    })
-    expect(reviewAll(fixed).belowMinMargin).toEqual({})
+    const withP01 = (price: number) =>
+      reviewAll(costContext(dearer, { ...ctx.prices, level: { ...ctx.prices.level, P01: price } }))
+
+    // Publishing P01 at the suggested price clears the guard…
+    expect(withP01(p01.minLevelPrice!).belowMinMargin).toEqual({})
+    // …and it is the minimum: one rounding step less still fails.
+    const step = catalog.settings.roundingStep
+    expect(Object.keys(withP01(p01.minLevelPrice! - step).belowMinMargin)).toEqual(['P01'])
+  })
+
+  it('a missing cost (NaN margin) is caught, with no level price suggested', () => {
+    const broken: Catalog = {
+      ...catalog,
+      options: catalog.options.map((o) => (o.code === 'R16' ? { ...o, cost: Number.NaN } : o)),
+    }
+    const result = reviewAll(costContext(broken, ctx.prices))
+    const flagged = Object.values(result.belowMinMargin)
+    expect(flagged.length).toBeGreaterThan(0)
+    expect(flagged.every((l) => l.minLevelPrice === null)).toBe(true)
+    expect(flagged.some((l) => l.worst.ram === 'R16')).toBe(true)
   })
 
   it('an inactive option is left out of the review', () => {

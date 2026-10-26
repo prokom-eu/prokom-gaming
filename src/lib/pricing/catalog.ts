@@ -12,6 +12,7 @@ import type { CompatCase, CompatCooler, CompatLevel, CompatRam, CompatSsd } from
 export type PricingSettingsInput = Pick<
   PricingSetting,
   | 'minMargin'
+  // Not used by the formulas: the publication queue (G4, part 2) compares candidates with it.
   | 'publishThreshold'
   | 'serviceCost'
   | 'caseCoolerBuffer'
