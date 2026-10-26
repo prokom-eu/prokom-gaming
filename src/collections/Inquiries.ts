@@ -7,6 +7,7 @@ import type {
 
 import { isPanelUser, nobody, panelOnly } from '../access/panel'
 import { formatInquiryNumber, nextInquirySeq, yearInPoland } from '../lib/inquiry/number'
+import { RETENTION_CONTEXT } from '../lib/inquiry/retention'
 import { nextStatusChangedAt } from '../lib/inquiry/status'
 import { CHOICES, INQUIRY_STATUS_CHOICES, INQUIRY_TYPE_CHOICES } from '../lib/inquiry/types'
 import { GROUP_SALES } from './shared'
@@ -54,16 +55,19 @@ const trackStatusChange: CollectionBeforeChangeHook = ({ data, operation, origin
   }
 }
 
-/** Erasure trail (ADR-G005): which record, who and when — never its content. */
-const recordDeletion: CollectionAfterDeleteHook = async ({ doc, req }) => {
-  const user = isPanelUser(req) ? req.user : null
+/**
+ * Erasure trail (ADR-G005): which record, who and when — never its content. The retention job
+ * marks its deletes in `context`; anything else is an erasure on request from the panel.
+ */
+export const recordDeletion: CollectionAfterDeleteHook = async ({ context, doc, req }) => {
+  const byRetention = context[RETENTION_CONTEXT] === true
+  const user = !byRetention && isPanelUser(req) ? req.user : null
   await req.payload.create({
     collection: 'inquiry-deletions',
     data: {
       inquiryId: Number(doc.id),
       number: typeof doc.number === 'string' ? doc.number : null,
-      // No panel user = the daily retention job (`lib/inquiry/retention`).
-      reason: user ? 'request' : 'retention',
+      reason: byRetention ? 'retention' : 'request',
       deletedBy: user?.id ?? null,
       deletedByEmail: user?.email ?? null,
     },

@@ -8,20 +8,22 @@ Ostatnia aktualizacja: 27.10.2026 (sesja G6 — zapytania: backend i maile).
   - Kolekcja `inquiries` (grupa „Sprzedaż”): pola ADR-G005 + uzupełnienie G6 (`forWhom`, `budget`, `customList`, `otherGames`, `caseColor`, `lighting`, `priceBatch`, `statusChangedAt`), słowniki 1:1 z planszy Formularz (`lib/inquiry/types.ts`). REST: brak tworzenia i odczytu publicznie; w panelu edytowalny tylko `status`. `inquiry-deletions` — ślad usunięcia (id, numer, powód, kto) bez treści.
   - Numer `PKG-RRRR-NNNN` z licznika `inquiry_counters` (tabela dopisana ręcznie w migracji `inquiries`, upsert w transakcji zapisu → bez luk w roku, rok wg czasu polskiego).
   - `POST /api/inquiry` → `submitInquiry()`: honeypot, podpisany `formToken`, Zod (e-mail zawsze wymagany, NIP z sumą przy fakturze na firmę), cena i zgodność z serwera (`lib/inquiry/price.ts` na `loadOffer`/`loadBatch`, koszty odcinane w `pricingStore.ts`), limit 5/10 min na skrót IP, zapis, 2 maile (powiadomienie z `Reply-To` klienta i linkiem do panelu; potwierdzenie z numerem, konfiguracją po `publicLabel`, ceną i czasem odpowiedzi z `site-settings`). Odpowiedzi: 201 `{ ok, number }`, 400 `invalid` (`fields`, przy niezgodności `compat`), 400 `rejected`, 413, 415, 429, 503.
-  - Retencja: zadanie `inquiry-retention` (codziennie 3:00) usuwa `lost`/`closed` po `INQUIRY_RETENTION_MONTHS`.
-  - Env: `SITE_URL`, `INQUIRY_NOTIFY_EMAIL` (wymagany na produkcji), `INQUIRY_RETENTION_MONTHS`; CI: `INQUIRY_NOTIFY_EMAIL` w zadaniu e2e.
+  - Retencja: zadanie `inquiry-retention` (codziennie 3:00 czasu serwera = UTC w kontenerze) usuwa `lost`/`closed` po `INQUIRY_RETENTION_MONTHS`; powód „retencja” w śladzie z `req.context`, nie z tego, czy ktoś jest zalogowany.
+  - Env: `SITE_URL` i `INQUIRY_NOTIFY_EMAIL` (oba wymagane na produkcji), `INQUIRY_RETENTION_MONTHS`; CI: oba w zadaniu e2e.
   - ADR-G005 — uzupełnienie 27.10.2026 (decyzje G6); spec. §10: e-mail wymagany.
 - Sprawdzone lokalnie: `lint`, `typecheck`, `format:check`, `test` (322), pełne `test:e2e` na `pnpm dev` (68), w tym `inquiry-api` (4: 201 + oba maile w Mailpit, kolejne numery, odmowy, brak publicznego odczytu, panel tylko status + ślad usunięcia), migracja `up → down → up`.
-- Niedokończone: `/przeglad` (recenzent — obowiązkowy: formularz, migracja, diff > 100 linii), push, `/pr`, CI. Panelu nie oglądałem w przeglądarce (sprawdzony przez API w e2e) — rzuć okiem na `/admin/collections/inquiries` (widok, zablokowane pola).
+- `/przeglad` (recenzent): „gotowe do PR”; za zgodą Krystiana poprawione: `SITE_URL` wymagany na produkcji, e-mail sprawdzany regułą pola `email` z Payload (inaczej 503 zamiast 400), telefon min. 6 cyfr, powód usunięcia z `req.context`, loader zapytania wybiera pola reguł jawnie (żadne przyszłe pole kosztu nie przejdzie), błąd startu aplikacji → JSON 503.
+- Niedokończone: push, `/pr`, CI. Panelu nie oglądałem w przeglądarce (sprawdzony przez API w e2e) — rzuć okiem na `/admin/collections/inquiries` (widok, zablokowane pola).
 - **`TODO(krystian)`:** treść klauzuli zgody (`lib/inquiry/consent.ts`, z planszy — potwierdzić z prawnikiem); potwierdzenie dla klienta ma tekst roboczy (`TODO(G12)`).
 - Następny krok: `/przeglad` → poprawki → push → `/pr` (tytuł `feat(g6): zapytania — backend, numer i maile`) → CI → squash → **G7** (`/zadanie G7 — strona główna: hero i taśma`).
 
 ## Uwagi na później (G6)
 - **G12 — token formularza:** `POST /api/inquiry` wymaga `formToken` (`issueFormToken(PAYLOAD_SECRET)` z `lib/inquiry/spam.ts`, min. 3 s). Formularz musi go dostać z serwera: strona `/zapytanie` renderowana dynamicznie albo osobny `GET` z tokenem — decyzja w G12. Pole-pułapka: `website` (`HONEYPOT_FIELD`).
+- **G12 — maile w `after()`:** dziś `submitInquiry` czeka na SMTP przed odpowiedzią (przy zawieszonym serwerze poczty do ok. 30 s, timeouty w `payload.config.ts`). Gdy formularz pokaże realny czas — przenieść wysyłkę do `after()` z `next/server` (rekord i tak zapisany wcześniej; przegląd G6).
 - **G12 — komunikaty:** odpowiedź 400 ma ścieżki pól (`config.ram`, `nip`) i kody reguł zgodności (`compat`) — komunikaty z planszy mapować po nich (`compatMessage` z `lib/compat.ts`).
 - **G13:** `voucher` i `ready` odrzucane (`ACCEPTED_TYPES` w `lib/inquiry/types.ts`, `TODO(G13)`).
 - **G14:** role `admin`/`serwis` — dziś każde konto panelu może usunąć zapytanie.
-- **G16:** `INQUIRY_NOTIFY_EMAIL` i `SITE_URL` w `compose.*.yml` i `docs/wdrozenia.md` (bez `INQUIRY_NOTIFY_EMAIL` produkcja nie wystartuje). Nginx musi nadpisywać `X-Real-IP` (limit zapytań go używa). Retencja jak alarm: cron zadań rusza z pierwszym żądaniem — sprawdzić po wdrożeniu, że `inquiry-retention` się kolejkuje (`payload-jobs`).
+- **G16:** `INQUIRY_NOTIFY_EMAIL` i `SITE_URL` w `compose.*.yml` i `docs/wdrozenia.md` (bez nich produkcja nie wystartuje); `TZ=Europe/Warsaw` w compose, jeśli retencja ma iść o 3:00 polskiego czasu. Nginx musi nadpisywać `X-Real-IP` (limit zapytań go używa). Retencja jak alarm: cron zadań rusza z pierwszym żądaniem — sprawdzić po wdrożeniu, że `inquiry-retention` się kolejkuje (`payload-jobs`).
 - **Limit zapytań w pamięci procesu** — jeden kontener; restart zeruje. Przy kilku instancjach potrzebny wspólny magazyn.
 - **Rekord na wypadek awarii poczty:** maile wysyłane po zapisie; błąd SMTP tylko w logu (rekord zostaje, klient dostaje numer).
 

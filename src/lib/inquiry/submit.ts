@@ -258,8 +258,16 @@ export async function submitInquiry(
       import('../logger'),
       import('./pricingStore'),
     ])
-  const payload = await getPayload({ config })
-  const env = getEnv()
+  let payload: Awaited<ReturnType<typeof getPayload>>
+  let env: ReturnType<typeof getEnv>
+  try {
+    payload = await getPayload({ config })
+    env = getEnv()
+  } catch (error) {
+    // Same JSON answer as any other outage, instead of Next's default 500 page (review G6).
+    log.error({ requestId: context.requestId, ...errorFields(error) }, 'Inquiry: app not ready')
+    return { ok: false, error: 'unavailable' }
+  }
 
   return submitInquiryWith(
     {

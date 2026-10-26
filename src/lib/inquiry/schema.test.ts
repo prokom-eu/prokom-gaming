@@ -60,6 +60,10 @@ describe('parseInquiryInput', () => {
     expect(fields({ ...build, name: ' ' })).toContain('name')
     expect(fields({ ...build, email: undefined })).toContain('email')
     expect(fields({ ...build, email: 'nie-mail' })).toContain('email')
+    // Domains Payload's e-mail field rejects must fail here too, not at the database (review G6).
+    expect(fields({ ...build, email: 'jan@foo-.pl' })).toContain('email')
+    expect(fields({ ...build, email: 'jan..k@example.test' })).toContain('email')
+    expect(fields({ ...build, email: 'jan.kowalski+gry@poczta.example.pl' })).toEqual([])
     expect(
       fields({ ...build, consent: { accepted: false, clauseVersion: CONSENT_CLAUSE.version } }),
     ).toContain('consent.accepted')
@@ -72,6 +76,9 @@ describe('parseInquiryInput', () => {
     expect(fields({ ...build, preferredContact: 'phone' })).toContain('phone')
     expect(fields({ ...build, preferredContact: 'phone', phone: '+48 600 100 200' })).toEqual([])
     expect(fields({ ...build, phone: 'zadzwoń' })).toContain('phone')
+    expect(fields({ ...build, phone: '------' })).toContain('phone')
+    expect(fields({ ...build, phone: '(12) 34' })).toContain('phone')
+    expect(fields({ ...build, phone: '18 267 65 11' })).toEqual([])
   })
 
   it('NIP: required for a company invoice, valid, only there', () => {

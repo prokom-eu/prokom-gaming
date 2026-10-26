@@ -3,6 +3,12 @@ import { RETAINED_UNTIL_EXPIRY } from './types'
 
 export const INQUIRY_RETENTION_TASK = 'inquiry-retention'
 
+/**
+ * `req.context` flag of deletes made by the retention job. The trail's reason comes from it, not
+ * from "is a panel user signed in": a panel account may run the job queue itself (review G6).
+ */
+export const RETENTION_CONTEXT = 'inquiryRetention'
+
 export type RetentionCandidate = {
   id: number
   status: InquiryStatus

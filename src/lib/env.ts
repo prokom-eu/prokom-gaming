@@ -29,11 +29,12 @@ const envSchema = z
     // without it the alarm only logs a warning (Krystian's decision, 26.10.2026).
     ALERT_EMAIL: z.email().optional(),
     // Public address of the site, no trailing slash: links in e-mails (G6: the panel link in the
-    // inquiry notification), later canonical URLs and the sitemap (G15).
+    // inquiry notification), later canonical URLs and the sitemap (G15). Locally defaults to
+    // http://localhost:3100 (set below, after the production check).
     SITE_URL: z
       .url({ protocol: /^https?$/ })
-      .default('http://localhost:3100')
-      .transform((url) => url.replace(/\/+$/, '')),
+      .transform((url) => url.replace(/\/+$/, ''))
+      .optional(),
     // Mailbox of inquiry notifications (ADR-G005). Required in production; locally optional —
     // without it only the customer's confirmation goes out and a warning is logged.
     INQUIRY_NOTIFY_EMAIL: z.email().optional(),
@@ -54,6 +55,13 @@ const envSchema = z
     message: 'required in production (inquiry notifications)',
     path: ['INQUIRY_NOTIFY_EMAIL'],
   })
+  // Explicit in production: a silent localhost default would send the panel link in every
+  // notification to nowhere (review G6). CI's `next start` sets it to its own localhost on purpose.
+  .refine((env) => env.NODE_ENV !== 'production' || Boolean(env.SITE_URL), {
+    message: 'required in production (links in e-mails)',
+    path: ['SITE_URL'],
+  })
+  .transform((env) => ({ ...env, SITE_URL: env.SITE_URL ?? 'http://localhost:3100' }))
 
 export type Env = z.infer<typeof envSchema>
 

@@ -42,6 +42,18 @@ const slug = z
   .max(120)
   .regex(/^[a-z0-9]+(-[a-z0-9]+)*$/)
 
+/**
+ * Payload's own e-mail rule (payload 3.91 `fields/validations.js`, field type `email`). Zod 4 lets
+ * through e.g. `jan@foo-.pl`; without the same rule here the collection would reject the record
+ * after validation and the customer would get 503 instead of 400 `email` (review G6).
+ */
+const PAYLOAD_EMAIL =
+  /^(?!.*\.\.)[\w!#$%&'*+/=?^`{|}~-](?:[\w!#$%&'*+/=?^`{|}~.-]*[\w!#$%&'*+/=?^`{|}~-])?@[a-z0-9](?:[a-z0-9-]*[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)*\.[a-z]{2,}$/i
+
+/** At least 6 digits once spaces, brackets and hyphens are gone (not `------`). */
+const isPhone = (value: string) =>
+  /^\+?[\d\s()-]+$/.test(value) && value.replace(/\D/g, '').length >= 6
+
 const uniqueList = <T extends z.ZodType<string>>(item: T, max: number) =>
   z
     .array(item)
@@ -81,11 +93,13 @@ const baseSchema = z.object({
   extras: uniqueList(z.enum(choiceValues(EXTRA_CHOICES)), EXTRA_CHOICES.length),
   // Contact (step 3). E-mail always: the offer goes by e-mail (Krystian 27.10.2026, board).
   name: requiredText(120),
-  email: z.string().trim().max(254).pipe(z.email()),
-  phone: optionalText(30).refine(
-    (value) => value === undefined || /^\+?[\d\s()-]{6,}$/.test(value),
-    'invalid phone',
-  ),
+  email: z
+    .string()
+    .trim()
+    .max(254)
+    .pipe(z.email())
+    .refine((v) => PAYLOAD_EMAIL.test(v), 'invalid e-mail'),
+  phone: optionalText(30).refine((value) => value === undefined || isPhone(value), 'invalid phone'),
   preferredContact: optionalChoice(PREFERRED_CONTACT_CHOICES),
   pickup: optionalChoice(PICKUP_CHOICES),
   invoice: optionalChoice(INVOICE_CHOICES),

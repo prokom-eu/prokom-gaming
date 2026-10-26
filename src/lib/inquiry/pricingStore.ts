@@ -22,16 +22,49 @@ const publicLabels = async (
 }
 
 // The cost layer reads parts with costs; an inquiry keeps only what the rules and prices need,
-// so no cost can end up in a record or an e-mail by mistake (ADR-G002 §8.7).
-const compatLevel = ({
-  color: _c,
-  markupClass: _m,
-  markupOverride: _o,
-  partsCost: _p,
-  ...level
-}: CostLevel): CompatLevel => level
-const compatOption = ({ cost: _cost, ...option }: CostOption): CompatOption & { active: boolean } =>
-  option
+// picked field by field — a cost field added later cannot slip through (ADR-G002 §8.7, review G6).
+const compatLevel = (l: CostLevel): CompatLevel => ({
+  code: l.code,
+  ramType: l.ramType,
+  gpuLengthMm: l.gpuLengthMm,
+  requiresAio: l.requiresAio,
+  minRamGb: l.minRamGb,
+  minSsdGb: l.minSsdGb,
+  minCoolerClass: l.minCoolerClass,
+  minCaseClass: l.minCaseClass,
+})
+
+type InquiryOption = CompatOption & { active: boolean }
+
+function compatOption(o: CostOption): InquiryOption {
+  const { code, active } = o
+  switch (o.type) {
+    case 'case':
+      return {
+        type: 'case',
+        code,
+        active,
+        gpuMaxMm: o.gpuMaxMm,
+        coolerMaxMm: o.coolerMaxMm,
+        aio360: o.aio360,
+        class: o.class,
+      }
+    case 'cooler':
+      return {
+        type: 'cooler',
+        code,
+        active,
+        kind: o.kind,
+        heightMm: o.heightMm,
+        radiatorThicknessMm: o.radiatorThicknessMm,
+        class: o.class,
+      }
+    case 'ram':
+      return { type: 'ram', code, active, ramType: o.ramType, capacityGb: o.capacityGb }
+    case 'ssd':
+      return { type: 'ssd', code, active, capacityGb: o.capacityGb }
+  }
+}
 
 /**
  * Offer and newest published prices for `submitInquiry()` — the same mapping of codes to parts as

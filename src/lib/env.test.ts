@@ -37,17 +37,37 @@ describe('parseEnv', () => {
         NODE_ENV: 'production',
         ALERT_EMAIL: 'a@example.test',
         INQUIRY_NOTIFY_EMAIL: 'gaming@example.test',
+        SITE_URL: 'https://prokomgaming.pl',
       }),
     ).toBeTruthy()
     expect(() => parseEnv({ ...valid, ALERT_EMAIL: 'not-an-address' })).toThrow(/ALERT_EMAIL/)
   })
 
   it('INQUIRY_NOTIFY_EMAIL: optional locally, required in production', () => {
-    const production = { ...valid, NODE_ENV: 'production', ALERT_EMAIL: 'a@example.test' }
+    const production = {
+      ...valid,
+      NODE_ENV: 'production',
+      ALERT_EMAIL: 'a@example.test',
+      SITE_URL: 'https://prokomgaming.pl',
+    }
     expect(() => parseEnv(production)).toThrow(/INQUIRY_NOTIFY_EMAIL/)
     expect(parseEnv({ ...production, INQUIRY_NOTIFY_EMAIL: 'g@example.test' })).toBeTruthy()
     expect(() => parseEnv({ ...valid, INQUIRY_NOTIFY_EMAIL: 'nope' })).toThrow(
       /INQUIRY_NOTIFY_EMAIL/,
+    )
+  })
+
+  it('SITE_URL: localhost by default locally, required in production', () => {
+    expect(parseEnv(valid).SITE_URL).toBe('http://localhost:3100')
+    const production = {
+      ...valid,
+      NODE_ENV: 'production',
+      ALERT_EMAIL: 'a@example.test',
+      INQUIRY_NOTIFY_EMAIL: 'g@example.test',
+    }
+    expect(() => parseEnv(production)).toThrow(/SITE_URL/)
+    expect(parseEnv({ ...production, SITE_URL: 'https://prokomgaming.pl' }).SITE_URL).toBe(
+      'https://prokomgaming.pl',
     )
   })
 

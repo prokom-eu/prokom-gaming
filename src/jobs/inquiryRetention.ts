@@ -1,6 +1,10 @@
 import type { TaskConfig } from 'payload'
 
-import { deleteExpiredInquiries, INQUIRY_RETENTION_TASK } from '../lib/inquiry/retention'
+import {
+  deleteExpiredInquiries,
+  INQUIRY_RETENTION_TASK,
+  RETENTION_CONTEXT,
+} from '../lib/inquiry/retention'
 
 export type InquiryRetentionIO = {
   input: Record<string, never>
@@ -15,7 +19,7 @@ export type InquiryRetentionIO = {
 export const InquiryRetentionTask: TaskConfig<InquiryRetentionIO> = {
   slug: INQUIRY_RETENTION_TASK,
   label: 'Usuwanie zakończonych zapytań po okresie przechowywania',
-  // 03:00:00 server time (seconds first); `schedule` queues the job, the `autoRun` cron runs it.
+  // 03:00:00 server time — UTC in the container unless compose sets TZ (G16); seconds first; `schedule` queues the job, the `autoRun` cron runs it.
   schedule: [{ cron: '0 0 3 * * *', queue: 'default' }],
   outputSchema: [{ name: 'deleted', type: 'number', required: true }],
   retries: 2,
@@ -49,6 +53,7 @@ export const InquiryRetentionTask: TaskConfig<InquiryRetentionIO> = {
           where: { id: { in: ids } },
           depth: 0,
           overrideAccess: true,
+          context: { [RETENTION_CONTEXT]: true },
           req,
         })
         if (errors.length > 0) {
