@@ -7,6 +7,7 @@ export const GROUP_OFFER = 'Oferta'
 export const GROUP_CONTENT = 'Treści'
 export const GROUP_ADMIN = 'Administracja'
 export const GROUP_GAMES = 'Gry i klatki'
+export const GROUP_SALES = 'Sprzedaż'
 
 export const RESOLUTIONS = [
   { label: 'FullHD', value: 'fullhd' },

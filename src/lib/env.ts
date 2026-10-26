@@ -1,8 +1,6 @@
 import { z } from 'zod'
 
 // Variables the app reads or the image sets (MEDIA_DIR, SITE_ENV: Dockerfile, compose in G16).
-// INQUIRY_NOTIFY_EMAIL, INQUIRY_RETENTION_MONTHS and SITE_URL (.env.example) join the schema in
-// the session that starts using them (G6/G15).
 const envSchema = z
   .object({
     NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
@@ -30,6 +28,18 @@ const envSchema = z
     // Where the margin alarm goes (ADR-G002 §4.4). Required in production; locally optional —
     // without it the alarm only logs a warning (Krystian's decision, 26.10.2026).
     ALERT_EMAIL: z.email().optional(),
+    // Public address of the site, no trailing slash: links in e-mails (G6: the panel link in the
+    // inquiry notification), later canonical URLs and the sitemap (G15).
+    SITE_URL: z
+      .url({ protocol: /^https?$/ })
+      .default('http://localhost:3100')
+      .transform((url) => url.replace(/\/+$/, '')),
+    // Mailbox of inquiry notifications (ADR-G005). Required in production; locally optional —
+    // without it only the customer's confirmation goes out and a warning is logged.
+    INQUIRY_NOTIFY_EMAIL: z.email().optional(),
+    // Closed inquiries (`lost`, `closed`) are deleted this many months after the last status
+    // change (ADR-G005; to be confirmed with the privacy policy).
+    INQUIRY_RETENTION_MONTHS: z.coerce.number().int().min(1).max(120).default(24),
   })
   // SMTP login is both or neither: a half-set pair would fail only at the first e-mail.
   .refine((env) => Boolean(env.SMTP_USER) === Boolean(env.SMTP_PASS), {
@@ -39,6 +49,10 @@ const envSchema = z
   .refine((env) => env.NODE_ENV !== 'production' || Boolean(env.ALERT_EMAIL), {
     message: 'required in production (margin alarm)',
     path: ['ALERT_EMAIL'],
+  })
+  .refine((env) => env.NODE_ENV !== 'production' || Boolean(env.INQUIRY_NOTIFY_EMAIL), {
+    message: 'required in production (inquiry notifications)',
+    path: ['INQUIRY_NOTIFY_EMAIL'],
   })
 
 export type Env = z.infer<typeof envSchema>
