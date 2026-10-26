@@ -103,3 +103,79 @@ export function fpsText(fps: number, game: GameScale): string {
   if (game.fpsCap && fps >= game.fpsCap) return `${game.fpsCap} FPS, limit gry`
   return `${fps} FPS`
 }
+
+export const RESOLUTIONS: readonly Resolution[] = ['fullhd', 'qhd', 'uhd']
+
+/** Names on the FullHD / 2K / 4K segments, next to the list so the two never drift apart. */
+export const RESOLUTION_LABELS: Record<Resolution, string> = {
+  fullhd: 'FullHD',
+  qhd: '2K',
+  uhd: '4K',
+}
+
+/** A game as the FPS list needs it (order = order of the list). */
+export type FpsListGame = GameScale & { slug: string; name: string; settingNote: string | null }
+
+/** One ready-to-draw row: everything the browser needs, nothing it could recompute. */
+export type FpsRow = {
+  game: string
+  name: string
+  note: string | null
+  text: string
+  percent: number
+  kind: FpsKind
+  sourceLabel: string
+  sourceUrl: string | null
+  setting: string
+}
+
+/**
+ * Rows of a build's FPS list at one resolution, in the order of `games`. A game without a stored
+ * number is left out — the site never shows a number it does not have.
+ */
+export function fpsRows(
+  table: FpsTable,
+  build: string,
+  games: readonly FpsListGame[],
+  resolution: Resolution,
+): FpsRow[] {
+  const rows: FpsRow[] = []
+  for (const game of games) {
+    const r = fpsFor(table, build, game.slug, resolution)
+    if (!r) continue
+    rows.push({
+      game: game.slug,
+      name: game.name,
+      note: game.settingNote,
+      text: fpsText(r.fps, game),
+      percent: barPercent(r.fps, game),
+      kind: r.kind,
+      sourceLabel: r.sourceLabel,
+      sourceUrl: r.sourceUrl,
+      setting: r.setting,
+    })
+  }
+  return rows
+}
+
+export type FpsListRows = Record<Resolution, FpsRow[]>
+
+/** Rows for all three resolutions; `null` when the build has no number at all — nothing to show. */
+export function fpsListRows(
+  table: FpsTable,
+  build: string,
+  games: readonly FpsListGame[],
+): FpsListRows | null {
+  const rows: FpsListRows = {
+    fullhd: fpsRows(table, build, games, 'fullhd'),
+    qhd: fpsRows(table, build, games, 'qhd'),
+    uhd: fpsRows(table, build, games, 'uhd'),
+  }
+  return RESOLUTIONS.some((r) => rows[r].length > 0) ? rows : null
+}
+
+/** The resolution shown first: the preferred one when it has numbers, else the first that does. */
+export function initialResolution(rows: FpsListRows, preferred: Resolution): Resolution {
+  if (rows[preferred].length > 0) return preferred
+  return RESOLUTIONS.find((r) => rows[r].length > 0) ?? preferred
+}

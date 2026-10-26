@@ -2,9 +2,13 @@ import { describe, expect, it } from 'vitest'
 
 import {
   KIND_PRIORITY,
+  RESOLUTIONS,
   barPercent,
   buildFpsTable,
   fpsFor,
+  fpsListRows,
+  fpsRows,
+  initialResolution,
   fpsText,
   pickResult,
   sourceOf,
@@ -118,5 +122,89 @@ describe('bar and text (board Zestaw)', () => {
     expect(fpsText(60, capped)).toBe('60 FPS, limit gry')
     expect(fpsText(41, capped)).toBe('41 FPS')
     expect(fpsText(362, esport)).toBe('362 FPS')
+  })
+})
+
+describe('fpsRows — what the FPS list draws', () => {
+  const games = [
+    { slug: 'elden-ring', name: 'Elden Ring', kind: 'capped', fpsCap: 60, settingNote: null },
+    {
+      slug: 'counter-strike-2',
+      name: 'Counter-Strike 2',
+      kind: 'esport',
+      fpsCap: null,
+      settingNote: null,
+    },
+    {
+      slug: 'gothic-1-remake',
+      name: 'Gothic 1 Remake',
+      kind: 'aaa',
+      fpsCap: null,
+      settingNote: 'ze skalowaniem DLSS/FSR Balanced',
+    },
+  ] as const
+  const table = buildFpsTable([
+    row('m', 350),
+    row('e', 60, { game: 'elden-ring' }),
+    row('r', 70, { game: 'gothic-1-remake', resolution: 'fullhd' }),
+  ])
+
+  it('keeps the order of the games and leaves out games without a number', () => {
+    expect(fpsRows(table, 'wampir', games, 'qhd').map((r) => r.game)).toEqual([
+      'elden-ring',
+      'counter-strike-2',
+    ])
+  })
+
+  it('carries text, bar, source and the setting note', () => {
+    const [elden, cs2] = fpsRows(table, 'wampir', games, 'qhd')
+    expect(elden).toMatchObject({ text: '60 FPS, limit gry', percent: 100, kind: 'e' })
+    expect(cs2).toMatchObject({
+      text: '350 FPS',
+      percent: 50,
+      kind: 'm',
+      sourceUrl: 'https://example.test/',
+    })
+    const [gothic] = fpsRows(table, 'wampir', games, 'fullhd')
+    expect(gothic).toMatchObject({ note: 'ze skalowaniem DLSS/FSR Balanced', kind: 'r' })
+  })
+})
+
+describe('fpsListRows / initialResolution — empty data never shows an empty list', () => {
+  const games = [
+    {
+      slug: 'counter-strike-2',
+      name: 'Counter-Strike 2',
+      kind: 'esport',
+      fpsCap: null,
+      settingNote: null,
+    },
+  ] as const
+
+  it('a build without any number → null (the section is not rendered)', () => {
+    expect(fpsListRows(buildFpsTable([]), 'wampir', games)).toBeNull()
+    expect(fpsListRows(buildFpsTable([row('m', 300)]), 'skrzat', games)).toBeNull()
+  })
+
+  it('rows for all three resolutions, empty where there is no number', () => {
+    const rows = fpsListRows(buildFpsTable([row('m', 300, { resolution: 'uhd' })]), 'wampir', games)
+    expect(rows?.fullhd).toEqual([])
+    expect(rows?.qhd).toEqual([])
+    expect(rows?.uhd).toHaveLength(1)
+  })
+
+  it('starts on the preferred resolution, or the first one that has numbers', () => {
+    const only4k = fpsListRows(
+      buildFpsTable([row('m', 300, { resolution: 'uhd' })]),
+      'wampir',
+      games,
+    )!
+    expect(initialResolution(only4k, 'qhd')).toBe('uhd')
+    const all = fpsListRows(
+      buildFpsTable(RESOLUTIONS.map((resolution) => row('m', 300, { resolution }))),
+      'wampir',
+      games,
+    )!
+    expect(initialResolution(all, 'qhd')).toBe('qhd')
   })
 })
