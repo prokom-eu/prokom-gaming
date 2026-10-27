@@ -78,6 +78,7 @@ export interface Config {
     'fps-results': FpsResult;
     inquiries: Inquiry;
     'inquiry-deletions': InquiryDeletion;
+    faq: Faq;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
     'payload-locked-documents': PayloadLockedDocument;
@@ -97,6 +98,7 @@ export interface Config {
     'fps-results': FpsResultsSelect<false> | FpsResultsSelect<true>;
     inquiries: InquiriesSelect<false> | InquiriesSelect<true>;
     'inquiry-deletions': InquiryDeletionsSelect<false> | InquiryDeletionsSelect<true>;
+    faq: FaqSelect<false> | FaqSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -519,6 +521,22 @@ export interface InquiryDeletion {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "faq".
+ */
+export interface Faq {
+  id: number;
+  question: string;
+  answer: string;
+  /**
+   * „Na stronie głównej” = sekcja „Zanim zapytasz” na głównej, nie /pytania.
+   */
+  group: 'purchase' | 'delivery' | 'returns' | 'tech' | 'parents' | 'home';
+  order: number;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -685,6 +703,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'inquiry-deletions';
         value: number | InquiryDeletion;
+      } | null)
+    | ({
+        relationTo: 'faq';
+        value: number | Faq;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -1028,6 +1050,18 @@ export interface InquiryDeletionsSelect<T extends boolean = true> {
   reason?: T;
   deletedBy?: T;
   deletedByEmail?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "faq_select".
+ */
+export interface FaqSelect<T extends boolean = true> {
+  question?: T;
+  answer?: T;
+  group?: T;
+  order?: T;
   updatedAt?: T;
   createdAt?: T;
 }

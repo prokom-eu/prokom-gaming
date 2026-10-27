@@ -17,6 +17,7 @@ import { fileURLToPath } from 'url'
 
 import config from '../payload.config'
 import { assertSeedAllowed, parseSeedEnv } from './config'
+import { mapFaq } from './faq'
 import { fpsSeed, mapFpsResult, mapGame, planFpsResults, type ExistingFpsResult } from './fps'
 import {
   firstBatch,
@@ -281,6 +282,28 @@ async function seedFpsResults(payload: Payload): Promise<void> {
   )
 }
 
+/**
+ * Questions and answers (G8), upserted by group + question — one question may be in two groups.
+ * Rewording a question in `faq.json` therefore adds a new record and leaves the old one: delete
+ * it in the panel (local seed only, like FPS results).
+ */
+async function seedFaq(payload: Payload): Promise<void> {
+  const faq = mapFaq()
+  for (const data of faq) {
+    const found = await payload.find({
+      collection: 'faq',
+      where: { and: [{ group: { equals: data.group } }, { question: { equals: data.question } }] },
+      limit: 1,
+      pagination: false,
+      ...asSeed,
+    })
+    const id = found.docs[0]?.id
+    if (id !== undefined) await payload.update({ collection: 'faq', id, data, ...asSeed })
+    else await payload.create({ collection: 'faq', data, ...asSeed })
+  }
+  payload.logger.info(`Seed: ${faq.length} FAQ questions.`)
+}
+
 const payload = await getPayload({ config })
 
 try {
@@ -289,6 +312,7 @@ try {
   await seedFirstBatch(payload, adminId)
   await seedGames(payload)
   await seedFpsResults(payload)
+  await seedFaq(payload)
 } finally {
   await payload.destroy()
 }

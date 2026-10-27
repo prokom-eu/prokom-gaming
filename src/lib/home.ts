@@ -384,16 +384,97 @@ export type MetricSample = {
   rows: { name: string; text: string; percent: number; kind: FpsKind }[]
 }
 
+/** The three creatures of "Baba Jaga czy Wampir?" (board Main `.cmp`), in this order. */
+export const COMPARE_BUILDS = ['kikimora', 'baba-jaga', 'wampir'] as const
+export const COMPARE_GAME = 'cyberpunk-2077'
+export const COMPARE_RESOLUTION: Resolution = 'qhd'
+
+export type CompareCard = {
+  slug: string
+  key: string
+  name: string
+  tierRoman: string
+  tierLabel: string
+  photo: { src: string; alt: string } | null
+  fps: number
+  kind: FpsKind
+  /** Bar height in % of the best of the three. */
+  percent: number
+  /** "+20% klatek" against the first creature (may be negative); `null` for the first. */
+  gain: number | null
+}
+
+export type CompareData = { cards: CompareCard[]; game: string; setting: string | null }
+
+/**
+ * "Baba Jaga czy Wampir?": stored FPS of the three creatures in one game and resolution, and how
+ * many more frames each gives than the first (board Main). Without a number for any of them the
+ * teaser has nothing honest to show: `null`.
+ */
+export function compareTeaser(
+  hero: HeroData,
+  games: readonly PanelGame[],
+  table: FpsTable,
+): CompareData | null {
+  const game = games.find((g) => g.slug === COMPARE_GAME)
+  if (!game) return null
+  const rows: { build: HeroBuild; fps: number; kind: FpsKind; setting: string }[] = []
+  for (const slug of COMPARE_BUILDS) {
+    const build = hero.builds.find((b) => b.slug === slug)
+    const r = build && fpsFor(table, slug, COMPARE_GAME, COMPARE_RESOLUTION)
+    if (!build || !r) return null
+    rows.push({ build, fps: r.fps, kind: r.kind, setting: r.setting })
+  }
+  // "+X% klatek" only compares like with like: three results with different test settings
+  // under one caption would mislead (ADR-G004) — then no chart at all.
+  if (new Set(rows.map((r) => r.setting)).size > 1) return null
+  const best = Math.max(...rows.map((r) => r.fps))
+  const first = rows[0].fps
+  return {
+    game: game.name,
+    setting: rows[0].setting,
+    cards: rows.map((r, i) => ({
+      slug: r.build.slug,
+      key: r.build.key,
+      name: r.build.name,
+      tierRoman: r.build.tierRoman,
+      tierLabel: r.build.tierLabel,
+      photo: r.build.photo,
+      fps: r.fps,
+      kind: r.kind,
+      percent: Math.round((r.fps / best) * 100),
+      gain: i === 0 ? null : Math.round((r.fps / first - 1) * 100),
+    })),
+  }
+}
+
+/** A question of "Zanim zapytasz" (collection `faq`, group "Na stronie głównej"). */
+export type HomeQuestion = { id: number; question: string; answer: string }
+
+/** "+20% klatek", "+0% klatek", "−5% klatek" (typographic minus). */
+export function gainText(gain: number): string {
+  return `${gain < 0 ? '−' : '+'}${Math.abs(gain)}% klatek`
+}
+
 /** Everything the home page reads from the database. */
 export type HomeData = {
   hero: HeroData
   /** `null` without games (empty database): the section keeps its text, no panel. */
   panel: GamesPanelData | null
   metric: MetricSample | null
+  compare: CompareData | null
+  /** Empty: the section "Zanim zapytasz" is left out. */
+  faq: HomeQuestion[]
 }
 
 /** The database failed: the hero keeps its text and buttons, sections without data hide. */
-export const EMPTY_HOME: HomeData = { hero: EMPTY_HERO, panel: null, metric: null }
+export const EMPTY_HOME: HomeData = {
+  hero: EMPTY_HERO,
+  panel: null,
+  metric: null,
+  compare: null,
+  faq: [],
+}
 
 export function metricSample(
   hero: HeroData,

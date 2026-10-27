@@ -4,6 +4,7 @@ import * as migration_20261026_213241_jobs from './20261026_213241_jobs'
 import * as migration_20261026_221159_games_fps from './20261026_221159_games_fps'
 import * as migration_20261026_230923_inquiries from './20261026_230923_inquiries'
 import * as migration_20261027_210131_builds_hero_text from './20261027_210131_builds_hero_text'
+import * as migration_20261027_225655_faq from './20261027_225655_faq'
 
 export const migrations = [
   {
@@ -35,5 +36,10 @@ export const migrations = [
     up: migration_20261027_210131_builds_hero_text.up,
     down: migration_20261027_210131_builds_hero_text.down,
     name: '20261027_210131_builds_hero_text',
+  },
+  {
+    up: migration_20261027_225655_faq.up,
+    down: migration_20261027_225655_faq.down,
+    name: '20261027_225655_faq',
   },
 ]

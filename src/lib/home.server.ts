@@ -6,6 +6,7 @@ import { getPayload } from 'payload'
 import { loadFpsTable } from './fps.server'
 import {
   buildHero,
+  compareTeaser,
   gamesPanel,
   metricSample,
   type HomeData,
@@ -32,7 +33,7 @@ export async function loadHome(): Promise<HomeData> {
   const payload = await getPayload({ config })
   const asVisitor = { overrideAccess: false, depth: 0, pagination: false } as const
 
-  const [builds, levels, parts, options, snapshot, fps] = await Promise.all([
+  const [builds, levels, parts, options, snapshot, fps, faq] = await Promise.all([
     payload.find({
       collection: 'builds',
       select: {
@@ -85,6 +86,16 @@ export async function loadHome(): Promise<HomeData> {
     }),
     loadPublishedSnapshot(payload),
     loadFpsTable(),
+    payload.find({
+      collection: 'faq',
+      where: { group: { equals: 'home' } },
+      select: { question: true, answer: true },
+      sort: 'order',
+      // Six on the board (spec. §4 pt 12): more added in the panel would not break the layout.
+      limit: 6,
+      overrideAccess: false,
+      depth: 0,
+    }),
   ])
 
   const levelCode = new Map(levels.docs.map((l) => [l.id, l.code]))
@@ -160,6 +171,8 @@ export async function loadHome(): Promise<HomeData> {
     hero,
     panel: games.length > 0 && hero.tiers.length > 0 ? gamesPanel(hero, games, fps.table) : null,
     metric: metricSample(hero, games, fps.table),
+    compare: compareTeaser(hero, games, fps.table),
+    faq: faq.docs.map((q) => ({ id: q.id, question: q.question, answer: q.answer })),
   }
 }
 
