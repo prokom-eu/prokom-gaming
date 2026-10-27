@@ -166,3 +166,43 @@
   --m3: #f2c230;
   --m4: #5a3a06;
 }
+
+/* ---------------------------------------------------------------------------------------------
+   Uzupełnienie (G8): sekcje strony głównej — wartości wpisane wprost w planszy Main (`.paths`,
+   `.best5`, `.scale`, `.bc`, `.how`, `.games`, `.proc`, `.doc`).
+   --------------------------------------------------------------------------------------------- */
+:root {
+  /* tła sekcji (gradienty pionowe) */
+  --sec-a: #050807;
+  --sec-b: #07100d; /* „Szesnaście istot” */
+  --sec-c: #081109; /* „Jak kupić” */
+  --sec-d: #08110e; /* „W co grasz?” */
+  --sec-proc: #060a08; /* „Zanim komputer wyjedzie” */
+  --sec-glow: rgba(242, 194, 48, 0.07);
+  /* tekst */
+  --sec-text: #b9b19c; /* opisy dróg i kroków */
+  --sec-desc: #a9a18c; /* opis karty istoty, kroków procesu */
+  --sec-bold: #e6ddc8; /* pogrubienia w opisach, imiona ludzi */
+  --sec-epithet: #e9e0ca; /* przydomek karty (miesza się z kolorem istoty) */
+  /* karty i panele */
+  --path-from: #0b1210;
+  --path-to: #060a09; /* karta drogi */
+  --card-bg: #070b0a; /* karta istoty */
+  --card-fade: rgba(5, 9, 8, 0.92);
+  --step-bg: #0b120f; /* koło numeru kroku */
+  --step-ring: #070d0b;
+  --avatar-bg: #0e1714;
+  --avatar-icon: #5c594d;
+  /* papier metryki */
+  --paper: #efe6d0;
+  --paper-ink: #2a241a;
+  --paper-strong: #1d1912;
+  --paper-label: #6d6149; /* plansza: #7a6d55 — 4,1:1 przy 12 px, poniżej AA; ciemniej (4,9:1) */
+  --paper-em: #6d6149;
+  --paper-small: #4b4232;
+  --paper-line: rgba(80, 60, 30, 0.25);
+  --paper-track: rgba(80, 60, 30, 0.15);
+  --paper-light: rgba(255, 255, 255, 0.35);
+  --paper-shade: rgba(120, 90, 40, 0.18);
+  --paper-bar: #3f8a2e;
+}

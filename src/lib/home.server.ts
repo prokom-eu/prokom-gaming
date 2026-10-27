@@ -4,7 +4,14 @@ import config from '@payload-config'
 import { getPayload } from 'payload'
 
 import { loadFpsTable } from './fps.server'
-import { buildHero, type HeroData, type HeroLevelInput } from './home'
+import {
+  buildHero,
+  gamesPanel,
+  metricSample,
+  type HomeData,
+  type HeroLevelInput,
+  type PanelGame,
+} from './home'
 import { snapshotFromRows, type PriceSnapshot } from './pricing/snapshot'
 
 const idOf = (value: unknown): number | null =>
@@ -15,12 +22,13 @@ const idOf = (value: unknown): number | null =>
       : null
 
 /**
- * Data of the home hero. Everything is read as the public visitor (`overrideAccess: false`) with
+ * Data of the home page: the hero and the sections that need the database (16 creatures, games
+ * panel, sample certificate). Everything is read as the public visitor (`overrideAccess: false`) with
  * an explicit `select` — except the level's parts: `components` is panel-only as a whole (it holds
  * `internalModel` and `cost`), so it is read trusted and only `role` + `publicLabel` of the CPU and
  * GPU are copied out, field by field (ADR-G002 §8.7; same pattern as `inquiry/pricingStore.ts`).
  */
-export async function loadHero(): Promise<HeroData> {
+export async function loadHome(): Promise<HomeData> {
   const payload = await getPayload({ config })
   const asVisitor = { overrideAccess: false, depth: 0, pagination: false } as const
 
@@ -110,7 +118,7 @@ export async function loadHero(): Promise<HeroData> {
     return (id !== null && map.get(id)) || ''
   }
 
-  return buildHero({
+  const hero = buildHero({
     builds: builds.docs.map((b) => ({
       slug: b.slug,
       name: b.name,
@@ -142,6 +150,17 @@ export async function loadHero(): Promise<HeroData> {
     snapshot,
     fps: fps.table,
   })
+  const games: PanelGame[] = fps.games.map((g) => ({
+    slug: g.slug,
+    name: g.name,
+    kind: g.kind,
+    fpsCap: g.fpsCap,
+  }))
+  return {
+    hero,
+    panel: games.length > 0 && hero.tiers.length > 0 ? gamesPanel(hero, games, fps.table) : null,
+    metric: metricSample(hero, games, fps.table),
+  }
 }
 
 /** Newest published batch as the visitor sees it (`costAtPublish` is panel-only). */

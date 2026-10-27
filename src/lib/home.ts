@@ -3,7 +3,17 @@
  * hero's client component gets — public labels, sell prices and FPS numbers, never a cost or an
  * internal model (ADR-G002 §8.7). `lib/home.server.ts` reads the database and calls `buildHero()`.
  */
-import { fpsFor, RESOLUTION_LABELS, type FpsKind, type FpsTable, type Resolution } from './fps'
+import {
+  barPercent,
+  fpsFor,
+  fpsText,
+  RESOLUTION_LABELS,
+  RESOLUTIONS,
+  type FpsKind,
+  type FpsTable,
+  type GameScale,
+  type Resolution,
+} from './fps'
 import { priceFromSnapshot, type PriceSnapshot } from './pricing/snapshot'
 import type { Config } from './pricing/types'
 
@@ -241,4 +251,168 @@ export function dateText(iso: string): string {
     year: 'numeric',
     timeZone: 'Europe/Warsaw',
   }).format(new Date(iso))
+}
+
+// ---------------------------------------------------------------------------------------------
+// Sections 3–7 (G8, spec. §4). Same rule as the hero: public labels, sell prices and stored FPS
+// numbers only.
+// ---------------------------------------------------------------------------------------------
+
+/** The 16 creature cards (spec. §4 pt 4: "w kolejności ceny"); without a price they go last. */
+export function bestiaryOrder(builds: readonly HeroBuild[]): HeroBuild[] {
+  return [...builds].sort((a, b) => (a.price ?? Infinity) - (b.price ?? Infinity))
+}
+
+/** Hint under each tier of the power scale (board Main, `.scale em`) — not in the data. */
+export const TIER_HINTS: Record<number, string> = {
+  1: 'Roblox, Minecraft, Fortnite, CS2',
+  2: 'e-sport i nowe gry na wysokich',
+  3: 'nowe gry w FullHD na wysokich',
+  4: 'FullHD na ultra, 2K na wysokich',
+  5: 'monitor 2K, 144 Hz',
+  6: '2K, wysokie odświeżanie',
+  7: 'monitor 4K',
+  8: '4K na ultra',
+  9: 'wszystko na maksimum',
+}
+
+/** One tier on the scale and in the games panel: the lead's colour and the names of the tier. */
+export type HomeTier = {
+  tier: number
+  roman: string
+  /** Realm of the lead level, e.g. "FullHD ultra / 2K". */
+  label: string
+  lead: string
+  names: string
+}
+
+export function homeTiers(hero: HeroData): HomeTier[] {
+  const bySlug = new Map(hero.builds.map((b) => [b.slug, b]))
+  return hero.tiers.map((t) => ({
+    tier: t.tier,
+    roman: t.roman,
+    label: bySlug.get(t.lead)?.tierLabel ?? '',
+    lead: t.lead,
+    names: t.builds.map((slug) => bySlug.get(slug)?.name ?? slug).join(', '),
+  }))
+}
+
+/** The game picked first in "W co grasz?" and the resolution (board Main). */
+export const PANEL_DEFAULT_GAME = 'cyberpunk-2077'
+export const PANEL_DEFAULT_RESOLUTION: Resolution = 'qhd'
+
+export type PanelGame = GameScale & { slug: string; name: string }
+
+/**
+ * "W co grasz?" — 33 games × 3 resolutions × 9 tiers, the number of each tier's lead build
+ * (ADR-G004: a tier's FPS = its lead build's). Compact on purpose, it travels to the browser:
+ * per resolution and game 9 numbers (`null` = no data) and 9 kind letters (`-` = no data).
+ */
+export type GamesPanelData = {
+  games: PanelGame[]
+  tiers: HomeTier[]
+  fps: Record<Resolution, (number | null)[][]>
+  kinds: Record<Resolution, string[]>
+  /** Test setting per game, from its stored results (e.g. "Ultra, natywnie"). */
+  settings: (string | null)[]
+}
+
+export function gamesPanel(
+  hero: HeroData,
+  games: readonly PanelGame[],
+  table: FpsTable,
+): GamesPanelData {
+  const tiers = homeTiers(hero)
+  const fps = { fullhd: [], qhd: [], uhd: [] } as GamesPanelData['fps']
+  const kinds = { fullhd: [], qhd: [], uhd: [] } as GamesPanelData['kinds']
+  const settings: (string | null)[] = []
+  for (const game of games) {
+    let setting: string | null = null
+    for (const resolution of RESOLUTIONS) {
+      const rows = tiers.map((t) => fpsFor(table, t.lead, game.slug, resolution))
+      fps[resolution].push(rows.map((r) => r?.fps ?? null))
+      kinds[resolution].push(rows.map((r) => r?.kind ?? '-').join(''))
+      setting ??= rows.find((r) => r)?.setting ?? null
+    }
+    settings.push(setting)
+  }
+  return { games: [...games], tiers, fps, kinds, settings }
+}
+
+export type PanelRow = HomeTier & { text: string; percent: number; kind: FpsKind }
+
+/**
+ * Rows of the panel for one game and resolution. Bars are relative to the best tier, at least 6%
+ * (board Main `grows`); a tier without a number is left out — never a number we do not have.
+ */
+export function panelRows(data: GamesPanelData, game: number, resolution: Resolution): PanelRow[] {
+  const values = data.fps[resolution][game] ?? []
+  const kinds = data.kinds[resolution][game] ?? ''
+  const scale = data.games[game]
+  // `|| 1`: all zeros would divide by zero (NaN%); the 6% minimum then draws them.
+  const max = Math.max(0, ...values.map((v) => v ?? 0)) || 1
+  const rows: PanelRow[] = []
+  data.tiers.forEach((tier, i) => {
+    const fps = values[i]
+    const kind = kinds[i]
+    if (fps == null || !scale || !isKind(kind)) return
+    rows.push({
+      ...tier,
+      text: fpsText(fps, scale),
+      percent: Math.max(6, Math.round((fps / max) * 100)),
+      kind,
+    })
+  })
+  return rows
+}
+
+const isKind = (value: string | undefined): value is FpsKind =>
+  value === 'p' || value === 'm' || value === 'r' || value === 'e'
+
+/** Games on the sample certificate (board Main `.doc-f`), measured at 2K. */
+export const METRIC_GAMES = ['cyberpunk-2077', 'counter-strike-2', 'wiedzmin-3'] as const
+
+/**
+ * Sample certificate in "Zanim komputer wyjedzie z Rabki": the hero's default creature with its
+ * stored 2K numbers and public part labels (no maker or model — that is on the real certificate).
+ */
+export type MetricSample = {
+  name: string
+  tierRoman: string
+  cpu: string | null
+  gpu: string | null
+  rows: { name: string; text: string; percent: number; kind: FpsKind }[]
+}
+
+/** Everything the home page reads from the database. */
+export type HomeData = {
+  hero: HeroData
+  /** `null` without games (empty database): the section keeps its text, no panel. */
+  panel: GamesPanelData | null
+  metric: MetricSample | null
+}
+
+/** The database failed: the hero keeps its text and buttons, sections without data hide. */
+export const EMPTY_HOME: HomeData = { hero: EMPTY_HERO, panel: null, metric: null }
+
+export function metricSample(
+  hero: HeroData,
+  games: readonly PanelGame[],
+  table: FpsTable,
+): MetricSample | null {
+  const build = hero.builds.find((b) => b.slug === HERO_DEFAULT)
+  if (!build) return null
+  const rows: MetricSample['rows'] = []
+  for (const slug of METRIC_GAMES) {
+    const game = games.find((g) => g.slug === slug)
+    const r = game && fpsFor(table, build.slug, slug, 'qhd')
+    if (!game || !r) continue
+    rows.push({
+      name: game.name,
+      text: fpsText(r.fps, game),
+      percent: barPercent(r.fps, game),
+      kind: r.kind,
+    })
+  }
+  return { name: build.name, tierRoman: build.tierRoman, cpu: build.cpu, gpu: build.gpu, rows }
 }
