@@ -1,9 +1,10 @@
 import { expect, test } from '@playwright/test'
 
 /**
- * Home sections 3–7 (G8, spec. §4 pt 3–7): order of the sections, 16 creature cards in price
+ * Home sections 3–13 (G8, spec. §4 pt 3–13): order of the sections, 16 creature cards in price
  * order with a source next to every FPS number, the games panel switching game and resolution,
- * and the rows that scroll sideways on a phone (ADR-G003 §4).
+ * the comparator preview, the home questions, and the rows that scroll sideways on a phone
+ * (ADR-G003 §4). Reviews (pt 8) stay hidden until real ones exist.
  */
 
 const SECTIONS = [
@@ -12,6 +13,11 @@ const SECTIONS = [
   'Jak kupić, skoro nie ma przycisku „Kup”',
   'W co grasz?',
   'Zanim komputer wyjedzie z Rabki',
+  'Kupujesz komputer dla dziecka?',
+  'Baba Jaga czy Wampir?',
+  'W cenie każdego komputera',
+  'Zanim zapytasz',
+  'Napisz, w co grasz',
 ]
 
 const price = (text: string) => Number(text.replace(/\D/g, ''))
@@ -94,4 +100,50 @@ test('paths, cards and games scroll sideways on a phone', async ({ page, isMobil
   }
   // The page itself never scrolls sideways.
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(414)
+})
+
+test('the comparator preview: three creatures, every number with its source', async ({ page }) => {
+  await page.goto('/')
+  const chart = page.locator('.hm-cmp__chart')
+  await expect(chart.locator('strong')).toHaveText(['Kikimora', 'Baba Jaga', 'Wampir'])
+  await expect(chart.locator('b')).toHaveText([/^\d+ FPS$/, /^\d+ FPS$/, /^\d+ FPS$/])
+  await expect(chart.locator('.src')).toHaveCount(3)
+  await expect(chart.locator('em').nth(2)).toHaveText(/^\+\d+% klatek$/)
+  await expect(chart.locator('figcaption')).toContainText('Cyberpunk 2077, 2K')
+  await expect(page.getByRole('link', { name: 'Otwórz porównywarkę' })).toHaveAttribute(
+    'href',
+    '/porownaj',
+  )
+})
+
+test('six home questions, the first open, the others open with the keyboard', async ({ page }) => {
+  await page.goto('/')
+  const faq = page.locator('.hm-faq details')
+  await expect(faq).toHaveCount(6)
+  await expect(faq.first()).toHaveAttribute('open', '')
+  await expect(faq.nth(1)).not.toHaveAttribute('open', '')
+  const summary = faq.nth(1).locator('summary')
+  await summary.scrollIntoViewIfNeeded()
+  await summary.focus()
+  await page.keyboard.press('Enter')
+  await expect(faq.nth(1)).toHaveAttribute('open', '')
+})
+
+test('closing call: 16 sigils and both buttons, no placeholders in the sections', async ({
+  page,
+}) => {
+  await page.goto('/')
+  await expect(page.locator('.hm-fin__sigils li')).toHaveCount(16)
+  await expect(page.getByRole('link', { name: 'Dobierz komputer' }).last()).toHaveAttribute(
+    'href',
+    '/konfigurator',
+  )
+  await expect(page.getByRole('link', { name: 'Zadaj pytanie' })).toHaveAttribute(
+    'href',
+    '/kontakt',
+  )
+  // No board placeholders like "[imię serwisanta]" or "[liczba]" and no instalment offer.
+  const text = (await page.locator('.hm-sec').allTextContents()).join(' ')
+  expect(text).not.toMatch(/\[[^\]]+\]/)
+  expect(text).not.toMatch(/\braty\b|rata\b|Santander/i)
 })

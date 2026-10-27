@@ -81,7 +81,7 @@ Kolejność sekcji (plansza Main, telefon: Telefon):
 9. **Kupujesz komputer dla dziecka?** (jasna sekcja) — Prawdziwa firma od 2004 roku · Przyjedź i zobacz · Odpisuje człowiek, nie bot · Gwarancja z odbiorem od Ciebie; „Przewodnik dla rodziców”.
 10. **Baba Jaga czy Wampir?** — zapowiedź porównywarki (3 istoty, słupki klatek), „Otwórz porównywarkę”.
 11. **W cenie każdego komputera** — 10 pozycji (Windows 11, montaż, test, pomiar klatek, metryka, Wi-Fi i Bluetooth, sterowniki i BIOS, podstawowe programy, wysyłka, gwarancja 2 lata). Telefon: 2 kolumny.
-12. **Zanim zapytasz** — 6 pytań z `faq.json`, grupa „Na stronie głównej” (`onHomeOnly`).
+12. **Zanim zapytasz** — 6 pytań z `faq.json`, grupa „Na stronie głównej” (`onHomeOnly` w seedzie; w kolekcji `faq` to grupa `home` — bez osobnego pola, G8).
 13. **Napisz, w co grasz** — końcowe wezwanie, 16 pieczęci, „Dobierz komputer” i „Zadaj pytanie”.
 
 ## 5. Wszystkie zestawy `/zestawy` (G9)

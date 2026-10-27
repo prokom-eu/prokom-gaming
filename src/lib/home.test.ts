@@ -7,6 +7,8 @@ import { buildFpsTable, fpsFor } from './fps'
 import {
   bestiaryOrder,
   buildHero,
+  compareTeaser,
+  gainText,
   dateText,
   gamesPanel,
   HERO_DEFAULT,
@@ -323,5 +325,43 @@ describe('home sections', () => {
         if (part.internalModel !== part.publicLabel) expect(text).not.toContain(part.internalModel)
       }
     }
+  })
+
+  it('compares Kikimora, Baba Jaga and Wampir in Cyberpunk 2077 at 2K', () => {
+    const data = compareTeaser(fullHero, panelGames, fullTable)!
+    const stored = (slug: string) => fpsFor(fullTable, slug, 'cyberpunk-2077', 'qhd')!.fps
+    expect(data.game).toBe('Cyberpunk 2077')
+    expect(data.setting).toBeTruthy()
+    expect(data.cards.map((c) => c.name)).toEqual(['Kikimora', 'Baba Jaga', 'Wampir'])
+    expect(data.cards.map((c) => c.fps)).toEqual(['kikimora', 'baba-jaga', 'wampir'].map(stored))
+    expect(data.cards[0].gain).toBeNull()
+    const k = stored('kikimora')
+    expect(data.cards[2].gain).toBe(Math.round((stored('wampir') / k - 1) * 100))
+    expect(Math.max(...data.cards.map((c) => c.percent))).toBe(100)
+  })
+
+  it('shows no comparison when a creature has no number', () => {
+    const table = { ...fullTable }
+    for (const key of Object.keys(table))
+      if (key.startsWith('baba-jaga|cyberpunk-2077|qhd')) delete table[key]
+    expect(compareTeaser(fullHero, panelGames, table)).toBeNull()
+  })
+
+  it('writes the gain with its sign, also when it is negative', () => {
+    expect(gainText(20)).toBe('+20% klatek')
+    expect(gainText(0)).toBe('+0% klatek')
+    expect(gainText(-5)).toBe('−5% klatek')
+    const table = structuredClone(fullTable)
+    const key = Object.keys(table).find((k) => k === 'wampir|cyberpunk-2077|qhd')!
+    table[key] = { ...table[key], fps: 50 }
+    const data = compareTeaser(fullHero, panelGames, table)!
+    expect(data.cards[2].gain).toBeLessThan(0)
+  })
+
+  it('shows no comparison when the three results have different settings', () => {
+    const table = structuredClone(fullTable)
+    const key = 'wampir|cyberpunk-2077|qhd'
+    table[key] = { ...table[key], setting: 'inne ustawienia' }
+    expect(compareTeaser(fullHero, panelGames, table)).toBeNull()
   })
 })

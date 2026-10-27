@@ -205,4 +205,15 @@
   --paper-light: rgba(255, 255, 255, 0.35);
   --paper-shade: rgba(120, 90, 40, 0.18);
   --paper-bar: #3f8a2e;
+  /* „Kupujesz komputer dla dziecka?” — jasna sekcja (`.par`) */
+  --par-bg: #ece3cc;
+  --par-ink: #231e16;
+  --par-head: #1b1710;
+  --par-text: #4a4131;
+  --par-rule: #b08a2e;
+  --par-btn: #141a17;
+  --par-line: rgba(35, 30, 22, 0.35);
+  /* „W cenie” i „Zanim zapytasz” */
+  --sec-e: #07100c;
+  --fin-glow: rgba(242, 194, 48, 0.25);
 }

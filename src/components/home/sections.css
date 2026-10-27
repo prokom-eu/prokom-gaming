@@ -760,6 +760,325 @@
   filter: drop-shadow(0 6px 10px color-mix(in srgb, var(--shadow) 45%, transparent));
 }
 
+/* ---------- shared: buttons row ---------- */
+.hm-cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
+  margin-top: 32px;
+}
+
+/* ---------- 9. Kupujesz komputer dla dziecka? (light) ---------- */
+.hm-par {
+  color: var(--par-ink);
+  background-color: var(--par-bg);
+  background-image:
+    radial-gradient(80% 90% at 0 0, var(--paper-light), transparent 60%),
+    radial-gradient(70% 80% at 100% 100%, var(--paper-shade), transparent 70%);
+}
+.hm-par__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 70px;
+}
+.hm-sec.hm-par h2.h {
+  font-size: 58px;
+  color: var(--par-head);
+}
+.hm-par .hm-lead {
+  color: var(--par-text);
+}
+.hm-par__btn,
+.hm-par__btn:hover {
+  background: var(--par-btn);
+  color: var(--paper);
+  box-shadow: none;
+}
+.hm-par .lnk {
+  color: var(--par-head);
+  border-color: var(--par-line);
+}
+.hm-par__list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 34px 40px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.hm-par__list h3 {
+  margin: 0;
+  padding-top: 16px;
+  border-top: 2px solid var(--par-rule);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--par-head);
+}
+.hm-par__list p {
+  margin: 10px 0 0;
+  font-size: 15.5px;
+  line-height: 1.6;
+  color: var(--par-text);
+}
+
+/* ---------- 10. Baba Jaga czy Wampir? ---------- */
+.hm-cmp__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 70px;
+  align-items: center;
+}
+.hm-cmp__chart {
+  margin: 0;
+}
+.hm-cmp__chart ul {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  align-items: end;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.hm-cmp__chart li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.hm-cmp__photo {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  width: 100%;
+  height: 180px;
+  filter: drop-shadow(0 0 20px color-mix(in srgb, var(--c) 50%, transparent));
+}
+.hm-cmp__photo img {
+  width: auto;
+  height: 100%;
+}
+.hm-cmp__sigil {
+  margin-top: 8px;
+  color: var(--c);
+  filter: drop-shadow(0 0 6px var(--c));
+}
+.hm-cmp__chart strong {
+  margin-top: 6px;
+  font-size: 21px;
+  color: var(--kosc);
+}
+.hm-cmp__tier {
+  margin: 4px 0 10px;
+  font-size: 13px;
+  color: var(--note);
+}
+.hm-cmp__bar {
+  display: flex;
+  align-items: flex-end;
+  width: 64px;
+  height: 160px;
+  background: repeating-linear-gradient(180deg, var(--fps-track) 0 1px, transparent 1px 55px);
+  border-bottom: 1px solid var(--line);
+}
+.hm-cmp__bar s {
+  display: block;
+  width: 100%;
+  background: linear-gradient(180deg, var(--c), color-mix(in srgb, var(--c) 25%, transparent));
+  box-shadow: 0 0 24px color-mix(in srgb, var(--c) 50%, transparent);
+}
+.hm-cmp__chart b {
+  margin-top: 10px;
+  font-size: 17px;
+  color: var(--kosc);
+}
+.hm-cmp__chart em {
+  min-height: 18px;
+  font-style: normal;
+  font-size: 13px;
+  font-weight: 700;
+  color: color-mix(in srgb, var(--c) 70%, var(--white));
+}
+.hm-cmp__chart .src {
+  margin-top: 4px;
+  font-size: 11px;
+}
+.hm-cmp__chart figcaption {
+  margin-top: 16px;
+  text-align: center;
+  font-size: 12.5px;
+  color: var(--mgla);
+}
+
+/* ---------- 11. W cenie każdego komputera ---------- */
+.hm-inc {
+  background: linear-gradient(180deg, var(--sec-a), var(--sec-e));
+}
+.hm-inc__list {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0 30px;
+  margin: 44px 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid color-mix(in srgb, var(--grom) 30%, transparent);
+}
+.hm-inc__list li {
+  display: flex;
+  gap: 12px;
+  padding: 22px 0;
+  border-bottom: 1px solid var(--line);
+}
+.hm-inc__list svg {
+  flex: none;
+  color: var(--grom);
+}
+.hm-inc__list b {
+  display: block;
+  font-size: 15.5px;
+  color: var(--kosc);
+}
+.hm-inc__list span {
+  display: block;
+  margin-top: 4px;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--mgla);
+}
+
+/* ---------- 12. Zanim zapytasz ---------- */
+.hm-faq {
+  background: var(--sec-e);
+}
+.hm-faq__in {
+  max-width: 980px;
+}
+.hm-sec.hm-faq h2.h {
+  margin-bottom: 30px;
+}
+.hm-faq details {
+  border-top: 1px solid var(--line);
+}
+.hm-faq details:last-child {
+  border-bottom: 1px solid var(--line);
+}
+.hm-faq summary {
+  /* The padding sits on the summary: the whole row, at least 44 px, opens the answer. */
+  min-height: 44px;
+  padding: 22px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  list-style: none;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--kosc);
+}
+.hm-faq summary::-webkit-details-marker {
+  display: none;
+}
+.hm-faq summary:focus-visible {
+  outline: 2px solid var(--grom);
+  outline-offset: 3px;
+}
+.hm-faq summary i {
+  position: relative;
+  flex: none;
+  width: 14px;
+  height: 14px;
+}
+.hm-faq summary i::before,
+.hm-faq summary i::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 6px;
+  height: 2px;
+  background: var(--grom);
+}
+.hm-faq summary i::after {
+  transform: rotate(90deg);
+  transition: transform 0.25s;
+}
+.hm-faq details[open] summary i::after {
+  transform: rotate(0);
+}
+.hm-faq details p {
+  max-width: 760px;
+  margin: -8px 0 22px;
+  /* Answers are a textarea in the panel: keep its line breaks. */
+  white-space: pre-line;
+  font-size: 16px;
+  line-height: 1.65;
+  color: var(--sec-text);
+}
+
+/* ---------- 13. Napisz, w co grasz ---------- */
+.hm-sec.hm-fin {
+  position: relative;
+  height: 760px;
+  padding: 0;
+  overflow: hidden;
+  background: var(--smola);
+}
+.hm-fin__bg {
+  object-fit: cover;
+  object-position: center bottom;
+}
+.hm-fin__in {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  padding-top: 120px;
+  text-align: center;
+}
+.hm-fin__sigils {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 0 0 34px;
+  padding: 0;
+  list-style: none;
+}
+.hm-fin__sigils li {
+  color: var(--c);
+  opacity: 0.55;
+  filter: drop-shadow(0 0 8px var(--c));
+  animation: hm-glow 6s ease-in-out infinite;
+}
+.hm-fin__sigils li:nth-child(2n) {
+  animation-delay: 1.5s;
+}
+.hm-fin__sigils li:nth-child(3n) {
+  animation-delay: 3s;
+}
+.hm-fin__sigils li:nth-child(5n) {
+  animation-delay: 4.5s;
+}
+@keyframes hm-glow {
+  50% {
+    opacity: 1;
+  }
+}
+.hm-sec.hm-fin h2.h {
+  font-size: 88px;
+  text-shadow: 0 0 50px var(--fin-glow);
+}
+.hm-fin .hm-lead {
+  max-width: 720px;
+  margin-inline: auto;
+  text-wrap: balance;
+}
+.hm-fin .hm-cta {
+  justify-content: center;
+}
+
 /* ---------- tablet and phone ---------- */
 @media (max-width: 1023px) {
   .hm-sec {
@@ -837,6 +1156,39 @@
     bottom: -20px;
     width: 96px;
     height: 96px;
+  }
+  .hm-par__grid,
+  .hm-cmp__grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  .hm-sec.hm-par h2.h {
+    font-size: 40px;
+  }
+  .hm-par__list {
+    grid-template-columns: 1fr;
+  }
+  .hm-cmp__chart ul {
+    gap: 10px;
+  }
+  .hm-inc__list {
+    grid-template-columns: 1fr 1fr;
+    gap: 0 12px;
+  }
+  .hm-sec.hm-fin {
+    height: auto;
+    padding: 90px 0;
+  }
+  .hm-fin__in {
+    padding-top: 30px;
+  }
+  .hm-sec.hm-fin h2.h {
+    font-size: 52px;
+  }
+  .hm-fin__sigils {
+    flex-wrap: wrap;
+    max-width: 460px;
+    margin-inline: auto;
   }
 }
 
@@ -960,9 +1312,31 @@
     width: 78px;
     height: 78px;
   }
+  .hm-sec.hm-par h2.h {
+    font-size: 36px;
+  }
+  .hm-cmp__photo {
+    height: 120px;
+  }
+  .hm-cmp__chart strong {
+    font-size: 16px;
+  }
+  .hm-sec.hm-fin h2.h {
+    font-size: 42px;
+  }
+  .hm-fin__sigils .sigil {
+    width: 34px !important;
+    height: 34px !important;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .hm-fin__sigils li {
+    animation: none;
+  }
+  .hm-faq summary i::after {
+    transition: none;
+  }
   .hm-card:hover .hm-card__scene {
     transform: translateX(-67%);
   }
