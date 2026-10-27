@@ -1,21 +1,29 @@
 # STAN — prokom-gaming
 
-Ostatnia aktualizacja: 27.10.2026 (sesja G6 — zapytania: backend i maile).
+Ostatnia aktualizacja: 27.10.2026 (sesja G7 — strona główna: hero i taśma).
 
 ## W toku
-- **G6 — zapytania: backend i maile** (jeden PR, decyzja Krystiana 27.10). Gałąź `feat/g6-zapytania` (z `develop` po scaleniu #16), podpisane commity, **niewypchnięta**.
+- **G7 — strona główna: hero i taśma.** Gałąź `feat/g7-hero` (z `develop` po scaleniu #17), **niewypchnięta**.
+- Decyzje Krystiana (27.10): zdjęcie na podstawie = zdjęcie obudowy zestawu z opcji (materiał producenta) + „zdjęcie poglądowe”; jedna wspólna podstawa w SVG (7 rodzajów z planszy → „Pomysły na później”); teksty karty jako pola `builds.creature.heroTitle`/`heroText`; taśma = stały tekst 5 etapów procesu, bez linku „Tablica warsztatu” do G14.
 - Zrobione:
-  - Kolekcja `inquiries` (grupa „Sprzedaż”): pola ADR-G005 + uzupełnienie G6 (`forWhom`, `budget`, `customList`, `otherGames`, `caseColor`, `lighting`, `priceBatch`, `statusChangedAt`), słowniki 1:1 z planszy Formularz (`lib/inquiry/types.ts`). REST: brak tworzenia i odczytu publicznie; w panelu edytowalny tylko `status`. `inquiry-deletions` — ślad usunięcia (id, numer, powód, kto) bez treści.
-  - Numer `PKG-RRRR-NNNN` z licznika `inquiry_counters` (tabela dopisana ręcznie w migracji `inquiries`, upsert w transakcji zapisu → bez luk w roku, rok wg czasu polskiego).
-  - `POST /api/inquiry` → `submitInquiry()`: honeypot, podpisany `formToken`, Zod (e-mail zawsze wymagany, NIP z sumą przy fakturze na firmę), cena i zgodność z serwera (`lib/inquiry/price.ts` na `loadOffer`/`loadBatch`, koszty odcinane w `pricingStore.ts`), limit 5/10 min na skrót IP, zapis, 2 maile (powiadomienie z `Reply-To` klienta i linkiem do panelu; potwierdzenie z numerem, konfiguracją po `publicLabel`, ceną i czasem odpowiedzi z `site-settings`). Odpowiedzi: 201 `{ ok, number }`, 400 `invalid` (`fields`, przy niezgodności `compat`), 400 `rejected`, 413, 415, 429, 503.
-  - Retencja: zadanie `inquiry-retention` (codziennie 3:00 czasu serwera = UTC w kontenerze) usuwa `lost`/`closed` po `INQUIRY_RETENTION_MONTHS`; powód „retencja” w śladzie z `req.context`, nie z tego, czy ktoś jest zalogowany.
-  - Env: `SITE_URL` i `INQUIRY_NOTIFY_EMAIL` (oba wymagane na produkcji), `INQUIRY_RETENTION_MONTHS`; CI: oba w zadaniu e2e.
-  - ADR-G005 — uzupełnienie 27.10.2026 (decyzje G6); spec. §10: e-mail wymagany.
-- Sprawdzone lokalnie: `lint`, `typecheck`, `format:check`, `test` (322), pełne `test:e2e` na `pnpm dev` (68), w tym `inquiry-api` (4: 201 + oba maile w Mailpit, kolejne numery, odmowy, brak publicznego odczytu, panel tylko status + ślad usunięcia), migracja `up → down → up`.
-- `/przeglad` (recenzent): „gotowe do PR”; za zgodą Krystiana poprawione: `SITE_URL` wymagany na produkcji, e-mail sprawdzany regułą pola `email` z Payload (inaczej 503 zamiast 400), telefon min. 6 cyfr, powód usunięcia z `req.context`, loader zapytania wybiera pola reguł jawnie (żadne przyszłe pole kosztu nie przejdzie), błąd startu aplikacji → JSON 503.
-- Niedokończone: push, `/pr`, CI. Panelu nie oglądałem w przeglądarce (sprawdzony przez API w e2e) — rzuć okiem na `/admin/collections/inquiries` (widok, zablokowane pola).
-- **`TODO(krystian)`:** treść klauzuli zgody (`lib/inquiry/consent.ts`, z planszy — potwierdzić z prawnikiem); potwierdzenie dla klienta ma tekst roboczy (`TODO(G12)`).
-- Następny krok: `/przeglad` → poprawki → push → `/pr` (tytuł `feat(g6): zapytania — backend, numer i maile`) → CI → squash → **G7** (`/zadanie G7 — strona główna: hero i taśma`).
+  - `builds.creature.heroTitle`, `heroText` (16 tekstów 1:1 z `BD.do_t`/`BD.do` planszy Main w `creatures.json`), migracja `builds_hero_text` (kolumny z pustą wartością domyślną, potem `DROP DEFAULT` — bez tego `NOT NULL` pada na bazie z zestawami; `up → down → up` czyste).
+  - `lib/home.ts` (przeglądarka: DTO hero bez kosztów, `buildHero()`, rotacja = wiodące istoty 9 poziomów z `tierLead` → `leadBuild`, materiały imion, `siblingsText`, `dateText`) + `lib/home.server.ts` (`server-only`: odczyt jako gość z jawnym `select`; części poziomu czytane z zaufaniem, kopiowane tylko `role` + `publicLabel` procesora i karty; cena `priceFromSnapshot` z najnowszej partii).
+  - `/` renderowana na żądanie (`await connection()`): hero potrzebuje bazy, `docker build` jej nie ma. Powłoka (`lib/site.ts`) nadal statyczna.
+  - `components/home/`: `Hero` (klient: wybór, autoprzełączanie 7 s tylko ≥ 1024 px, pauza na kursor/fokus/ukrytą kartę, kliknięcie zatrzymuje na stałe, paralaksa tylko myszą, sceny innych istot dociągane po wyborze albo 3 s przed zmianą), `HeroCard`, `TierStrip` (9 medalionów, linia postępu), `Pedestal`, `WorkshopStrip`; `home.css` — geometria planszy w jednostkach `--u` (ramka 1440×1000, `cqw/cqh`), telefon/tablet < 1024 px jedna kolumna; tokeny G7 i materiały (`[data-material]`) w `tokens.css`; ikony sklep/oko/rozeta.
+  - `zl()` (`lib/pricing/format.ts`) grupuje też 4 cyfry („4 990 zł”; `toLocaleString('pl-PL')` dawał „4990 zł” — także w mailach G6).
+- Sprawdzone lokalnie: `lint`, `typecheck`, `format:check`, `test` (338, w tym `home.test.ts`: ceny 16 istot = fixtures, karta Wampira, brak kosztów i `internalModel` w DTO), pełne `test:e2e` na `pnpm dev` (78), w tym `home` (Wampir na start, medaliony i zakładki, rotacja tylko desktop, nigdy na telefonie i przy reduced motion, HTML `/` bez żadnego `internalModel` z bazy) i axe `/` 1440/414; `pnpm build` (`/` dynamiczna). Podgląd w przeglądarce 1440, 1920, 820, 414 porównany z `Main-1440/01`, `Main-414/01–02`, `Main-hero-820`, `-1920` — układ zgodny.
+- **Lighthouse mobile `/` (`next start`): wydajność 85–86, dostępność 100, dobre praktyki 96, SEO 90; LCP 3,9 s (symulowany; zmierzony 0,39 s), CLS 0.** Element LCP na telefonie = zdjęcie obudowy (ma `fetchPriority="high"`). Próby z blokadą plików: bez Archivo (88 KB, tylko znak PRO-KOM w nagłówku, pełny krój zmienny z osią szerokości) → 90 i LCP 3,5 s; bez żadnych czcionek → 92 i 3,3 s. Reszta to ~161 KB JS i obrazy w modelu łącza 1,6 Mb/s. **Do decyzji Krystiana:** podzbiór Archivo tylko ze znakami logo przy 118/800 (`next/font/local`, kilka KB; wymaga `fontTools` + `brotli` jednorazowo) — w tym PR osobnym commitem albo w G15.
+- Niedokończone: decyzja o Archivo, `/przeglad`, commity, push, `/pr`, CI; test na prawdziwym telefonie (Android + iPhone).
+- Następny krok: decyzja o Archivo → `/przeglad` → poprawki → push → `/pr` (tytuł `feat(g7): strona główna — hero i taśma`) → CI → squash → **G8** (`/zadanie G8 — strona główna: sekcje`).
+
+## Uwagi na później (G7)
+- **Świadome odstępstwa od ADR-G003 na rzecz planszy (zrzuty):** wysokość hero `clamp(720px, 50vw, 1320px)` jak w planszy, nie `100svh`; geometria sceny jak w planszy (panorama = scena 4320×1600 jednostek, ramka w środku), nie samo `cover` w hero — inaczej księżyc i scena są za małe względem zrzutów; na telefonie bez pierwszego planu i bez podstawy (plansza ukrywa `fg6` i `alt6` < 1024 px; ADR §5 mówi „tło + pierwszy plan”).
+- **Karta istoty:** przy każdej liczbie klatek `SourceLabel` (zasada > plansza); dopisek bez „Klatki z niezależnych testów” (źródło jest przy liczbie). Brak ceny (brak partii) → bez ceny, przycisk zostaje.
+- **Sceny Wampira i innych w grafikach `-hero.webp` są ciemniejsze niż SVG na planszy** (plansza ma animowane dodatki i poświaty) — przy eksporcie scen w czacie można rozjaśnić niebo.
+- **G8:** sekcje 3–13 dopisać pod `WorkshopStrip` w `(site)/page.tsx`; `heroTitle`/`heroText` pasują do kart 16 istot.
+- **G14:** `WorkshopStrip` dostaje dane z `GET /api/warsztat` (nazwa zestawu, kolor, etap); wtedy kropka „na żywo” i link „Tablica warsztatu”.
+- **Zdjęcia obudów 444×505** — na ekranach 2× miękkie; po sesji zdjęciowej zdjęcia egzemplarzy w `builds.photos` (hero bierze dziś zdjęcie obudowy z opcji).
+- `pnpm start` słucha na 3000 (nie bierze `PORT` z `.env` jak `pnpm dev`) i ostrzega o `output: standalone` — do pomiarów lokalnych wystarcza.
 
 ## Uwagi na później (G6)
 - **G12 — token formularza:** `POST /api/inquiry` wymaga `formToken` (`issueFormToken(PAYLOAD_SECRET)` z `lib/inquiry/spam.ts`, min. 3 s). Formularz musi go dostać z serwera: strona `/zapytanie` renderowana dynamicznie albo osobny `GET` z tokenem — decyzja w G12. Pole-pułapka: `website` (`HONEYPOT_FIELD`).
@@ -50,6 +58,7 @@ Ostatnia aktualizacja: 27.10.2026 (sesja G6 — zapytania: backend i maile).
 - **Pozycja usunięta z oferty zostawia otwarty wpis `price-history`** (jest w partii N, nie ma jej w N+1, `writeBatch` jej nie zamyka). Dziś nieszkodliwe — części z zestawu nie da się usunąć — ale przed liczeniem „najniższej ceny z 30 dni” zamykać wpisy pozycji, których nie ma w nowej partii.
 
 ## Zrobione
+- 27.10.2026 — **G6 (zapytania: backend i maile)** scalony do `develop` (#17): `inquiries`, numer `PKG-RRRR-NNNN`, `POST /api/inquiry` + `submitInquiry()`, maile, retencja. Nadal `TODO(krystian)`: treść klauzuli zgody (`lib/inquiry/consent.ts`, prawnik); potwierdzenie dla klienta z tekstem roboczym (`TODO(G12)`).
 - 26.10.2026 — **G5 PR 2 (lista klatek)** scalony do `develop` (#16) — G5 zamknięta: `SourceLabel`, `FpsList` (FullHD/2K/4K, domyślnie 2K, wyłączone segmenty bez liczb), arkusz „Jak liczymy?”, wyjątek „platforma testowa” w ADR-G004 §6. `TODO(krystian)` w `HowWeMeasure.tsx` (dopisek o platformie testowej) nadal czeka.
 - 26.10.2026 — **G5 PR 1 (dane klatek)** scalony do `develop` (#15): kolekcje `games` i `fps-results` (`cpu`/`gpu` tylko panel, jeden wynik `m`/`r`/`e` na trójkę, link tylko `http(s)`, blokada usuwania gry/zestawu z wynikami), migracja `games_fps`, seed 33 gier i 1 584 wyników (idempotentny, `p` nietykane), `lib/fps.ts` (priorytet p > m > r > e, etykiety, pasek), `loadFpsTable()` jako gość.
 - 26.10.2026 — **G4 PR 2b (import kosztów i alarm marży)** scalony do `develop` (#14) — G4 zamknięta: import CSV „kod lub EAN; koszt” z podglądem zmian, alarm marży jako zadanie Payload `margin-alarm` (po imporcie od razu, po ręcznej zmianie kosztu z crona), `autoPublish`, `ALERT_EMAIL` wymagany na produkcji.
@@ -114,4 +123,5 @@ G1 → G2 → G3 → G4 → G5 → G6 → G7 → G8 → G9 → (kontrola 8.11) �
 - [czat] 6 poradników w szkicu (na start wystarczy 1 gotowy — plan cięcia §4).
 
 ## Pomysły na później
+- 7 rodzajów podstawy pod komputerem w hero (kamień, woda, grobowiec, pień, lustro, lód, bazalt — plansza Main) jako obrazy z czatu (G7: jedna wspólna).
 - Pełna strona `/warsztat`, edycje limitowane, raty (po umowie z bankiem i ADR), import cen z API hurtowni, Strefa Klienta w Django (2027).
