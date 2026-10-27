@@ -97,3 +97,72 @@
   --fps-row-line: rgba(236, 228, 208, 0.07); /* linia między wierszami listy klatek */
   --fps-track: rgba(236, 228, 208, 0.08); /* tor paska klatek */
 }
+
+/* ---------------------------------------------------------------------------------------------
+   Uzupełnienie (G7): hero strony głównej i taśma — wartości wpisane wprost w planszy Main
+   (`.hero6`, `.card6`, `.strip6`, `.tick5`).
+   --------------------------------------------------------------------------------------------- */
+:root {
+  --white: #fff; /* blask i jasne końce materiałów */
+  --hero-realm: #e6dcc5; /* kraina nad imieniem, nagłówek karty (z kolorem istoty) */
+  --hero-kicker: #d9cfb6; /* „Rabka-Zdrój, od 2004 roku” */
+  --hero-lead: #d0c7b0; /* tekst pod nagłówkiem hero */
+  --hero-trust: #c9bfa6; /* trzy obietnice pod przyciskami */
+  --hero-dim: #a59e8a; /* podpisy w karcie i pod medalionami */
+  --hero-tab: #d9d0b9; /* imiona w zakładkach karty */
+  --hero-look: #b4ab95; /* „Obudowa czarna, …” */
+  --hero-card-text: #cbc2ab; /* opis w karcie */
+  --hero-spec: #efe6d0; /* wartości w karcie */
+  --hero-note: #8f8a78; /* dopisek pod ceną */
+  --hero-tier-name: #cfc6b0; /* istoty pod medalionem */
+  --hero-cap: #f3ecd9; /* „Od Skrzata do Peruna” */
+  --card-glass-from: rgba(9, 14, 13, 0.78);
+  --card-glass-to: rgba(5, 8, 8, 0.88); /* szkło karty istoty */
+  --hero-strip: rgba(2, 4, 4, 0.92); /* wygaszenie pod medalionami */
+  /* droga „od Skrzata do Peruna”: linia postępu pod medalionami */
+  --tier-line: linear-gradient(
+    90deg,
+    #7cf26b,
+    #ff4d8d,
+    #3ddc97,
+    #b26bff,
+    #e0322b,
+    #ff7a1a,
+    #f2c230
+  );
+  --tick-bg: #050907; /* taśma „Teraz w warsztacie” */
+  --tick-text: #bdb39b;
+}
+
+/* Materiał imienia istoty (plansza Main, `--m1…--m4`): cztery przystanki gradientu od światła do
+   cienia. Ustawiany na elemencie z `data-material`, bo część przystanków bierze kolor istoty (--c). */
+[data-material='kosc'] {
+  --m1: #fbfff2;
+  --m2: color-mix(in srgb, var(--c) 40%, #fff);
+  --m3: var(--c);
+  --m4: color-mix(in srgb, var(--c) 30%, #000);
+}
+[data-material='krew'] {
+  --m1: #fff2ee;
+  --m2: #ffb0a0;
+  --m3: var(--c);
+  --m4: #3a0505;
+}
+[data-material='lod'] {
+  --m1: #fff;
+  --m2: #e4f7ff;
+  --m3: #8fd8f5;
+  --m4: #22566c;
+}
+[data-material='ogien'] {
+  --m1: #fffbe6;
+  --m2: #ffd27a;
+  --m3: var(--c);
+  --m4: #4a1404;
+}
+[data-material='zloto'] {
+  --m1: #fffdf2;
+  --m2: #ffe9a6;
+  --m3: #f2c230;
+  --m4: #5a3a06;
+}

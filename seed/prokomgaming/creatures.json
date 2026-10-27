@@ -18,6 +18,8 @@
       "why": "Mały, ale pracowity: Roblox, Minecraft, Fortnite i CS2 w FullHD. Najtańsze wejście do grania.",
       "giftTitle": "Pracowitość",
       "gift": "Roblox, Minecraft, Fortnite i CS2 płynnie w FullHD. Najtańsze wejście do grania.",
+      "heroTitle": "Najtańsze wejście do grania w FullHD",
+      "heroText": "Ryzen 5 5500 i Radeon RX 7600: Roblox, Minecraft, Fortnite i CS2 płynnie w FullHD. Najtańszy komputer w ofercie, a składany i testowany jak każdy inny.",
       "legend": "Domowy duszek z polskich podań, w czerwonej czapeczce. Mieszkał za piecem albo w stodole i znosił do domu zboże i pieniądze tym, którzy dobrze go traktowali.",
       "legendSource": {
         "title": "Wikipedia: Skrzat",
@@ -44,6 +46,8 @@
       "why": "Tak jak Licho nie śpi, kiedy grasz do rana: CS2, Fortnite i nowe gry w FullHD na wysokich ustawieniach.",
       "giftTitle": "Nie śpi",
       "gift": "Gra do rana w CS2, Fortnite i Valoranta, a nowe gry w FullHD na wysokich ustawieniach.",
+      "heroTitle": "E-sport i nowe gry w FullHD",
+      "heroText": "Ryzen 5 5600 i RTX 5060 z DLSS 4: e-sport grubo powyżej 144 klatek i nowe gry w FullHD na wysokich.",
       "legend": "Uosobienie złego losu. W baśniach ma jedno oko, a po polsku do dziś mówimy: „Cicho! Licho nie śpi”.",
       "legendSource": {
         "title": "Wikipedia: Likho",
@@ -70,6 +74,8 @@
       "why": "Szybki i złośliwy dla przeciwników: nowe gry w FullHD na wysokich, na nowej platformie z zapasem na wymianę procesora.",
       "giftTitle": "Wir",
       "gift": "Nowe gry w FullHD na wysokich, na platformie z zapasem na wymianę procesora.",
+      "heroTitle": "FullHD na wysokich, także w premierach",
+      "heroText": "Nowa platforma AM5, RTX 5060 i dysk 1 TB. Za kilka lat wymienisz sam procesor, bez nowej płyty.",
       "legend": "Na wsi wierzono, że w wirze powietrznym siedzi diabeł. Na jego widok kładziono się na ziemi albo spluwano przez lewe ramię.",
       "legendSource": {
         "title": "Leksykon Teatr NN: ludowe wierzenia o wietrze",
@@ -96,6 +102,8 @@
       "why": "Głęboka woda: nowe gry w FullHD na wysokich, na procesorze Intel. Dobrze radzi sobie też z nauką i pracą.",
       "giftTitle": "Głębia",
       "gift": "Nowe gry w FullHD na wysokich, na procesorze Intel.",
+      "heroTitle": "FullHD na wysokich, także w premierach",
+      "heroText": "Intel Core i5-14400F i RTX 5060: nowe gry w FullHD na wysokich, a w dzień nauka i praca.",
       "legend": "Dusza topielca, związana z wodą, w której zginął. Wciąga do stawów i bagien tych, którzy podejdą za blisko.",
       "legendSource": {
         "title": "Wikipedia: Topielec",
@@ -122,6 +130,8 @@
       "why": "Poluje nocą jak sowa: FullHD na ultra i 2K na wysokich, z 12 GB pamięci na karcie.",
       "giftTitle": "Nocne łowy",
       "gift": "FullHD na ultra i 2K na wysokich, z 12 GB pamięci na karcie.",
+      "heroTitle": "FullHD na ultra, 2K na wysokich",
+      "heroText": "Radeon RX 9070 GRE z 12 GB pamięci: FullHD na ultra i 2K na wysokich, w panoramicznej obudowie.",
       "legend": "Rodziła się z dwoma sercami i dwiema duszami. Nocą latała jak sowa, a jej imię wywodzi się od łacińskiego strix, czyli sowa.",
       "legendSource": {
         "title": "Wikipedia: Strzyga",
@@ -148,6 +158,8 @@
       "why": "Cicha obudowa i fiolet w środku. Do pierwszego meczu nikt jej nie usłyszy.",
       "giftTitle": "Cisza",
       "gift": "Płynne 2K, cicho i w fioletowym świetle. Do pierwszego meczu nikt jej nie usłyszy.",
+      "heroTitle": "Płynne 2K na monitorze 144 Hz",
+      "heroText": "RTX 5070 z DLSS 4 i chłodzenie wodne 360 mm. Płynne 2K, cicho i w fioletowym świetle.",
       "legend": "Duch domowy. Gdy wszyscy śpią, wychodzi prząść, a gdy w domu bałagan, gwiżdże i tłucze naczynia.",
       "legendSource": {
         "title": "Wikipedia: Kikimora",
@@ -174,6 +186,8 @@
       "why": "Nie da Ci spać: 2K na wysokich ustawieniach i 16 GB pamięci na karcie, nawet o trzeciej nad ranem.",
       "giftTitle": "Bezsenne noce",
       "gift": "2K na wysokich ustawieniach i 16 GB pamięci na karcie, nawet o trzeciej nad ranem.",
+      "heroTitle": "Płynne 2K na monitorze 144 Hz",
+      "heroText": "Radeon RX 9070 z 16 GB pamięci i Ryzen 5 9600X: 2K na wysokich, z zapasem pamięci na nowe gry.",
       "legend": "Nocna mara z wierzeń Słowian. Siadała śpiącym na piersi, a potrafiła przemienić się w ćmę albo źdźbło słomy.",
       "legendSource": {
         "title": "CEEOL: Mapping mythological motives. Zmora",
@@ -200,6 +214,8 @@
       "why": "Biała jak mgła nad rzeką: biała obudowa, lodowe światło i moc do 2K.",
       "giftTitle": "Biel",
       "gift": "Biała obudowa, lodowe światło i płynne 2K.",
+      "heroTitle": "Płynne 2K na monitorze 144 Hz",
+      "heroText": "Moc Kikimory w bieli: biała karta, płyta i obudowa, do tego 32 GB pamięci i białe chłodzenie wodne.",
       "legend": "Duch wody w postaci dziewczyny. Najgroźniejsza w Zielone Świątki, gdy dawano jej wieńce, żeby trzymała się z dala od pól.",
       "legendSource": {
         "title": "Wikipedia: Green week (Rusalia)",
@@ -226,6 +242,8 @@
       "why": "W jej kotle warzą się klatki na całe 2K: najszybszy procesor do gier w tej cenie i wysokie ustawienia.",
       "giftTitle": "Kocioł",
       "gift": "Najszybszy typ procesora do gier i 2K na wysokich ustawieniach.",
+      "heroTitle": "2K z wysokim odświeżaniem",
+      "heroText": "Ryzen 7 7800X3D, najszybszy typ procesora do gier, i RTX 5070. 2K na wysokich i 32 GB pamięci.",
       "legend": "Jej chata kręci się na kurzych nogach, a ona sama lata w moździerzu, poganiając go tłuczkiem.",
       "legendSource": {
         "title": "Britannica: Baba Yaga",
@@ -252,6 +270,8 @@
       "why": "Zabójcze spojrzenie to jego żywioł: monitory 2K z wysokim odświeżaniem.",
       "giftTitle": "Spojrzenie",
       "gift": "Stworzony do monitorów 2K z wysokim odświeżaniem. Każdy ruch myszką widać od razu.",
+      "heroTitle": "2K z wysokim odświeżaniem",
+      "heroText": "Ryzen 7 7800X3D i Radeon RX 9070 XT: CS2 i Call of Duty grubo powyżej 144 klatek w 2K, premiery w 2K na wysokich.",
       "legend": "Warszawska legenda: zabijał wzrokiem w piwnicy przy Krzywym Kole. Pokonał go śmiałek w płaszczu obszytym lustrami.",
       "legendSource": {
         "title": "National Geographic: warszawski bazyliszek",
@@ -278,6 +298,8 @@
       "why": "Ta sama moc co Bazyliszek, ale w bieli i lodowym świetle. Spokojna i chłodna nawet w najdłuższych sesjach.",
       "giftTitle": "Mróz",
       "gift": "Moc Bazyliszka w bieli. 2K z wysokim odświeżaniem i lodowe światło.",
+      "heroTitle": "2K z wysokim odświeżaniem",
+      "heroText": "Moc Bazyliszka w białej obudowie z lodowym światłem i białym chłodzeniem wodnym.",
       "legend": "Słowiańska bogini zimy i mrozu. Na powitanie wiosny do dziś topimy jej słomianą kukłę, w Polsce, Czechach i na Słowacji.",
       "legendSource": {
         "title": "Wikipedia: Marzanna",
@@ -304,6 +326,8 @@
       "why": "W dzień praca i montaż, nocą przemiana w maszynę do grania w 4K, na procesorze Intel.",
       "giftTitle": "Przemiana",
       "gift": "W dzień praca i montaż, nocą 4K na wysokich, na procesorze Intel.",
+      "heroTitle": "4K na wysokich ustawieniach",
+      "heroText": "Intel Core Ultra 7 i RTX 5070 Ti: 4K na wysokich, a w dzień montaż i praca na wielu rdzeniach.",
       "legend": "Słowianie wierzyli, że wilkołakiem staje się tylko ktoś przeklęty. Klątwę zdejmowało się, wymawiając jego imię albo częstując go chlebem.",
       "legendSource": {
         "title": "National Geographic: wilkołaki w kulturze",
@@ -330,6 +354,8 @@
       "why": "Nie śpi w nocy i nie zwalnia: 2K z wysokim odświeżaniem i 4K na wysokich. Czarny, z czerwonym światłem.",
       "giftTitle": "Bezsenność",
       "gift": "2K z wysokim odświeżaniem i 4K na wysokich. Czarny, z czerwonym światłem.",
+      "heroTitle": "4K na wysokich ustawieniach",
+      "heroText": "Ryzen 7 9800X3D i RTX 5070 Ti: 2K z wysokim odświeżaniem i 4K na wysokich, z zapasem na premiery.",
       "legend": "Polskie upiory, wąpierze i strzygonie z czasem zlały się w jedną postać. Samo słowo „wampir” ma słowiańskie korzenie.",
       "legendSource": {
         "title": "National Geographic: polskie strzygonie",
@@ -356,6 +382,8 @@
       "why": "Przedostatni szczebel drzewa mocy. Tak jak Weles stoi naprzeciw Peruna, tak ten komputer jest tuż pod samym szczytem: 4K w najcięższych grach.",
       "giftTitle": "Potęga",
       "gift": "4K na ultra w najcięższych grach. Tuż pod samym szczytem.",
+      "heroTitle": "4K na ultra w najcięższych grach",
+      "heroText": "Ryzen 7 9800X3D i RTX 5080: 4K na ultra w najcięższych grach, dysk 2 TB na bibliotekę.",
       "legend": "Bóg ziemi, wód i bogactwa, strażnik granicy z Nawią i odwieczny przeciwnik Peruna. Z jego smoczą postacią wiąże się tatrzański Wołoszyn.",
       "legendSource": {
         "title": "National Geographic: Weles w wierzeniach Słowian",
@@ -382,6 +410,8 @@
       "why": "Zieje ogniem w 4K. Ta sama moc co Weles, ale w ogniu: moc, która nie gaśnie w najcięższych grach.",
       "giftTitle": "Ogień",
       "gift": "4K w najcięższych grach. Moc Welesa w ogniu, która nie gaśnie.",
+      "heroTitle": "4K na ultra w najcięższych grach",
+      "heroText": "Ryzen 7 9850X3D i RTX 5080 z trzema wentylatorami, w obudowie premium z ekranem na pompie chłodzenia.",
       "legend": "Słowiański smok, pan pogody i wód. Ludowe podania widzą w nim jedno z wcieleń Welesa i przeciwnika samego Peruna.",
       "legendSource": {
         "title": "National Geographic: bóg piorunów",
@@ -408,6 +438,8 @@
       "why": "Szczyt drzewa mocy. Wszystko w 4K, bez kompromisów.",
       "giftTitle": "Grom",
       "gift": "Szczyt drzewa mocy. 4K bez kompromisów, streaming i wszystko naraz.",
+      "heroTitle": "Wszystko na maksimum, bez kompromisów",
+      "heroText": "Szczyt drzewa: RTX 5090, 64 GB pamięci i 2 TB na bibliotekę. Dla tych, którzy nie chcą słyszeć słowa „wystarczy”.",
       "legend": "Bóg burzy i pioruna. Jego drzewem był dąb, a bronią kamień, topór i strzała. Na kijowskim posągu miał srebrną głowę i złoty wąs.",
       "legendSource": {
         "title": "National Geographic: bóg piorunów",

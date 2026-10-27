@@ -108,6 +108,8 @@ export type SeedCreature = {
   why: string
   giftTitle: string
   gift: string
+  heroTitle: string
+  heroText: string
   legend: string
   legendSource: { title: string; url: string }
 }
@@ -224,6 +226,8 @@ export function mapBuild(b: SeedBuild, c: SeedCreature, refs: BuildRefs): BuildD
       why: c.why,
       giftTitle: c.giftTitle,
       gift: c.gift,
+      heroTitle: c.heroTitle,
+      heroText: c.heroText,
       legend: c.legend,
       legendSource: { title: c.legendSource.title, url: c.legendSource.url },
     },

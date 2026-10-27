@@ -323,6 +323,14 @@ export interface Build {
     why: string;
     giftTitle: string;
     gift: string;
+    /**
+     * Np. „4K na wysokich ustawieniach”. Karta istoty w hero strony głównej.
+     */
+    heroTitle: string;
+    /**
+     * Wymienia procesor i kartę z nazwy — zaktualizuj przy zmianie części poziomu mocy.
+     */
+    heroText: string;
     legend: string;
     legendSource: {
       title: string;
@@ -864,6 +872,8 @@ export interface BuildsSelect<T extends boolean = true> {
         why?: T;
         giftTitle?: T;
         gift?: T;
+        heroTitle?: T;
+        heroText?: T;
         legend?: T;
         legendSource?:
           | T

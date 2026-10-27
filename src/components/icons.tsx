@@ -131,3 +131,30 @@ export const IconPhone = (p: IconProps) => (
     <path d="M5 4h4l2 5-3 2a11 11 0 005 5l2-3 5 2v4a2 2 0 01-2 2A17 17 0 013 6a2 2 0 012-2z" />
   </Icon>
 )
+
+export const IconShop = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M4 9l2-5h12l2 5M4 9v11h16V9M4 9h16M9 20v-6h6v6" />
+  </Icon>
+)
+
+export const IconEye = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z" />
+    <circle cx="12" cy="12" r="3" />
+  </Icon>
+)
+
+/** Slavic rosette before "Rabka-Zdrój, od 2004 roku" (board Main, `.rs`). */
+export const IconRosette = (p: IconProps) => (
+  <Icon strokeWidth={1.4} {...p}>
+    <circle cx="12" cy="12" r="11" fill="currentColor" stroke="none" opacity=".13" />
+    <circle cx="12" cy="12" r="6" />
+    <path d="M6.8 9A6 6 0 0 0 17.2 9" />
+    <path d="M12 6a6 6 0 0 0 5.2 9" />
+    <path d="M17.2 9A6 6 0 0 0 12 18" />
+    <path d="M17.2 15a6 6 0 0 0-10.4 0" />
+    <path d="M12 18a6 6 0 0 0-5.2-9" />
+    <path d="M6.8 15A6 6 0 0 0 12 6" />
+  </Icon>
+)

@@ -1,10 +1,16 @@
 /**
- * Number formats for prices in the panel and its messages (Polish). Browser-safe; one place, so
- * the prices screen and the guard's messages show amounts the same way.
+ * Number formats for prices on the site, in the panel and in messages (Polish). Browser-safe; one
+ * place, so every screen and mail shows amounts the same way.
  */
 
+const GROUP = /\B(?=(\d{3})+(?!\d))/g
+
+/**
+ * "14 540 zł", "4 990 zł". Grouped by hand with a non-breaking space: `toLocaleString('pl-PL')`
+ * leaves 4-digit numbers ungrouped ("4990 zł"), unlike the boards.
+ */
 export const zl = (value: number | null): string =>
-  value === null ? '—' : `${Math.round(value).toLocaleString('pl-PL')} zł`
+  value === null ? '—' : `${String(Math.round(value)).replace(GROUP, ' ')} zł`
 
 export const percent = (value: number | null, signed = false): string => {
   if (value === null || !Number.isFinite(value)) return '—'
