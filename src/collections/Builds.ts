@@ -122,6 +122,10 @@ export const Builds: CollectionConfig = {
           label: 'Karta na głównej — opis',
           type: 'textarea',
           required: true,
+          admin: {
+            description:
+              'Wymienia procesor i kartę z nazwy — zaktualizuj przy zmianie części poziomu mocy.',
+          },
         },
         { name: 'legend', label: 'Legenda', type: 'textarea', required: true },
         {

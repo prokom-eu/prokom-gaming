@@ -128,7 +128,16 @@ export function Hero({ data }: { data: HeroData }) {
   }
 
   const build = builds.get(active)
-  if (!build) return null
+  // No offer to show (empty database or a failed read): the text, heading and buttons still stand.
+  if (!build) {
+    return (
+      <section className="hero hero--empty" data-scene-top>
+        <div className="hero__frame">
+          <HeroCopy />
+        </div>
+      </section>
+    )
+  }
   const siblings = data.builds.filter((b) => b.tier === build.tier)
   const animationKey = switches > 0 ? `${active}-${switches}` : null
 
@@ -199,8 +208,8 @@ export function Hero({ data }: { data: HeroData }) {
           <span className="hero__name">{build.name}</span>
         </div>
 
-        <div className="hero__stage" aria-hidden="true">
-          <span className="hero__halo" />
+        <div className="hero__stage">
+          <span className="hero__halo" aria-hidden="true" />
           <Pedestal />
           {mounted.map((slug) => {
             const b = builds.get(slug)
@@ -211,11 +220,12 @@ export function Hero({ data }: { data: HeroData }) {
                 className="hero__photo"
                 data-on={slug === active}
                 data-new={slug === active && animationKey !== null}
+                // Own colour: while fading out, the previous creature's photo keeps its own glow.
                 style={{ ['--c' as string]: `var(--c-${b.slug})` }}
               >
                 <Image
                   src={b.photo.src}
-                  alt=""
+                  alt={b.photo.alt}
                   fill
                   sizes="(max-width: 1023px) 80vw, 36vw"
                   loading={slug === first ? 'eager' : 'lazy'}
@@ -227,39 +237,7 @@ export function Hero({ data }: { data: HeroData }) {
           })}
         </div>
 
-        <div className="hero__copy">
-          <p className="hero__kicker">
-            <IconRosette size={20} />
-            <span>Rabka-Zdrój, od 2004 roku</span>
-          </p>
-          <h1>Komputery do gier. Sprawdzone w&nbsp;grach.</h1>
-          <p className="hero__lead">
-            Składamy je ręcznie w Rabce-Zdroju i zanim do Ciebie trafią, mierzymy klatki w grach, w
-            które grasz. Każdy nosi imię istoty ze słowiańskich podań: im wyżej, tym potężniejsza.
-          </p>
-          <div className="hero__cta">
-            <ButtonLink href="/konfigurator" size="lg">
-              Dobierz komputer
-            </ButtonLink>
-            <ButtonLink href="/zestawy" variant="ghost" size="lg">
-              Zobacz wszystkie zestawy
-            </ButtonLink>
-          </div>
-          <ul className="hero__trust">
-            <li>
-              <IconClock size={17} />
-              <span>Odpowiedź w godzinę, 8–22</span>
-            </li>
-            <li>
-              <IconShield size={17} />
-              <span>2 lata gwarancji</span>
-            </li>
-            <li>
-              <IconShop size={17} />
-              <span>Sklepy w Rabce i Zakopanem</span>
-            </li>
-          </ul>
-        </div>
+        <HeroCopy />
 
         <HeroCard
           build={build}
@@ -272,5 +250,44 @@ export function Hero({ data }: { data: HeroData }) {
         <TierStrip tiers={data.tiers} builds={builds} activeTier={build.tier} onPick={pick} />
       </div>
     </section>
+  )
+}
+
+/** Heading, lead, buttons and promises at the left of the hero (board Main, `.hcopy6`). */
+function HeroCopy() {
+  return (
+    <div className="hero__copy">
+      <p className="hero__kicker">
+        <IconRosette size={20} />
+        <span>Rabka-Zdrój, od 2004 roku</span>
+      </p>
+      <h1>Komputery do gier. Sprawdzone w&nbsp;grach.</h1>
+      <p className="hero__lead">
+        Składamy je ręcznie w Rabce-Zdroju i zanim do Ciebie trafią, mierzymy klatki w grach, w
+        które grasz. Każdy nosi imię istoty ze słowiańskich podań: im wyżej, tym potężniejsza.
+      </p>
+      <div className="hero__cta">
+        <ButtonLink href="/konfigurator" size="lg">
+          Dobierz komputer
+        </ButtonLink>
+        <ButtonLink href="/zestawy" variant="ghost" size="lg">
+          Zobacz wszystkie zestawy
+        </ButtonLink>
+      </div>
+      <ul className="hero__trust">
+        <li>
+          <IconClock size={17} />
+          <span>Odpowiedź w godzinę, 8–22</span>
+        </li>
+        <li>
+          <IconShield size={17} />
+          <span>2 lata gwarancji</span>
+        </li>
+        <li>
+          <IconShop size={17} />
+          <span>Sklepy w Rabce i Zakopanem</span>
+        </li>
+      </ul>
+    </div>
   )
 }

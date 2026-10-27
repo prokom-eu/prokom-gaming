@@ -1008,6 +1008,10 @@
     padding: 0 16px;
     font-size: 14px;
   }
+  /* Hero without offer data: only the text, below the header. */
+  .hero--empty .hero__copy {
+    margin-top: 120px;
+  }
 }
 @media (min-width: 700px) and (max-width: 1023px) {
   .hero__copy,

@@ -327,6 +327,9 @@ export interface Build {
      * Np. „4K na wysokich ustawieniach”. Karta istoty w hero strony głównej.
      */
     heroTitle: string;
+    /**
+     * Wymienia procesor i kartę z nazwy — zaktualizuj przy zmianie części poziomu mocy.
+     */
     heroText: string;
     legend: string;
     legendSource: {

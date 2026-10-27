@@ -108,6 +108,9 @@ export type HeroData = {
   pricedAt: string | null
 }
 
+/** No offer (empty database, no build with a level) or the database failed: text and buttons only. */
+export const EMPTY_HERO: HeroData = { builds: [], tiers: [], pricedAt: null }
+
 /** A build as the server reads it (public fields only). */
 export type HeroBuildInput = {
   slug: string
