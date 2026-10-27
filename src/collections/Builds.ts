@@ -108,6 +108,21 @@ export const Builds: CollectionConfig = {
         { name: 'why', label: 'Dlaczego ta istota', type: 'textarea', required: true },
         { name: 'giftTitle', label: 'Dar — tytuł', type: 'text', required: true },
         { name: 'gift', label: 'Dar — opis', type: 'textarea', required: true },
+        {
+          name: 'heroTitle',
+          label: 'Karta na głównej — nagłówek',
+          type: 'text',
+          required: true,
+          admin: {
+            description: 'Np. „4K na wysokich ustawieniach”. Karta istoty w hero strony głównej.',
+          },
+        },
+        {
+          name: 'heroText',
+          label: 'Karta na głównej — opis',
+          type: 'textarea',
+          required: true,
+        },
         { name: 'legend', label: 'Legenda', type: 'textarea', required: true },
         {
           name: 'legendSource',
