@@ -188,7 +188,10 @@ jobs:
 
       # Next's build cache: unchanged modules are not compiled again. Restored from the newest
       # run when the sources changed (the usual case); a stale cache only costs a full build.
-      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      # Saved only on pushes to develop/main: the key changes with every source change, so saving
+      # on each PR uploaded a new archive (~40 s) that no other PR could restore anyway.
+      - id: next-cache
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .next/cache
           key: next-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ hashFiles('src/**', 'next.config.ts') }}
@@ -196,6 +199,12 @@ jobs:
 
       - name: Build
         run: pnpm build
+
+      - if: github.event_name == 'push' && steps.next-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .next/cache
+          key: ${{ steps.next-cache.outputs.cache-primary-key }}
 
       # Chromium of the pinned Playwright version; system libraries are installed every time.
       - id: playwright-cache
