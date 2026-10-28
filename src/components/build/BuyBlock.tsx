@@ -76,7 +76,8 @@ export function BuyBlock({ data, pageUrl }: { data: BuildPageData; pageUrl: stri
               <ButtonLink variant="ghost" href={`${routes.configurator}?zestaw=${build.slug}`}>
                 Zmień części
               </ButtonLink>
-              {/* TODO(G11): the comparison counter in localStorage; until then a plain link. */}
+              {/* The comparison opens with this build and the next dearer one; the counter in the
+                  header follows the builds picked there (`pkg:compare`). */}
               <ButtonLink variant="ghost" href={`${routes.compare}?z=${build.slug}`}>
                 Porównaj
               </ButtonLink>
