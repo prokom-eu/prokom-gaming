@@ -230,3 +230,33 @@
   --flt-label: #9a9583; /* „Monitor”, „Budżet”, „Rodzaj” */
   --zmb-bg: rgba(5, 8, 7, 0.94); /* przyklejony pasek filtrów na telefonie */
 }
+
+/* ---------------------------------------------------------------------------------------------
+   Uzupełnienie (G9): karta zestawu — wartości wpisane wprost w planszy Zestaw (`.zh5`, `.an7`,
+   `.bpl`, `.dp7`, `.tr7`, `LIGHTS`).
+   --------------------------------------------------------------------------------------------- */
+:root {
+  /* kolory światła w „Dopasuj” (plansza: LIGHTS) */
+  --light-piorun: #f2c230;
+  --light-krew: #e0322b;
+  --light-las: #3ddc97;
+  --light-czary: #b26bff;
+  --light-lod: #9fe7ff;
+  --light-ogien: #ff7a1a;
+  /* tła */
+  --bp-panel: #08100d; /* kafle części, opcje, kroki, pudełko, gwarancja */
+  --bp-frame-from: #081210;
+  --bp-frame-to: #050a09; /* ramka planu wnętrza */
+  --bp-up-to: #060b0a; /* pasek „Miejsce na rozbudowę” */
+  --bp-photo-to: #080d0b; /* tło zdjęcia poglądowego (od --avatar-bg) */
+  --bp-step-bg: #0a120f; /* koło etapu */
+  /* plan wnętrza (rysunek) */
+  --bp-line: #6f7d79;
+  --bp-case: #4d5956;
+  --bp-mark-bg: #071010;
+  --bp-mark-text: #cfd6d3;
+  --bp-plan-label: #5f6b68;
+  /* tekst */
+  --bp-strong: #e6ddc7; /* etykiety grup „Dopasuj”, podpisy testów */
+  --bp-min: #a49d89; /* „Minimum, którego pilnujemy” */
+}

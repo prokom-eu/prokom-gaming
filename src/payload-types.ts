@@ -528,9 +528,9 @@ export interface Faq {
   question: string;
   answer: string;
   /**
-   * „Na stronie głównej” = sekcja „Zanim zapytasz” na głównej, nie /pytania.
+   * „Na stronie głównej” = „Zanim zapytasz” na głównej; „Na karcie zestawu” = „Pytania o {istotę}” na każdej karcie. Obie nie trafiają na /pytania.
    */
-  group: 'purchase' | 'delivery' | 'returns' | 'tech' | 'parents' | 'home';
+  group: 'purchase' | 'delivery' | 'returns' | 'tech' | 'parents' | 'home' | 'build';
   order: number;
   updatedAt: string;
   createdAt: string;

@@ -5,7 +5,8 @@ import { GROUP_CONTENT } from './shared'
 
 /**
  * Groups of questions (spec. §19: five groups of `/pytania`) plus the six questions of the home
- * page section "Zanim zapytasz" (spec. §4 pt 12) — separate wording, never shown on `/pytania`.
+ * page section "Zanim zapytasz" (spec. §4 pt 12) and the nine "Pytania o {istotę}" of every build
+ * page (spec. §6 pt 13, the same for all 16) — separate wording, never shown on `/pytania`.
  */
 export const FAQ_GROUPS = [
   { label: 'Zakup i płatność', value: 'purchase' },
@@ -14,6 +15,7 @@ export const FAQ_GROUPS = [
   { label: 'Technika i klatki', value: 'tech' },
   { label: 'Dla rodziców', value: 'parents' },
   { label: 'Na stronie głównej', value: 'home' },
+  { label: 'Na karcie zestawu', value: 'build' },
 ] as const
 
 export type FaqGroup = (typeof FAQ_GROUPS)[number]['value']
@@ -43,7 +45,8 @@ export const Faq: CollectionConfig = {
           index: true,
           options: [...FAQ_GROUPS],
           admin: {
-            description: '„Na stronie głównej” = sekcja „Zanim zapytasz” na głównej, nie /pytania.',
+            description:
+              '„Na stronie głównej” = „Zanim zapytasz” na głównej; „Na karcie zestawu” = „Pytania o {istotę}” na każdej karcie. Obie nie trafiają na /pytania.',
           },
         },
         {

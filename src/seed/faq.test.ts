@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { mapFaq } from './faq'
+import { mapBuildFaq, mapFaq } from './faq'
 
 describe('mapFaq', () => {
   const faq = mapFaq()
@@ -25,5 +25,17 @@ describe('mapFaq', () => {
 
   it('rejects an unknown group', () => {
     expect(() => mapFaq([{ group: 'Inne', items: [{ q: 'x', a: 'y' }] }])).toThrow(/Inne/)
+  })
+})
+
+describe('mapBuildFaq', () => {
+  const faq = mapBuildFaq()
+
+  it('maps the nine build page questions in board order', () => {
+    expect(faq).toHaveLength(9)
+    expect(faq.every((f) => f.group === 'build')).toBe(true)
+    expect(faq.map((f) => f.order)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9])
+    expect(faq[0].question).toBe('Jak długo czekam na komputer?')
+    expect(faq[8].question).toBe('Czy pociągnie gry, które dopiero wyjdą?')
   })
 })

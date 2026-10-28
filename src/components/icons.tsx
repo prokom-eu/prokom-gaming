@@ -158,3 +158,50 @@ export const IconRosette = (p: IconProps) => (
     <path d="M6.8 15A6 6 0 0 0 12 6" />
   </Icon>
 )
+
+// G9 — build page (board Zestaw: steps, box, care, price list).
+export const IconDoc = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M7 3h7l5 5v13H7z" />
+    <path d="M14 3v5h5M10 13h6M10 17h6" />
+  </Icon>
+)
+export const IconLock = (p: IconProps) => (
+  <Icon {...p}>
+    <rect x="5" y="11" width="14" height="10" rx="2" />
+    <path d="M8 11V7a4 4 0 018 0v4" />
+  </Icon>
+)
+export const IconWrench = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M14 6a4 4 0 005 5l-9 9-3-3 9-9a4 4 0 01-2-2z" />
+  </Icon>
+)
+export const IconFlame = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M12 3c1 4 5 5 5 10a5 5 0 01-10 0c0-3 2-4 2-7 2 1 3 3 3 5 1-2 0-5 0-8z" />
+  </Icon>
+)
+export const IconTruck = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M3 7h11v9H3zM14 10h4l3 3v3h-7" />
+    <circle cx="7" cy="18" r="2" />
+    <circle cx="17" cy="18" r="2" />
+  </Icon>
+)
+export const IconPlug = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M6 3v5a3 3 0 006 0V3M9 11v4a5 5 0 0010 0v-2M17 13V9M21 13V9" />
+  </Icon>
+)
+export const IconWifi = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M2 9a15 15 0 0120 0M5 12.5a10 10 0 0114 0M8.5 16a5 5 0 017 0" />
+    <circle cx="12" cy="19" r="1" />
+  </Icon>
+)
+export const IconPlus = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M12 5v14M5 12h14" />
+  </Icon>
+)

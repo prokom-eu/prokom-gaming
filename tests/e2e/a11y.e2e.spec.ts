@@ -3,10 +3,11 @@ import { expect, test } from '@playwright/test'
 
 // Every page passes axe (WCAG 2.1 A/AA) at 1440 and 414 (both Playwright projects).
 // Each UI session adds its pages here. G1: home (temporary) and the panel login; G2: 404
-// (the shell itself is on every page; the open menu is checked in shell.e2e.spec.ts); G9: /zestawy.
+// (the shell itself is on every page; the open menu is checked in shell.e2e.spec.ts); G9: /zestawy, /zestawy/wampir.
 const PAGES = [
   { path: '/', status: 200 },
   { path: '/zestawy', status: 200 },
+  { path: '/zestawy/wampir', status: 200 },
   { path: '/admin/login', status: 200 },
   { path: '/nie-ma-takiej-strony', status: 404 },
 ]
