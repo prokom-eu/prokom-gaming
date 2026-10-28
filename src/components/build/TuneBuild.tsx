@@ -102,13 +102,11 @@ export function TuneBuild(props: Props) {
             </li>
             <li>
               <span>Pamięć</span>
-              <em>
-                {ramPick?.label} {props.ramType}
-              </em>
+              <em>{ramPick ? `${ramPick.label} ${props.ramType}` : '—'}</em>
             </li>
             <li>
               <span>Dysk</span>
-              <em>{ssdPick?.label} NVMe</em>
+              <em>{ssdPick ? `${ssdPick.label} NVMe` : '—'}</em>
             </li>
             <li>
               <span>Światło</span>

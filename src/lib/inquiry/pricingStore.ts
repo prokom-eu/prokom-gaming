@@ -67,24 +67,32 @@ function compatOption(o: CostOption): InquiryOption {
 }
 
 /**
- * Offer and newest published prices for `submitInquiry()` — the same mapping of codes to parts as
- * the price screen (`lib/pricing/store`). `null` while no batch is published.
+ * The offer without prices: compatibility data of every level and option, the build recipes and
+ * the public labels. Shared by `submitInquiry()` and the build page („Dopasuj” offers exactly what
+ * the inquiry accepts) — the build page needs it even before any price batch exists.
  */
-export async function loadInquiryPricing(payload: Payload): Promise<Pricing | null> {
-  const [offer, batch, level, option] = await Promise.all([
+export async function loadInquiryOffer(payload: Payload): Promise<Omit<Pricing, 'snapshot'>> {
+  const [offer, level, option] = await Promise.all([
     loadOffer(payload),
-    loadBatch(payload),
     publicLabels(payload, 'power-levels'),
     publicLabels(payload, 'options'),
   ])
-  if (!batch) return null
   return {
     offer: {
       levels: offer.catalog.levels.map(compatLevel),
       options: offer.catalog.options.map(compatOption),
       builds: offer.builds,
     },
-    snapshot: batch.snapshot,
     labels: { level, option },
   }
+}
+
+/**
+ * Offer and newest published prices for `submitInquiry()` — the same mapping of codes to parts as
+ * the price screen (`lib/pricing/store`). `null` while no batch is published.
+ */
+export async function loadInquiryPricing(payload: Payload): Promise<Pricing | null> {
+  const [data, batch] = await Promise.all([loadInquiryOffer(payload), loadBatch(payload)])
+  if (!batch) return null
+  return { ...data, snapshot: batch.snapshot }
 }

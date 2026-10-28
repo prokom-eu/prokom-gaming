@@ -387,8 +387,23 @@
   gap: 10px;
   margin-top: 10px;
 }
+.bp-price__share {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 14px;
+  margin: 16px 0 0;
+}
+.bp-price__sms {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: 13.5px;
+  color: var(--sec-desc);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
 .bp-price__parent {
-  margin-top: 16px;
   font-size: 14px;
   color: var(--grom);
   border-color: color-mix(in srgb, var(--grom) 45%, transparent);

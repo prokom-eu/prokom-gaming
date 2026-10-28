@@ -87,10 +87,16 @@ export function BuyBlock({ data, pageUrl }: { data: BuildPageData; pageUrl: stri
                 Porównaj
               </ButtonLink>
             </div>
-            <a className="lnk bp-price__parent" href={parentMail(data, pageUrl)}>
-              <IconMail size={18} />
-              Wyślij rodzicowi ze specyfikacją
-            </a>
+            <p className="bp-price__share">
+              <a className="lnk bp-price__parent" href={parentMail(data, pageUrl)}>
+                <IconMail size={18} />
+                Wyślij rodzicowi ze specyfikacją
+              </a>
+              {/* TODO(krystian): the label „albo SMS-em” is ours, not from the board. */}
+              <a className="bp-price__sms" href={parentSms(data, pageUrl)}>
+                albo SMS-em
+              </a>
+            </p>
             <ul className="bp-price__list">
               {PROMISES.map(({ icon: Icon, text }) => (
                 <li key={text}>
@@ -120,15 +126,30 @@ export function BuyBlock({ data, pageUrl }: { data: BuildPageData; pageUrl: stri
 }
 
 /**
- * „Wyślij rodzicowi ze specyfikacją”: an e-mail the visitor sends from their own mail app — the
- * board has only `mailto:`. TODO(krystian): wording of the subject and body (working text).
+ * „Wyślij rodzicowi ze specyfikacją” (spec. §6 pt 3: link + mail/SMS through `mailto:`/`sms:`): a
+ * message the visitor sends from their own phone or mail app. The board links to the inquiry form
+ * here; the spec wins. TODO(krystian): wording of the subject and the text (working text).
  */
-function parentMail(data: BuildPageData, pageUrl: string): string {
+function parentText(data: BuildPageData, pageUrl: string): string {
   const { build } = data
   const spec = [build.cpu, build.gpu, build.ram, build.disk].filter(Boolean).join(', ')
   const price =
-    build.price !== null ? `\nCena: ${zl(build.price)} z montażem, Windows 11 i wysyłką.` : ''
-  const subject = `Komputer do gier ${build.name} — PRO-KOM Gaming`
-  const body = `${build.name}, Moc ${build.tierRoman} (${build.tierLabel}).\n${spec}.${price}\n\nSzczegóły: ${pageUrl}`
-  return `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+    build.price !== null
+      ? `
+Cena: ${zl(build.price)} z montażem, Windows 11 i wysyłką.`
+      : ''
+  return `${build.name}, Moc ${build.tierRoman} (${build.tierLabel}).
+${spec}.${price}
+
+Szczegóły: ${pageUrl}`
+}
+
+function parentMail(data: BuildPageData, pageUrl: string): string {
+  const subject = `Komputer do gier ${data.build.name} — PRO-KOM Gaming`
+  return `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(parentText(data, pageUrl))}`
+}
+
+/** `sms:?&body=` — the form both Android and iOS read. */
+function parentSms(data: BuildPageData, pageUrl: string): string {
+  return `sms:?&body=${encodeURIComponent(parentText(data, pageUrl))}`
 }

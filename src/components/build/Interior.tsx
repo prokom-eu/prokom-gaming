@@ -49,9 +49,9 @@ export function Interior({ data }: { data: BuildPageData }) {
             </div>
             <ul>
               {items.map((item) => (
-                <li key={item.text}>
+                <li key={`${item.value} ${item.text}`}>
                   <b className="nm">{item.value}</b>
-                  <span>{item.text}</span>
+                  {item.text && <span>{item.text}</span>}
                 </li>
               ))}
             </ul>

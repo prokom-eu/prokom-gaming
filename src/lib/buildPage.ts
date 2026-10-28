@@ -246,7 +246,11 @@ export function ownLight(look: string): string {
 
 export type Tuned = { ram: string; ssd: string; light: LightKey | null }
 
-/** Price of the tuned version — the same sum as the configurator and the inquiry. */
+/**
+ * Price of the tuned version — the same sum as the configurator and the inquiry. The page shows
+ * the build price + the choices' surcharges (`TuneBuild`); the tests check that both are equal for
+ * every choice of all 16 builds, so this is the reference, not dead code.
+ */
 export function tunedPrice(config: Config, tuned: Tuned, prices: PriceList): number | null {
   return priceFromSnapshot({ ...config, ram: tuned.ram, ssd: tuned.ssd }, prices)
 }

@@ -16,8 +16,10 @@ import {
 } from './buildPage'
 import type { FpsListGame, FpsTable } from './fps'
 import type { HeroBuild } from './home'
-import { loadInquiryPricing } from './inquiry/pricingStore'
+import { loadInquiryOffer } from './inquiry/pricingStore'
 import { loadOffer } from './offer.server'
+import { priceFromSnapshot } from './pricing/snapshot'
+import { loadBatch } from './pricing/store'
 import type { Config } from './pricing/types'
 
 export type BuildPageData = {
@@ -53,9 +55,11 @@ export type BuildPageData = {
 
 /**
  * One build page. The shared offer (`loadOffer()`: hero data of all 16, FPS) and the inquiry's own
- * pricing (`loadInquiryPricing()`: compatibility data, recipes, newest prices) — so „Dopasuj”
- * offers exactly what `/api/inquiry` accepts at the same price. The level's parts are read trusted
- * and only `role` + `publicLabel` are copied out (ADR-G002 §8.7). `null` = no such build.
+ * offer (`loadInquiryOffer()`: compatibility data, recipes, labels) — so „Dopasuj” offers exactly
+ * what `/api/inquiry` accepts. This build's price, the surcharges and the price date all come from
+ * one newest batch (`loadBatch()`), read once. Without any published batch the page still stands,
+ * only without a price and „Dopasuj” (review G9). The level's parts are read trusted and only
+ * `role` + `publicLabel` are copied out (ADR-G002 §8.7). `null` = no such build.
  */
 export async function loadBuildPage(slug: string): Promise<BuildPageData | null> {
   const payload = await getPayload({ config })
@@ -84,9 +88,10 @@ export async function loadBuildPage(slug: string): Promise<BuildPageData | null>
   if (!doc) return null
   const levelId = typeof doc.level === 'number' ? doc.level : doc.level.id
 
-  const [offer, pricing, level, parts, faq] = await Promise.all([
+  const [offer, catalog, batch, level, parts, faq] = await Promise.all([
     loadOffer(payload),
-    loadInquiryPricing(payload),
+    loadInquiryOffer(payload),
+    loadBatch(payload),
     payload.findByID({
       collection: 'power-levels',
       id: levelId,
@@ -109,12 +114,18 @@ export async function loadBuildPage(slug: string): Promise<BuildPageData | null>
     }),
   ])
 
-  const build = offer.hero.builds.find((b) => b.slug === slug)
-  const recipe = pricing?.offer.builds.find((b) => b.slug === slug)
-  if (!build || !recipe) return null
+  const shown = offer.hero.builds.find((b) => b.slug === slug)
+  const recipe = catalog.offer.builds.find((b) => b.slug === slug)
+  if (!shown || !recipe) return null
+  const snapshot = batch?.snapshot ?? null
+  // The price from the same batch as the surcharges (not the hero's own read of the newest batch).
+  const build = {
+    ...shown,
+    price: snapshot ? priceFromSnapshot(recipe.config, snapshot) : null,
+  }
   const label = (role: string) => parts.components?.find((c) => c.role === role)?.publicLabel ?? ''
-  const optionLabel = (code: string) => pricing?.labels.option[code] ?? ''
-  const cooler = pricing?.offer.options.find((o) => o.code === recipe.config.cooler)
+  const optionLabel = (code: string) => catalog.labels.option[code] ?? ''
+  const cooler = catalog.offer.options.find((o) => o.code === recipe.config.cooler)
 
   const games: FpsListGame[] = BUILD_PAGE_GAMES.flatMap((s) => {
     const g = offer.fps.games.find((x) => x.slug === s)
@@ -166,15 +177,15 @@ export async function loadBuildPage(slug: string): Promise<BuildPageData | null>
           psuW: level.upgrade.psuW ?? null,
         }
       : null,
-    tune: pricing
+    tune: snapshot
       ? {
-          ram: tuneChoices('ram', recipe.config, pricing.offer, pricing.snapshot),
-          ssd: tuneChoices('ssd', recipe.config, pricing.offer, pricing.snapshot),
+          ram: tuneChoices('ram', recipe.config, catalog.offer, snapshot),
+          ssd: tuneChoices('ssd', recipe.config, catalog.offer, snapshot),
         }
       : { ram: [], ssd: [] },
     monitor: monitorFit(offer.fps.table, slug),
     fps: { games, table: offer.fps.table },
-    pricedAt: offer.hero.pricedAt,
+    pricedAt: snapshot?.publishedAt ?? null,
     neighbours: neighbours(offer.hero.builds, slug),
     switcher: prevNext(offer.hero.builds, slug),
     faq: faq.docs.map((q) => ({ id: q.id, question: q.question, answer: q.answer })),

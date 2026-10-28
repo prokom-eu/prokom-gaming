@@ -75,6 +75,7 @@ export function BuildHero({ data }: { data: BuildPageData }) {
           <p className="lore">{build.legend}</p>
           <a className="bp-src" href={build.legendSource.url} rel="noopener" target="_blank">
             Źródło: {build.legendSource.title}
+            <span className="sr-only"> (otwiera się w nowej karcie)</span>
           </a>
         </div>
       </div>
