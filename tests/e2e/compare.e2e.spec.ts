@@ -91,6 +91,25 @@ test('a visit without builds returns to the ones picked last time', async ({ pag
   await expect(page.locator('.cmp-slot .nm')).toHaveText(['Licho', 'Perun'])
 })
 
+test('opening the default view saves nothing; a return to it keeps syncing', async ({ page }) => {
+  // Review G11: the same three builds saved and shown must not stop the address from following.
+  await page.goto('/porownaj')
+  await expect(page).toHaveURL(/z=baba-jaga,wampir,weles/)
+  expect(await page.evaluate(() => localStorage.getItem('pkg:compare'))).toBeNull()
+  await page.evaluate(() =>
+    localStorage.setItem('pkg:compare', JSON.stringify(['baba-jaga', 'wampir', 'weles'])),
+  )
+  await page.goto('/porownaj')
+  await expect(page).toHaveURL(/z=baba-jaga,wampir,weles/)
+  await page.getByRole('radio', { name: '4K' }).click()
+  await expect(page).toHaveURL(/rozdz=4k/)
+  await page.getByRole('button', { name: 'Usuń Wampira z porównania' }).click()
+  await expect(page).toHaveURL(/z=baba-jaga,weles&/)
+  expect(await page.evaluate(() => localStorage.getItem('pkg:compare'))).toBe(
+    JSON.stringify(['baba-jaga', 'weles']),
+  )
+})
+
 test('not enough power: the suggestion goes into the comparison', async ({ page }) => {
   await page.goto('/porownaj?z=skrzat,licho&gra=cyberpunk-2077&rozdz=4k&hz=60')
   await expect(page.locator('.cmp-verdict h2')).toHaveText('Za mało mocy na ten monitor')

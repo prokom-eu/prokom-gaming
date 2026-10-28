@@ -210,6 +210,53 @@ describe('verdict and steps (board example: Cyberpunk 2077, 2K, 144 Hz)', () => 
   })
 })
 
+describe('verdict corner cases (review G11)', () => {
+  it('nobody reaches 60 in a heavy game: the text names 60, not the monitor', () => {
+    // Without the dearer builds in the data, no suggestion is possible.
+    const cheap = {
+      ...data,
+      builds: data.builds.filter((b) => ['skrzat', 'licho'].includes(b.slug)),
+    }
+    const idx = (slug: string) => data.builds.findIndex((b) => b.slug === slug)
+    const keep = [idx('skrzat'), idx('licho')]
+    const pickCols = (rows: (number | null)[][]) => rows.map((r) => keep.map((k) => r[k] ?? null))
+    const trimmed: CompareData = {
+      ...cheap,
+      fps: {
+        fullhd: pickCols(data.fps.fullhd),
+        qhd: pickCols(data.fps.qhd),
+        uhd: pickCols(data.fps.uhd),
+      },
+      kinds: {
+        fullhd: data.kinds.fullhd.map((k) => keep.map((i) => k[i]).join('')),
+        qhd: data.kinds.qhd.map((k) => keep.map((i) => k[i]).join('')),
+        uhd: data.kinds.uhd.map((k) => keep.map((i) => k[i]).join('')),
+      },
+    }
+    const v = compareView(
+      trimmed,
+      { ...board, slots: ['skrzat', 'licho'], resolution: 'uhd', hz: 144 },
+      false,
+    )!
+    expect(v.verdict.suggest).toBeNull()
+    expect(v.verdict.more).toMatch(/^Tu nawet Perun nie da pełnych 60 klatek\./)
+  })
+
+  it('no numbers at all: no promise, even for a capped game', () => {
+    const empty: CompareData = {
+      ...data,
+      fps: {
+        fullhd: data.fps.fullhd.map((r) => r.map(() => null)),
+        qhd: data.fps.qhd.map((r) => r.map(() => null)),
+        uhd: data.fps.uhd.map((r) => r.map(() => null)),
+      },
+    }
+    const v = compareView(empty, { ...board, game: 'elden-ring' }, false)!
+    expect(v.verdict.title).toBe('Brak wyników dla tej gry')
+    expect(v.verdict.text).not.toMatch(/płynne/)
+  })
+})
+
 describe('chart and matrix', () => {
   it('positions on a scale 12% above the highest of numbers, monitor and 60', () => {
     const v = view({})

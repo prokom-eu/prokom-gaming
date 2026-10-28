@@ -289,7 +289,19 @@ export function compareView(
     : 'płynna gra, powyżej 60 klatek'
   const res = RESOLUTION_LABELS[state.resolution]
   let verdict: Verdict
-  if (capped) {
+  if (withNumber.length === 0) {
+    // No number for these builds in this game: no promise either (ADR-G004).
+    // TODO(krystian): wording (not on the board).
+    verdict = {
+      color: null,
+      tone: 'low',
+      title: 'Brak wyników dla tej gry',
+      text: 'Brak wyników dla tych komputerów w tej grze.',
+      more: null,
+      suggest: null,
+      suggestName: null,
+    }
+  } else if (capped) {
     verdict = {
       color: null,
       tone: 'capped',
@@ -340,7 +352,7 @@ export function compareView(
         : 'Brak wyników dla tych komputerów w tej grze.',
       more: s
         ? `Do pełnej płynności w ${game.name} w ${res} wystarczy ${s.name} (Moc ${s.tierRoman}): ${sFps} klatek.`
-        : `Tu nawet Perun nie da pełnych ${state.hz} klatek. Zmniejsz ustawienia graficzne albo rozdzielczość: napisz, w co grasz, a podpowiemy, co ustawić.`,
+        : `Tu nawet Perun nie da pełnych ${target} klatek. Zmniejsz ustawienia graficzne albo rozdzielczość: napisz, w co grasz, a podpowiemy, co ustawić.`,
       suggest: s?.slug ?? null,
       suggestName: s?.accusative ?? null,
     }

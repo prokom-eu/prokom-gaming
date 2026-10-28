@@ -77,5 +77,13 @@ function CompareFor({
 }) {
   const initial = parseCompare(params, data)
   // A new address from a soft navigation (e.g. „Porównaj” on another build) starts a fresh state.
-  return <Compare key={compareQuery(initial)} data={data} initial={initial} siteUrl={siteUrl} />
+  return (
+    <Compare
+      key={compareQuery(initial)}
+      data={data}
+      initial={initial}
+      siteUrl={siteUrl}
+      fromLink={Boolean(params.z)}
+    />
+  )
 }

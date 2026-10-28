@@ -54,9 +54,12 @@ export function Compare({
   data,
   initial,
   siteUrl,
+  fromLink,
 }: {
   data: CompareData
   initial: CompareState
+  /** The address named the builds (`?z=`): a sent link or „Porównaj” on a build page. */
+  fromLink: boolean
   /** Absolute origin for the link that is sent (the same on the server and in the browser). */
   siteUrl: string
 }) {
@@ -66,28 +69,35 @@ export function Compare({
   const view = useMemo(() => compareView(data, state, showAll), [data, state, showAll])
   const query = compareQuery(state)
 
+  // Builds are saved (header counter, return visit) only once the visitor chose them: a link
+  // with `?z=` or a change on the page — merely opening the default view saves nothing.
+  const chosen = useRef(fromLink)
   const update = (patch: Partial<CompareState>) => {
+    chosen.current = true
     setState((s) => ({ ...s, ...patch }))
     setCopied(false)
   }
 
   // A visit without builds in the address returns to the ones picked last time: a new address,
-  // so the server renders them (the page remounts this component with the new state).
+  // so the server renders them (the page remounts this component with the new state). Only when
+  // they differ from this view — otherwise the address would not change and nothing remounts.
   const router = useRouter()
   // While that navigation runs, this (default) state must not overwrite the saved builds.
   const restoring = useRef(false)
   useEffect(() => {
-    if (new URLSearchParams(window.location.search).has('z')) return
+    if (fromLink) return
     const saved = savedSlots(data)
-    if (!saved) return
+    if (!saved || saved.join(',') === initial.slots.join(',')) return
     restoring.current = true
     router.replace(`${routes.compare}${compareQuery({ ...initial, slots: saved })}`)
-  }, [data, initial, router])
+  }, [data, fromLink, initial, router])
 
   useEffect(() => {
     if (restoring.current) return
     if (window.location.search !== query) window.history.replaceState(null, '', query)
-    if (writeItem(storageKeys.compare, JSON.stringify(state.slots))) notifyStorage()
+    if (chosen.current && writeItem(storageKeys.compare, JSON.stringify(state.slots))) {
+      notifyStorage()
+    }
   }, [query, state.slots])
 
   if (!view) return null
@@ -307,14 +317,16 @@ export function Compare({
                     : colorOf(view.verdict.color),
               } as CSSProperties
             }
-            role="status"
           >
             <div className="cmp-verdict__key">
               Werdykt dla: {view.game.name}, {res}, monitor {state.hz} Hz
             </div>
-            <h2 className="h">{view.verdict.title}</h2>
-            <p>{view.verdict.text}</p>
-            {view.verdict.more && <p className="cmp-verdict__more">{view.verdict.more}</p>}
+            {/* Announced on change: the verdict itself, not the buttons and „Jak to liczymy?”. */}
+            <div role="status">
+              <h2 className="h">{view.verdict.title}</h2>
+              <p>{view.verdict.text}</p>
+              {view.verdict.more && <p className="cmp-verdict__more">{view.verdict.more}</p>}
+            </div>
             {view.verdict.suggest && (
               <button
                 type="button"
@@ -418,13 +430,20 @@ export function Compare({
               <li className="cmp-legend--ok">płynnie, 60 i więcej</li>
               <li className="cmp-legend--full">wykorzystuje monitor {state.hz} Hz</li>
             </ul>
-            <table className="cmp-table cmp-table--matrix" style={{ '--n': n } as CSSProperties}>
+            <table
+              role="table"
+              className="cmp-table cmp-table--matrix"
+              style={{ '--n': n } as CSSProperties}
+            >
               <caption className="sr-only">Klatki we wszystkich grach, {res}</caption>
-              <thead>
-                <tr>
-                  <th scope="col">Gra</th>
+              <thead role="rowgroup">
+                <tr role="row">
+                  <th role="columnheader" scope="col">
+                    Gra
+                  </th>
                   {view.builds.map((b, i) => (
                     <th
+                      role="columnheader"
                       key={`${i}-${b.slug}`}
                       scope="col"
                       style={{ '--c': colorOf(b.slug) } as CSSProperties}
@@ -434,15 +453,19 @@ export function Compare({
                   ))}
                 </tr>
               </thead>
-              <tbody>
+              <tbody role="rowgroup">
                 {view.matrix.map((row) => (
-                  <tr key={row.game} className={row.selected ? 'cmp-row--sel' : undefined}>
-                    <th scope="row">
+                  <tr
+                    role="row"
+                    key={row.game}
+                    className={row.selected ? 'cmp-row--sel' : undefined}
+                  >
+                    <th role="rowheader" scope="row">
                       {row.name}
                       <small>{row.kind}</small>
                     </th>
                     {row.cells.map((cell, i) => (
-                      <td key={i}>
+                      <td role="cell" key={i}>
                         <span className={`cmp-cell cmp-cell--${cell.tone}`}>
                           {cell.value}
                           {cell.kind && (
@@ -473,13 +496,18 @@ export function Compare({
                 zestawie.
               </p>
             </div>
-            <table className="cmp-table cmp-table--spec" style={{ '--n': n } as CSSProperties}>
+            <table
+              role="table"
+              className="cmp-table cmp-table--spec"
+              style={{ '--n': n } as CSSProperties}
+            >
               <caption className="sr-only">Podzespoły porównywanych komputerów</caption>
-              <thead>
-                <tr>
-                  <td />
+              <thead role="rowgroup">
+                <tr role="row">
+                  <td role="cell" />
                   {view.builds.map((b, i) => (
                     <th
+                      role="columnheader"
                       key={`${i}-${b.slug}`}
                       scope="col"
                       style={{ '--c': colorOf(b.slug) } as CSSProperties}
@@ -489,24 +517,29 @@ export function Compare({
                   ))}
                 </tr>
               </thead>
-              <tbody>
+              <tbody role="rowgroup">
                 {view.spec.map((row) =>
                   'group' in row ? (
                     row.hidden ? null : (
-                      <tr key={row.group} className="cmp-row--group">
-                        <th scope="colgroup" colSpan={n + 1}>
+                      <tr role="row" key={row.group} className="cmp-row--group">
+                        <th role="rowheader" scope="colgroup" colSpan={n + 1}>
                           {row.group}
                         </th>
                       </tr>
                     )
                   ) : row.hidden ? null : (
-                    <tr key={row.label} className={row.same ? 'cmp-row--same' : undefined}>
-                      <th scope="row">
+                    <tr
+                      role="row"
+                      key={row.label}
+                      className={row.same ? 'cmp-row--same' : undefined}
+                    >
+                      <th role="rowheader" scope="row">
                         {row.label}
                         {row.hint && <small>{row.hint}</small>}
                       </th>
                       {row.values.map((v, i) => (
                         <td
+                          role="cell"
                           key={i}
                           className={
                             v.tone ? `cmp-spec--${v.tone.replace(' ', ' cmp-spec--')}` : undefined
