@@ -169,7 +169,13 @@
 
 /* ---------- picks on a game page (creature cards, board KomputerDo `.kd7-p`) ---------- */
 .gm-cards {
-  margin-top: 34px;
+  margin: 34px 0 0;
+  padding: 0;
+  list-style: none;
+}
+/* The screen-reader tag is absolutely positioned: anchored here, it cannot widen the page. */
+.gm-cards > li {
+  position: relative;
 }
 @media (min-width: 761px) {
   .gm-cards.hscroll {
@@ -470,5 +476,56 @@
   }
   .gm-pick:hover {
     transform: none;
+  }
+}
+
+/* ---------- game page (board KomputerDo `.kd7`, `.sh7`) ---------- */
+.gm-body--game {
+  padding: 70px 0 0;
+}
+.gm-body--game .gm-body__head {
+  align-items: flex-end;
+  gap: 40px;
+}
+.gm-body--game .gm-body__head h2 {
+  max-width: 620px;
+  font-size: 50px;
+  color: var(--kosc-hi);
+}
+.gm-body__head--tiers {
+  margin-top: 90px;
+}
+.gm-more {
+  padding: 0 0 110px;
+  background: var(--sec-a);
+}
+.gm-info--faq {
+  grid-template-columns: minmax(0, 860px);
+}
+@media (max-width: 760px) {
+  .gm-body--game {
+    padding-top: 40px;
+  }
+  .gm-body--game .gm-body__head {
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .gm-body--game .gm-body__head h2 {
+    font-size: 34px;
+  }
+  .gm-body__head--tiers {
+    margin-top: 50px;
+  }
+  .gm-more {
+    padding-bottom: 60px;
+  }
+}
+.gm-head--game h1 {
+  max-width: 760px;
+  font-size: 68px;
+}
+@media (max-width: 700px) {
+  .gm-head--game h1 {
+    font-size: 40px;
   }
 }
