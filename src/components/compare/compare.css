@@ -530,7 +530,7 @@
   font-weight: 700;
   font-size: 17px;
   text-transform: uppercase;
-  color: var(--c);
+  color: color-mix(in srgb, var(--c) 75%, var(--white));
 }
 .cmp-chart__track {
   position: relative;
@@ -582,7 +582,7 @@
 .cmp-steps b {
   font-size: 20px;
   font-weight: 800;
-  color: var(--c);
+  color: color-mix(in srgb, var(--c) 75%, var(--white));
 }
 .cmp-steps em {
   font-style: normal;
@@ -657,7 +657,7 @@
   font-size: 15px;
   text-align: center;
   text-transform: uppercase;
-  color: var(--c);
+  color: color-mix(in srgb, var(--c) 75%, var(--white));
 }
 .cmp-table thead th:first-child {
   width: 34%;

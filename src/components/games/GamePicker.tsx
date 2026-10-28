@@ -47,7 +47,7 @@ export function GamePicker({ data, initial }: { data: PickerData; initial: Picke
     <>
       <header className="gm-head" data-scene-top>
         <div className="wrap">
-          <h1 className="h">Komputer do {current.name}</h1>
+          <h1 className="h">{`Komputer do ${current.name}`}</h1>
           <p className="gm-lead">
             Wybierz grę i monitor. Pokażemy klatki w każdym poziomie mocy, trzy zestawy, które mają
             sens, i to, skąd pochodzi każdy wynik.

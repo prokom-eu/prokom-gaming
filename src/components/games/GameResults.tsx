@@ -28,7 +28,7 @@ export function GameResults({ data, game }: { data: PickerData; game: GameInfo }
     <>
       <header className="gm-head gm-head--game" data-scene-top>
         <div className="wrap">
-          <h1 className="h">Komputer do {game.name}</h1>
+          <h1 className="h">{`Komputer do ${game.name}`}</h1>
           <p className="gm-lead">{gameLead(game)}</p>
           <Segmented
             label="Rozdzielczość monitora"

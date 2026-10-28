@@ -132,7 +132,12 @@ export function Compare({
           <label className="cmp-field">
             <span>Gra</span>
             <span className="cmp-select">
-              <select value={state.game} onChange={(e) => update({ game: e.target.value })}>
+              {/* Named on its own: the visible label is hidden on narrow screens (board). */}
+              <select
+                aria-label="Gra"
+                value={state.game}
+                onChange={(e) => update({ game: e.target.value })}
+              >
                 {data.games.map((g) => (
                   <option key={g.slug} value={g.slug}>
                     {g.name}

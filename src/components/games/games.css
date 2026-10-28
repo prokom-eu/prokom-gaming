@@ -211,7 +211,8 @@
 .gm-tier__name b {
   display: block;
   font-size: 15px;
-  color: var(--c);
+  /* Lightened like the creature texts elsewhere: Wampir's red is < 4.5:1 as small text. */
+  color: color-mix(in srgb, var(--c) 75%, var(--white));
 }
 .gm-tier__name span {
   font-size: 13px;
