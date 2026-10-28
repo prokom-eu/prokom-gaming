@@ -1,0 +1,1213 @@
+/* Configurator `/konfigurator` (spec. §7): sizes from the boards Konfigurator / Konfigurator-telefon
+   (`.k2`, `.k2-steps`, `.mons`, `.reco`, `.tr`, `.og`/`.oc`, `.mg`/`.mc`, `.match`, `.sl`, `.sb`,
+   `.toast`, `.mbar`). Colours only from tokens.css; `--c` is the level's creature colour and `--lc`
+   the chosen light, both set on `.cf`. */
+
+.cf {
+  position: relative;
+  padding: 44px 0 110px;
+  background:
+    radial-gradient(
+      55% 45% at 85% 12%,
+      color-mix(in srgb, var(--c) 14%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      40% 30% at 10% 90%,
+      color-mix(in srgb, var(--grom) 5%, transparent),
+      transparent 70%
+    ),
+    var(--sec-a);
+  transition: background 0.6s;
+  scroll-margin-top: 80px;
+}
+.cf--empty {
+  min-height: 60vh;
+}
+
+/* ---------- top: title and steps ---------- */
+.cf-top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 26px;
+}
+.cf-top h1 {
+  margin: 0;
+  font-size: 64px;
+}
+.cf-lead {
+  margin: 10px 0 0;
+  max-width: 720px;
+  font-size: 17px;
+  color: var(--cf-lead);
+}
+.cf-steps {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.cf-steps button {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 30px 1fr;
+  grid-template-rows: auto auto;
+  column-gap: 10px;
+  align-items: center;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  background: var(--cf-step-bg);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.2s,
+    background 0.2s;
+}
+.cf-steps em {
+  grid-row: 1 / 3;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--kosc) 7%, transparent);
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 800;
+  color: var(--cf-pill);
+}
+.cf-steps span {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--cf-step-name);
+  white-space: nowrap;
+}
+.cf-steps small {
+  font-size: 12px;
+  color: var(--cf-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cf-steps .is-done em {
+  background: color-mix(in srgb, var(--c) 25%, transparent);
+  color: var(--c);
+}
+.cf-steps .is-on {
+  border-color: var(--grom);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--grom) 14%, transparent),
+    var(--cf-step-bg)
+  );
+}
+.cf-steps .is-on em {
+  background: var(--grom);
+  color: var(--on-grom);
+}
+
+/* ---------- layout ---------- */
+.cf-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 400px;
+  gap: 36px;
+  align-items: start;
+  margin-top: 34px;
+}
+.cf-grid > * {
+  min-width: 0;
+}
+.cf-step h2 {
+  margin: 0;
+  font-size: 44px;
+  outline: none;
+}
+.cf-mut {
+  margin: 8px 0 0;
+  max-width: 760px;
+  font-size: 16px;
+  color: var(--sec-desc);
+}
+.cf-lbl {
+  display: block;
+  margin: 28px 0 12px;
+  padding: 0;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--foot-head);
+}
+.cf-fine {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  margin-top: 16px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--cf-dim);
+}
+.cf-fine svg {
+  flex: none;
+  margin-top: 2px;
+}
+.cf-nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 36px;
+  padding-top: 22px;
+  border-top: 1px solid var(--line);
+}
+.cf-nav > :last-child {
+  margin-left: auto;
+}
+.cf-nav .btn[disabled] {
+  opacity: 0.3;
+  cursor: not-allowed;
+  transform: none;
+}
+.cf-back {
+  transform: rotate(180deg);
+}
+
+/* ---------- step 1: monitor, games, recommendation ---------- */
+.cf-mons {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+.cf-mon {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 20px 22px;
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, var(--panel-from), var(--cf-end));
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.cf-mon b {
+  font-family: var(--font-head);
+  font-size: 24px;
+}
+.cf-mon span {
+  font-size: 13.5px;
+  color: var(--mgla);
+}
+.cf-mon[aria-pressed='true'] {
+  border-color: var(--grom);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--grom) 12%, transparent),
+    var(--cf-end)
+  );
+}
+.cf-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.cf-reco {
+  margin-top: 30px;
+  padding: 24px 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  border: 1px solid color-mix(in srgb, var(--rc) 45%, transparent);
+  background: linear-gradient(
+    100deg,
+    color-mix(in srgb, var(--rc) 14%, var(--cf-end)),
+    var(--cf-end) 70%
+  );
+}
+.cf-reco__k {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 800;
+  color: var(--rc);
+}
+.cf-reco__name {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+}
+.cf-reco__sigil {
+  color: var(--rc);
+}
+.cf-reco__name b {
+  font-size: 36px;
+  color: var(--rc);
+  text-shadow: 0 0 28px color-mix(in srgb, var(--rc) 60%, transparent);
+}
+.cf-reco em {
+  display: block;
+  margin-top: 6px;
+  font-size: 15px;
+  font-style: normal;
+  color: var(--link-text);
+}
+.cf-reco__why {
+  display: block;
+  margin-top: 6px;
+  font-size: 13.5px;
+  color: var(--mgla);
+}
+.cf-reco__r {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+}
+.cf-reco__p {
+  font-size: 14px;
+  color: var(--sec-desc);
+}
+.cf-reco__p b {
+  font-size: 26px;
+  color: var(--kosc);
+}
+
+/* ---------- step 2: tiers ---------- */
+.cf-tiers {
+  display: grid;
+  gap: 10px;
+  margin: 24px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.cf-tier {
+  border: 1px solid var(--line);
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--tc) 7%, var(--panel-to)),
+    var(--panel-to) 55%
+  );
+  transition:
+    border-color 0.25s,
+    box-shadow 0.25s;
+}
+.cf-tier.is-on {
+  border-color: var(--tc);
+  box-shadow:
+    0 0 0 1px var(--tc),
+    0 18px 50px -24px var(--tc);
+}
+.cf-tier__h {
+  display: grid;
+  grid-template-columns: 190px 1fr auto;
+  gap: 16px;
+  align-items: center;
+  padding: 12px 18px 0;
+}
+.cf-tier__n b {
+  display: block;
+  font-size: 14.5px;
+  font-weight: 800;
+  color: var(--hero-spec);
+}
+.cf-tier__n span {
+  font-size: 12.5px;
+  color: var(--cf-dim);
+}
+.cf-tier__v {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  grid-column: 2;
+}
+.cf-tier__v button {
+  padding: 5px 12px;
+  min-height: 32px;
+  border-radius: var(--radius-pill);
+  border: 1px solid color-mix(in srgb, var(--kosc) 16%, transparent);
+  background: none;
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 800;
+  color: var(--cf-pill);
+  cursor: pointer;
+}
+/* The board puts dark text on the pure creature colour; on red (Wampir) that is 4.4:1 < AA, so
+   the fill is lightened a quarter towards bone: ≥ 5.9:1 for every creature. */
+.cf-tier__v button[aria-pressed='true'] {
+  background: color-mix(in srgb, var(--vc) 75%, var(--kosc));
+  border-color: var(--vc);
+  color: var(--cf-ink);
+}
+.cf-tier__v button.is-pre {
+  border-color: var(--vc);
+  color: var(--vc);
+}
+.cf-tier__p {
+  grid-column: 3;
+  text-align: right;
+}
+.cf-tier__p span {
+  margin-right: 6px;
+  font-size: 12px;
+  color: var(--cf-dim);
+}
+.cf-tier__p b {
+  font-size: 18px;
+}
+.cf-tier__b {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 52px minmax(250px, 1.5fr) minmax(0, 1.2fr) 150px 112px;
+  gap: 18px;
+  align-items: center;
+  padding: 12px 18px 16px;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.cf-tier__sigil {
+  color: var(--tc);
+  filter: drop-shadow(0 0 10px color-mix(in srgb, var(--tc) 50%, transparent));
+}
+.cf-tier__m b {
+  display: block;
+  font-size: 24px;
+  color: var(--tc);
+}
+.cf-tier__m span {
+  display: block;
+  margin-top: 4px;
+  font-size: 14.5px;
+  font-weight: 700;
+}
+.cf-tier__m small {
+  display: block;
+  font-size: 12.5px;
+  color: var(--cf-dim);
+}
+.cf-tier__f {
+  display: flex;
+  gap: 6px;
+}
+.cf-fp {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  padding: 7px 8px;
+  border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--shadow) 20%, transparent);
+}
+.cf-fp i {
+  display: block;
+  font-size: 11px;
+  font-style: normal;
+  color: var(--cf-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cf-fp b {
+  font-size: 16px;
+  color: var(--tc);
+}
+.cf-srcdot {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  display: block;
+}
+.cf-srcdot i {
+  display: block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+.cf-srcdot.src--pk i {
+  background: var(--src-pk);
+}
+.cf-srcdot.src--ind i {
+  background: var(--src-ind);
+}
+.cf-srcdot.src--est i {
+  background: var(--src-est);
+}
+.cf-tier__up {
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: var(--sec-desc);
+}
+.cf-tier__ok {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: var(--radius-pill);
+  border: 1px solid color-mix(in srgb, var(--kosc) 20%, transparent);
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--nav-text);
+}
+.cf-tier.is-on .cf-tier__ok {
+  background: color-mix(in srgb, var(--tc) 75%, var(--kosc));
+  border-color: var(--tc);
+  color: var(--cf-ink);
+}
+
+/* ---------- steps 3–4: option cards ---------- */
+.cf-flt {
+  margin-top: 20px;
+}
+.cf-seg {
+  display: inline-flex;
+  margin-top: 20px;
+  padding: 4px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--line);
+}
+.cf-seg button {
+  min-height: 40px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: none;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--cf-pill);
+  cursor: pointer;
+}
+.cf-seg button[aria-pressed='true'] {
+  background: var(--grom);
+  color: var(--on-grom);
+}
+.cf-og {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 20px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.cf-oc {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, var(--cf-tile), var(--panel-to));
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.2s,
+    transform 0.2s;
+}
+.cf-oc:hover:not([aria-disabled='true']) {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--kosc) 28%, transparent);
+}
+.cf-oc[aria-pressed='true'] {
+  border-color: var(--grom);
+  box-shadow:
+    0 0 0 1px var(--grom),
+    0 16px 40px -20px color-mix(in srgb, var(--grom) 60%, transparent);
+}
+.cf-oc[aria-disabled='true'] {
+  cursor: not-allowed;
+}
+.cf-oc[aria-disabled='true'] > :not(.cf-oc__x) {
+  opacity: 0.35;
+}
+.cf-oc__img {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: 170px;
+  overflow: hidden;
+  background:
+    radial-gradient(
+      closest-side at 50% 58%,
+      color-mix(in srgb, var(--c) 22%, transparent),
+      transparent
+    ),
+    linear-gradient(180deg, var(--avatar-bg), var(--cf-img-to));
+}
+.cf-oc__img img {
+  width: auto;
+  max-width: 88%;
+  height: auto;
+  max-height: 150px;
+  object-fit: contain;
+  filter: drop-shadow(0 14px 18px color-mix(in srgb, var(--shadow) 60%, transparent));
+}
+.cf-oc__tag {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--grom);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 800;
+  color: var(--on-grom);
+}
+.cf-oc__t b {
+  display: block;
+  font-size: 15px;
+  line-height: 1.3;
+}
+.cf-oc__t span {
+  display: block;
+  margin-top: 3px;
+  font-size: 12.5px;
+  color: var(--mgla);
+}
+.cf-oc__s {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.cf-oc__s i {
+  padding: 3px 8px;
+  border: 1px solid var(--line);
+  font-size: 11.5px;
+  font-style: normal;
+  color: var(--cf-spec);
+}
+.cf-oc__p {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-top: auto;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+.cf-oc__p b {
+  font-size: 17px;
+}
+.cf-oc__p small {
+  font-size: 12px;
+  color: var(--cf-dim);
+}
+.cf-oc[aria-pressed='true'] .cf-oc__p b {
+  color: var(--grom);
+}
+.cf-oc__x {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--cf-err);
+}
+
+/* light colour (look of `.bp-lights`, board Zestaw) */
+.cf-lights {
+  margin: 28px 0 0;
+  padding: 0;
+  border: 0;
+}
+/* A legend ignores vertical margins inside a fieldset: the fieldset carries the space. */
+.cf-lights .cf-lbl {
+  margin: 0 0 12px;
+}
+.cf-lights__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.cf-lights__row button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 56px;
+  padding: 8px 6px;
+  border: 1px solid var(--line);
+  background: none;
+  color: var(--cf-pill);
+  font: inherit;
+  cursor: pointer;
+}
+.cf-lights__row i {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--lc);
+  box-shadow: 0 0 12px var(--lc);
+}
+.cf-lights__row small {
+  font-size: 12px;
+}
+.cf-lights__row button[aria-pressed='true'] {
+  border-color: var(--grom);
+  color: var(--kosc);
+}
+
+/* ---------- step 5: memory and disk ---------- */
+.cf-mg {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.cf-mc {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, var(--cf-tile), var(--panel-to));
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.cf-mc b {
+  font-family: var(--font-head);
+  font-size: 26px;
+}
+.cf-mc span {
+  font-size: 12.5px;
+  color: var(--cf-spec);
+}
+.cf-mc em {
+  font-size: 12.5px;
+  font-style: normal;
+  color: var(--cf-dim);
+}
+.cf-mc strong {
+  margin-top: 8px;
+  font-size: 16px;
+}
+.cf-mc small {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--cf-err);
+}
+.cf-mc[aria-pressed='true'] {
+  border-color: var(--grom);
+  box-shadow: 0 0 0 1px var(--grom);
+}
+.cf-mc[aria-pressed='true'] strong {
+  color: var(--grom);
+}
+.cf-mc[aria-disabled='true'] {
+  cursor: not-allowed;
+}
+.cf-mc[aria-disabled='true'] > :not(small) {
+  opacity: 0.35;
+}
+
+/* ---------- step 6: summary ---------- */
+.cf-match {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-top: 24px;
+  padding: 18px 22px;
+  border: 1px solid color-mix(in srgb, var(--c) 40%, transparent);
+  background: linear-gradient(
+    100deg,
+    color-mix(in srgb, var(--c) 12%, var(--cf-end)),
+    var(--cf-end) 70%
+  );
+}
+.cf-match__sigil {
+  color: var(--c);
+}
+.cf-match div > b {
+  display: block;
+  font-size: 20px;
+}
+.cf-match div > span {
+  display: block;
+  margin-top: 2px;
+  font-size: 14px;
+  color: var(--sec-desc);
+}
+.cf-sum {
+  margin: 18px 0 0;
+  border-top: 1px solid var(--line);
+}
+.cf-sum__row {
+  display: grid;
+  grid-template-columns: 150px 1fr auto;
+  gap: 16px;
+  align-items: baseline;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--line);
+}
+.cf-sum dt {
+  font-size: 13.5px;
+  color: var(--mgla);
+}
+.cf-sum dd {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+.cf-sum .cf-sum__p {
+  white-space: nowrap;
+}
+.cf-sum__row.is-total dt {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--kosc);
+}
+.cf-sum__row.is-total dd {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--mgla);
+}
+.cf-sum__row.is-total .cf-sum__p {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--grom);
+}
+.cf-promises {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 20px;
+  margin: 20px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 14px;
+  color: var(--sec-text);
+}
+.cf-promises li {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.cf-promises svg {
+  flex: none;
+  color: var(--grom);
+}
+.cf-ta {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid color-mix(in srgb, var(--kosc) 16%, transparent);
+  background: color-mix(in srgb, var(--shadow) 25%, transparent);
+  color: var(--kosc);
+  font: inherit;
+  font-size: 15px;
+  resize: vertical;
+}
+.cf-ta::placeholder {
+  color: var(--cf-dim);
+}
+.cf-fin {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 22px;
+}
+.cf-sms {
+  margin: 10px 0 0;
+  font-size: 13.5px;
+}
+.cf-sms a {
+  color: var(--sec-desc);
+}
+
+/* ---------- preview (side) ---------- */
+.cf-side {
+  position: sticky;
+  top: 90px;
+}
+.cf-sb {
+  padding: 0 0 20px;
+  overflow: hidden;
+  background: linear-gradient(180deg, var(--panel-from), var(--panel-to));
+}
+.cf-sb__stage {
+  position: relative;
+  height: 250px;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(
+      closest-side at 50% 62%,
+      color-mix(in srgb, var(--glow) 32%, transparent),
+      transparent
+    ),
+    linear-gradient(180deg, var(--cf-stage-from), var(--panel-to));
+  transition: background 0.4s;
+}
+.cf-sb__glow {
+  position: absolute;
+  bottom: 20px;
+  left: 22%;
+  right: 22%;
+  height: 16px;
+  border-radius: 50%;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--glow) 75%, transparent),
+    transparent
+  );
+  filter: blur(5px);
+}
+.cf-sb__img {
+  position: relative;
+  width: auto;
+  max-width: 80%;
+  height: auto;
+  max-height: 210px;
+  object-fit: contain;
+  filter: drop-shadow(0 16px 22px color-mix(in srgb, var(--shadow) 60%, transparent));
+  animation: cf-hov 6s ease-in-out infinite;
+}
+@keyframes cf-hov {
+  50% {
+    transform: translateY(-7px);
+  }
+}
+.cf-sb__h {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 16px 22px 0;
+}
+.cf-sb__sigil {
+  color: var(--c);
+}
+.cf-sb__h div > b {
+  display: block;
+  font-size: 22px;
+  color: var(--c);
+}
+.cf-sb__h div > span {
+  display: block;
+  font-size: 13px;
+  color: var(--sec-desc);
+}
+.cf-sb__l {
+  margin: 14px 22px 0;
+  padding: 0;
+  list-style: none;
+}
+.cf-sb__l li {
+  display: grid;
+  grid-template-columns: 86px 1fr auto;
+  gap: 10px;
+  align-items: baseline;
+  padding: 8px 0;
+  border-top: 1px solid var(--line);
+  font-size: 13px;
+}
+.cf-sb__l span {
+  color: var(--cf-dim);
+}
+.cf-sb__l em {
+  font-style: normal;
+  line-height: 1.35;
+  color: var(--cf-step-name);
+}
+.cf-sb__l b {
+  font-size: 13px;
+  white-space: nowrap;
+}
+.cf-sb__fps {
+  margin: 14px 22px 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+.cf-sb__fps > b {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 13.5px;
+}
+.cf-fr {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 2px 10px;
+  padding: 6px 0;
+}
+.cf-fr > span {
+  font-size: 13px;
+}
+.cf-fr > b {
+  font-size: 13px;
+  color: var(--c);
+}
+.cf-fr i {
+  grid-column: 1 / 3;
+  height: 4px;
+  border-radius: 3px;
+  background: var(--fps-track);
+}
+.cf-fr s {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+  background: var(--c);
+  box-shadow: 0 0 8px var(--c);
+  transition: width 0.5s;
+}
+.cf-fr .src {
+  grid-column: 1 / 3;
+  font-size: 11.5px;
+}
+.cf-sb__fps small {
+  font-size: 11.5px;
+  color: var(--cf-small);
+}
+.cf-sb__p {
+  margin: 14px 22px 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+.cf-tag {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--kosc) 8%, transparent);
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--cf-pill);
+}
+.cf-tag.is-exact {
+  background: color-mix(in srgb, var(--c) 22%, transparent);
+  color: var(--c);
+}
+.cf-sb__p > b {
+  display: block;
+  margin-top: 8px;
+  font-size: 36px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+.cf-sb__p small {
+  display: block;
+  margin: 2px 0 14px;
+  font-size: 12.5px;
+  color: var(--sec-desc);
+}
+.cf-wide {
+  width: 100%;
+}
+
+/* ---------- message after a level change (board `.toast`) ---------- */
+.cf-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  /* Above the phone bar (240). */
+  z-index: 250;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: min(680px, calc(100vw - 32px));
+  padding: 14px 16px 14px 18px;
+  border: 1px solid color-mix(in srgb, var(--grom) 45%, transparent);
+  background: var(--cf-toast-bg);
+  box-shadow: 0 20px 60px -20px var(--shadow);
+  font-size: 14px;
+  color: var(--cf-toast-text);
+  transform: translateX(-50%);
+  animation: cf-toast-in 0.3s ease;
+}
+.cf-toast p {
+  margin: 0;
+}
+.cf-toast button {
+  flex: none;
+  min-width: 44px;
+  min-height: 44px;
+  margin-left: auto;
+  border: 0;
+  background: none;
+  color: var(--sec-desc);
+  cursor: pointer;
+}
+@keyframes cf-toast-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 10px);
+  }
+}
+
+/* ---------- phone bar (hidden on desktop) ---------- */
+.cf-mbar {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cf,
+  .cf * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+@media (max-width: 1100px) {
+  .cf-grid {
+    grid-template-columns: 1fr;
+  }
+  .cf-side {
+    position: static;
+  }
+  .cf-og,
+  .cf-mg {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .cf-tier__b {
+    grid-template-columns: 44px 1fr;
+    row-gap: 10px;
+  }
+  .cf-tier__f,
+  .cf-tier__up,
+  .cf-tier__ok {
+    grid-column: 1 / 3;
+  }
+  .cf-tier__h {
+    grid-template-columns: 1fr auto;
+  }
+  .cf-tier__v {
+    grid-column: 1 / 3;
+    grid-row: 2;
+  }
+  .cf-tier__p {
+    grid-column: 2;
+    grid-row: 1;
+  }
+}
+
+/* Phone (ADR-G003 §4, `stany/tel-07`, `tel-08`): steps as a scrolled row, no side panel, the price
+   and „Dalej” above the tab bar. */
+@media (max-width: 760px) {
+  .cf {
+    padding: 24px 0 170px;
+  }
+  .cf-top h1 {
+    font-size: 40px;
+  }
+  .cf-steps {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    scroll-snap-type: x proximity;
+  }
+  .cf-steps li {
+    flex: none;
+    scroll-snap-align: start;
+  }
+  .cf-steps button {
+    min-width: 150px;
+    min-height: 52px;
+    padding: 10px 12px;
+  }
+  .cf-steps small {
+    display: none;
+  }
+  .cf-step h2 {
+    font-size: 32px;
+  }
+  .cf-mons {
+    grid-template-columns: 1fr;
+  }
+  .cf-reco {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .cf-reco__r {
+    align-items: stretch;
+    width: 100%;
+  }
+  .cf-og {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .cf-oc {
+    padding: 10px;
+  }
+  .cf-oc__img {
+    height: 120px;
+  }
+  .cf-oc__img img {
+    max-height: 104px;
+  }
+  .cf-oc__s {
+    display: none;
+  }
+  .cf-mg {
+    grid-template-columns: 1fr 1fr;
+  }
+  .cf-sum__row {
+    grid-template-columns: 1fr auto;
+  }
+  .cf-sum dt {
+    grid-column: 1 / 3;
+  }
+  .cf-promises {
+    grid-template-columns: 1fr;
+  }
+  .cf-fin .btn {
+    width: 100%;
+  }
+  .cf-side {
+    display: none;
+  }
+  .cf-fp i {
+    font-size: 10px;
+  }
+  .cf-tier__p b {
+    font-size: 15px;
+  }
+  .cf-tier__ok {
+    width: 100%;
+  }
+  .cf-mbar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom));
+    z-index: 240;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-top: 1px solid color-mix(in srgb, var(--grom) 30%, transparent);
+    background: var(--cf-mbar-bg);
+    backdrop-filter: blur(10px);
+  }
+  .cf-mbar small {
+    display: block;
+    font-size: 12px;
+    color: var(--sec-desc);
+  }
+  .cf-mbar b {
+    font-size: 22px;
+  }
+  .cf-mbar .btn {
+    min-height: 46px;
+    padding: 0 18px;
+    font-size: 14px;
+  }
+  .cf-toast {
+    bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 84px);
+  }
+  /* Touch targets ≥ 44 px (ADR-G003 §4). */
+  .cf-tier__v button,
+  .cf-seg button {
+    min-height: 44px;
+  }
+}
