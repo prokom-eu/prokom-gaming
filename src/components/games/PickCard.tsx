@@ -15,11 +15,14 @@ export function PickCard({
   card,
   fpsText,
   kind,
+  eager = false,
 }: {
   tag: PickTag
   card: PickCardData
   fpsText: string
   kind: FpsKind
+  /** The first card: loaded at once, the scene first (LCP). */
+  eager?: boolean
 }) {
   return (
     <Link
@@ -35,11 +38,19 @@ export function PickCard({
           alt=""
           width={560}
           height={320}
+          loading={eager ? 'eager' : 'lazy'}
+          fetchPriority={eager ? 'high' : undefined}
         />
         <span className="gm-pick__fade" />
         {card.photo && (
           <span className="gm-pick__photo">
-            <Image src={card.photo.src} alt="" width={300} height={341} />
+            <Image
+              src={card.photo.src}
+              alt=""
+              width={300}
+              height={341}
+              loading={eager ? 'eager' : 'lazy'}
+            />
           </span>
         )}
       </span>

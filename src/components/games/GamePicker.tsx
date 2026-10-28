@@ -88,7 +88,7 @@ export function GamePicker({ data, initial }: { data: PickerData; initial: Picke
 
           {picks.length > 0 && (
             <HScroll className="gm-picks" aria-label="Polecane zestawy">
-              {picks.map((p) => {
+              {picks.map((p, i) => {
                 const card = data.cards[p.slug]
                 if (!card) return null
                 return (
@@ -98,6 +98,7 @@ export function GamePicker({ data, initial }: { data: PickerData; initial: Picke
                     card={card}
                     fpsText={fpsText(p.fps, current)}
                     kind={p.kind}
+                    eager={i === 0}
                   />
                 )
               })}

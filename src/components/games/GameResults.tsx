@@ -57,13 +57,14 @@ export function GameResults({ data, game }: { data: PickerData; game: GameInfo }
                 </p>
               </div>
               <HScroll as="ul" className="gm-cards" aria-label={`Polecane na monitor ${label}`}>
-                {picks.map((p) => {
+                {picks.map((p, i) => {
                   const card = data.cards[p.slug]
                   if (!card) return null
                   return (
                     <li key={p.tag}>
                       <span className="sr-only">{p.tag}: </span>
                       <CreatureCardView
+                        eager={i === 0}
                         card={card}
                         fps={{
                           label: `${game.name}, ${label}`,

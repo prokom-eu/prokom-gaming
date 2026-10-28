@@ -212,11 +212,14 @@ export function Compare({
                       alt=""
                       width={560}
                       height={320}
+                      // All slots are above the fold; the first scene is the likely LCP.
+                      loading="eager"
+                      fetchPriority={i === 0 ? 'high' : undefined}
                     />
                     <span className="cmp-slot__fade" aria-hidden="true" />
                     {b.photo && (
                       <span className="cmp-slot__photo" aria-hidden="true">
-                        <Image src={b.photo.src} alt="" width={240} height={273} />
+                        <Image src={b.photo.src} alt="" width={240} height={273} loading="eager" />
                       </span>
                     )}
                     <span className="cmp-slot__sigil" aria-hidden="true">

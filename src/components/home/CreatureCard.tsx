@@ -36,9 +36,12 @@ export type CreatureCardFps = { label: string; text: string; kind: FpsKind }
 export function CreatureCardView({
   card,
   fps,
+  eager = false,
 }: {
   card: CreatureCardData
   fps: CreatureCardFps | null
+  /** Above the fold (the first card of a game page): loaded at once, the scene first. */
+  eager?: boolean
 }) {
   return (
     <Link
@@ -55,11 +58,19 @@ export function CreatureCardView({
           alt=""
           width={580}
           height={331}
+          loading={eager ? 'eager' : 'lazy'}
+          fetchPriority={eager ? 'high' : undefined}
         />
         <span className="hm-card__glow" />
         {card.photo && (
           <span className="hm-card__photo">
-            <Image src={card.photo.src} alt="" width={240} height={273} />
+            <Image
+              src={card.photo.src}
+              alt=""
+              width={240}
+              height={273}
+              loading={eager ? 'eager' : 'lazy'}
+            />
           </span>
         )}
         <span className="hm-card__sigil">
