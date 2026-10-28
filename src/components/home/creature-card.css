@@ -1,0 +1,171 @@
+/* Creature card (board Main `.bc`, board Zestaw „Inne istoty w pobliżu”): shared by the home
+   page and the build page. The home page's phone rules (no text under 640 px) stay in
+   sections.css — the build page shows the text, like its board. */
+.hm-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  background: var(--card-bg);
+  border: 1px solid color-mix(in srgb, var(--kosc) 9%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--c) 18%, transparent);
+  transition:
+    transform 0.4s cubic-bezier(0.2, 0.7, 0.2, 1),
+    border-color 0.4s,
+    box-shadow 0.4s;
+}
+.hm-card:hover {
+  transform: translateY(-8px);
+  border-color: color-mix(in srgb, var(--c) 55%, transparent);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--c) 55%, transparent),
+    0 30px 60px -30px color-mix(in srgb, var(--c) 60%, transparent);
+}
+.hm-card__view {
+  position: relative;
+  display: block;
+  height: 330px;
+  overflow: hidden;
+}
+.hm-card__scene {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: auto;
+  max-width: none;
+  height: 100%;
+  /* The card scenes (1680×960) have the pedestal at ~67% of the width: the image is as tall as
+     the card and moved so the pedestal sits in the middle. */
+  transform: translateX(-67%);
+  transform-origin: 67% 100%;
+  transition:
+    transform 0.8s cubic-bezier(0.2, 0.7, 0.2, 1),
+    filter 0.6s;
+}
+.hm-card:hover .hm-card__scene {
+  transform: translateX(-67%) scale(1.06);
+  filter: brightness(1.12) saturate(1.08);
+}
+.hm-card__glow {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(0deg, var(--card-fade) 0%, transparent 26%),
+    linear-gradient(180deg, color-mix(in srgb, var(--card-fade) 60%, transparent), transparent 30%);
+}
+.hm-card__photo {
+  position: absolute;
+  left: 0;
+  right: 0;
+  /* Standing on the pedestal: its top edge is at ~74% of the scene height. */
+  bottom: 25.5%;
+  height: 60%;
+  transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.hm-card__photo img {
+  display: block;
+  width: auto;
+  height: 100%;
+  margin: 0 auto;
+}
+.hm-card:hover .hm-card__photo {
+  transform: translateY(-6px) scale(1.03);
+}
+.hm-card__sigil {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  color: var(--c);
+  filter: drop-shadow(0 0 8px var(--c));
+  transition: transform 0.5s;
+}
+.hm-card:hover .hm-card__sigil {
+  transform: rotate(-8deg) scale(1.08);
+}
+.hm-card__tier {
+  position: absolute;
+  right: 12px;
+  top: 16px;
+  text-align: right;
+  font-size: 12.5px;
+  font-weight: 800;
+  color: color-mix(in srgb, var(--c) 70%, var(--white));
+}
+.hm-card__tier em {
+  display: block;
+  font-family: var(--font-head);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 15px;
+  color: var(--hero-tier-name);
+}
+.hm-card__body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 4px 18px 18px;
+}
+.hm-card__body > em {
+  font-size: 17px;
+  color: color-mix(in srgb, var(--c) 55%, var(--sec-epithet));
+}
+.hm-card__body strong {
+  margin-top: 2px;
+  font-size: 25px;
+  letter-spacing: 0.02em;
+  color: var(--kosc-hi);
+}
+.hm-card__text {
+  flex: 1;
+  margin-top: 10px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--sec-desc);
+}
+.hm-card__text b {
+  color: var(--sec-bold);
+}
+.hm-card__foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 10px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid color-mix(in srgb, var(--kosc) 9%, transparent);
+  font-size: 11.5px;
+  color: var(--hero-note);
+}
+.hm-card__fps b {
+  display: block;
+  font-size: 15px;
+  color: color-mix(in srgb, var(--c) 70%, var(--white));
+}
+.hm-card__fps .src {
+  margin-top: 2px;
+  font-size: 11px;
+}
+.hm-card__price {
+  white-space: nowrap;
+  font-size: 13.5px;
+  font-weight: 800;
+  color: var(--kosc);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hm-card:hover .hm-card__scene {
+    transform: translateX(-67%);
+  }
+  .hm-card,
+  .hm-card__scene,
+  .hm-card__photo,
+  .hm-card__sigil {
+    transition: none;
+  }
+  .hm-card:hover,
+  .hm-card:hover .hm-card__photo,
+  .hm-card:hover .hm-card__sigil {
+    transform: none;
+  }
+}
