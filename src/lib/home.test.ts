@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import pricingExpected from '../../tests/fixtures/pricing-expected.json'
 import { fpsSeed } from '../seed/fps'
-import { firstBatch, firstBatchPublishedAt, seed } from '../seed/offer'
+import { seed } from '../seed/offer'
 import { buildFpsTable, fpsFor } from './fps'
 import {
   bestiaryOrder,
@@ -22,50 +22,20 @@ import {
   siblingsText,
   TIER_HINTS,
   type PanelGame,
-  type HeroBuildInput,
-  type HeroLevelInput,
-  type HeroOptionInput,
 } from './home'
 import { zl } from './pricing/format'
-import { snapshotFromRows } from './pricing/snapshot'
+import {
+  seedBuilds,
+  seedFpsTable,
+  seedLevels,
+  seedOptions,
+  seedSnapshot,
+} from './testing/offerFromSeed'
 
-// The hero built from the seed, as `loadHero()` maps the database (codes instead of ids).
-const creature = new Map(seed.creatures.map((c) => [c.slug, c]))
-const builds: HeroBuildInput[] = seed.builds.map((b) => {
-  const c = creature.get(b.creature)!
-  return {
-    slug: b.slug,
-    name: b.name,
-    config: { level: b.level, case: b.case, cooler: b.cooler, ram: b.ram, ssd: b.ssd },
-    creature: {
-      key: c.id,
-      accusative: c.accusative,
-      epithet: c.epithet,
-      look: c.look,
-      heroTitle: c.heroTitle,
-      heroText: c.heroText,
-    },
-  }
-})
-const levels: HeroLevelInput[] = seed.levels.map((l) => ({
-  code: l.code,
-  tier: l.tier,
-  tierRoman: l.tierRoman,
-  tierLabel: l.tierLabel,
-  tierLead: l.tierLead,
-  targetResolution: l.targetResolution,
-  leadBuild: l.leadBuild,
-  cpu: l.components.find((c) => c.role === 'cpu')?.publicLabel ?? null,
-  gpu: l.components.find((c) => c.role === 'gpu')?.publicLabel ?? null,
-}))
-const options: HeroOptionInput[] = seed.options.map((o) => ({
-  code: o.code,
-  publicLabel: o.publicLabel,
-  photo: o.image ? { src: `/api/media/file/${o.code}.webp`, alt: o.publicLabel } : null,
-}))
-const snapshot = snapshotFromRows(
-  firstBatch().map((row) => ({ ...row, batch: 1, publishedAt: firstBatchPublishedAt() })),
-)
+const builds = seedBuilds
+const levels = seedLevels
+const options = seedOptions
+const snapshot = seedSnapshot
 const fps = buildFpsTable([
   {
     build: 'wampir',
@@ -207,20 +177,7 @@ describe('hero texts', () => {
 
 // Sections 3–7 from the full seed: every FPS number of `fps-sources.json` as `loadFpsTable()`
 // reads it back (kinds m/r/e, one per build × game × resolution).
-const gameSlug = new Map(fpsSeed.games.map((g) => [g.name, g.slug]))
-const fullTable = buildFpsTable(
-  fpsSeed.results.map((r) => ({
-    build: r.build,
-    game: gameSlug.get(r.game)!,
-    resolution: r.resolution,
-    fps: r.fps,
-    kind: r.kind,
-    sourceLabel: r.source,
-    sourceUrl: r.url,
-    setting: r.setting,
-    measuredAt: null,
-  })),
-)
+const fullTable = seedFpsTable
 const panelGames: PanelGame[] = [...fpsSeed.games]
   .sort((a, b) => a.popularRank - b.popularRank)
   .map((g) => ({ slug: g.slug, name: g.name, kind: g.kind, fpsCap: g.fpsCap }))
