@@ -259,4 +259,25 @@
   /* tekst */
   --bp-strong: #e6ddc7; /* etykiety grup „Dopasuj”, podpisy testów */
   --bp-min: #a49d89; /* „Minimum, którego pilnujemy” */
+
+  /* -------------------------------------------------------------------------------------------
+     Uzupełnienie (G10): konfigurator — wartości wpisane wprost w planszy Konfigurator (`.k2`,
+     `.k2-st`, `.tr`, `.oc`, `.mc`, `.sb`, `.toast`, `.mbar`).
+     ------------------------------------------------------------------------------------------- */
+  --cf-lead: #bdb49e; /* podtytuł strony */
+  --cf-step-bg: rgba(8, 14, 12, 0.6);
+  --cf-step-name: #e3dac4; /* nazwa kroku, wartości w podglądzie */
+  --cf-pill: #cfc6b1; /* numer kroku, warianty, chipy */
+  --cf-dim: #8f8a7a; /* drobne podpisy, „od” */
+  --cf-end: #080e0c; /* koniec gradientów kafli */
+  --cf-tile: #0b1411; /* początek kafli opcji */
+  --cf-img-to: #0a110e; /* tło zdjęcia opcji */
+  --cf-stage-from: #0d1714; /* tło podglądu obudowy */
+  --cf-spec: #bfb69f; /* parametry opcji, opis pamięci */
+  --cf-err: #e58a6e; /* powód wyszarzenia */
+  --cf-small: #8f8a7a; /* notka pod klatkami (plansza #77746a: 4,0:1 < AA przy 11,5 px) */
+  --cf-ink: #0b0f0d; /* tekst na kolorze istoty */
+  --cf-toast-bg: #0d1512;
+  --cf-toast-text: #e7dcc0;
+  --cf-mbar-bg: rgba(5, 8, 7, 0.96);
 }

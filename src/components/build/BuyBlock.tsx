@@ -1,20 +1,14 @@
 import Image from 'next/image'
 
 import { FpsList } from '@/components/FpsList'
-import { IconClock, IconDoc, IconMail, IconShield, IconTruck } from '@/components/icons'
+import { IconMail } from '@/components/icons'
+import { PROMISES } from '@/components/promises'
 import { ButtonLink } from '@/components/ui/Button'
 import { inquiryHref } from '@/lib/buildPage'
 import type { BuildPageData } from '@/lib/buildPage.server'
 import { dateText } from '@/lib/home'
 import { routes } from '@/lib/nav'
 import { zl } from '@/lib/pricing/format'
-
-const PROMISES = [
-  { icon: IconClock, text: 'Gotowy w 5–10 dni roboczych' },
-  { icon: IconTruck, text: 'Wysyłka w cenie albo odbiór w sklepie' },
-  { icon: IconDoc, text: 'Metryka z wynikami tego egzemplarza' },
-  { icon: IconShield, text: '2 lata gwarancji, kurier odbiera od Ciebie' },
-]
 
 /**
  * Sections 2–4 of spec. §6 (board Zestaw `.zb`): „Dlaczego {istota}?” with the look, the photo,
