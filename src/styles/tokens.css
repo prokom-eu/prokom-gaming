@@ -280,4 +280,19 @@
   --cf-toast-bg: #0d1512;
   --cf-toast-text: #e7dcc0;
   --cf-mbar-bg: rgba(5, 8, 7, 0.96);
+
+  /* -------------------------------------------------------------------------------------------
+     Uzupełnienie (G11): dobór pod grę i strony gier — wartości wpisane wprost w planszach Gra
+     (`.gpk`, `.gt`, `.gbx`) i KomputerDo (`.kd7-*`).
+     ------------------------------------------------------------------------------------------- */
+  --gm-card-from: #0b1411; /* karta polecanego zestawu */
+  --gm-card-to: #070c0a;
+  --gm-tag-bg: rgba(5, 8, 7, 0.78); /* plakietka „Najtaniej płynnie” */
+  --gm-names: #8f8a78; /* istoty poziomu w tabeli */
+  --gm-value: #f2ead6; /* liczba klatek w tabeli */
+  --gm-smooth: #8ff0b5; /* „płynnie” */
+  --gm-low: #ff9a8f; /* „poniżej 60” */
+  --gm-dt: #9a9583; /* etykiety w panelach */
+  --gm-muted: #8d8a7c; /* podpisy w panelach */
+  --gm-lore: #cfc6b1; /* poziom pod imieniem na karcie */
 }
