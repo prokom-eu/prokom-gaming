@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { ITEM_CODE } from '../pricing/types'
 import { CONSENT_CLAUSE } from './consent'
 import { isValidNip, normalizeNip } from './nip'
 import {
@@ -32,10 +33,7 @@ const optionalChoice = <V extends string>(choices: readonly { value: V }[]) =>
   z.preprocess(blankToUndefined, z.enum(choiceValues(choices)).optional())
 
 /** Item code of a level or an option (`P07`, `SIG3A`); the price list decides if it exists. */
-const code = z
-  .string()
-  .trim()
-  .regex(/^[A-Za-z0-9_-]{1,40}$/)
+const code = z.string().trim().regex(ITEM_CODE)
 
 const slug = z
   .string()

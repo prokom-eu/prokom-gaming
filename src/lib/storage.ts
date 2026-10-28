@@ -6,6 +6,8 @@ export const storageKeys = {
   compare: 'pkg:compare',
   /** Items in the inquiry (G12 defines the contents). */
   inquiry: 'pkg:inquiry',
+  /** Last configurator state (query string of `/konfigurator`) — „powrót do konfiguracji”. */
+  config: 'pkg:config',
   /** Cookie banner answer. */
   consent: 'pkg:consent',
 } as const

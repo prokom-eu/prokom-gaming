@@ -3,6 +3,9 @@
  * here carries a cost or an internal model — those live only in `cost.ts` (server-only).
  */
 
+/** Format of an item code (`P07`, `SIG3A`) — the inquiry API and the configurator's address. */
+export const ITEM_CODE = /^[A-Za-z0-9_-]{1,40}$/
+
 /** Item code of the service (assembly, Windows, shipping) in published prices. */
 export const SERVICE_CODE = 'SERVICE'
 
