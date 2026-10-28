@@ -12,12 +12,17 @@ import '@/components/configurator/configurator.css'
 
 type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> }
 
-export const metadata: Metadata = {
-  title: 'Konfigurator — złóż swój komputer do gier',
-  // One address for search engines: the state parameters only make copies of the same page.
-  alternates: { canonical: '/konfigurator' },
-  description:
-    'Wybierz moc, wygląd i pamięć. Cena przelicza się przy każdym kliknięciu i jest dokładnie taka, jak w naszych gotowych zestawach.',
+export async function generateMetadata(): Promise<Metadata> {
+  // The environment is read per request (the image build has none).
+  await connection()
+  return {
+    title: 'Konfigurator — złóż swój komputer do gier',
+    // One address for search engines: the state parameters only make copies of the same page.
+    // Absolute (no `metadataBase` in the layout until G15).
+    alternates: { canonical: new URL(routes.configurator, getEnv().SITE_URL).toString() },
+    description:
+      'Wybierz moc, wygląd i pamięć. Cena przelicza się przy każdym kliknięciu i jest dokładnie taka, jak w naszych gotowych zestawach.',
+  }
 }
 
 /** The first value of each parameter, as `URLSearchParams` (what `parseState` reads). */
