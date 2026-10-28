@@ -217,3 +217,16 @@
   --sec-e: #07100c;
   --fin-glow: rgba(242, 194, 48, 0.25);
 }
+
+/* ---------------------------------------------------------------------------------------------
+   Uzupełnienie (G9): lista zestawów — wartości wpisane wprost w planszy Zestawy (`.phead`, `.zc`,
+   `.filters`, `.zmb`).
+   --------------------------------------------------------------------------------------------- */
+:root {
+  --phead-glow: rgba(242, 194, 48, 0.1); /* poświata nagłówka podstrony */
+  --zc-from: #0b1411; /* karta zestawu (gradient do --panel-to) */
+  --zc-short: #d4cbb5; /* jedno zdanie pod imieniem */
+  --zc-spec: #c9bfa6; /* części w ramkach */
+  --flt-label: #9a9583; /* „Monitor”, „Budżet”, „Rodzaj” */
+  --zmb-bg: rgba(5, 8, 7, 0.94); /* przyklejony pasek filtrów na telefonie */
+}

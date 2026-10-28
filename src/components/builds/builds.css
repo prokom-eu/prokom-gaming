@@ -1,0 +1,462 @@
+/* „Wszystkie zestawy” (spec. §5): sizes from the boards Zestawy / Zestawy-telefon
+   (`.phead`, `.filters`, `.zgrid`, `.zc`, `.help`, `.zmb`). Colours only from tokens.css. */
+
+/* ---------- page header ---------- */
+.bl-head {
+  position: relative;
+  overflow: hidden;
+  padding: 150px 0 60px;
+  background:
+    radial-gradient(70% 120% at 80% 0%, var(--phead-glow), transparent 60%),
+    linear-gradient(180deg, var(--sec-e), var(--sec-a));
+}
+.bl-head h1 {
+  margin: 0;
+  font-size: 72px;
+  color: var(--kosc-hi);
+}
+.bl-lead {
+  max-width: 640px;
+  margin: 18px 0 0;
+  font-size: 18.5px;
+  line-height: 1.65;
+  color: var(--lead);
+}
+
+/* ---------- list ---------- */
+.bl-list {
+  --nav-h-phone: 69px;
+  padding: 30px 0 120px;
+  background: var(--sec-a);
+}
+.bl-filters {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 18px 28px;
+  margin-top: -30px;
+  padding: 18px 24px;
+  background: linear-gradient(180deg, var(--panel-from), var(--panel-to));
+  border: 1px solid color-mix(in srgb, var(--kosc) 10%, transparent);
+}
+.bl-fgp {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.bl-fgp > span {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--flt-label);
+}
+.bl-fgp > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.bl-count {
+  margin: 0 0 0 auto;
+  font-size: 14px;
+  color: var(--sec-desc);
+}
+.bl-count b {
+  font-size: 20px;
+  color: var(--kosc);
+}
+
+.bl-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  margin: 30px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.bl-grid > li {
+  display: flex;
+}
+
+/* ---------- card ---------- */
+.bl-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background: linear-gradient(180deg, var(--zc-from), var(--panel-to));
+  transition: transform 0.35s;
+}
+.bl-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border: 1px solid color-mix(in srgb, var(--kosc) 10%, transparent);
+  clip-path: inherit;
+}
+.bl-card:hover {
+  transform: translateY(-6px);
+}
+.bl-card__art {
+  --art-h: 230px;
+  position: relative;
+  display: block;
+  height: var(--art-h);
+  overflow: hidden;
+  container-type: inline-size;
+}
+.bl-card__art::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(0deg, var(--zc-from) 2%, transparent 45%);
+}
+.bl-card__scene {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  /* The card scenes (1680×960) have the pedestal at ~67% of the width. */
+  object-fit: cover;
+  object-position: 67% 100%;
+  transition: transform 0.8s;
+}
+.bl-card:hover .bl-card__scene {
+  transform: scale(1.08);
+}
+.bl-card__photo {
+  /* Height of the scene as drawn by `cover` (aspect 1.75): the case stands on the pedestal,
+     whose top edge is ~25.5% of that height above the bottom. */
+  --scene-h: max(var(--art-h), 100cqw / 1.75);
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--scene-h) * 0.255);
+  height: min(var(--scene-h) * 0.6, var(--art-h) - var(--scene-h) * 0.255 - 10px);
+}
+.bl-card__photo img {
+  display: block;
+  width: auto;
+  height: 100%;
+  margin: 0 auto;
+  transform: translateX(17cqw);
+}
+.bl-card__tx {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 6px 22px 22px;
+}
+.bl-card__m {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+}
+.bl-card__m i {
+  font-size: 16px;
+  color: var(--sec-desc);
+}
+.bl-badge {
+  display: inline-flex;
+  align-items: center;
+  height: 26px;
+  padding: 0 10px;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--c) 20%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 45%, transparent);
+  font-size: 12.5px;
+  font-weight: 800;
+  color: color-mix(in srgb, var(--c) 75%, var(--white));
+}
+.bl-card__name {
+  margin: 10px 0 0;
+  font-size: 30px;
+  color: var(--kosc);
+}
+.bl-card__link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+.bl-card__link:focus-visible {
+  outline: none;
+}
+.bl-card:has(.bl-card__link:focus-visible) {
+  outline: 3px solid var(--grom2);
+  outline-offset: 3px;
+}
+.bl-card__short {
+  margin: 8px 0 0;
+  font-size: 18px;
+  line-height: 1.3;
+  color: var(--zc-short);
+}
+.bl-card__specs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.bl-card__specs li {
+  padding: 5px 10px;
+  border: 1px solid var(--line);
+  font-size: 12.5px;
+  color: var(--zc-spec);
+}
+.bl-card__fps {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 6px;
+  margin: 12px 0 0;
+  font-size: 13.5px;
+  color: var(--sec-desc);
+}
+.bl-card__fps b {
+  color: color-mix(in srgb, var(--c) 75%, var(--white));
+}
+.bl-card__p {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: auto 0 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+/* At least 16 px above the price row; `margin-top: auto` aligns price rows across a grid row. */
+.bl-card__tx > :nth-last-child(2) {
+  margin-bottom: 16px;
+}
+.bl-card__p b {
+  font-size: 17px;
+  color: var(--kosc);
+}
+.bl-card__go {
+  color: var(--grom);
+  border-color: color-mix(in srgb, var(--grom) 45%, transparent);
+}
+
+/* ---------- empty result, help ---------- */
+.bl-empty {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 30px;
+  padding: 28px 32px;
+  background: linear-gradient(180deg, var(--panel-from), var(--panel-to));
+  border: 1px solid color-mix(in srgb, var(--kosc) 10%, transparent);
+}
+.bl-empty p {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--kosc);
+}
+.bl-help {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 30px;
+  margin-top: 50px;
+  padding: 34px 40px;
+  background: linear-gradient(180deg, var(--panel-from), var(--panel-to));
+  border: 1px solid color-mix(in srgb, var(--kosc) 10%, transparent);
+}
+.bl-help h2 {
+  margin: 0;
+  font-size: 38px;
+  color: var(--kosc);
+}
+.bl-help p {
+  margin: 8px 0 0;
+  font-size: 16px;
+  color: var(--sec-text);
+}
+.bl-help__cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* ---------- phone: sticky monitor chips + sheet ---------- */
+.bl-quick {
+  display: none;
+}
+.bl-sheet {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.bl-sheet__title {
+  font-size: 18px;
+  color: var(--kosc-strong);
+}
+.bl-sheet .bl-fgp {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+.bl-sheet__go {
+  width: 100%;
+  min-height: 52px;
+}
+
+@media (max-width: 1000px) {
+  .bl-grid {
+    grid-template-columns: 1fr;
+  }
+  .bl-help {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 760px) {
+  .bl-head {
+    padding: 110px 0 40px;
+  }
+  .bl-head h1 {
+    font-size: 40px;
+  }
+  .bl-lead {
+    font-size: 15.5px;
+  }
+  .bl-list {
+    padding: 0 0 60px;
+  }
+  .bl-filters {
+    display: none;
+  }
+  .bl-quick {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    transition: top 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0 10px 16px;
+    background: var(--zmb-bg);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--line);
+  }
+  /* The phone header comes back on scroll up (fixed, over the page): stay under it, then slide
+     up with it (same timing as `.nav`). 69 px = the phone header (12 px padding, 44 px row). */
+  body:has(.nav:not([data-hidden='true'])) .bl-quick {
+    top: var(--nav-h-phone);
+  }
+  .bl-quick__chips {
+    display: flex;
+    flex: 1;
+    gap: 6px;
+    min-width: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .bl-quick__chips::-webkit-scrollbar {
+    display: none;
+  }
+  .bl-quick .chip {
+    padding: 8px 14px;
+    font-size: 13.5px;
+  }
+  .bl-quick__more {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: 7px;
+    min-height: 44px;
+    margin-right: 16px;
+    padding: 8px 14px;
+    border-radius: var(--radius-pill);
+    border: 1px solid color-mix(in srgb, var(--grom) 45%, transparent);
+    background: none;
+    font: inherit;
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--grom);
+    cursor: pointer;
+  }
+  .bl-quick__more em {
+    display: grid;
+    place-items: center;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 9px;
+    background: var(--grom);
+    font-style: normal;
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--on-grom);
+  }
+  .bl-grid {
+    gap: 14px;
+    margin-top: 16px;
+  }
+  .bl-card__art {
+    --art-h: 150px;
+  }
+  .bl-card__tx {
+    padding: 2px 16px 16px;
+  }
+  .bl-card__name {
+    margin-top: 6px;
+    font-size: 25px;
+  }
+  .bl-card__short {
+    margin-top: 4px;
+    font-size: 16px;
+  }
+  .bl-card__specs {
+    margin-top: 10px;
+  }
+  .bl-card__specs li {
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+  .bl-card__specs li:nth-child(3) {
+    display: none;
+  }
+  .bl-card__p {
+    padding-top: 12px;
+  }
+  .bl-card__tx > :nth-last-child(2) {
+    margin-bottom: 12px;
+  }
+  .bl-empty {
+    margin-top: 16px;
+    padding: 22px 20px;
+  }
+  .bl-help {
+    margin-top: 30px;
+    padding: 24px 20px;
+  }
+  .bl-help h2 {
+    font-size: 30px;
+  }
+  .bl-help__cta {
+    flex-direction: column;
+    align-self: stretch;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bl-quick,
+  .bl-card,
+  .bl-card__scene {
+    transition: none;
+  }
+  .bl-card:hover,
+  .bl-card:hover .bl-card__scene {
+    transform: none;
+  }
+}

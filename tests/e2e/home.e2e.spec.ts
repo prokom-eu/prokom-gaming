@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test'
+import { expectNoHiddenOffer, panelInternalModels } from './helpers/hiddenOffer'
 
 /**
  * Home hero and workshop strip (G7, spec. §4 pt 1–2, ADR-G003 §5): Wampir first, medallions and
@@ -97,38 +98,8 @@ test.describe('automatic switch', () => {
 })
 
 test('the page carries no cost or internal model', async ({ page, playwright, baseURL }) => {
-  const email = process.env.SEED_ADMIN_EMAIL
-  const password = process.env.SEED_ADMIN_PASSWORD
-  if (!email || !password) throw new Error('SEED_ADMIN_EMAIL / SEED_ADMIN_PASSWORD are not set.')
-  // Own context: the login cookie must not reach the page request.
-  const panel = await playwright.request.newContext({ baseURL })
-  const login = await panel.post('/api/users/login', { data: { email, password } })
-  const headers = { Authorization: `JWT ${((await login.json()) as { token: string }).token}` }
-  type Docs = { docs: Record<string, unknown>[] }
-  const levels = (await (
-    await panel.get('/api/power-levels?limit=100&depth=0', { headers })
-  ).json()) as Docs
-  const options = (await (
-    await panel.get('/api/options?limit=100&depth=0', { headers })
-  ).json()) as Docs
-  await panel.dispose()
-
-  // Power-level parts, RAM and SSD (cases and coolers are shown by full name on purpose).
-  const internalModels = [
-    ...levels.docs.flatMap((d) =>
-      (d.components as { internalModel: string }[]).map((c) => c.internalModel),
-    ),
-    ...options.docs
-      .filter((d) => d.type === 'ram' || d.type === 'ssd')
-      .map((d) => d.internalModel as string),
-  ]
-  expect(internalModels).toHaveLength(16 * 4 + 7 + 4)
-
+  const internalModels = await panelInternalModels(playwright, baseURL)
   const response = await page.goto('/')
   expect(response?.status()).toBe(200)
-  const html = await response!.text()
-  for (const model of internalModels) expect(html, model).not.toContain(model)
-  for (const key of ['cost', 'costAtPublish', 'internalModel', 'markupClass', 'internalRef']) {
-    expect(html, key).not.toContain(`"${key}"`)
-  }
+  expectNoHiddenOffer(await response!.text(), internalModels)
 })
