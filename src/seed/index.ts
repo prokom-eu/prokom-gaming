@@ -17,7 +17,7 @@ import { fileURLToPath } from 'url'
 
 import config from '../payload.config'
 import { assertSeedAllowed, parseSeedEnv } from './config'
-import { mapFaq } from './faq'
+import { mapBuildFaq, mapFaq } from './faq'
 import { fpsSeed, mapFpsResult, mapGame, planFpsResults, type ExistingFpsResult } from './fps'
 import {
   firstBatch,
@@ -288,7 +288,7 @@ async function seedFpsResults(payload: Payload): Promise<void> {
  * it in the panel (local seed only, like FPS results).
  */
 async function seedFaq(payload: Payload): Promise<void> {
-  const faq = mapFaq()
+  const faq = [...mapFaq(), ...mapBuildFaq()]
   for (const data of faq) {
     const found = await payload.find({
       collection: 'faq',

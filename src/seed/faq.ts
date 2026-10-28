@@ -1,8 +1,9 @@
 /**
- * Questions from seed/prokomgaming/faq.json mapped to `faq` documents (G8). Pure, no database:
+ * Questions from seed/prokomgaming/faq.json (G8) and build-faq.json (G9) mapped to `faq` documents. Pure, no database:
  * the runner (`index.ts`) upserts by group + question; `faq.test.ts` checks the mapping.
  */
 import type { Faq } from '../payload-types'
+import buildFaqSeed from '../../seed/prokomgaming/build-faq.json'
 import faqSeed from '../../seed/prokomgaming/faq.json'
 import { FAQ_GROUPS, type FaqGroup } from '../collections/Faq'
 
@@ -24,4 +25,16 @@ export function mapFaq(groups: readonly SeedFaq[] = faqSeed.items): FaqData[] {
       order: i + 1,
     }))
   })
+}
+
+/** The nine questions of every build page (`build-faq.json`, group `build`, G9). */
+export function mapBuildFaq(
+  items: readonly { q: string; a: string }[] = buildFaqSeed.items,
+): FaqData[] {
+  return items.map((item, i) => ({
+    question: item.q,
+    answer: item.a,
+    group: 'build',
+    order: i + 1,
+  }))
 }
