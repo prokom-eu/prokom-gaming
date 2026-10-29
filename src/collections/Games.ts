@@ -82,6 +82,16 @@ export const Games: CollectionConfig = {
       defaultValue: true,
     },
     {
+      name: 'intro',
+      label: 'O grze (1–2 zdania na stronie gry)',
+      type: 'textarea',
+      maxLength: 400,
+      admin: {
+        description:
+          'Dopisek do leadu na /komputer-do/<slug>, np. „Night City to jeden z najcięższych testów dla karty graficznej.” Puste = sam szablon.',
+      },
+    },
+    {
       name: 'requirements',
       label: 'Wymagania producenta',
       type: 'group',

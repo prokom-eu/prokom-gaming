@@ -407,6 +407,10 @@ export interface Game {
   settingNote?: string | null;
   seoPage?: boolean | null;
   /**
+   * Dopisek do leadu na /komputer-do/<slug>, np. „Night City to jeden z najcięższych testów dla karty graficznej.” Puste = sam szablon.
+   */
+  intro?: string | null;
+  /**
    * Ze strony gry, z datą sprawdzenia. Puste = blok ukryty na stronie.
    */
   requirements?: {
@@ -951,6 +955,7 @@ export interface GamesSelect<T extends boolean = true> {
   setting?: T;
   settingNote?: T;
   seoPage?: T;
+  intro?: T;
   requirements?:
     | T
     | {

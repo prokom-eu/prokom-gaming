@@ -339,7 +339,7 @@ export function gamesPanel(
   return { games: [...games], tiers, fps, kinds, settings }
 }
 
-export type PanelRow = HomeTier & { text: string; percent: number; kind: FpsKind }
+export type PanelRow = HomeTier & { fps: number; text: string; percent: number; kind: FpsKind }
 
 /**
  * Rows of the panel for one game and resolution. Bars are relative to the best tier, at least 6%
@@ -358,6 +358,7 @@ export function panelRows(data: GamesPanelData, game: number, resolution: Resolu
     if (fps == null || !scale || !isKind(kind)) return
     rows.push({
       ...tier,
+      fps,
       text: fpsText(fps, scale),
       percent: Math.max(6, Math.round((fps / max) * 100)),
       kind,

@@ -124,7 +124,7 @@ export function StepSummary({
           <IconMail size={18} />
           Wyślij rodzicowi
         </a>
-        {/* TODO(G11): the comparison counter in localStorage; until then the base creature. */}
+        {/* The comparison works on builds: the closest one stands in for this configuration. */}
         {view.build && (
           <ButtonLink variant="ghost" href={`${routes.compare}?z=${view.build.slug}`}>
             <IconBars size={18} />

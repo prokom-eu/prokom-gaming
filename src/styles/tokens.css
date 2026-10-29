@@ -280,4 +280,54 @@
   --cf-toast-bg: #0d1512;
   --cf-toast-text: #e7dcc0;
   --cf-mbar-bg: rgba(5, 8, 7, 0.96);
+
+  /* -------------------------------------------------------------------------------------------
+     Uzupełnienie (G11): dobór pod grę i strony gier — wartości wpisane wprost w planszach Gra
+     (`.gpk`, `.gt`, `.gbx`) i KomputerDo (`.kd7-*`).
+     ------------------------------------------------------------------------------------------- */
+  --gm-card-from: #0b1411; /* karta polecanego zestawu */
+  --gm-card-to: #070c0a;
+  --gm-tag-bg: rgba(5, 8, 7, 0.78); /* plakietka „Najtaniej płynnie” */
+  --gm-names: #8f8a78; /* istoty poziomu w tabeli */
+  --gm-value: #f2ead6; /* liczba klatek w tabeli */
+  --gm-smooth: #8ff0b5; /* „płynnie” */
+  --gm-low: #ff9a8f; /* „poniżej 60” */
+  --gm-dt: #9a9583; /* etykiety w panelach */
+  --gm-muted: #8d8a7c; /* podpisy w panelach */
+  --gm-lore: #cfc6b1; /* poziom pod imieniem na karcie */
+
+  /* -------------------------------------------------------------------------------------------
+     Uzupełnienie (G11): porównywarka — wartości wpisane wprost w planszy Porownywarka (`.ph6`,
+     `.bar6`, `.slot6`, `.vd6`, `.ch6`, `.up6`, `.mx6`, `.cl`, `.sp6`, `.sh6x`).
+     ------------------------------------------------------------------------------------------- */
+  --cmp-lead: #c9c0a9; /* podtytuł strony */
+  --cmp-bar-bg: rgba(5, 8, 7, 0.9); /* przyklejony pasek gry i monitora */
+  --cmp-label: #a49d89; /* etykiety paska, podpisy liczb */
+  --cmp-select-bg: #0b1210;
+  --cmp-toggle-knob: #e9e1cc;
+  --cmp-slot-tier: #d9cfb7; /* kraina w rogu karty */
+  --cmp-ok-bg: #173d2a; /* plakietka „Wystarczy” */
+  --cmp-ok-text: #9ef2b9;
+  --cmp-text: #d0c7b0; /* tekst werdyktu */
+  --cmp-soft: #bdb49e; /* drugie zdanie werdyktu, legenda, linie wykresu */
+  --cmp-strong: #efe6d0; /* pogrubienie w opisie karty */
+  --cmp-panel: #08100d; /* tło werdyktu */
+  --cmp-step-bg: #09110e; /* „Z A na B”, „Wyślij to porównanie” */
+  --cmp-head-bg: #060a09; /* przyklejony nagłówek tabel na telefonie */
+  /* macierz: poniżej 60 / płynnie / wykorzystuje monitor / blokada */
+  --cmp-low-bg: #2a1513;
+  --cmp-low-line: rgba(180, 72, 63, 0.55);
+  --cmp-low-key: #3a1a18;
+  --cmp-low-key-line: #b4483f;
+  --cmp-ok-cell-bg: #22220f;
+  --cmp-ok-cell-text: #f2d47a;
+  --cmp-ok-cell-line: rgba(201, 164, 58, 0.45);
+  --cmp-ok-key: #2a2a14;
+  --cmp-ok-key-line: #c9a43a;
+  --cmp-full-bg: #0f2a1c;
+  --cmp-full-line: rgba(79, 210, 138, 0.5);
+  --cmp-full-key: #123222;
+  --cmp-full-key-line: #4fd28a;
+  --cmp-cap-bg: #141c19;
+  --cmp-low-verdict: #ff8a5b; /* werdykt „Za mało mocy” */
 }
