@@ -19,6 +19,7 @@ import {
   EXTRA_CHOICES,
   FOR_WHOM_CHOICES,
   INVOICE_CHOICES,
+  isLight,
   labelOf,
   LIGHT_COLOR_CHOICES,
   LIGHTING_CHOICES,
@@ -167,9 +168,6 @@ const EMPTY: FormState = {
 // ---------------------------------------------------------------------------------------------
 // Entry: from the address (build page, configurator, comparison) or the saved draft
 // ---------------------------------------------------------------------------------------------
-
-const isLight = (value: unknown): value is LightColor =>
-  LIGHT_COLOR_CHOICES.some((c) => c.value === value)
 
 function cleanChanges(value: unknown): Partial<Config> {
   if (!value || typeof value !== 'object') return {}

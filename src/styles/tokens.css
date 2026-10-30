@@ -342,7 +342,7 @@
   --iq-h3: #efe6d0;
   --iq-input-bg: #0a110f;
   --iq-input-line: rgba(236, 228, 208, 0.18);
-  --iq-placeholder: #6f6c61;
+  --iq-placeholder: #8a8576; /* rozjaśniony z #6f6c61 planszy: podpowiedzi ≥ 4,5:1 */
   --iq-ring: rgba(242, 194, 48, 0.18); /* fokus pola */
   --iq-err-line: #e0675b;
   --iq-err-ring: rgba(224, 103, 91, 0.15);

@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * A row of pill buttons (board `.opt6`): one choice, or several with `multi`. Each button says
+ * A row of pill buttons (board `.opt6`): one choice, or several when `value` is a list. Each button says
  * whether it is chosen through `aria-pressed`, the group is named by its heading.
  */
 export function Options<V extends string>({

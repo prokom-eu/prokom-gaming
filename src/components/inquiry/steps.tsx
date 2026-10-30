@@ -468,15 +468,18 @@ export function StepReview({
         {reviewOf(state, data).map((row) => (
           <div key={row.label}>
             <dt>{row.label}</dt>
-            <dd>{row.value}</dd>
-            <button
-              type="button"
-              className="lnk iq-review__edit"
-              aria-label={`Zmień: ${row.label}`}
-              onClick={() => onEdit(row.step)}
-            >
-              Zmień
-            </button>
+            {/* „Zmień” inside `dd`: a `dl` group may hold only `dt` and `dd`. */}
+            <dd>
+              <span>{row.value}</span>
+              <button
+                type="button"
+                className="lnk iq-review__edit"
+                aria-label={`Zmień: ${row.label}`}
+                onClick={() => onEdit(row.step)}
+              >
+                Zmień
+              </button>
+            </dd>
           </div>
         ))}
       </dl>

@@ -262,8 +262,7 @@ export function tunedNote(diff: number, light: LightKey | null, zl: (v: number) 
 
 /**
  * „Zapytaj o tę wersję” → `/zapytanie?zestaw=wampir&ram=R64&ssd=NM2&swiatlo=lod`, only what
- * differs from the build. The light colour has no field in the inquiry yet — `TODO(G12)`: the form
- * decides how to keep it (decision of Krystian, 28.10.2026: address only, API unchanged).
+ * differs from the build. The form saves the light colour as `lightColor` (ADR-G005, 30.10.2026).
  */
 export function inquiryHref(slug: string, config: Config, tuned?: Tuned): string {
   const params = new URLSearchParams({ zestaw: slug })

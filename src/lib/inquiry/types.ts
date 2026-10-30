@@ -109,6 +109,10 @@ export const LIGHT_COLOR_CHOICES = [
 ] as const satisfies readonly Choice<string>[]
 export type LightColor = (typeof LIGHT_COLOR_CHOICES)[number]['value']
 
+/** One of the six light colours (an address or a stored value may hold anything). */
+export const isLight = (value: unknown): value is LightColor =>
+  LIGHT_COLOR_CHOICES.some((c) => c.value === value)
+
 export const EXTRA_CHOICES = [
   { value: 'monitor', label: 'Monitor' },
   { value: 'mouse_keyboard', label: 'Mysz i klawiatura' },

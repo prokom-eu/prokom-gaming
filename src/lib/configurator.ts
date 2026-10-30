@@ -5,7 +5,8 @@
  * board's JS 1:1 where the board has them; reasons for greyed-out options are the ADR texts
  * (`compatMessage`). `lib/configurator.server.ts` reads the database.
  */
-import { LIGHTS, type LightKey } from './buildPage'
+import { type LightKey } from './buildPage'
+import { isLight } from './inquiry/types'
 import {
   checkCompat,
   compatMessage,
@@ -141,7 +142,6 @@ export function decodeConfig(k: string | null | undefined): Config | null {
 }
 
 const isStep = (v: string | null): v is StepKey => STEPS.some((s) => s.key === v)
-const isLight = (v: string | null): v is LightKey => LIGHTS.some((l) => l.key === v)
 
 /** Every code active, published and of the right type; the rules are checked separately. */
 function sellable(config: Config, offer: ConfOffer, prices: PriceList): boolean {
@@ -237,8 +237,8 @@ export function stateQuery(state: ConfiguratorState): string {
 export const OTHER_PART_MAX = 200
 
 /**
- * „Zapytaj o tę konfigurację” → `/zapytanie?k=…[&swiatlo=…][&inne=…]`. `TODO(G12)`: the form reads
- * `k` (the API already takes a `config` of five codes, ADR-G005), `swiatlo` and `inne` (to notes).
+ * „Zapytaj o tę konfigurację” → `/zapytanie?k=…[&swiatlo=…][&inne=…]`; the form reads `k` as the
+ * configuration, `swiatlo` as the light colour and `inne` into the notes (`lib/inquiry/form.ts`).
  */
 export function configInquiryHref(config: Config, light: LightKey | null, other = ''): string {
   const params = new URLSearchParams({ k: encodeConfig(config) })

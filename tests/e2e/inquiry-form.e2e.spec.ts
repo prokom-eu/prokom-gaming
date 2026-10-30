@@ -46,6 +46,8 @@ async function inquiryByNumber(request: APIRequestContext, number: string): Prom
 
 /** axe (WCAG 2.1 A/AA) on the current state of the page — rule ids and targets on failure. */
 async function expectNoAxeViolations(page: Page) {
+  // The step fades in (and pills change colour): measure contrast once it has settled.
+  await page.waitForFunction(() => document.getAnimations().every((a) => a.playState !== 'running'))
   const { violations } = await new AxeBuilder({ page })
     .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
     .analyze()
@@ -126,6 +128,7 @@ test('from a build page: changes and light colour reach the record, both e-mails
   await page.getByRole('button', { name: 'Cyberpunk 2077', exact: true }).click()
   await page.getByRole('button', { name: '2K', exact: true }).click()
   await expect(summary).toContainText('Cyberpunk 2077')
+  await expectNoAxeViolations(page)
 
   await next(page, 'Dalej: kontakt')
   // Leaving the contact step empty shows the board's messages.
@@ -147,6 +150,7 @@ test('from a build page: changes and light colour reach the record, both e-mails
   await expect(review).toContainText('Wampir, Moc VII, 4K, pamięć')
   await expect(review).toContainText('światło Lód')
   await expect(review).toContainText(customer)
+  await expectNoAxeViolations(page)
 
   const number = await send(page, openedAt)
   expect(new URL(page.url()).searchParams.get('istota')).toBe('wampir')

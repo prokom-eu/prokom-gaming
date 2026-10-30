@@ -448,7 +448,7 @@ textarea.iq-in {
 }
 .iq-review div {
   display: grid;
-  grid-template-columns: 170px 1fr auto;
+  grid-template-columns: 170px 1fr;
   gap: 18px;
   align-items: baseline;
   padding: 16px 0;
@@ -459,6 +459,10 @@ textarea.iq-in {
   color: var(--iq-muted);
 }
 .iq-review dd {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 18px;
   margin: 0;
   font-size: 15.5px;
   font-weight: 700;
@@ -468,6 +472,7 @@ textarea.iq-in {
   white-space: pre-line;
 }
 .iq-review__edit {
+  flex: none;
   min-height: 44px;
   padding: 0 0 2px;
   border: 0;
@@ -697,16 +702,13 @@ textarea.iq-in {
     gap: 18px;
   }
   .iq-review div {
-    grid-template-columns: 1fr auto;
-    gap: 4px 12px;
-  }
-  .iq-review dt {
-    grid-column: 1 / -1;
+    grid-template-columns: 1fr;
+    gap: 4px;
   }
   /* „Dalej” stays at hand above the tab bar (ADR-G003 §4: sticky bars). */
   .iq-nav {
     position: sticky;
-    bottom: var(--tabbar-h, 0px);
+    bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom));
     z-index: 5;
     margin: 24px -16px -18px;
     padding: 12px 16px;
