@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 import { IconPhone } from '@/components/icons'
 import { ButtonLink } from '@/components/ui/Button'
 import { routes } from '@/lib/nav'
-import { company } from '@/lib/site'
+import { company, registers } from '@/lib/site'
 
 import '@/components/content/content.css'
 
@@ -12,10 +12,6 @@ export const metadata: Metadata = {
   description:
     'Komputer do gier dla dziecka bez stresu i bez żargonu: wystarczy powiedzieć, w co dziecko gra. Płacisz po ofercie, przelewem albo BLIK-iem.',
 }
-
-// Public registers named on the board (spec. §16: „CEIDG, biała lista VAT z linkami”).
-const CEIDG_HREF = 'https://aplikacja.ceidg.gov.pl/ceidg/ceidg.public.ui/search.aspx'
-const VAT_LIST_HREF = 'https://www.podatki.gov.pl/wykaz-podatnikow-vat-wyszukiwarka'
 
 const STEPS = [
   {
@@ -117,11 +113,11 @@ export default function ParentsPage() {
                 <Check />
                 <span>
                   <b>Firma od 2004 roku.</b> {company.name}, NIP {company.nip},{' '}
-                  <a href={CEIDG_HREF} target="_blank" rel="noopener noreferrer">
+                  <a href={registers.ceidg} target="_blank" rel="noopener noreferrer">
                     CEIDG
                   </a>{' '}
                   i{' '}
-                  <a href={VAT_LIST_HREF} target="_blank" rel="noopener noreferrer">
+                  <a href={registers.vatList} target="_blank" rel="noopener noreferrer">
                     biała lista VAT
                   </a>
                   .

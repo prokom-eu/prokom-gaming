@@ -97,7 +97,6 @@ export default async function GuidePage({ params }: Props) {
           author: guide.author,
           publishedAt: guide.publishedAt ?? null,
           updatedAt: guide.updatedAt ?? null,
-          category: guide.category,
         })}
       />
       <PageHeader

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { splitLineBreaks } from '../seed/legal'
 
-import { headingId, legalHeadings, type LegalContent } from './legal'
+import { hasLegalContent, headingId, legalHeadings, type LegalContent } from './legal'
 
 const text = (value: string) => ({ type: 'text', version: 1, text: value })
 const h2 = (value: string) => ({ type: 'heading', tag: 'h2', version: 1, children: [text(value)] })
@@ -35,6 +35,15 @@ describe('legalHeadings', () => {
       { id: 'cookies', title: 'Cookies', number: 2 },
       { id: 'cookies-2', title: 'Cookies', number: 3 },
     ])
+  })
+})
+
+describe('hasLegalContent', () => {
+  it('rejects the empty global of a fresh database', () => {
+    expect(hasLegalContent({})).toBe(false)
+    expect(hasLegalContent({ draft: true })).toBe(false)
+    expect(hasLegalContent(null)).toBe(false)
+    expect(hasLegalContent({ content: content([p('x')]) })).toBe(true)
   })
 })
 

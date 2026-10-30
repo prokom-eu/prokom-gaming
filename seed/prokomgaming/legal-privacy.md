@@ -14,7 +14,7 @@ Administratorem Twoich danych jest PRO-KOM Tadeusz Wójciak, ul. Orkana 16B, 34-
 
 ## Komu przekazujemy dane
 
-Tylko tym, bez których nie zrealizujemy zamówienia: firmie kurierskiej, dostawcy hostingu i poczty, biuru rachunkowemu. Nie sprzedajemy danych. Jeśli dostawca narzędzi analitycznych przetwarza dane poza Europejskim Obszarem Gospodarczym, robi to na podstawie standardowych klauzul umownych [do potwierdzenia przy wyborze narzędzia].
+Tylko tym, bez których nie zrealizujemy zamówienia: firmie kurierskiej, dostawcy hostingu i poczty, biuru rachunkowemu. Nie sprzedajemy danych. Jeśli dostawca narzędzi analitycznych przetwarza dane poza Europejskim Obszarem Gospodarczym, robi to na podstawie standardowych klauzul umownych.
 
 ## Twoje prawa
 
@@ -27,7 +27,7 @@ Używamy plików cookies. Niezbędne działają zawsze, pozostałe tylko za Twoj
 | Rodzaj | Po co | Zgoda | Jak długo |
 | --- | --- | --- | --- |
 | Niezbędne | Działanie strony, formularza, konta i zapamiętanie Twojego wyboru cookies. | nie wymagają | sesja albo do 12 miesięcy |
-| Analityczne | Liczymy odwiedziny i sprawdzamy, które strony są niezrozumiałe. [narzędzie do wyboru] | tak | do 14 miesięcy |
+| Analityczne | Liczymy odwiedziny i sprawdzamy, które strony są niezrozumiałe. | tak | do 14 miesięcy |
 | Marketingowe | Mierzymy skuteczność reklam na Facebooku i TikToku. | tak | do 13 miesięcy |
 
 ## Bezpieczeństwo

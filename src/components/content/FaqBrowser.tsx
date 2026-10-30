@@ -1,16 +1,24 @@
 'use client'
 
-import { useState, type ReactNode } from 'react'
+import { useState, useSyncExternalStore, type ReactNode } from 'react'
 
 import { questionsCount, type FaqSection } from '@/lib/faq'
 
 /**
  * Groups of `/pytania` (board FAQ): buttons switch the shown group, the first question of the
- * group is open. Every group stays in the HTML (inactive ones `hidden`), so the page reads in
- * full without JavaScript and for search engines; JSON-LD lists all questions anyway.
+ * group is open. Until the script runs every group is shown, so the page reads in full without
+ * JavaScript; after that the inactive ones are `hidden`. JSON-LD lists all questions anyway.
  */
+const noop = () => () => {}
+
 export function FaqBrowser({ sections, aside }: { sections: FaqSection[]; aside: ReactNode }) {
   const [active, setActive] = useState(sections[0]?.group)
+  // false in the server HTML, true once hydrated (no effect, no extra render).
+  const ready = useSyncExternalStore(
+    noop,
+    () => true,
+    () => false,
+  )
 
   return (
     <div className="ct-faq">
@@ -39,7 +47,7 @@ export function FaqBrowser({ sections, aside }: { sections: FaqSection[]; aside:
             id={`faq-${s.group}`}
             className="ct-faq__body"
             aria-labelledby={`faq-${s.group}-title`}
-            hidden={s.group !== active}
+            hidden={ready && s.group !== active}
           >
             <h2 id={`faq-${s.group}-title`} className="h">
               {s.label}

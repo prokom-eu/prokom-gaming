@@ -41,11 +41,9 @@ for (const { path, h1 } of PAGES) {
       () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
     )
     expect(overflow).toBeLessThanOrEqual(0)
-    // No placeholders of the boards that this session filled or hid (spec. §27.7).
-    const html = await page.content()
-    for (const placeholder of ['[telefon', '[godziny', '[imię serwisanta]', '[rok]', '[data]']) {
-      expect(html).not.toContain(placeholder)
-    }
+    // No bracketed placeholder of the boards in the page (spec. §27.7: zero square brackets).
+    expect(await page.locator('main').innerText()).not.toMatch(/\[[^\]\n]{2,}\]/)
+    expect(await page.content()).not.toContain('[imię serwisanta]')
   })
 }
 
@@ -152,7 +150,10 @@ test('legal pages: content from the panel, numbered table of contents, draft not
   await expect(page.getByText('Projekt do weryfikacji przez prawnika.')).toBeVisible()
   await expect(page.getByRole('heading', { level: 2, name: '§ 5 Zwrot w 14 dni' })).toBeVisible()
   // No ODR platform and no instalments (spec. §21).
-  await expect(page.locator('main')).not.toContainText('raty')
+  // Whole words only (spec. §27.7: „utraty” is fine).
+  expect(await page.locator('main').innerText()).not.toMatch(
+    /(^|[^\p{L}])rat(y|ach|alnej)?([^\p{L}]|$)/iu,
+  )
 
   // The footer's „Ustawienia cookies” lands on the cookies paragraph.
   await page.goto('/polityka-prywatnosci#cookies')
@@ -173,6 +174,8 @@ test('guides: only published ones are listed, a draft is 404, the guide has Arti
     docs: { slug: string }[]
   }
   expect(api.docs.map((d) => d.slug)).toEqual(['rodzice'])
+  // Versions (drafts included) are panel-only (`readVersions`).
+  expect((await request.get('/api/guides/versions?depth=0')).status()).toBe(403)
 
   await page.locator('.ct-guide').first().click()
   await expect(page).toHaveURL(/\/poradniki\/rodzice$/)

@@ -5,6 +5,15 @@ export type LegalContent = LegalTerm['content']
 
 type LexicalNode = { type: string; tag?: string; text?: string; children?: LexicalNode[] }
 
+/**
+ * A legal global with content. On a fresh server database the global has no row yet and
+ * Payload returns `{}` (the seed does not run there) — the page then shows its fallback.
+ */
+export function hasLegalContent(doc: unknown): doc is { content: LegalContent } {
+  const content = (doc as { content?: { root?: { children?: unknown } } } | null)?.content
+  return Array.isArray(content?.root?.children)
+}
+
 export type LegalHeading = { node: unknown; id: string; title: string; number: number }
 
 /** Plain text of a node and its children. */

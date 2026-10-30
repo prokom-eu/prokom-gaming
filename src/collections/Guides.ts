@@ -27,7 +27,15 @@ export const Guides: CollectionConfig = {
   },
   defaultSort: '-publishedAt',
   versions: { drafts: true },
-  access: { read: publishedOrPanel, create: panelOnly, update: panelOnly, delete: panelOnly },
+  // `readVersions` explicitly: without it Payload lets any signed-in user read the versions —
+  // customers (G14) would read the drafts through `/api/guides/versions`.
+  access: {
+    read: publishedOrPanel,
+    readVersions: panelOnly,
+    create: panelOnly,
+    update: panelOnly,
+    delete: panelOnly,
+  },
   fields: [
     { name: 'title', label: 'Tytuł', type: 'text', required: true },
     {

@@ -74,7 +74,6 @@ export function guideJsonLd(input: {
   author: string
   publishedAt: string | null
   updatedAt: string | null
-  category: string
 }): object[] {
   const url = (path: string) => new URL(path, input.siteUrl).toString()
   return [

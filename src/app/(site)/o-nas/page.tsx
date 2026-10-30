@@ -4,7 +4,7 @@ import { PageHeader } from '@/components/content/PageHeader'
 import { Sigil } from '@/components/Sigil'
 import { ButtonLink } from '@/components/ui/Button'
 import { routes } from '@/lib/nav'
-import { company } from '@/lib/site'
+import { company, registers } from '@/lib/site'
 
 import '@/components/content/content.css'
 
@@ -231,15 +231,11 @@ export default function AboutPage() {
             <div>
               <dt>Rejestry</dt>
               <dd>
-                <a href="https://aplikacja.ceidg.gov.pl" target="_blank" rel="noopener noreferrer">
+                <a href={registers.ceidg} target="_blank" rel="noopener noreferrer">
                   CEIDG
                 </a>{' '}
                 i{' '}
-                <a
-                  href="https://www.podatki.gov.pl/wykaz-podatnikow-vat-wyszukiwarka/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
+                <a href={registers.vatList} target="_blank" rel="noopener noreferrer">
                   biała lista podatników VAT
                 </a>
               </dd>

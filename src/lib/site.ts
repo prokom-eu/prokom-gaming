@@ -18,6 +18,12 @@ export const company = {
   phoneHref: 'tel:+48182676511',
 } as const
 
+// Public registers where a customer checks the company (spec. §16, boards Rodzice, OFirmie).
+export const registers = {
+  ceidg: 'https://aplikacja.ceidg.gov.pl/ceidg/ceidg.public.ui/search.aspx',
+  vatList: 'https://www.podatki.gov.pl/wykaz-podatnikow-vat-wyszukiwarka/',
+} as const
+
 // Profile addresses unknown yet: an empty value hides the link (no placeholder in HTML, spec. §27.7).
 export const social: { label: string; href: string }[] = [
   { label: 'Facebook', href: '' }, // TODO(krystian): Facebook profile address

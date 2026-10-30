@@ -69,7 +69,6 @@ describe('guideJsonLd', () => {
       author: 'Zespół PRO-KOM Gaming',
       publishedAt: null,
       updatedAt: '2026-10-30T10:00:00.000Z',
-      category: 'parents',
     }) as [Record<string, unknown>, Record<string, unknown>]
     expect(article).toMatchObject({
       '@type': 'Article',
