@@ -20,6 +20,7 @@
 - [ ] Zgodność ze zrzutami `docs/design/prokomgaming/screens/<Plansza>-1440` i `-414` oraz `stany/`.
 - [ ] Telefon jak aplikacja: dolny pasek, arkusze (fokus, Esc, tło), paski przyklejone nad dolnym paskiem, cele dotyku ≥ 44 px, bez poziomego przewijania strony (360–414 px).
 - [ ] Sprawdzone na prawdziwym Androidzie i iPhonie.
+- [ ] Panel: zgodność ze zrzutami `docs/design/prokomgaming/panel/screens/<Ekran>-1440` i `-414` oraz stanami telefonu `stany/tel-*` (spec. panelu §2a, §18); test e2e dostępu (niezalogowany, rola `serwis`) dla każdego nowego widoku i akcji; koszty i marże nie pojawiają się w odpowiedziach dla strony.
 - [ ] Kolory i kroje tylko z tokenów; teksty z planszy; zero nawiasów kwadratowych na produkcji.
 
 ## SEO

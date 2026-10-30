@@ -53,7 +53,7 @@
 | `/poradniki`, `/poradniki/[slug]` | Poradniki, Poradnik (+ telefon) | G13 |
 | `/regulamin`, `/polityka-prywatnosci` | Regulamin, Prywatnosc (+ telefon) | G13 |
 | 404 | 404 / 404-telefon | G2 |
-| `/admin` | panel Payload | G3–G15 |
+| `/admin` | panel Payload — specyfikacja: `docs/strony/prokomgaming-panel.md` (P0–P8) | G3–G15, P0–P8 |
 | `/sitemap.xml`, `/robots.txt` | — | G15 |
 
 Adresy w linkach plansz (`*.dc.html`) zamień na adresy z tej tabeli.
@@ -166,6 +166,8 @@ Plansze Regulamin i Prywatnosc — **projekty do weryfikacji przez prawnika** (n
 
 ## 22. Panel (G3, G4, G15)
 Grupy w panelu: **Sprzedaż** (Zapytania, Zamówienia, Egzemplarze, Zgłoszenia, Gotowe od ręki, Bony, Klienci) · **Oferta** (Zestawy, Poziomy mocy, Opcje, Ceny — publikacja, Historia cen) · **Gry i klatki** (Gry, Wyniki FPS) · **Treści** (Poradniki, Pytania, Ustawienia strony, Regulamin, Polityka) · **Administracja** (Użytkownicy: role `admin`, `serwis`). Ekran „Ceny”: kolejka do zatwierdzenia, strażnik marży, import CSV, widok zestawów (cena, koszt, marża, zmiana) — ADR-G002 §4.
+
+**Od 30.10.2026 panel opisuje `docs/strony/prokomgaming-panel.md`** (nawigacja w grupach Codziennie · Ceny · Oferta · Analiza · System, kolekcje bez własnego widoku w grupie „Dane”) — w sprawach panelu wygrywa tamten plik.
 
 ## 23. SEO (G15)
 - Meta `title`/`description` unikalne (szablony: zestaw — „{Istota} — komputer do gier {rozdzielczość}, {cena} zł | PRO-KOM Gaming”; gra — „Komputer do {gry}: ile klatek w FullHD, 2K i 4K | PRO-KOM Gaming”).

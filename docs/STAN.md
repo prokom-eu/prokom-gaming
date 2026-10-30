@@ -120,7 +120,7 @@ Ostatnia aktualizacja: 30.10.2026 (sesja G12 — formularz zapytania i „wysła
 - 25.10.2026 — pakiet startowy (pierwszy commit, podpisany): CLAUDE.md, specyfikacja `docs/strony/prokomgaming.md`, ADR-G001…G005, plan G0–G16, wzorzec wyglądu v36 (`docs/design/prokomgaming/`), seed (`seed/prokomgaming/`), oczekiwane wyniki testów cen (`tests/fixtures/pricing-expected.json`).
 
 ## Następne kroki
-G1 → G2 → G3 → G4 → G5 → G6 → G7 → G8 → G9 → (kontrola 8.11) → G10 → G11 → G12 → (kontrola 13.11) → G13 → G14 → G15 → G16 (produkcja 20.11).
+G1 → G2 → G3 → G4 → G5 → G6 → G7 → G8 → G9 → (kontrola 8.11) → G10 → G11 → G12 → (kontrola 13.11) → G13 → G14 (+ role, pola `orders` dla panelu) → **P1 → P3 → P4 → P2** → G15 (+ Umami) → G16 (produkcja 20.11) → **P6 → P7 → P5 → P8**. Panel: `docs/zadania/prokomgaming-panel.md` (P0 = przegląd dokumentów panelu względem kodu, bez kodu — można zrobić w dowolnym momencie przed P1; paczka wgrana 30.10 z czatu).
 
 ## Decyzje (skrót)
 - Osobne repo, ten sam stos i wersje co `prokom-web` (ADR-G001), porty 3100 / 54321 / 1026 / 8026.
@@ -129,6 +129,7 @@ G1 → G2 → G3 → G4 → G5 → G6 → G7 → G8 → G9 → (kontrola 8.11) �
 - Ceny liczone jedną funkcją, gwarancja marży 11% (ADR-G002). Klatki z testów z etykietą źródła (ADR-G004).
 - Telefon jak aplikacja (ADR-G003 §4).
 - Zapytania, metryka, warsztat, konto w Payload za stałym kontraktem; `users` i `customers` osobno (ADR-G005).
+- **Panel (akceptacja Krystiana 30.10, wizualizacja v8):** własne widoki Payload `/admin` (ADR-G006); koszt części = najniższa cena dostępnej oferty w sklepach albo koszt z faktury, **brutto**, bez cenników AB/Action; „Sprawdź ceny” przez Claude API, nic nie publikuje się samo (ADR-G007); odpowiedzi na zapytania z panelu: SMTP + IMAP, wątek przy zapytaniu (ADR-G008); statystyki: Umami na naszym serwerze, bez ciasteczek (ADR-G009); na telefonie panel jak aplikacja, dodawany do ekranu głównego (PWA) z powiadomieniami push (ADR-G010).
 
 ## Uwagi do kolejnych sesji (ryzyka z G0)
 - **G4 — ceny partii 1 są z arkusza** (`_check.sell`, fixtures `serviceSell` i `priceFrom`); od G4 PR 1 test `cost.test.ts` pokazuje, że kod daje te same 90 liczb. `level_from` ma w partii 1 pusty `costAtPublish` — publikacja w PR 2 zapisze koszt najtańszej konfiguracji (`review.priceFrom[poziom].cost`). Kod usługi w cenach: `SERVICE`. Klasy narzutu w bazie: `fullhd | qhd | uhd | flagship` (= klucze `levelMarkupByClass`; arkusz: FullHD/2K/4K/flagowiec). Publikacja: wzór transakcji w `src/seed/index.ts` (`initTransaction` / `commitTransaction` / `killTransaction`).
@@ -164,7 +165,13 @@ G1 → G2 → G3 → G4 → G5 → G6 → G7 → G8 → G9 → (kontrola 8.11) �
 - [Krystian, przed publikacją stron gier] wymagania producenta 33 gier (`games.requirements` puste — blok ukryty do uzupełnienia).
 - [czat] 6 poradników w szkicu (na start wystarczy 1 gotowy — plan cięcia §4).
 
+## Otwarte pytania — panel (30.10)
+- [SZEF, przed P3/P4] skrzynka Gaming (`gaming@pro-kom.eu`?) z dostępem IMAP dla panelu.
+- [SZEF, przed P7] klucz API Anthropic na firmę i limit wydatków (propozycja 20 USD/mies., ADR-G007 §4).
+- [prawnik] polityka prywatności: statystyki bez ciasteczek (Umami), odpowiedzi z panelu.
+- [Krystian, przed G16] SPF/DKIM/DMARC domeny nadawcy w Seohost.
+
 ## Pomysły na później
 - 7 rodzajów podstawy pod komputerem w hero (kamień, woda, grobowiec, pień, lustro, lód, bazalt — plansza Main) jako obrazy z czatu (G7: jedna wspólna).
 - Błyskawica nad dębem w „Napisz, w co grasz” (animacja z planszy Main, `.fbolt`) — G8 ma statyczny dąb.
-- Pełna strona `/warsztat`, edycje limitowane, raty (po umowie z bankiem i ADR), import cen z API hurtowni, Strefa Klienta w Django (2027).
+- Pełna strona `/warsztat`, edycje limitowane, raty (po umowie z bankiem i ADR), import cen z API hurtowni (odrzucone 30.10.2026 — bez AB/Action, ADR-G007), Strefa Klienta w Django (2027).
