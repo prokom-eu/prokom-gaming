@@ -18,6 +18,8 @@ export function voucherCode(): string {
 const assignCode: CollectionBeforeChangeHook = ({ data, operation }) =>
   operation === 'create' && !data.code ? { ...data, code: voucherCode() } : data
 
+// TODO(krystian): retention of `recipient` and `dedication` (data of a third person) — with the
+// privacy policy; the inquiry retention job does not cover vouchers.
 /**
  * Gift vouchers (spec. §12, ADR-G005): the order is an inquiry of type `voucher`; the panel issues
  * the voucher (code, PDF) after the payment. Panel only — nothing public reads codes.

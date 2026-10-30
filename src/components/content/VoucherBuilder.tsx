@@ -152,6 +152,8 @@ export function VoucherBuilder({ scene, token }: { scene: ReactNode; token: stri
                 <b>Płacisz i dostajesz bon</b>
                 <span>PDF na e-mail od razu po wpłacie albo koperta w sklepie.</span>
               </li>
+              {/* TODO(krystian): the G12 form has no field for the voucher code yet — today the
+                  code goes into „Uwagi”; a field (and checking the code) when vouchers start. */}
               <li>
                 <b>Obdarowany wybiera komputer</b>
                 <span>Wpisuje kod w zapytaniu. Kwota odlicza się od ceny w ofercie.</span>

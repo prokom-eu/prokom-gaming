@@ -1,4 +1,4 @@
-import { randomInt } from 'node:crypto'
+import { createHmac, randomInt } from 'node:crypto'
 
 import { expect, test, type APIRequestContext, type Page } from '@playwright/test'
 
@@ -16,8 +16,21 @@ const run = Date.now().toString(36)
 
 test.beforeEach(async ({ request }) => {
   const on = (await request.get('/bon')).status() === 200
+  // CI turns the flags on: there a skip would hide the tests, so it fails instead.
+  if (process.env.CI && !on) throw new Error('FEATURE_VOUCHER / FEATURE_READY are off in CI')
   test.skip(!on, 'FEATURE_VOUCHER / FEATURE_READY are off on this server')
 })
+
+/** A signed „form shown at” token, like the page renders (ADR-G005; same as inquiry-api). */
+function formToken(): string {
+  const secret = process.env.PAYLOAD_SECRET
+  if (!secret) throw new Error('PAYLOAD_SECRET is not set.')
+  const issuedAt = Date.now() - 5_000
+  const signature = createHmac('sha256', secret)
+    .update(`inquiry-form:${issuedAt}`)
+    .digest('base64url')
+  return `${issuedAt}.${signature}`
+}
 
 async function adminHeaders(request: APIRequestContext) {
   const email = process.env.SEED_ADMIN_EMAIL
@@ -157,6 +170,41 @@ test('/gotowe: reservation → ready record at the unit price, the unit leaves t
   await expect(card).toHaveCount(0)
 })
 
+test('two reservations of one unit at the same moment: exactly one wins', async ({
+  request,
+}, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop-1440', 'one run is enough (it reserves a unit)')
+  const id = (await units(request)).bies!
+  const headers = await adminHeaders(request)
+  await request.patch(`/api/stock/${id}`, { headers, data: { reservedUntil: null } })
+  const body = (n: number) => ({
+    type: 'ready',
+    stock: id,
+    name: 'Test e2e',
+    email: `race-${run}-${n}@example.test`,
+    consent: { accepted: true, clauseVersion: '2026-10-27' },
+    source: { url: 'http://localhost:3100/gotowe' },
+    formToken: formToken(),
+  })
+  const [a, b] = await Promise.all(
+    [1, 2].map((n) =>
+      request.post('/api/inquiry', {
+        data: body(n),
+        headers: { 'x-real-ip': `198.51.100.${randomInt(1, 254)}` },
+      }),
+    ),
+  )
+  expect([a.status(), b.status()].sort()).toEqual([201, 400])
+  const refused = a.status() === 400 ? a : b
+  expect(await refused.json()).toEqual({ error: 'invalid', fields: ['stock'] })
+  // Free it again for the next test and runs.
+  await request.patch(`/api/stock/${id}`, { headers, data: { reservedUntil: null } })
+})
+
+test('/api/stock is panel-only (units are read by the page itself)', async ({ request }) => {
+  expect((await request.get('/api/stock')).status()).toBe(403)
+})
+
 test('panel: the margin guard blocks a discount below the minimum margin', async ({
   request,
 }, testInfo) => {
@@ -168,4 +216,8 @@ test('panel: the margin guard blocks a discount below the minimum margin', async
   expect(JSON.stringify(await blocked.json())).toContain('Za duży rabat')
   const fine = await request.patch(`/api/stock/${id}`, { headers, data: { discount: 0 } })
   expect(fine.status()).toBe(200)
+  // Taking a unit off the site always works, whatever its margin.
+  const off = await request.patch(`/api/stock/${id}`, { headers, data: { active: false } })
+  expect(off.status()).toBe(200)
+  await request.patch(`/api/stock/${id}`, { headers, data: { active: true } })
 })

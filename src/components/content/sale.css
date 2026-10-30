@@ -435,6 +435,9 @@
   .bn-card__in {
     animation: none;
   }
+  .bn__amounts button {
+    transition: none;
+  }
 }
 @media (max-width: 1000px) {
   .bn-head {

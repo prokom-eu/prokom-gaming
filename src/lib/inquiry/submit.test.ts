@@ -270,6 +270,7 @@ describe('submitInquiryWith — voucher and „Gotowe od ręki” (G13)', () => 
     reservedUntil: null,
     location: 'rabka',
     conditionNote: 'egzemplarz pokazowy',
+    marginOk: true,
   }
   const ready = (extra: Record<string, unknown> = {}) =>
     body({ type: 'ready', build: undefined, games: [], stock: 9, ...extra })
@@ -322,6 +323,7 @@ describe('submitInquiryWith — voucher and „Gotowe od ręki” (G13)', () => 
     for (const found of [
       null,
       { ...unit, active: false },
+      { ...unit, marginOk: false },
       { ...unit, reservedUntil: new Date(t0 + 60_000).toISOString() },
     ]) {
       const { deps } = setup({ loadStock: vi.fn(async () => found) })

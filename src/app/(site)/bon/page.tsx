@@ -12,6 +12,7 @@ import '@/components/content/content.css'
 import '@/components/content/sale.css'
 import '@/components/inquiry/inquiry.css'
 
+// TODO(krystian): G15 — JSON-LD (Product/Offer of the units, voucher) before the flag goes on.
 export const metadata: Metadata = {
   title: 'Bon podarunkowy',
   description:

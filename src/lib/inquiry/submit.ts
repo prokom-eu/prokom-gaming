@@ -1,3 +1,5 @@
+import { sql, type PostgresAdapter } from '@payloadcms/db-postgres'
+
 import type { Inquiry } from '../../payload-types'
 import type { CompatError } from '../compat'
 import { errorFields, type LogFields } from '../logger'
@@ -49,6 +51,8 @@ export type StockUnit = {
   reservedUntil: string | null
   location: string
   conditionNote: string
+  /** The panel's margin guard still accepts it at today's prices and costs (ADR-G002 §7). */
+  marginOk: boolean
 }
 
 /** Everything `submitInquiry` touches outside itself — injected, so the logic is unit-tested. */
@@ -165,7 +169,7 @@ export async function submitInquiryWith(
         deps.log.error(errorFields(error), 'Inquiry stock lookup failed')
         return { ok: false, error: 'unavailable' }
       }
-      if (!unit || !unit.active || isReserved(unit.reservedUntil, now)) {
+      if (!unit || !unit.active || !unit.marginOk || isReserved(unit.reservedUntil, now)) {
         deps.log.info({ stock: input.stock }, 'Inquiry for a unit that is gone or reserved')
         return { ok: false, error: 'invalid', fields: ['stock'] }
       }
@@ -384,6 +388,7 @@ export async function submitInquiry(
         return docs.map(({ id, slug, name }) => ({ id, slug, name }))
       },
       loadStock: async (id) => {
+        const { stockChecker } = await import('../../collections/stockGuard.server')
         const doc = await payload.findByID({
           collection: 'stock',
           id,
@@ -398,8 +403,14 @@ export async function submitInquiry(
               typeof entry[1] === 'string' && entry[1].trim() !== '',
           ),
         )
+        const check = (await stockChecker(payload))({
+          buildId: doc.build.id,
+          changes: doc.changes,
+          discount: doc.discount,
+        })
         return {
           id: doc.id,
+          marginOk: check.ok,
           buildSlug: doc.build.slug,
           changes,
           discount: doc.discount ?? 0,
@@ -409,29 +420,18 @@ export async function submitInquiry(
           conditionNote: doc.conditionNote,
         }
       },
-      // Only a free unit is updated (the condition is in the query), so of two reservations at the
-      // same moment the second finds nothing to update.
+      // One conditional UPDATE: the row is locked and the condition re-checked by Postgres, so of
+      // two reservations at the same moment exactly one changes it (`payload.update` with `where`
+      // reads first and writes after — two requests could both see the unit as free).
       reserveStock: async (id, until, now) => {
-        const { docs } = await payload.update({
-          collection: 'stock',
-          where: {
-            and: [
-              { id: { equals: id } },
-              { active: { equals: true } },
-              {
-                or: [
-                  { reservedUntil: { exists: false } },
-                  { reservedUntil: { less_than_equal: now } },
-                ],
-              },
-            ],
-          },
-          data: { reservedUntil: until },
-          depth: 0,
-          overrideAccess: true,
-          context: { [SKIP_STOCK_GUARD]: true },
-        })
-        return docs.length === 1
+        const { drizzle } = payload.db as unknown as PostgresAdapter
+        const result = await drizzle.execute<{ id: number }>(sql`
+          UPDATE "stock" SET "reserved_until" = ${until}, "updated_at" = now()
+          WHERE "id" = ${id} AND "active" = true
+            AND ("reserved_until" IS NULL OR "reserved_until" <= ${now})
+          RETURNING "id"
+        `)
+        return result.rows.length === 1
       },
       releaseStock: async (id) => {
         await payload.update({

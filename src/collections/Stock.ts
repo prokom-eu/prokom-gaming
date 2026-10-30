@@ -1,11 +1,6 @@
-import {
-  ValidationError,
-  type Access,
-  type CollectionBeforeChangeHook,
-  type CollectionConfig,
-} from 'payload'
+import { ValidationError, type CollectionBeforeChangeHook, type CollectionConfig } from 'payload'
 
-import { isPanelUser, panelOnly } from '../access/panel'
+import { panelOnly } from '../access/panel'
 import { SKIP_STOCK_GUARD, STOCK_CONDITIONS, STOCK_LOCATIONS } from '../lib/stock'
 import { GROUP_OFFER } from './shared'
 
@@ -18,9 +13,6 @@ const idOf = (ref: unknown): number | null => {
   return null
 }
 
-/** The site reads units on sale only; the panel reads all of them. */
-const onSaleOrPanel: Access = ({ req }) => (isPanelUser(req) ? true : { active: { equals: true } })
-
 /**
  * Margin guard (ADR-G002 §7, addendum 30.10.2026): a unit is saved only when its configuration
  * is priced, compatible and its price minus the discount keeps the minimum margin.
@@ -28,14 +20,23 @@ const onSaleOrPanel: Access = ({ req }) => (isPanelUser(req) ? true : { active: 
 const guardMargin: CollectionBeforeChangeHook = async ({ data, originalDoc, req, context }) => {
   if (context[SKIP_STOCK_GUARD]) return data
   const merged = { ...originalDoc, ...data }
+  // Taking a unit off the site or freeing a reservation must always work, even when its margin
+  // already fell (a new price batch, a cost change): the guard checks only what changes the price
+  // or puts the unit back on sale.
+  if (merged.active === false) return data
+  const changed = (key: string) =>
+    JSON.stringify(merged[key] ?? null) !== JSON.stringify(originalDoc?.[key] ?? null)
+  const relevant =
+    !originalDoc || ['build', 'changes', 'discount'].some(changed) || !originalDoc.active
+  if (!relevant) return data
   const buildId = idOf(merged.build)
   if (buildId === null) return data
   const { guardStockUnit } = await import('./stockGuard.server')
-  const result = await guardStockUnit(
-    req.payload,
-    { buildId, changes: merged.changes },
-    merged.discount,
-  )
+  const result = await guardStockUnit(req.payload, {
+    buildId,
+    changes: merged.changes,
+    discount: merged.discount,
+  })
   if (!result.ok) {
     throw new ValidationError(
       {
@@ -72,7 +73,9 @@ export const Stock: CollectionConfig = {
     description:
       'Egzemplarze do kupienia od ręki. Cena = cena konfiguracji z cennika minus rabat (strażnik marży). Strona widoczna po włączeniu FEATURE_READY.',
   },
-  access: { read: onSaleOrPanel, create: panelOnly, update: panelOnly, delete: panelOnly },
+  // Panel only: the site reads units through the Local API (`lib/stock.server.ts`), so nothing
+  // about units — not even a hidden one or a discount — is public while the page is off.
+  access: { read: panelOnly, create: panelOnly, update: panelOnly, delete: panelOnly },
   hooks: { beforeChange: [guardMargin] },
   fields: [
     {
@@ -134,6 +137,12 @@ export const Stock: CollectionConfig = {
           type: 'number',
           min: 0,
           defaultValue: 0,
+          // Whole złoty, like every price on the site.
+          validate: (value: unknown) =>
+            value === null ||
+            value === undefined ||
+            (typeof value === 'number' && Number.isInteger(value) && value >= 0) ||
+            'Rabat w pełnych złotych (bez groszy).',
           admin: { description: 'Odejmowany od ceny konfiguracji. Strażnik pilnuje marży.' },
         },
         { name: 'active', label: 'Na stronie', type: 'checkbox', defaultValue: true, index: true },
