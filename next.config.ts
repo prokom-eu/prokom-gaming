@@ -12,6 +12,10 @@ const nextConfig: NextConfig = {
   // Scenes and photos as AVIF with WebP fallback, in screen sizes (ADR-G003 §3, §6).
   images: {
     formats: ['image/avif', 'image/webp'],
+    // `next dev` only: files as they are, no on-the-fly optimisation (the first visit of a page
+    // with a 4320 px scene waited ~15 s). `next build` / `next start` — and so Lighthouse, CI and
+    // the server — optimise as before.
+    unoptimized: process.env.NODE_ENV === 'development',
   },
   webpack: (webpackConfig) => {
     webpackConfig.resolve.extensionAlias = {
