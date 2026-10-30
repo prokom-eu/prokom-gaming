@@ -108,6 +108,7 @@ Ostatnia aktualizacja: 30.10.2026 (sesja G13 — PR 2: gotowe od ręki i bon).
 - **Pozycja usunięta z oferty zostawia otwarty wpis `price-history`** (jest w partii N, nie ma jej w N+1, `writeBatch` jej nie zamyka). Dziś nieszkodliwe — części z zestawu nie da się usunąć — ale przed liczeniem „najniższej ceny z 30 dni” zamykać wpisy pozycji, których nie ma w nowej partii.
 
 ## Zrobione
+- 30.10.2026 — **P0 (dokumenty panelu, gałąź `docs/panel-p0`)**: spec. panelu v1.1 sprawdzona z kodem G3–G13. Kolejka „Do zatwierdzenia” = `buildQueue()` (wyliczana, bez tabeli). Decyzje Krystiana: zmiana przepisu zestawu zapisywana od razu po potwierdzeniu ceny (bez kolejki); `autoPublish` — P1 usuwa auto-publikację; godziny SLA w `mail-settings.replyHours`, `{termin}` = `site-settings.fulfilment`; `stock`/`vouchers` jako listy Payload w grupie „Oferta”. Dopisek G14: `inquiries.email` małymi literami.
 - 30.10.2026 — **G12 (formularz zapytania i „wysłane”)** scalona do `develop` (#27); test na prawdziwym telefonie nadal do zrobienia.
 - 29.10.2026 — **G11 (dobór pod grę, 33 strony gier, porównywarka)** scalona do `develop` (#26); Lighthouse stron gier 81–85 = odstępstwo do G15; test na prawdziwym telefonie nadal do zrobienia.
 - 28.10.2026 — **G10 PR 2 (strona konfiguratora)** scalony do `develop` (#25) — G10 zamknięta; test na prawdziwym telefonie nadal do zrobienia.
@@ -136,7 +137,7 @@ Ostatnia aktualizacja: 30.10.2026 (sesja G13 — PR 2: gotowe od ręki i bon).
 - 25.10.2026 — pakiet startowy (pierwszy commit, podpisany): CLAUDE.md, specyfikacja `docs/strony/prokomgaming.md`, ADR-G001…G005, plan G0–G16, wzorzec wyglądu v36 (`docs/design/prokomgaming/`), seed (`seed/prokomgaming/`), oczekiwane wyniki testów cen (`tests/fixtures/pricing-expected.json`).
 
 ## Następne kroki
-G1 → G2 → G3 → G4 → G5 → G6 → G7 → G8 → G9 → (kontrola 8.11) → G10 → G11 → G12 → (kontrola 13.11) → G13 → G14 (+ role, pola `orders` dla panelu) → **P1 → P3 → P4 → P2** → G15 (+ Umami) → G16 (produkcja 20.11) → **P6 → P7 → P5 → P8**. Panel: `docs/zadania/prokomgaming-panel.md` (P0 = przegląd dokumentów panelu względem kodu, bez kodu — można zrobić w dowolnym momencie przed P1; paczka wgrana 30.10 z czatu).
+G1 → G2 → G3 → G4 → G5 → G6 → G7 → G8 → G9 → (kontrola 8.11) → G10 → G11 → G12 → (kontrola 13.11) → G13 → G14 (+ role, pola `orders` dla panelu) → **P1 → P3 → P4 → P2** → G15 (+ Umami) → G16 (produkcja 20.11) → **P6 → P7 → P5 → P8**. Panel: `docs/zadania/prokomgaming-panel.md` (P0 zrobione 30.10 — spec. v1.1).
 
 ## Decyzje (skrót)
 - Osobne repo, ten sam stos i wersje co `prokom-web` (ADR-G001), porty 3100 / 54321 / 1026 / 8026.
@@ -193,4 +194,5 @@ G1 → G2 → G3 → G4 → G5 → G6 → G7 → G8 → G9 → (kontrola 8.11) �
 - Rezerwacje-psoty na „Gotowe od ręki”: dziś limit tylko na IP; przy włączaniu strony rozważyć jedną aktywną rezerwację na e-mail albo krótszy czas.
 - Alarm marży (mail) wymieniający egzemplarze ukryte przez strażnika — dziś tylko wpis w logu.
 - Newsletter „Nowy poradnik co dwa tygodnie” (plansza Poradniki) — wymaga narzędzia mailingowego i zgody marketingowej (ADR).
+- Panel: własne widoki „Gotowe od ręki” (`stock`) i „Bony” (`vouchers`) — w v1 listy Payload (P0).
 - Pełna strona `/warsztat`, edycje limitowane, raty (po umowie z bankiem i ADR), import cen z API hurtowni (odrzucone 30.10.2026 — bez AB/Action, ADR-G007), Strefa Klienta w Django (2027).

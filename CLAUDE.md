@@ -110,6 +110,6 @@ tests/fixtures/              # oczekiwane ceny i wyniki zgodności (testy G4)
 - Skrypty Krystiana (nie uruchamiaj ich sam): `scripts\start.ps1`, `scripts\koniec.ps1`.
 
 ## Wtyczki Claude Code
-- frontend-design: przy każdym UI, ALE wygląd jest zamknięty: kolory, kroje, sceny i ruch wyłącznie wg ADR-G003 i `docs/design/prokomgaming/`. Przy sprzeczności wygrywa wzorzec. W panelu wygląd wg `docs/design/prokomgaming/panel/` i tokenów `src/admin/styles/panel-tokens.css`.
+- frontend-design: przy każdym UI, ALE wygląd jest zamknięty: kolory, kroje, sceny i ruch wyłącznie wg ADR-G003 i `docs/design/prokomgaming/`. Przy sprzeczności wygrywa wzorzec. W panelu wygląd wg `docs/design/prokomgaming/panel/` i tokenów `src/admin/styles/panel-tokens.css` (powstaje w P1).
 - Superpowers: brainstorming, writing-plans, systematic-debugging, verification-before-completion. NIE: worktree, subagent-driven-development, finishing-a-development-branch — obowiązuje nasz flow (`/zadanie` → plan → PR, `/przeglad`).
 - Przy sprzeczności skilla z tym plikiem albo ze specyfikacją wygrywa ten plik i specyfikacja.
