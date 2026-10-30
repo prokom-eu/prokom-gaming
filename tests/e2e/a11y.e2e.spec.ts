@@ -7,7 +7,8 @@ import { expect, test } from '@playwright/test'
 // G10: the configurator — the level step and the case step (option cards greyed out with reasons);
 // G11: the game picker, a game page and the comparison (with „Tylko różnice” and a capped game);
 // G12: the inquiry form (first step, with a configuration) and the sent page;
-// G13: the content pages (FAQ, contact, parents, about, legal texts, guides).
+// G13: the content pages (FAQ, contact, parents, about, legal texts, guides); the voucher and
+// „Gotowe od ręki” only where FEATURE_* are on (CI) — elsewhere they answer 404 (checked as such).
 const PAGES = [
   { path: '/', status: 200 },
   { path: '/zestawy', status: 200 },
@@ -35,6 +36,8 @@ const PAGES = [
   { path: '/polityka-prywatnosci', status: 200 },
   { path: '/poradniki', status: 200 },
   { path: '/poradniki/rodzice', status: 200 },
+  { path: '/bon', status: Number(process.env.FEATURE_VOUCHER === '1' ? 200 : 404) },
+  { path: '/gotowe', status: Number(process.env.FEATURE_READY === '1' ? 200 : 404) },
   { path: '/admin/login', status: 200 },
   { path: '/nie-ma-takiej-strony', status: 404 },
 ]
