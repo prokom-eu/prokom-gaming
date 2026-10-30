@@ -30,7 +30,7 @@ function formToken(): string {
 
 // Each run comes from its own address (Nginx sets X-Real-IP), so repeated local runs do not hit
 // the limit of 5 inquiries per 10 minutes.
-const ip = `198.51.100.${randomInt(1, 254)}`
+const ip = `10.${randomInt(0, 256)}.${randomInt(0, 256)}.${randomInt(1, 255)}`
 const run = Date.now().toString(36)
 
 const inquiry = (extra: Record<string, unknown> = {}) => ({

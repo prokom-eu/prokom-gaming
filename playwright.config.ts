@@ -13,11 +13,19 @@ try {
 const port = Number(process.env.PORT ?? 3100)
 process.env.PORT = String(port)
 
+// Tests that change costs, publish price batches or try to break the offer (and put it back):
+// they run first, one at a time, and every other test starts after them — so a test reading
+// prices never sees a half-changed price list.
+const DB_WRITERS = /(prices-panel|prices-import|offer-integrity)\.e2e\.spec\.ts$/
+
 export default defineConfig({
   testDir: './tests/e2e',
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
-  workers: 1,
+  // CI: files in parallel on 3 workers (4-core runner, one `next start`); tests inside a file stay
+  // in order (`fullyParallel` off). Locally 1: `next dev` compiles every route on first visit and
+  // under parallel load slow pages miss the timeout — locally only the changed area runs anyway.
+  workers: process.env.CI ? 3 : 1,
   timeout: 60_000,
   reporter: process.env.CI ? 'github' : 'list',
   use: {
@@ -27,11 +35,35 @@ export default defineConfig({
   // The two reference widths of the design (docs/design/prokomgaming/screens/*-1440, *-414).
   projects: [
     {
+      name: 'db-writers',
+      testMatch: DB_WRITERS,
+      workers: 1,
+      use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } },
+    },
+    {
+      // The read-only checks of the prices screen at 414 (the publishing test skips on a phone).
+      name: 'db-writers-414',
+      testMatch: /prices-panel\.e2e\.spec\.ts$/,
+      workers: 1,
+      dependencies: ['db-writers'],
+      use: {
+        ...devices['Desktop Chrome'],
+        viewport: { width: 414, height: 896 },
+        deviceScaleFactor: 2,
+        isMobile: true,
+        hasTouch: true,
+      },
+    },
+    {
       name: 'desktop-1440',
+      testIgnore: DB_WRITERS,
+      dependencies: ['db-writers'],
       use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } },
     },
     {
       name: 'mobile-414',
+      testIgnore: DB_WRITERS,
+      dependencies: ['db-writers'],
       use: {
         ...devices['Desktop Chrome'],
         viewport: { width: 414, height: 896 },

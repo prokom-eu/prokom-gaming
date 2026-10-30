@@ -100,7 +100,8 @@ test.describe('phone', () => {
     const menu = page.getByRole('dialog', { name: 'Menu' })
     await expect(menu).toBeVisible()
     await expect(menu.getByRole('link', { name: /Wampir/ })).toBeAttached()
-    await expect(menu.getByRole('link', { name: 'Gotowe od ręki' })).toBeVisible()
+    // „Gotowe od ręki” is behind FEATURE_READY (G13); „Poradniki” is always in the menu.
+    await expect(menu.getByRole('link', { name: /Poradniki/ })).toBeVisible()
     await expect(menu.getByRole('link', { name: 'Napisz' })).toBeAttached()
 
     // The page behind is inert: tabbing never leaves the sheet.
