@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import type { CSSProperties, ReactNode } from 'react'
 
+import type { Features } from '@/lib/features'
 import { buildHref, routes } from '@/lib/nav'
 import type { MenuCreature } from '@/lib/site'
 
@@ -28,6 +29,7 @@ import { ButtonLink } from './ui/Button'
 type Props = {
   creatures: MenuCreature[]
   phone: { label: string; href: string }
+  features: Features
 }
 
 type Tile = { href: string; icon: ReactNode; title: string; note: string }
@@ -36,10 +38,10 @@ type Tile = { href: string; icon: ReactNode; title: string; note: string }
  * The "Menu" tab (ADR-G003 §4, stany/tel-02-menu.jpg): a bottom sheet on the phone, a panel
  * from the right on a tablet. 16 creatures, 8 tiles, 4 links and the contact card.
  */
-export function MenuSheet({ creatures, phone }: Props) {
+export function MenuSheet({ creatures, phone, features }: Props) {
   const { menuOpen, closeMenu, compareCount } = useShell()
 
-  const tiles: Tile[] = [
+  const allTiles: Tile[] = [
     {
       href: routes.stock,
       icon: <IconBox />,
@@ -64,6 +66,12 @@ export function MenuSheet({ creatures, phone }: Props) {
     { href: routes.voucher, icon: <IconGift />, title: 'Bon podarunkowy', note: 'na prezent' },
     { href: routes.faq, icon: <IconQuestion />, title: 'Częste pytania', note: 'zakup i dostawa' },
   ]
+  // Gotowe od ręki and the voucher only when their page is on (lib/features.ts).
+  const tiles = allTiles.filter(
+    (t) =>
+      (features.ready || t.href !== routes.stock) &&
+      (features.voucher || t.href !== routes.voucher),
+  )
 
   return (
     <BottomSheet
