@@ -1,12 +1,13 @@
 import Link from 'next/link'
 
+import type { Features } from '@/lib/features'
 import { routes } from '@/lib/nav'
 import { company, social } from '@/lib/site'
 
 import { Logo } from './Logo'
 import { Container } from './ui/Container'
 
-const columns = [
+const allColumns = [
   {
     title: 'Komputery',
     links: [
@@ -42,7 +43,16 @@ const columns = [
 ]
 
 /** Footer (spec. §3): 5 columns + legal bar; on a phone 2 columns, first and last full width. */
-export function SiteFooter() {
+export function SiteFooter({ features }: { features: Features }) {
+  // Gotowe od ręki and the voucher only when their page is on (lib/features.ts).
+  const hidden = new Set<string>([
+    ...(features.ready ? [] : [routes.stock]),
+    ...(features.voucher ? [] : [routes.voucher]),
+  ])
+  const columns = allColumns.map((col) => ({
+    ...col,
+    links: col.links.filter((link) => !hidden.has(link.href)),
+  }))
   return (
     <footer className="foot">
       <Container className="foot__grid">

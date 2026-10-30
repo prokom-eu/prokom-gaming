@@ -10,6 +10,7 @@ import * as migration_20261028_224243_games_intro from './20261028_224243_games_
 import * as migration_20261030_181905_inquiries_light_color from './20261030_181905_inquiries_light_color'
 import * as migration_20261030_201740_legal_globals from './20261030_201740_legal_globals'
 import * as migration_20261030_202851_guides from './20261030_202851_guides'
+import * as migration_20261030_212115_stock_vouchers from './20261030_212115_stock_vouchers'
 
 export const migrations = [
   {
@@ -71,5 +72,10 @@ export const migrations = [
     up: migration_20261030_202851_guides.up,
     down: migration_20261030_202851_guides.down,
     name: '20261030_202851_guides',
+  },
+  {
+    up: migration_20261030_212115_stock_vouchers.up,
+    down: migration_20261030_212115_stock_vouchers.down,
+    name: '20261030_212115_stock_vouchers',
   },
 ]

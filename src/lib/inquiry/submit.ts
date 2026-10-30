@@ -1,14 +1,18 @@
+import { sql, type PostgresAdapter } from '@payloadcms/db-postgres'
+
 import type { Inquiry } from '../../payload-types'
 import type { CompatError } from '../compat'
 import { errorFields, type LogFields } from '../logger'
 import type { PriceSnapshot } from '../pricing/snapshot'
 import type { Config } from '../pricing/types'
+import { isReserved, locationOf, RESERVATION_MS, SKIP_STOCK_GUARD, stockPrice } from '../stock'
 import {
   confirmationEmail,
   notificationEmail,
   type ComputerForEmail,
   type Email,
   type InquiryForEmail,
+  type StockForEmail,
 } from './emails'
 import { priceComputer, type InquiryOffer, type PricedComputer } from './price'
 import { inquiryFieldErrors, parseInquiryInput } from './schema'
@@ -36,6 +40,21 @@ export type Pricing = {
   labels: { level: Record<string, string>; option: Record<string, string> }
 }
 
+/** A „Gotowe od ręki” unit as the inquiry needs it: what to price and whether it is free. */
+export type StockUnit = {
+  id: number
+  buildSlug: string
+  /** Codes changed against the build's recipe (empty = the recipe). */
+  changes: Partial<Config>
+  discount: number
+  active: boolean
+  reservedUntil: string | null
+  location: string
+  conditionNote: string
+  /** The panel's margin guard still accepts it at today's prices and costs (ADR-G002 §7). */
+  marginOk: boolean
+}
+
 /** Everything `submitInquiry` touches outside itself — injected, so the logic is unit-tested. */
 export type SubmitDeps = {
   secret: string
@@ -44,6 +63,12 @@ export type SubmitDeps = {
   /** `null` when no price batch is published yet (a new database). */
   loadPricing: () => Promise<Pricing | null>
   findGames: (slugs: string[]) => Promise<{ id: number; slug: string; name: string }[]>
+  /** `null` = no such unit (or not readable). */
+  loadStock: (id: number) => Promise<StockUnit | null>
+  /** Claims the unit until `until` unless it is reserved at `now`; `false` = someone was first. */
+  reserveStock: (id: number, until: string, now: string) => Promise<boolean>
+  /** Gives the unit back when the inquiry could not be saved. */
+  releaseStock: (id: number) => Promise<void>
   /** Returns the record after the hooks, so with its number. */
   save: (data: NewInquiry) => Promise<{ id: number; number?: string | null }>
   sendEmail: (email: Email) => Promise<unknown>
@@ -74,7 +99,11 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 const carriesComputer = (type: InquiryType) => (CONFIG_TYPES as readonly string[]).includes(type)
 
-function computerForEmail(priced: PricedComputer, pricing: Pricing): ComputerForEmail {
+function computerForEmail(
+  priced: PricedComputer,
+  pricing: Pricing,
+  unit: StockUnit | null,
+): ComputerForEmail {
   const { level, option } = pricing.labels
   const config: Config = priced.config
   return {
@@ -89,6 +118,7 @@ function computerForEmail(priced: PricedComputer, pricing: Pricing): ComputerFor
     },
     price: priced.price,
     publishedAt: pricing.snapshot.publishedAt,
+    ...(unit ? { unit: { discount: unit.discount } } : {}),
   }
 }
 
@@ -119,7 +149,8 @@ export async function submitInquiryWith(
   // The computer is priced and checked here, from published prices — never taken as sent.
   let pricing: Pricing | null = null
   let priced: PricedComputer | null = null
-  if (carriesComputer(input.type)) {
+  let unit: StockUnit | null = null
+  if (carriesComputer(input.type) || input.type === 'ready') {
     try {
       pricing = await deps.loadPricing()
     } catch (error) {
@@ -130,13 +161,37 @@ export async function submitInquiryWith(
       deps.log.error({}, 'Inquiry with a computer, but no prices are published')
       return { ok: false, error: 'unavailable' }
     }
-    const result = priceComputer(input, pricing.offer, pricing.snapshot)
-    if (!result.ok) {
+    if (input.type === 'ready') {
+      // „Gotowe od ręki”: the unit's configuration, priced like any computer, minus its discount.
+      try {
+        unit = input.stock === undefined ? null : await deps.loadStock(input.stock)
+      } catch (error) {
+        deps.log.error(errorFields(error), 'Inquiry stock lookup failed')
+        return { ok: false, error: 'unavailable' }
+      }
+      if (!unit || !unit.active || !unit.marginOk || isReserved(unit.reservedUntil, now)) {
+        deps.log.info({ stock: input.stock }, 'Inquiry for a unit that is gone or reserved')
+        return { ok: false, error: 'invalid', fields: ['stock'] }
+      }
+      const result = priceComputer(
+        { build: unit.buildSlug, config: unit.changes },
+        pricing.offer,
+        pricing.snapshot,
+      )
+      const price = result.ok ? stockPrice(result.price, unit.discount) : null
+      if (!result.ok || price === null) {
+        deps.log.error({ stock: unit.id }, 'Stock unit cannot be priced')
+        return { ok: false, error: 'invalid', fields: ['stock'] }
+      }
+      priced = { ...result, price }
+    }
+    const result = priced ? null : priceComputer(input, pricing.offer, pricing.snapshot)
+    if (result && !result.ok) {
       // Codes only: which rule the configuration broke, for the site to explain (G12).
       deps.log.info({ fields: result.fields, compat: result.compat }, 'Inquiry computer rejected')
       return { ok: false, error: 'invalid', fields: result.fields, compat: result.compat }
     }
-    priced = result
+    if (result) priced = result
   }
 
   // Unknown or removed games are dropped, like a stale list: not the customer's fault.
@@ -159,6 +214,22 @@ export async function submitInquiryWith(
     return { ok: false, error: 'rate_limited' }
   }
   const acceptedAt = new Date(now).toISOString()
+
+  // The unit is claimed before the record is saved: of two people at the same moment, one wins.
+  const reservedUntil = new Date(now + RESERVATION_MS).toISOString()
+  if (unit) {
+    let claimed: boolean
+    try {
+      claimed = await deps.reserveStock(unit.id, reservedUntil, acceptedAt)
+    } catch (error) {
+      deps.log.error(errorFields(error), 'Stock reservation failed')
+      return { ok: false, error: 'unavailable' }
+    }
+    if (!claimed) {
+      deps.log.info({ stock: unit.id }, 'Stock unit reserved by someone else')
+      return { ok: false, error: 'invalid', fields: ['stock'] }
+    }
+  }
 
   let saved: { id: number; number?: string | null }
   try {
@@ -191,9 +262,19 @@ export async function submitInquiryWith(
       consent: { ...input.consent, acceptedAt },
       marketingConsent: input.marketingConsent,
       source: input.source,
+      voucher: input.voucher ?? {},
+      stock: unit?.id ?? null,
     })
   } catch (error) {
     deps.log.error(errorFields(error), 'Inquiry not saved')
+    if (unit) {
+      await deps.releaseStock(unit.id).catch((releaseError: unknown) => {
+        deps.log.error(
+          { stock: unit.id, ...errorFields(releaseError) },
+          'Stock reservation not released',
+        )
+      })
+    }
     return { ok: false, error: 'unavailable' }
   }
   const { id } = saved
@@ -203,10 +284,20 @@ export async function submitInquiryWith(
   deps.log.info({ inquiry: id, type: input.type }, 'Inquiry saved')
 
   // The record is the source of truth: a failed e-mail is logged, the customer still gets 201.
+  const { stock: _stockId, ...fields } = input
+  const stock: StockForEmail | null = unit
+    ? {
+        id: unit.id,
+        location: locationOf(unit.location)?.label ?? unit.location,
+        conditionNote: unit.conditionNote,
+        reservedUntil,
+      }
+    : null
   const forEmail: InquiryForEmail = {
-    ...input,
+    ...fields,
+    stock,
     number,
-    computer: priced && pricing ? computerForEmail(priced, pricing) : null,
+    computer: priced && pricing ? computerForEmail(priced, pricing, unit) : null,
     games: games.map((g) => g.name),
     consent: { clauseVersion: input.consent.clauseVersion, acceptedAt },
   }
@@ -295,6 +386,62 @@ export async function submitInquiry(
           overrideAccess: true,
         })
         return docs.map(({ id, slug, name }) => ({ id, slug, name }))
+      },
+      loadStock: async (id) => {
+        const { stockChecker } = await import('../../collections/stockGuard.server')
+        const doc = await payload.findByID({
+          collection: 'stock',
+          id,
+          depth: 1,
+          overrideAccess: true,
+          disableErrors: true,
+        })
+        if (!doc || typeof doc.build !== 'object' || doc.build === null) return null
+        const changes = Object.fromEntries(
+          Object.entries(doc.changes ?? {}).filter(
+            (entry): entry is [string, string] =>
+              typeof entry[1] === 'string' && entry[1].trim() !== '',
+          ),
+        )
+        const check = (await stockChecker(payload))({
+          buildId: doc.build.id,
+          changes: doc.changes,
+          discount: doc.discount,
+        })
+        return {
+          id: doc.id,
+          marginOk: check.ok,
+          buildSlug: doc.build.slug,
+          changes,
+          discount: doc.discount ?? 0,
+          active: doc.active ?? false,
+          reservedUntil: doc.reservedUntil ?? null,
+          location: doc.location,
+          conditionNote: doc.conditionNote,
+        }
+      },
+      // One conditional UPDATE: the row is locked and the condition re-checked by Postgres, so of
+      // two reservations at the same moment exactly one changes it (`payload.update` with `where`
+      // reads first and writes after — two requests could both see the unit as free).
+      reserveStock: async (id, until, now) => {
+        const { drizzle } = payload.db as unknown as PostgresAdapter
+        const result = await drizzle.execute<{ id: number }>(sql`
+          UPDATE "stock" SET "reserved_until" = ${until}, "updated_at" = now()
+          WHERE "id" = ${id} AND "active" = true
+            AND ("reserved_until" IS NULL OR "reserved_until" <= ${now})
+          RETURNING "id"
+        `)
+        return result.rows.length === 1
+      },
+      releaseStock: async (id) => {
+        await payload.update({
+          collection: 'stock',
+          id,
+          data: { reservedUntil: null },
+          depth: 0,
+          overrideAccess: true,
+          context: { [SKIP_STOCK_GUARD]: true },
+        })
       },
       save: (data) =>
         payload.create({ collection: 'inquiries', data, depth: 0, overrideAccess: true }),

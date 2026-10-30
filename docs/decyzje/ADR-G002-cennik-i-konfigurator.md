@@ -91,6 +91,8 @@ Kroki: **Monitor i gry → Poziom mocy → Obudowa → Chłodzenie → RAM i dys
 ## 7. Promocje
 Rabat kwotowy albo procentowy na **poziom albo opcję**, nigdy na sam zestaw (obejmuje gotowca i identyczny wybór). Nie może zejść poniżej podłogi marży (walidacja). Przy obniżce: najniższa cena z 30 dni z `price-history`.
 
+**Uzupełnienie 30.10.2026 (G13 — „Gotowe od ręki”, decyzja Krystiana):** wyjątek dla **konkretnego egzemplarza** z kolekcji `stock` (pokazowy, z wystawy, po zwrocie): cena egzemplarza = cena jego konfiguracji z najnowszej opublikowanej partii (`lib/inquiry/price.ts`, te same kody co zestaw) **minus `discount` egzemplarza w zł**. To nie jest promocja zestawu — cena zestawu na stronie i w konfiguratorze się nie zmienia. Strażnik (`lib/pricing/stock.ts`) działa w trzech miejscach: panel nie zapisze egzemplarza, którego marża po rabacie spada poniżej `minMargin` (hak kolekcji `stock`; zdjęcie ze strony i zwolnienie rezerwacji przechodzą zawsze); strona nie pokaże, a serwer nie przyjmie rezerwacji egzemplarza, który przy dzisiejszych cenach i kosztach łamie marżę (np. po nowej partii albo wzroście kosztów — wtedy znika ze strony z wpisem w logu). Serwer liczy cenę przy zapytaniu `ready`, nigdy nie bierze jej z przeglądarki. Omnibus (czy cena egzemplarza z rabatem to „obniżka” wymagająca najniższej ceny z 30 dni) — do potwierdzenia z prawnikiem przed włączeniem strony (`FEATURE_READY`).
+
 ## 8. Testy obowiązkowe (G4)
 1. Każdy zestaw: `price(build) == price(konfiguracja z tych samych kodów)` == `fixtures.builds[].price`.
 2. Pełny przegląd: 85 134 zgodnych, `rejectedByReason`, `minMargin` 0,110920 dla `P01 + H9 + KRAKEN + R16D4 + PXL512` (6 410 zł).

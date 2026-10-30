@@ -1,19 +1,19 @@
 # STAN — prokom-gaming
 
-Ostatnia aktualizacja: 30.10.2026 (sesja G13 — strony treści, PR 1).
+Ostatnia aktualizacja: 30.10.2026 (sesja G13 — PR 2: gotowe od ręki i bon).
 
 ## W toku
-- **G13 — strony treści, gotowe od ręki, bon.** Decyzje Krystiana (30.10): **2 PR-y** (świadomie duże, commity per strona) — PR 1 `feat/g13-strony-tresci` (strony treści), PR 2 `feat/g13-gotowe-bon` (gotowe + bon **za flagą**, domyślnie wyłączone). Plan: `stock` z ceną z `snapshot.ts` minus rabat egzemplarza (strażnik marży w panelu przez `cost.ts`), `vouchers`, API przyjmuje `voucher`/`ready`, flagi w `site-settings`.
-- PR 1 — zrobione (gałąź `feat/g13-strony-tresci`, 10 commitów, niewypchnięta):
-  - `/pytania` (5 grup / 21 pytań z `faq`, przełączanie, bez JS widać wszystkie grupy, JSON-LD `FAQPage`), wspólny nagłówek stron treści (`PageHeader`, `content.css`, tokeny `--ct-*`, `JsonLd`).
-  - `/kontakt`: 3 kanały, 2 sklepy z rysowaną mapą (link do Google Maps, bez iframe), „Krótkie pytanie?” → `POST /api/inquiry` typu `contact` (token, honeypot, limit). **Nowa klauzula `CONTACT_CONSENT_CLAUSE` z wersją `2026-10-30-kontakt`**; API przyjmuje obie wersje (rekord zapisuje przyjętą).
-  - `/dla-rodzicow` (jasna strona; jasny wariant nagłówka powłoki `[data-nav-light]`, na telefonie po przewinięciu wraca ciemny), `/o-nas`.
-  - `/regulamin`, `/polityka-prywatnosci`: globale `legal-terms` / `legal-privacy` (flaga projektu, wersja, data, „w skrócie”, Lexical z `EXPERIMENTAL_TableFeature` — tabele polityki), migracja `legal_globals`; spis treści i „§ n” z nagłówków H2, kotwica `#cookies` ze stopki. Seed: Markdown z plansz (`seed/prokomgaming/legal-*.md`) → Lexical.
-  - Poradniki: kolekcja `guides` (szkice Payload, publicznie tylko `published`, `readVersions` tylko panel), migracja `guides`; `/poradniki` (temat w `?temat=`), `/poradniki/[slug]` (spis treści, „Ściągawka” = cytat, polecane istoty, „Czytaj dalej”, JSON-LD `Article`). Seed: „rodzice” opublikowany, 6 szkiców.
-  - Testy: Vitest +27 (516), e2e `content-pages` (8 stron × 1440/414, zero `[..]` w treści, kontakt → rekord + 2 maile, szkice → 404 i 403 na `/versions`), axe +8 stron. Regresja `inquiry-api`, `inquiry-form`, `shell`, `admin` zielona; `pnpm build` zielony; migracje up → down → up czyste; seed 2× idempotentny.
-- `/przeglad` (recenzent): „poprawki wymagane” — poprawione: strony prawne na pustej bazie (500 → komunikat), `readVersions` poradników, nawiasy w polityce i szczelniejszy test, `/pytania` bez JS, adresy rejestrów w `lib/site.ts`.
-- Niesprawdzone: Lighthouse mobile nowych stron, prawdziwy telefon (Android + iPhone).
-- **Następny krok:** decyzja Krystiana o PR 1 (`/pr`) → PR 2 `feat/g13-gotowe-bon` od `develop` po scaleniu PR 1.
+- **G13 — PR 2: gotowe od ręki i bon (za flagami).** PR 1 (strony treści) scalony 30.10 (#29). Gałąź `feat/g13-gotowe-bon` od `develop`, jeden PR (decyzja Krystiana 30.10). Decyzje Krystiana (30.10): cena egzemplarza = cena konfiguracji z partii **minus rabat egzemplarza** (uzupełnienie ADR-G002 §7) ze strażnikiem marży; dane kontaktowe w **arkuszu na stronie** (nie przez 4 kroki G12).
+- Zrobione:
+  - Flagi `FEATURE_READY` / `FEATURE_VOUCHER` (`lib/features.ts`, domyślnie wyłączone): strona 404, linki w stopce i menu znikają; CI e2e włącza obie; lokalnie konfiguracja `dev-gotowe-bon` w `.claude/launch.json`. **Zmiana względem planu:** zmienne środowiskowe zamiast pola w `site-settings` — layout nie czyta bazy; uzasadnienie w ADR-G005 (uzupełnienie 30.10).
+  - Kolekcje `stock` (zestaw + zmiany kodów, miejsce, stan, opis, rabat w pełnych zł, `reservedUntil`, tylko panel) i `vouchers` (kod `XXXX-XXXX` z `crypto`, statusy, tylko panel); pola `inquiries.voucher` i `inquiries.stock`; migracja `stock_vouchers` (down poprawiony jak w `faq`).
+  - Strażnik marży egzemplarza (`lib/pricing/stock.ts`, `collections/stockGuard.server.ts`): przy zapisie w panelu (zdjęcie ze strony i zwolnienie rezerwacji przechodzą zawsze) **i** przy każdym wyświetleniu oraz rezerwacji — egzemplarz łamiący marżę po nowej partii lub wzroście kosztów znika ze strony (log `stock unit hidden`).
+  - API: `voucher` (kwota z listy, wygląd) i `ready` (cena z serwera, rezerwacja 24 h jednym `UPDATE … RETURNING` przed zapisem, zwolnienie przy błędzie zapisu); maile z bonem/egzemplarzem i własnymi krokami „Co będzie dalej”.
+  - `/bon` (podgląd na żywo, kwota, wygląd, dla kogo, dedykacja, arkusz `QuickInquirySheet`), `/gotowe` (karty z `stockCards`, rezerwacja w arkuszu, „Powiadom mnie” → `/zapytanie`). Seed: 3 przykładowe egzemplarze z planszy (lokalnie i w CI, każde uruchomienie zwalnia rezerwacje).
+  - Testy: Vitest 537; e2e `sale-pages` (bon → rekord + maile, rezerwacja → rekord z ceną egzemplarza i zniknięcie z listy, wyścig dwóch rezerwacji → 201 + 400, strażnik blokuje za duży rabat, `/api/stock` 403), axe `/bon` i `/gotowe`, regresja `inquiry-api`, `inquiry-form`, `shell`, `content-pages`, `admin`, `offer-api`; `pnpm build` zielony; migracja up → down → up czysta.
+- `/przeglad` (recenzent): „poprawki wymagane” — poprawione: rezerwacja atomowa w SQL (+ test wyścigu), strażnik także przy wyświetlaniu i sprzedaży, strażnik nie blokuje zdjęcia egzemplarza, `stock` tylko panel, rabat w pełnych zł, CI kończy się błędem, gdy flag brak, `prefers-reduced-motion`, `TODO` (kod bonu w formularzu, retencja bonów, JSON-LD).
+- Niesprawdzone: Lighthouse mobile `/bon` i `/gotowe`, prawdziwy telefon.
+- **Następny krok:** PR 2 G13 → CI → squash → G14 (z dopiskami panelu; P0 zrobione 30.10, kolejność: `docs/zadania/prokomgaming-panel.md` §1).
 
 ## Uwagi na później (G13)
 - **Treści do potwierdzenia (`TODO(krystian)`):** klauzula `CONTACT_CONSENT_CLAUSE` (prawnik, razem z polityką), komunikaty wysyłki kontaktu i „Wysyłam…”, tekst pustej listy poradników, komunikat stron prawnych przy awarii bazy, wiadomość „Wyślij go komuś”, telefon Gaming i godziny telefonu oraz sklepów [SZEF], lata salonu i serwisu kas w historii („O nas”), kwoty w poradniku „rodzice” (zdanie z „[konkretne kwoty…]” usunięte — wpisać w panelu po ustaleniu cennika).
@@ -24,6 +24,11 @@ Ostatnia aktualizacja: 30.10.2026 (sesja G13 — strony treści, PR 1).
 - **`EXPERIMENTAL_TableFeature`** (tabele w edytorze prawnym) — sprawdzić przy aktualizacji Payload razem z `prokom-web`.
 - **G15:** sitemap (+8 adresów stron treści i poradników z bazy), `Article` z `image`, Lighthouse stron treści, breadcrumb JSON-LD stron prawnych.
 - Drobne z przeglądu (bez zmian): `legalHeadings`/`nodeText` obsługują też poradniki (nazwa myli — kiedyś `lib/richtext.ts`); `/poradniki/[slug]` przy awarii bazy daje 500 (inne strony mają łagodny fallback); obie wersje klauzuli przyjmowane dla każdego typu.
+
+- **PR 2 (gotowe i bon) — do decyzji przed włączeniem flag [SZEF]:** kwoty bonów i ważność 12 mies. (`VOUCHER_AMOUNTS`), co z resztą bonu, egzemplarze i rabaty, Omnibus przy cenie egzemplarza z rabatem (prawnik), pole na kod bonu w formularzu G12, retencja danych z bonu (odbiorca, dedykacja), JSON-LD `/bon` i `/gotowe` (G15). Teksty robocze (`TODO(krystian)`): kroki „Co będzie dalej” bonu i rezerwacji w mailu, komunikaty po wysłaniu, „ktoś przed chwilą zarezerwował”, pusta lista gotowych.
+- **Świadome odstępstwa od plansz Bon i Gotowe:** bez pytania o raty (decyzja „bez rat”) i bez „[do decyzji]”; kod na podglądzie bonu „XXXX-XXXX” bez nawiasów; zamówienie i rezerwacja w arkuszu z danymi kontaktowymi (plansza linkuje do formularza); bez „egzemplarz nr …” (numery egzemplarzy w G14) i bez dopisku „Przykładowe egzemplarze…”; „Powiadom mnie” prowadzi do `/zapytanie`; zdjęcie obudowy z przepisu zestawu (zmieniona obudowa = bez zdjęcia).
+- **G16 — flagi:** `FEATURE_READY` / `FEATURE_VOUCHER` w `compose.*.yml` i jako argument budowy obrazu (strony statyczne czytają flagę przy budowie — inaczej stopka i menu na `/dla-rodzicow`, `/o-nas` nie pokażą linków); na staging na demo dla szefa włączone, na produkcji wyłączone do decyzji.
+- **Migracja `stock_vouchers` — `down` kasuje egzemplarze, bony i pola bonu/egzemplarza w zapytaniach.** Usunięcie zestawu z egzemplarzami kończy się błędem bazy (`build_id NOT NULL`) — najpierw usuń egzemplarz.
 
 ## Uwagi na później (G12)
 - **Treści do potwierdzenia (`TODO(krystian)`):** komunikaty, których nie ma na planszy (telefon, NIP, pusta lista, błędy wysyłki 400/429/503, „Wysyłam…”, konfiguracji nie da się wycenić), zgoda marketingowa (z prawnikiem, razem z klauzulą `consent.ts`), scena po wysłaniu dla „Pomóżcie mi dobrać” i własnej listy (dziś domyślna istota głównej), tekst przy awarii bazy na `/zapytanie`, dopisek przy cenie.
@@ -186,6 +191,8 @@ G1 → G2 → G3 → G4 → G5 → G6 → G7 → G8 → G9 → (kontrola 8.11) �
 ## Pomysły na później
 - 7 rodzajów podstawy pod komputerem w hero (kamień, woda, grobowiec, pień, lustro, lód, bazalt — plansza Main) jako obrazy z czatu (G7: jedna wspólna).
 - Błyskawica nad dębem w „Napisz, w co grasz” (animacja z planszy Main, `.fbolt`) — G8 ma statyczny dąb.
+- Rezerwacje-psoty na „Gotowe od ręki”: dziś limit tylko na IP; przy włączaniu strony rozważyć jedną aktywną rezerwację na e-mail albo krótszy czas.
+- Alarm marży (mail) wymieniający egzemplarze ukryte przez strażnika — dziś tylko wpis w logu.
 - Newsletter „Nowy poradnik co dwa tygodnie” (plansza Poradniki) — wymaga narzędzia mailingowego i zgody marketingowej (ADR).
 - Panel: własne widoki „Gotowe od ręki” (`stock`) i „Bony” (`vouchers`) — w v1 listy Payload (P0).
 - Pełna strona `/warsztat`, edycje limitowane, raty (po umowie z bankiem i ADR), import cen z API hurtowni (odrzucone 30.10.2026 — bez AB/Action, ADR-G007), Strefa Klienta w Django (2027).

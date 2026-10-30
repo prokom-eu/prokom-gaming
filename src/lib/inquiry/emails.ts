@@ -14,7 +14,9 @@ import {
   PICKUP_CHOICES,
   PREFERRED_CONTACT_CHOICES,
   REFRESH_CHOICES,
+  VOUCHER_DESIGN_CHOICES,
   type InquiryType,
+  type VoucherDesign,
 } from './types'
 
 type Choice<T extends readonly { value: string }[]> = T[number]['value']
@@ -28,6 +30,16 @@ export type ComputerForEmail = {
   price: number
   /** When the prices were published: „cena z dnia …” (ADR-G002 §2). */
   publishedAt: string
+  /** A „Gotowe od ręki” unit: `price` is its own price (configuration minus `discount`). */
+  unit?: { discount: number }
+}
+
+/** The reserved unit (type `ready`), as the team needs it. */
+export type StockForEmail = {
+  id: number
+  location: string
+  conditionNote: string
+  reservedUntil: string
 }
 
 /** What the e-mails need from a saved inquiry. */
@@ -59,6 +71,8 @@ export type InquiryForEmail = {
   source: { url: string; utmSource?: string; utmMedium?: string; utmCampaign?: string }
   consent: { clauseVersion: string; acceptedAt: string }
   marketingConsent: boolean
+  voucher?: { amount: number; design: VoucherDesign; recipient?: string; dedication?: string }
+  stock?: StockForEmail | null
 }
 
 export type Email = { to: string; replyTo?: string; subject: string; text: string }
@@ -115,9 +129,17 @@ function computerLines(
       return `- ${PART_LABELS[key]}: ${label}${withCodes && label !== code ? ` (${code})` : ''}`
     }),
     ...(lightColor ? [`- Światło: ${labelOf(LIGHT_COLOR_CHOICES, lightColor)}`] : []),
-    `Cena: ${zl(computer.price)} brutto (cena z dnia ${dateFormat.format(new Date(computer.publishedAt))})`,
+    computer.unit
+      ? `Cena za ten egzemplarz: ${zl(computer.price)} brutto` +
+        (withCodes && computer.unit.discount > 0
+          ? ` (rabat egzemplarza ${zl(computer.unit.discount)}, ceny z dnia ${dateFormat.format(new Date(computer.publishedAt))})`
+          : '')
+      : `Cena: ${zl(computer.price)} brutto (cena z dnia ${dateFormat.format(new Date(computer.publishedAt))})`,
   ]
 }
+
+const voucherText = (voucher: NonNullable<InquiryForEmail['voucher']>) =>
+  `${zl(voucher.amount)}, wygląd ${labelOf(VOUCHER_DESIGN_CHOICES, voucher.design)}`
 
 function monitorText(inquiry: InquiryForEmail): string | undefined {
   const parts = [
@@ -150,6 +172,20 @@ export function notificationEmail(
     '',
     `Rodzaj: ${typeLabel(inquiry.type)}`,
     ...(inquiry.computer ? computerLines(inquiry.computer, true, inquiry.lightColor) : []),
+    ...(inquiry.stock
+      ? rows([
+          ['Egzemplarz', `#${inquiry.stock.id}, ${inquiry.stock.location}`],
+          ['Stan', inquiry.stock.conditionNote],
+          ['Zarezerwowany do', dateTimeFormat.format(new Date(inquiry.stock.reservedUntil))],
+        ])
+      : []),
+    ...(inquiry.voucher
+      ? rows([
+          ['Bon', voucherText(inquiry.voucher)],
+          ['Dla kogo (na bonie)', inquiry.voucher.recipient],
+          ['Dedykacja', inquiry.voucher.dedication],
+        ])
+      : []),
     ...rows([
       ['Dla kogo', optional(FOR_WHOM_CHOICES, inquiry.forWhom)],
       ['Budżet', optional(BUDGET_CHOICES, inquiry.budget)],
@@ -202,6 +238,25 @@ export const NEXT_STEPS = [
   ['5–10 dni roboczych', 'Montaż, test obciążeniowy, pomiary w grach, metryka i wysyłka.'],
 ] as const
 
+// TODO(krystian): the steps of a voucher and of a reserved unit (not on the boards; working text
+// from the Bon and Gotowe boards: PDF after payment, shipping in 1–2 working days).
+const VOUCHER_STEPS = [
+  ['Teraz', 'Zamówienie bonu jest u nas. Kopia poszła na Twój e-mail.'],
+  ['W ciągu godziny', 'Odpiszemy z fakturą pro forma. Codziennie 8–22.'],
+  ['Gdy zapłacisz', 'Bon jako PDF do druku przyjdzie na e-mail albo czeka w kopercie w sklepie.'],
+] as const
+const READY_STEPS = [
+  ['Teraz', 'Egzemplarz jest zarezerwowany dla Ciebie na 24 godziny.'],
+  ['W ciągu godziny', 'Odpiszemy z fakturą pro forma i terminem odbioru. Codziennie 8–22.'],
+  ['Gdy zapłacisz', 'Wysyłka w 1–2 dni robocze albo odbiór w sklepie od ręki.'],
+] as const
+
+export function nextSteps(type: InquiryType): readonly (readonly [string, string])[] {
+  if (type === 'voucher') return VOUCHER_STEPS
+  if (type === 'ready') return READY_STEPS
+  return NEXT_STEPS
+}
+
 /**
  * Confirmation for the customer: number, computer and price, what comes next (spec. §10: the
  * board's „Co będzie dalej”). It does not repeat the message or the contact details: anyone can
@@ -222,11 +277,20 @@ export function confirmationEmail(
       `dziękujemy za zapytanie ${inquiry.number}.` +
         (responseTime ? ` Odpiszemy ${responseTime}.` : ' Odpiszemy najszybciej, jak się da.'),
       ...(inquiry.computer
-        ? ['', 'Twoja konfiguracja:', ...computerLines(inquiry.computer, false, inquiry.lightColor)]
+        ? [
+            '',
+            inquiry.stock ? 'Zarezerwowany egzemplarz:' : 'Twoja konfiguracja:',
+            ...computerLines(inquiry.computer, false, inquiry.lightColor),
+          ]
         : []),
+      ...(inquiry.stock
+        ? [`Rezerwacja do: ${dateTimeFormat.format(new Date(inquiry.stock.reservedUntil))}`]
+        : []),
+      // Amount and look only: the recipient and the dedication are what a person typed (see above).
+      ...(inquiry.voucher ? ['', `Bon podarunkowy: ${voucherText(inquiry.voucher)}`] : []),
       '',
       'Co będzie dalej:',
-      ...NEXT_STEPS.map(([title, text], i) => `${i + 1}. ${title}: ${text}`),
+      ...nextSteps(inquiry.type).map(([title, text], i) => `${i + 1}. ${title}: ${text}`),
       '',
       'Coś się nie zgadza? Odpowiedz na tę wiadomość.',
       'Jeśli to nie Ty wysłałeś(-aś) ten formularz, zignoruj tę wiadomość.',

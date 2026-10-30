@@ -50,10 +50,28 @@ describe('parseInquiryInput', () => {
     if (result.success) expect(result.data.phone).toBeUndefined()
   })
 
-  it('rejects voucher and ready until G13, and unknown types', () => {
-    expect(fields({ ...base, type: 'voucher' })).toContain('type')
-    expect(fields({ ...base, type: 'ready' })).toContain('type')
+  it('rejects unknown types', () => {
     expect(fields({ ...base, type: 'order' })).toContain('type')
+  })
+
+  it('voucher: an amount from the list and a look; its fields only in a voucher', () => {
+    const voucher = { amount: 1000, design: 'perun', recipient: 'Dla Kuby' }
+    expect(fields({ ...base, type: 'voucher', voucher })).toEqual([])
+    expect(fields({ ...base, type: 'voucher' })).toContain('voucher')
+    expect(fields({ ...base, type: 'voucher', voucher: { ...voucher, amount: 750 } })).toContain(
+      'voucher.amount',
+    )
+    expect(fields({ ...base, type: 'voucher', voucher: { ...voucher, design: 'zmij' } })).toContain(
+      'voucher.design',
+    )
+    expect(fields({ ...build, voucher })).toContain('voucher')
+  })
+
+  it('ready: the unit id, nothing priced from the browser; the unit only in ready', () => {
+    expect(fields({ ...base, type: 'ready', stock: 3 })).toEqual([])
+    expect(fields({ ...base, type: 'ready' })).toContain('stock')
+    expect(fields({ ...base, type: 'ready', stock: 3, build: 'wampir' })).toContain('build')
+    expect(fields({ ...base, type: 'contact', message: 'x', stock: 3 })).toContain('stock')
   })
 
   it('always requires a name, an e-mail and the current consent', () => {

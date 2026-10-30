@@ -7,6 +7,7 @@ import { MobileTabBar } from '@/components/MobileTabBar'
 import { ShellProvider } from '@/components/shell/ShellProvider'
 import { SiteFooter } from '@/components/SiteFooter'
 import { SiteHeader } from '@/components/SiteHeader'
+import { features } from '@/lib/features'
 import { company, cookieBannerEnabled, menuCreatures } from '@/lib/site'
 
 import { fontVariables } from './fonts'
@@ -21,6 +22,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = { viewportFit: 'cover' }
 
 export default function SiteLayout({ children }: { children: ReactNode }) {
+  const flags = features()
   return (
     <html lang="pl" className={fontVariables}>
       <body>
@@ -30,11 +32,12 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
         <ShellProvider>
           <SiteHeader />
           <main id="tresc">{children}</main>
-          <SiteFooter />
+          <SiteFooter features={flags} />
           <MobileTabBar />
           <MenuSheet
             creatures={menuCreatures}
             phone={{ label: company.phone, href: company.phoneHref }}
+            features={flags}
           />
           <CookieBanner enabled={cookieBannerEnabled} />
         </ShellProvider>

@@ -148,6 +148,9 @@ jobs:
       INQUIRY_NOTIFY_EMAIL: gaming@example.test
       # Links in e-mails; required in production (the app runs `next start` here).
       SITE_URL: http://localhost:3100
+      # Gotowe od ręki and the voucher (G13): off in production until the owner decides, on for e2e.
+      FEATURE_READY: '1'
+      FEATURE_VOUCHER: '1'
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1

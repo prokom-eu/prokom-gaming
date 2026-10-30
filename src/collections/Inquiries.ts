@@ -187,6 +187,50 @@ export const Inquiries: CollectionConfig = {
     },
     {
       type: 'collapsible',
+      label: 'Bon i egzemplarz od ręki',
+      admin: {
+        condition: (data) => data?.type === 'voucher' || data?.type === 'ready',
+      },
+      fields: [
+        {
+          name: 'voucher',
+          label: 'Bon podarunkowy',
+          type: 'group',
+          admin: { condition: (data) => data?.type === 'voucher' },
+          fields: [
+            {
+              type: 'row',
+              fields: [
+                { name: 'amount', label: 'Kwota (zł)', type: 'number', ...locked },
+                {
+                  name: 'design',
+                  label: 'Wygląd',
+                  type: 'select',
+                  options: options(CHOICES.voucherDesign),
+                  ...locked,
+                },
+                text('recipient', 'Dla kogo'),
+                text('dedication', 'Dedykacja'),
+              ],
+            },
+          ],
+        },
+        {
+          name: 'stock',
+          label: 'Egzemplarz od ręki',
+          type: 'relationship',
+          relationTo: 'stock',
+          ...locked,
+          admin: {
+            readOnly: true,
+            condition: (data) => data?.type === 'ready',
+            description: 'Rezerwacja na 24 h ustawiona przy zapisie zapytania.',
+          },
+        },
+      ],
+    },
+    {
+      type: 'collapsible',
       label: 'Gry i wygląd',
       fields: [
         {

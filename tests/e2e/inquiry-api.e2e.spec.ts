@@ -163,17 +163,23 @@ test('refusals: wrong media type, broken JSON, too large, spam, invalid fields, 
   const unknownBuild = await post(request, inquiry({ build: 'smok' }))
   expect(await unknownBuild.json()).toEqual({ error: 'invalid', fields: ['build'] })
 
-  // Bon and „Gotowe od ręki” wait for G13.
+  // A voucher needs its amount and look; a reservation needs its unit (G13).
   const voucher = await post(
     request,
     inquiry({ type: 'voucher', build: undefined, config: undefined }),
   )
-  expect(await voucher.json()).toMatchObject({ error: 'invalid', fields: ['type'] })
+  expect(await voucher.json()).toMatchObject({ error: 'invalid', fields: ['voucher'] })
+  const ready = await post(
+    request,
+    inquiry({ type: 'ready', build: undefined, config: undefined, stock: 999_999 }),
+  )
+  expect(await ready.json()).toEqual({ error: 'invalid', fields: ['stock'] })
 })
 
 test('inquiries are not readable or writable through the public REST API', async ({ request }) => {
   expect((await request.get('/api/inquiries')).status()).toBe(403)
   expect((await request.get('/api/inquiry-deletions')).status()).toBe(403)
+  expect((await request.get('/api/vouchers')).status()).toBe(403)
   const create = await request.post('/api/inquiries', {
     data: { type: 'contact', name: 'x', email: 'x@example.test' },
   })
