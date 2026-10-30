@@ -84,7 +84,9 @@ async function sendSheet(page: Page, email: string, openedAt: number): Promise<s
 }
 
 const ownIp = (page: Page) =>
-  page.setExtraHTTPHeaders({ 'x-real-ip': `198.51.100.${randomInt(1, 254)}` })
+  page.setExtraHTTPHeaders({
+    'x-real-ip': `10.${randomInt(0, 256)}.${randomInt(0, 256)}.${randomInt(1, 255)}`,
+  })
 
 test('/bon: live preview, no instalments, order → voucher record and two e-mails', async ({
   page,
@@ -190,7 +192,9 @@ test('two reservations of one unit at the same moment: exactly one wins', async 
     [1, 2].map((n) =>
       request.post('/api/inquiry', {
         data: body(n),
-        headers: { 'x-real-ip': `198.51.100.${randomInt(1, 254)}` },
+        headers: {
+          'x-real-ip': `10.${randomInt(0, 256)}.${randomInt(0, 256)}.${randomInt(1, 255)}`,
+        },
       }),
     ),
   )

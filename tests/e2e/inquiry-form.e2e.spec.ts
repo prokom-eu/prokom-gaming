@@ -83,7 +83,9 @@ async function expectEmails(request: APIRequestContext, customer: string, number
  * limit of 5 inquiries per 10 minutes and repeated runs do not run into it.
  */
 async function open(page: Page, path: string): Promise<number> {
-  await page.setExtraHTTPHeaders({ 'x-real-ip': `198.51.100.${randomInt(1, 254)}` })
+  await page.setExtraHTTPHeaders({
+    'x-real-ip': `10.${randomInt(0, 256)}.${randomInt(0, 256)}.${randomInt(1, 255)}`,
+  })
   await page.goto(path)
   await expect(page.getByRole('heading', { level: 1, name: 'Zapytanie o komputer' })).toBeVisible()
   return Date.now()

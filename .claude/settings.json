@@ -15,17 +15,47 @@
       "Bash(git switch*)",
       "Bash(git checkout -b *)",
       "Bash(git add *)",
-      "Bash(git commit *)"
+      "Bash(git commit *)",
+      "Bash(git merge --no-ff --no-edit origin/develop)",
+      "Bash(git push)",
+      "Bash(git push -u origin feat/*)",
+      "Bash(git push -u origin fix/*)",
+      "Bash(git push -u origin chore/*)",
+      "Bash(git push -u origin docs/*)",
+      "Bash(gh pr create *)",
+      "Bash(gh pr view*)",
+      "Bash(gh pr list*)",
+      "Bash(gh pr checks*)",
+      "Bash(gh pr diff*)",
+      "Bash(gh run list*)",
+      "Bash(gh run view*)",
+      "Bash(pnpm vitest run *)",
+      "Bash(pnpm exec prettier *)",
+      "Bash(pnpm prettier *)",
+      "Bash(pnpm exec playwright test*)",
+      "Bash(pnpm generate:types)",
+      "Bash(pnpm generate:importmap)",
+      "Bash(pnpm payload migrate)",
+      "Bash(pnpm payload migrate:down)",
+      "Bash(pnpm payload migrate:status)",
+      "Bash(pnpm payload migrate:create *)",
+      "Bash(pnpm seed)",
+      "mcp__Claude_Browser__find",
+      "mcp__Claude_Browser__read_console_messages",
+      "mcp__Claude_Browser__preview_logs",
+      "mcp__Claude_Browser__read_network_requests",
+      "mcp__Claude_Browser__get_page_text",
+      "mcp__ccd_pr__get_status"
     ],
     "ask": [
-      "Bash(git push*)",
       "Bash(pnpm add*)",
       "Bash(pnpm install*)",
       "Bash(pnpm remove*)",
-      "Bash(pnpm payload*)",
-      "Bash(pnpm seed*)",
       "Bash(docker *)",
-      "Bash(gh *)",
+      "Bash(gh pr merge*)",
+      "Bash(gh pr close*)",
+      "Bash(gh release*)",
+      "Bash(gh workflow run*)",
       "Bash(ssh *)",
       "Bash(scp *)"
     ],
@@ -59,9 +89,7 @@
           {
             "type": "command",
             "command": "node",
-            "args": [
-              "${CLAUDE_PROJECT_DIR}/.claude/hooks/format.mjs"
-            ],
+            "args": ["${CLAUDE_PROJECT_DIR}/.claude/hooks/format.mjs"],
             "timeout": 30
           }
         ]

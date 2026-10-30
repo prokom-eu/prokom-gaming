@@ -92,7 +92,9 @@ test('/kontakt: „Krótkie pytanie?” → board messages, then a contact recor
   request,
 }, testInfo) => {
   // Own address per test: the limit of inquiries is per IP (X-Real-IP, ADR-G005).
-  await page.setExtraHTTPHeaders({ 'x-real-ip': `198.51.100.${randomInt(1, 254)}` })
+  await page.setExtraHTTPHeaders({
+    'x-real-ip': `10.${randomInt(0, 256)}.${randomInt(0, 256)}.${randomInt(1, 255)}`,
+  })
   await page.goto('/kontakt')
   const openedAt = Date.now()
   const send = page.getByRole('button', { name: 'Wyślij wiadomość' })
