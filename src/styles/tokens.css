@@ -417,4 +417,20 @@
   --ct-map-shade: rgba(0, 0, 0, 0.35);
   --ct-map-halo: rgba(242, 194, 48, 0.12);
   --ct-gold-line: rgba(242, 194, 48, 0.45);
+  --par-nav: #3a3226; /* nagłówek strony nad jasną sekcją (Dla rodziców) */
+  --par-logo-sub: #5a4d33;
+  --par-ico-line: rgba(35, 30, 22, 0.2);
+  --par-ico-bg: rgba(255, 255, 255, 0.3);
+  --par-hero-light: rgba(255, 255, 255, 0.45); /* jasna strona: poświata nagłówka */
+  --par-hero-shade: rgba(120, 90, 40, 0.16);
+  --par-steps-bg: #f4ecd8; /* „Jak to wygląda, krok po kroku” */
+  --par-card: #fbf6ea; /* „Sprawdź nas, zanim zapłacisz” */
+  --par-card-line: rgba(35, 30, 22, 0.12);
+  --par-card-shadow: rgba(80, 60, 30, 0.25);
+  --par-check: #3f8a2e;
+  --par-game-bg: #10180f; /* kafle „W co gra Twoje dziecko?” */
+  --par-game-label: #9a9583;
+  --par-game-text: #b9b19c;
+  --par-btn-text: #efe6d0;
+  --par-safe-lead: #c4bba5;
 }
