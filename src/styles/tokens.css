@@ -375,4 +375,82 @@
   --iq-tl-line: rgba(236, 228, 208, 0.1);
   --iq-tl-now: rgba(242, 194, 48, 0.15);
   --iq-card-muted: #9a9583;
+
+  /* ---------- G13: strony treści (plansze FAQ, Kontakt, OFirmie, Rodzice, Poradniki, Regulamin) ---------- */
+  --ct-page: #050807; /* tło sekcji pod nagłówkiem */
+  --ct-title: #f6efdd; /* nagłówki stron i sekcji */
+  --ct-lead: #d0c7b0; /* tekst pod nagłówkiem strony */
+  --ct-text: #b9b19c; /* tekst sekcji, odpowiedzi */
+  --ct-strong: #efe6d0; /* pytania, wyróżnienia */
+  --ct-muted: #8f8a78; /* liczniki, podpisy */
+  --ct-soft: #a9a18c; /* tekst w ramkach pomocy */
+  --ct-nav-text: #cfc6b0; /* przyciski grup pytań */
+  --ct-card: #08100d; /* przyciski grup, karty */
+  --ct-card-line: rgba(236, 228, 208, 0.1);
+  --ct-help-bg: #09110e; /* ramka „Nie znalazłeś odpowiedzi?” */
+  --ct-help-line: rgba(242, 194, 48, 0.3);
+  --ct-veil: rgba(3, 5, 5, 0.92); /* zasłona sceny nagłówka od strony tekstu */
+  --ct-veil-mid: rgba(3, 5, 5, 0.7);
+  --ct-veil-low: rgba(3, 5, 5, 0.15);
+  --ct-veil-clear: rgba(3, 5, 5, 0);
+  --ct-veil-foot: #050807;
+  --ct-veil-foot-clear: rgba(5, 8, 7, 0);
+  --ct-veil-phone: rgba(5, 8, 7, 0.8);
+  --ct-veil-phone-top: rgba(5, 8, 7, 0.4);
+  --ct-shadow: rgba(0, 0, 0, 0.6);
+  --ct-channel-bg: rgba(8, 14, 12, 0.92); /* kafle kanałów kontaktu nad sceną */
+  --ct-channel-line: rgba(236, 228, 208, 0.12);
+  --ct-channel-hl-line: rgba(242, 194, 48, 0.5);
+  --ct-channel-hl-glow: rgba(242, 194, 48, 0.12);
+  --ct-channel-hl-shadow: rgba(242, 194, 48, 0.35);
+  --ct-icon-line: rgba(242, 194, 48, 0.45);
+  --ct-body: #cfc6b0; /* tekst kafli, godziny */
+  --ct-ask-to: #081009; /* tło sekcji „Krótkie pytanie?” na dole */
+  --ct-ok-line: rgba(79, 210, 138, 0.45); /* „Wiadomość wysłana” */
+  --ct-ok-bg: #0d2219;
+  --ct-ok-head: #c9f7d9;
+  --ct-ok-text: #9ccfb0;
+  --ct-map-ground: #0a1310; /* rysunek mapy sklepu */
+  --ct-map-road: #1d2b26;
+  --ct-map-street: #15211d;
+  --ct-map-glow: rgba(242, 194, 48, 0.14);
+  --ct-map-shade: rgba(0, 0, 0, 0.35);
+  --ct-map-halo: rgba(242, 194, 48, 0.12);
+  --ct-gold-line: rgba(242, 194, 48, 0.45);
+  --par-nav: #3a3226; /* nagłówek strony nad jasną sekcją (Dla rodziców) */
+  --par-logo-sub: #5a4d33;
+  --par-ico-line: rgba(35, 30, 22, 0.2);
+  --par-ico-bg: rgba(255, 255, 255, 0.3);
+  --par-hero-light: rgba(255, 255, 255, 0.45); /* jasna strona: poświata nagłówka */
+  --par-hero-shade: rgba(120, 90, 40, 0.16);
+  --par-steps-bg: #f4ecd8; /* „Jak to wygląda, krok po kroku” */
+  --par-card: #fbf6ea; /* „Sprawdź nas, zanim zapłacisz” */
+  --par-card-line: rgba(35, 30, 22, 0.12);
+  --par-card-shadow: rgba(80, 60, 30, 0.25);
+  --par-check: #3f8a2e;
+  --par-game-bg: #10180f; /* kafle „W co gra Twoje dziecko?” */
+  --par-game-label: #9a9583;
+  --par-game-text: #b9b19c;
+  --par-btn-text: #efe6d0;
+  --par-safe-lead: #c4bba5;
+  --ct-band-bg: rgba(7, 12, 10, 0.88); /* O nas: pas liczb nad sceną */
+  --ct-band-line: rgba(242, 194, 48, 0.28);
+  --ct-band-text: #c9c0a9;
+  --ct-tl-from: #f2c230; /* oś historii */
+  --ct-tl-to: rgba(242, 194, 48, 0.1);
+  --ct-tl-glow: rgba(242, 194, 48, 0.5);
+  --ct-line-hover: rgba(242, 194, 48, 0.5);
+  --ct-final-glow: rgba(242, 194, 48, 0.12);
+  --ct-draft-line: rgba(242, 194, 48, 0.4); /* „Projekt do weryfikacji przez prawnika” */
+  --ct-draft-bg: rgba(242, 194, 48, 0.06);
+  --ct-draft-text: #e6ddc7;
+  --ct-doc-text: #c4bba5; /* treść regulaminu i polityki */
+  --ct-summary-text: #d8cfb8;
+  --ct-toc-label: #9a9583;
+  --ct-toc-line: rgba(236, 228, 208, 0.06);
+  --ct-article-text: #ddd4bf; /* treść poradnika (Cormorant) */
+  --ct-article-lead: #f2ead6;
+  --ct-crumbs: #a9a18c;
+  --ct-guide-fade: rgba(8, 16, 13, 0); /* przejście sceny karty poradnika w tło */
+  --ct-more-to: #07100c; /* „Czytaj dalej” */
 }

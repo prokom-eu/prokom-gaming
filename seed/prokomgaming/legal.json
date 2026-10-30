@@ -1,0 +1,26 @@
+{
+  "_info": "Globale `legal-terms` i `legal-privacy` (spec. §21). Treść 1:1 z plansz Regulamin i Prywatnosc — PROJEKTY do weryfikacji przez prawnika (draft: true = napis na stronie). Treść w plikach .md obok (## = paragraf § i pozycja spisu treści, > = ramka z uwagą, <br> w ramce = nowa linia); seed zamienia je na Lexical. Z planszy podmienione tylko znane wartości: telefon (+48 18 267 65 11) i e-mail bez „[do potwierdzenia]”; pozostałe nawiasy kwadratowe zostają do decyzji prawnika i Krystiana (spec. §25–§27). „[data publikacji]” = pole effectiveDate (puste do publikacji).",
+  "terms": {
+    "contentFile": "legal-terms.md",
+    "version": "0.1",
+    "draft": true,
+    "summary": [
+      "Zapytanie nic nie kosztuje. Umowa powstaje, gdy akceptujesz ofertę i płacisz.",
+      "Oferta jest ważna 48 godzin, cena w ofercie jest wiążąca.",
+      "Komputer dostajesz w 5–10 dni roboczych od wpłaty, wysyłka w cenie.",
+      "14 dni na zwrot bez podania przyczyny, także przy komputerze składanym pod Ciebie. Odesłanie na Twój koszt.",
+      "2 lata gwarancji PRO-KOM na cały komputer, kurier odbiera od Ciebie."
+    ]
+  },
+  "privacy": {
+    "contentFile": "legal-privacy.md",
+    "version": "0.1",
+    "draft": true,
+    "summary": [
+      "Dane z zapytania służą tylko do odpowiedzi i oferty.",
+      "Nie sprzedajemy danych. Przekazujemy je tylko kurierowi, księgowości i hostingowi.",
+      "Cookies analityczne i marketingowe tylko za Twoją zgodą.",
+      "W każdej chwili możesz poprosić o wgląd albo usunięcie danych."
+    ]
+  }
+}

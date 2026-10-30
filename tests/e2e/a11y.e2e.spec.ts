@@ -6,7 +6,8 @@ import { expect, test } from '@playwright/test'
 // (the shell itself is on every page; the open menu is checked in shell.e2e.spec.ts); G9: /zestawy, /zestawy/wampir;
 // G10: the configurator — the level step and the case step (option cards greyed out with reasons);
 // G11: the game picker, a game page and the comparison (with „Tylko różnice” and a capped game);
-// G12: the inquiry form (first step, with a configuration) and the sent page.
+// G12: the inquiry form (first step, with a configuration) and the sent page;
+// G13: the content pages (FAQ, contact, parents, about, legal texts, guides).
 const PAGES = [
   { path: '/', status: 200 },
   { path: '/zestawy', status: 200 },
@@ -26,6 +27,14 @@ const PAGES = [
   { path: '/zapytanie?zestaw=wampir', status: 200 },
   { path: '/zapytanie?k=P13.LB500.PL3LX.R32.NM1&swiatlo=lod', status: 200 },
   { path: '/zapytanie/wyslane?nr=PKG-2026-0001&istota=wampir', status: 200 },
+  { path: '/pytania', status: 200 },
+  { path: '/kontakt', status: 200 },
+  { path: '/dla-rodzicow', status: 200 },
+  { path: '/o-nas', status: 200 },
+  { path: '/regulamin', status: 200 },
+  { path: '/polityka-prywatnosci', status: 200 },
+  { path: '/poradniki', status: 200 },
+  { path: '/poradniki/rodzice', status: 200 },
   { path: '/admin/login', status: 200 },
   { path: '/nie-ma-takiej-strony', status: 404 },
 ]

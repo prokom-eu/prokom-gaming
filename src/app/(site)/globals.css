@@ -350,6 +350,23 @@ body:has([data-scene-top]) .nav {
   background: none;
   border-bottom-color: transparent;
 }
+/* A light page (Dla rodziców) marks its top section with [data-nav-light]: dark text while the
+   header floats over it; once the phone header turns solid (dark), the normal colours return. */
+body:has([data-nav-light]) .nav:not([data-top='false']) {
+  --nav-text: var(--par-nav);
+  --nphone: var(--par-nav);
+  --kosc-hi: var(--par-head);
+  --line: var(--par-ico-line);
+}
+body:has([data-nav-light]) .nav:not([data-top='false']) .logo b {
+  color: var(--par-head);
+}
+body:has([data-nav-light]) .nav:not([data-top='false']) .logo__sub {
+  color: var(--par-logo-sub);
+}
+body:has([data-nav-light]) .nav:not([data-top='false']) .ico {
+  background: var(--par-ico-bg);
+}
 .nav ul {
   display: flex;
   gap: 26px;
