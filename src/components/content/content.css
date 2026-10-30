@@ -1,0 +1,273 @@
+/* Content pages (G13): header with a scene, sections, FAQ. Colours only from tokens (ADR-G003). */
+
+/* ---------- header (boards: .hd6.hdl) ---------- */
+.ct-head {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: clamp(440px, 32vw, 540px);
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--scene-bg);
+}
+/* The board centres the panorama a bit above the middle, not on the bottom edge; nudged right so
+   the moon sits beside the title, not behind the lead. */
+.ct-head .scene--wide img {
+  top: 50%;
+  bottom: auto;
+  transform: translate(-48%, -60%);
+}
+.ct-head__veil {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      90deg,
+      var(--ct-veil) 0%,
+      var(--ct-veil-mid) 40%,
+      var(--ct-veil-low) 75%,
+      var(--ct-veil-clear)
+    ),
+    linear-gradient(0deg, var(--ct-veil-foot) 0%, var(--ct-veil-foot-clear) 40%),
+    linear-gradient(180deg, var(--ct-veil-mid), var(--ct-veil-clear) 22%);
+}
+.ct-head__in {
+  position: relative;
+  z-index: 5;
+  margin-top: auto;
+  padding-top: 150px;
+  padding-bottom: 64px;
+}
+.ct-head__title {
+  max-width: 760px;
+  margin: 0;
+  font-size: 68px;
+  line-height: 1.02;
+  color: var(--ct-title);
+  text-shadow: 0 4px 30px var(--ct-shadow);
+}
+.ct-head__lead {
+  max-width: 600px;
+  margin: 20px 0 0;
+  font-size: 18px;
+  line-height: 1.65;
+  color: var(--ct-lead);
+}
+
+/* ---------- sections ---------- */
+.ct-sec {
+  padding: 110px 0;
+  background: var(--ct-page);
+}
+.ct-sec--faq {
+  padding: 64px 0 110px;
+}
+.ct-wide {
+  width: 100%;
+}
+
+/* ---------- FAQ (board: .fq7) ---------- */
+.ct-faq {
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  gap: 64px;
+  align-items: start;
+}
+.ct-faq__nav {
+  position: sticky;
+  top: 24px;
+}
+.ct-faq__groups {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.ct-faq__groups button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  padding: 14px 16px;
+  border: 1px solid var(--ct-card-line);
+  background: var(--ct-card);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ct-nav-text);
+  text-align: left;
+  cursor: pointer;
+}
+.ct-faq__groups button em {
+  flex: none;
+  font-style: normal;
+  font-size: 12.5px;
+  color: var(--ct-muted);
+}
+.ct-faq__groups button.on {
+  border-color: var(--grom);
+  color: var(--white);
+  box-shadow: inset 3px 0 0 var(--grom);
+}
+.ct-faq__groups button.on em {
+  color: var(--grom);
+}
+.ct-faq__groups button:focus-visible {
+  outline: 2px solid var(--grom);
+  outline-offset: 3px;
+}
+.ct-faq__help {
+  margin-top: 20px;
+  padding: 20px;
+  border: 1px solid var(--ct-help-line);
+  background: var(--ct-help-bg);
+}
+.ct-faq__help b {
+  font-size: 16px;
+  color: var(--ct-strong);
+}
+.ct-faq__help p {
+  margin: 4px 0 14px;
+  font-size: 14px;
+  color: var(--ct-soft);
+}
+.ct-faq__body h2 {
+  margin: 0 0 18px;
+  font-size: 40px;
+  color: var(--ct-title);
+}
+.ct-faq__body:not([hidden]) {
+  animation: ct-in 0.4s ease;
+}
+@keyframes ct-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+/* ---------- question and answer (details) ---------- */
+.ct-qa {
+  border-top: 1px solid var(--line);
+}
+.ct-qa:last-child {
+  border-bottom: 1px solid var(--line);
+}
+.ct-qa summary {
+  /* The padding sits on the summary: the whole row, at least 44 px, opens the answer. */
+  min-height: 44px;
+  padding: 20px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  list-style: none;
+  cursor: pointer;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--ct-strong);
+}
+.ct-qa summary::-webkit-details-marker {
+  display: none;
+}
+.ct-qa summary:focus-visible {
+  outline: 2px solid var(--grom);
+  outline-offset: 3px;
+}
+.ct-qa summary i {
+  position: relative;
+  flex: none;
+  width: 14px;
+  height: 14px;
+}
+.ct-qa summary i::before,
+.ct-qa summary i::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 6px;
+  height: 2px;
+  background: var(--grom);
+}
+.ct-qa summary i::after {
+  transform: rotate(90deg);
+  transition: transform 0.25s;
+}
+.ct-qa[open] summary i::after {
+  transform: rotate(0);
+}
+.ct-qa p {
+  max-width: 760px;
+  margin: -8px 0 20px;
+  /* Answers are a textarea in the panel: keep its line breaks. */
+  white-space: pre-line;
+  font-size: 15.5px;
+  line-height: 1.7;
+  color: var(--ct-text);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ct-faq__body:not([hidden]) {
+    animation: none;
+  }
+}
+
+@media (max-width: 1023px) {
+  .ct-head__in {
+    padding-top: 120px;
+    padding-bottom: 44px;
+  }
+  .ct-head__veil {
+    background: linear-gradient(
+      0deg,
+      var(--ct-veil-foot) 8%,
+      var(--ct-veil-phone) 55%,
+      var(--ct-veil-phone-top)
+    );
+  }
+  .ct-head__title {
+    font-size: 46px;
+  }
+  .ct-head__lead {
+    font-size: 16.5px;
+  }
+  .ct-sec {
+    padding: 76px 0;
+  }
+}
+@media (max-width: 1000px) {
+  .ct-faq {
+    /* minmax(0, …): the scrolling row of groups must not widen the page. */
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+  }
+  .ct-faq__nav {
+    position: static;
+  }
+  /* Phone: groups in one scrolling row, help box hidden (board FAQ-telefon). */
+  .ct-faq__groups {
+    flex-direction: row;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .ct-faq__groups::-webkit-scrollbar {
+    display: none;
+  }
+  .ct-faq__groups button {
+    flex: none;
+  }
+  .ct-faq__help {
+    display: none;
+  }
+  .ct-faq__body h2 {
+    font-size: 30px;
+  }
+}
+@media (max-width: 640px) {
+  .ct-head__title {
+    font-size: 38px;
+  }
+}

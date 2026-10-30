@@ -375,4 +375,27 @@
   --iq-tl-line: rgba(236, 228, 208, 0.1);
   --iq-tl-now: rgba(242, 194, 48, 0.15);
   --iq-card-muted: #9a9583;
+
+  /* ---------- G13: strony treści (plansze FAQ, Kontakt, OFirmie, Rodzice, Poradniki, Regulamin) ---------- */
+  --ct-page: #050807; /* tło sekcji pod nagłówkiem */
+  --ct-title: #f6efdd; /* nagłówki stron i sekcji */
+  --ct-lead: #d0c7b0; /* tekst pod nagłówkiem strony */
+  --ct-text: #b9b19c; /* tekst sekcji, odpowiedzi */
+  --ct-strong: #efe6d0; /* pytania, wyróżnienia */
+  --ct-muted: #8f8a78; /* liczniki, podpisy */
+  --ct-soft: #a9a18c; /* tekst w ramkach pomocy */
+  --ct-nav-text: #cfc6b0; /* przyciski grup pytań */
+  --ct-card: #08100d; /* przyciski grup, karty */
+  --ct-card-line: rgba(236, 228, 208, 0.1);
+  --ct-help-bg: #09110e; /* ramka „Nie znalazłeś odpowiedzi?” */
+  --ct-help-line: rgba(242, 194, 48, 0.3);
+  --ct-veil: rgba(3, 5, 5, 0.92); /* zasłona sceny nagłówka od strony tekstu */
+  --ct-veil-mid: rgba(3, 5, 5, 0.7);
+  --ct-veil-low: rgba(3, 5, 5, 0.15);
+  --ct-veil-clear: rgba(3, 5, 5, 0);
+  --ct-veil-foot: #050807;
+  --ct-veil-foot-clear: rgba(5, 8, 7, 0);
+  --ct-veil-phone: rgba(5, 8, 7, 0.8);
+  --ct-veil-phone-top: rgba(5, 8, 7, 0.4);
+  --ct-shadow: rgba(0, 0, 0, 0.6);
 }
