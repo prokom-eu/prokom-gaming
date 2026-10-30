@@ -1,0 +1,479 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#080C0B">
+<title>Panel PRO-KOM Gaming, edytor zestawu</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""><link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#080C0B}
+a{color:#F2C230}a:hover{color:#FFE08A}
+.pn{--bg:#080C0B;--side:#050807;--s1:#0F1613;--s2:#141D19;--s3:#1A2520;--ln:rgba(236,228,208,.09);--ln2:rgba(236,228,208,.16);--tx:#ECE4D0;--tx2:#C2BAA4;--mu:#9A9583;--gold:#F2C230;--gold2:#FFE08A;--ok:#63D296;--warn:#F2A54A;--bad:#FF7A6B;--info:#86B8F7;
+ font-family:Manrope,system-ui,sans-serif;font-size:14px;line-height:1.5;color:var(--tx);background:var(--bg);-webkit-font-smoothing:antialiased;display:flex;flex-wrap:wrap;align-items:stretch;min-height:100%}
+.pn *{box-sizing:border-box}
+.pn .tab,.pn .num,.pn td,.pn .kv b{font-variant-numeric:tabular-nums}
+.pn button{font:inherit;color:inherit}
+.pn a{text-decoration:none}
+.pn :focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.side{flex:1 1 236px;max-width:248px;background:var(--side);border-right:1px solid var(--ln);padding:22px 14px 28px;display:flex;flex-direction:column;gap:22px}
+.brand{display:flex;align-items:center;gap:10px;padding:0 8px;color:var(--tx)}
+.brand b{font-family:Manrope;font-weight:800;font-size:19px;letter-spacing:-.01em}.brand b i{font-style:normal;color:var(--gold)}
+.brand small{display:block;font-size:11px;font-weight:700;letter-spacing:.24em;color:var(--mu);margin-top:-2px}
+.brand .tagp{margin-left:auto;font-size:11px;font-weight:700;color:#151005;background:var(--gold);padding:2px 7px;border-radius:5px}
+.navg{display:flex;flex-direction:column;gap:2px}
+.navg h6{margin:0 0 6px;padding:0 10px;font-size:11.5px;font-weight:700;color:var(--mu);letter-spacing:.06em}
+.ni{display:flex;align-items:center;gap:11px;min-height:38px;padding:0 10px;border-radius:9px;color:var(--tx2);font-weight:600;font-size:14px}
+.ni:hover{background:var(--s1);color:var(--tx)}
+.ni.on{background:linear-gradient(90deg,rgba(242,194,48,.16),rgba(242,194,48,.04));color:var(--tx);box-shadow:inset 0 0 0 1px rgba(242,194,48,.28)}
+.ni.on .ic{color:var(--gold)}
+.ni .bd{margin-left:auto;min-width:22px;height:20px;padding:0 6px;border-radius:10px;font-size:11.5px;font-weight:800;display:grid;place-items:center;background:var(--s3);color:var(--tx)}
+.ni .bd.g{background:var(--gold);color:#151005}.ni .bd.r{background:var(--bad);color:#1a0703}
+.ni.dim{color:#8E897A}
+.sidefoot{margin-top:auto;display:flex;flex-direction:column;gap:10px;padding:14px 10px 0;border-top:1px solid var(--ln)}
+.sidefoot .who{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--tx2)}
+.av{width:30px;height:30px;border-radius:50%;background:var(--s3);display:grid;place-items:center;font-weight:800;font-size:12px;color:var(--gold)}
+.main{flex:999 1 560px;min-width:0;display:flex;flex-direction:column}
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:12px 16px;padding:16px 32px;border-bottom:1px solid var(--ln);background:rgba(8,12,11,.92)}
+.crumb{display:flex;align-items:center;gap:8px;color:var(--mu);font-size:13px}.crumb b{color:var(--tx);font-weight:700}
+.srch{flex:1 1 260px;max-width:420px;display:flex;align-items:center;gap:10px;height:40px;padding:0 12px;border:1px solid var(--ln2);border-radius:10px;background:var(--s1);color:var(--mu)}
+.srch input{flex:1;min-width:0;background:none;border:0;outline:0;color:var(--tx);font:inherit}
+.srch kbd{font:600 11px Manrope;border:1px solid var(--ln2);border-radius:5px;padding:1px 6px;color:var(--mu)}
+.sp{flex:1}
+.live{display:flex;align-items:center;gap:8px;height:34px;padding:0 12px;border-radius:999px;background:var(--s1);border:1px solid var(--ln);font-size:12.5px;color:var(--tx2)}
+.live i{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 3px rgba(99,210,150,.18)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:0 16px;border-radius:10px;font-weight:700;font-size:14px;border:1px solid transparent;cursor:pointer;white-space:nowrap}
+.btn.gold{background:linear-gradient(180deg,#FFD452,#F2C230);color:#171104;box-shadow:0 8px 24px -10px rgba(242,194,48,.55)}
+.btn.gold:hover{color:#171104;filter:brightness(1.05)}
+.btn.ghost{background:var(--s1);border-color:var(--ln2);color:var(--tx)}.btn.ghost:hover{border-color:rgba(242,194,48,.45);color:var(--tx)}
+.btn.quiet{background:none;color:var(--tx2);padding:0 10px}.btn.quiet:hover{color:var(--tx)}
+.btn.sm{min-height:34px;padding:0 12px;font-size:13px;border-radius:8px}
+.btn[disabled]{opacity:.45;cursor:not-allowed;filter:grayscale(.4)}
+.icb{width:38px;height:38px;display:grid;place-items:center;border-radius:10px;border:1px solid var(--ln2);background:var(--s1);color:var(--tx2);cursor:pointer;position:relative}
+.icb em{position:absolute;top:-5px;right:-5px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--bad);color:#1a0703;font:800 10.5px/18px Manrope;font-style:normal}
+.wrap{padding:28px 32px 48px;display:flex;flex-direction:column;gap:22px;max-width:1240px;width:100%}
+.ph{display:flex;flex-wrap:wrap;align-items:flex-end;gap:14px 20px}
+.ph h1{margin:0;font-size:28px;line-height:1.15;font-weight:800;letter-spacing:-.02em}
+.ph p{margin:4px 0 0;color:var(--tx2);max-width:68ch}
+.ph .acts{margin-left:auto;display:flex;flex-wrap:wrap;gap:10px}
+.card{background:var(--s1);border:1px solid var(--ln);border-radius:14px;padding:20px}
+.card h2{margin:0;font-size:16px;font-weight:800;letter-spacing:-.01em}
+.card .hd{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin-bottom:14px}
+.card .hd p{margin:0;color:var(--mu);font-size:13px}
+.card .hd .r{margin-left:auto;display:flex;gap:8px;align-items:center}
+.grid{display:grid;gap:16px}
+.grid>*{min-width:0}
+.g4{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.g2{grid-template-columns:repeat(auto-fit,minmax(360px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.kpi{display:flex;flex-direction:column;gap:6px;padding:18px 20px}
+.kpi span{font-size:12.5px;color:var(--mu);font-weight:600}
+.kpi b{font-size:28px;font-weight:800;letter-spacing:-.02em;line-height:1.1}
+.kpi small{color:var(--tx2);font-size:12.5px}
+.kpi.bad{border-color:rgba(255,122,107,.45);background:linear-gradient(180deg,rgba(255,122,107,.09),var(--s1) 70%)}.kpi.bad b{color:var(--bad)}
+.kpi.gold b{color:var(--gold)}
+.chip{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 9px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap;border:1px solid transparent}
+.chip i{width:7px;height:7px;border-radius:50%;background:currentColor;flex:none}
+.chip.ok{color:var(--ok);background:rgba(99,210,150,.1);border-color:rgba(99,210,150,.25)}
+.chip.warn{color:var(--warn);background:rgba(242,165,74,.1);border-color:rgba(242,165,74,.28)}
+.chip.bad{color:var(--bad);background:rgba(255,122,107,.1);border-color:rgba(255,122,107,.3)}
+.chip.bad i{border-radius:2px;transform:rotate(45deg)}
+.chip.info{color:var(--info);background:rgba(134,184,247,.1);border-color:rgba(134,184,247,.28)}
+.chip.mu{color:var(--tx2);background:var(--s2);border-color:var(--ln)}
+.chip.gold{color:var(--gold);background:rgba(242,194,48,.1);border-color:rgba(242,194,48,.3)}
+.seg{display:inline-flex;gap:2px;padding:3px;border-radius:10px;background:var(--s2);border:1px solid var(--ln)}
+.seg button{height:32px;padding:0 12px;border:0;border-radius:7px;background:none;color:var(--tx2);font-weight:700;font-size:13px;cursor:pointer}
+.seg button.on{background:var(--s3);color:var(--tx);box-shadow:inset 0 0 0 1px var(--ln2)}
+.tbx{overflow-x:auto;margin:0 -20px -20px;border-top:1px solid var(--ln)}
+.tbx+.note,.tbx+p{margin-top:34px!important}
+table.t{width:100%;border-collapse:collapse;font-size:13.5px}
+.t th{text-align:left;font-size:12px;font-weight:700;color:var(--mu);padding:10px 14px;border-bottom:1px solid var(--ln);white-space:nowrap;background:var(--s1)}
+.t td{padding:11px 14px;border-bottom:1px solid var(--ln);vertical-align:middle}
+.t tr:last-child td{border-bottom:0}
+.t tr:hover td{background:rgba(236,228,208,.025)}
+.t .r{text-align:right}
+.t .nm{display:flex;align-items:center;gap:10px;min-width:0}
+.t .nm small{display:block;color:var(--mu);font-size:12px}
+.t td.mu{color:var(--mu);white-space:nowrap}
+.th{width:36px;height:36px;border-radius:8px;background:#0B110F;border:1px solid var(--ln);display:grid;place-items:center;overflow:hidden;flex:none}
+.th img{width:34px;height:34px;object-fit:contain}
+.cn{font-family:Cinzel,Georgia,serif;font-weight:700;letter-spacing:.03em;font-size:15px}
+.sg{fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;flex:none}.sg .f{fill:currentColor;stroke:none}.sg .o{stroke-opacity:.45}
+.up{color:var(--bad)}.dn{color:var(--ok)}
+.delta{display:inline-flex;align-items:center;gap:3px;font-weight:700}
+.mbar{position:relative;height:6px;border-radius:3px;background:var(--s3);min-width:90px}
+.mbar s{position:absolute;left:0;top:0;bottom:0;border-radius:3px;background:var(--ok)}
+.mbar.warn s{background:var(--warn)}.mbar.bad s{background:var(--bad)}
+.mbar u{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--tx);opacity:.7;border-radius:1px}
+.alert{display:flex;flex-wrap:wrap;gap:16px 22px;align-items:center;padding:20px 22px;border-radius:14px;border:1px solid rgba(255,122,107,.4);background:linear-gradient(100deg,rgba(255,122,107,.12),rgba(255,122,107,.03) 60%),var(--s1)}
+.alert .ai{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:rgba(255,122,107,.16);color:var(--bad);flex:none}
+.alert .tx{flex:1 1 420px;min-width:0}
+.alert h3{margin:0;font-size:17px;font-weight:800}
+.alert p{margin:4px 0 0;color:var(--tx2)}
+.alert .acts{display:flex;gap:10px;flex-wrap:wrap}
+.ok-alert{border-color:rgba(99,210,150,.4);background:linear-gradient(100deg,rgba(99,210,150,.12),rgba(99,210,150,.03) 60%),var(--s1)}.ok-alert .ai{background:rgba(99,210,150,.16);color:var(--ok)}
+.claude{display:flex;gap:12px;align-items:flex-start;padding:16px 18px;border-radius:12px;background:linear-gradient(135deg,rgba(242,194,48,.07),rgba(134,184,247,.05));border:1px solid rgba(242,194,48,.22)}
+.claude .ci{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;background:rgba(242,194,48,.14);color:var(--gold);flex:none}
+.kv{display:grid;grid-template-columns:1fr auto;gap:8px 16px;font-size:13.5px}
+.kv span{color:var(--tx2)}.kv b{text-align:right}
+.feed{display:flex;flex-direction:column}
+.feed li{list-style:none;display:flex;gap:12px;padding:11px 0;border-bottom:1px solid var(--ln)}
+.feed li:last-child{border-bottom:0}
+.feed .fi{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;background:var(--s2);color:var(--tx2);flex:none}
+.feed p{margin:0;font-size:13.5px}.feed small{color:var(--mu);font-size:12px}
+ul.feed{margin:0;padding:0}
+.tog{position:relative;display:inline-block;width:38px;height:22px;flex:none}
+.tog input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer}
+.tog span{position:absolute;inset:0;border-radius:11px;background:var(--s3);border:1px solid var(--ln2);transition:background .15s}
+.tog span:after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:var(--tx2);transition:transform .15s}
+.tog input:checked+span{background:rgba(242,194,48,.85);border-color:transparent}.tog input:checked+span:after{transform:translateX(16px);background:#171104}
+.cb{width:18px;height:18px;accent-color:#F2C230;cursor:pointer}
+.fld{display:flex;flex-direction:column;gap:6px}
+.fld label{font-size:12.5px;font-weight:700;color:var(--tx2)}
+.fld input,.fld select,.fld textarea{height:40px;padding:0 12px;border-radius:9px;border:1px solid var(--ln2);background:#0B110F;color:var(--tx);font:inherit}
+.fld textarea{height:auto;min-height:72px;padding:10px 12px;resize:vertical}
+.fld small{color:var(--mu);font-size:12px}
+.note{font-size:12.5px;color:var(--mu)}
+.pill-row{display:flex;flex-wrap:wrap;gap:8px}
+.fpill{display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 13px;border-radius:999px;border:1px solid var(--ln2);background:var(--s1);color:var(--tx2);font-weight:700;font-size:13px;cursor:pointer}
+.fpill b{font-weight:800;color:var(--tx)}
+.fpill.on{border-color:rgba(242,194,48,.55);background:rgba(242,194,48,.1);color:var(--tx)}
+
+.badge-new{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 3px rgba(242,194,48,.18)}
+.spark{display:block;width:100%;height:36px}
+.kpi .spk{margin-top:4px}
+.trend{font-size:12px;font-weight:700}
+.chart{width:100%;height:220px;display:block}
+.chart text{fill:var(--mu);font:600 11px Manrope}
+.bar-h{height:8px;border-radius:4px;background:var(--s3);overflow:hidden}.bar-h s{display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,#F2C230,#FFE08A)}
+.funnel{display:flex;flex-direction:column;gap:10px}
+.funnel .fs{display:grid;grid-template-columns:170px 1fr 70px 64px;gap:12px;align-items:center;font-size:13.5px}
+.funnel .fb{height:30px;border-radius:7px;background:linear-gradient(90deg,rgba(242,194,48,.85),rgba(242,194,48,.35));min-width:6px}
+.ibx{display:flex;flex-wrap:wrap;align-items:stretch;border:1px solid var(--ln);border-radius:14px;background:var(--s1);overflow:hidden;min-height:760px}
+.ibl{flex:1 1 330px;max-width:380px;border-right:1px solid var(--ln);display:flex;flex-direction:column;min-width:0}
+.ibl .it{display:flex;gap:12px;padding:14px 16px;border-bottom:1px solid var(--ln);color:var(--tx);text-align:left;background:none;border-left:3px solid transparent;width:100%;cursor:pointer}
+.ibl .it:hover{background:rgba(236,228,208,.03)}
+.ibl .it.on{background:rgba(242,194,48,.07);border-left-color:var(--gold)}
+.ibl .it b{font-size:14px}.ibl .it p{margin:2px 0 0;color:var(--tx2);font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ibm{flex:999 1 460px;min-width:0;display:flex;flex-direction:column}
+.ibc{flex:1 1 300px;max-width:360px;border-left:1px solid var(--ln);padding:18px;display:flex;flex-direction:column;gap:14px;min-width:0;background:rgba(5,8,7,.35)}
+.ibc .kv{grid-template-columns:auto minmax(0,1fr)}.ibc .kv span{white-space:nowrap}
+.msg{max-width:78%;padding:12px 14px;border-radius:14px;font-size:13.5px;line-height:1.55}
+.msg.in{background:var(--s2);border:1px solid var(--ln);border-top-left-radius:4px}
+.msg.out{margin-left:auto;background:linear-gradient(180deg,rgba(242,194,48,.16),rgba(242,194,48,.08));border:1px solid rgba(242,194,48,.3);border-top-right-radius:4px}
+.msg.sys{max-width:100%;margin:0 auto;background:none;border:1px dashed var(--ln2);color:var(--mu);font-size:12.5px;text-align:center}
+.msg.int{max-width:100%;background:rgba(134,184,247,.07);border:1px solid rgba(134,184,247,.25)}
+.msg .mh{display:flex;gap:8px;align-items:baseline;margin-bottom:4px;font-size:12px;color:var(--mu)}.msg .mh b{color:var(--tx);font-size:12.5px}
+.cmp{border-top:1px solid var(--ln);padding:14px 16px;display:flex;flex-direction:column;gap:10px;background:rgba(5,8,7,.35)}
+.cmp textarea{width:100%;min-height:110px;border-radius:10px;border:1px solid var(--ln2);background:#0B110F;color:var(--tx);font:inherit;padding:12px;resize:vertical}
+.kb{display:flex;gap:14px;overflow-x:auto;padding-bottom:6px;align-items:flex-start}
+.kcol{min-width:0;display:flex;flex-direction:column;gap:10px;background:var(--s1);border:1px solid var(--ln);border-radius:14px;padding:12px}
+.kcol h3{margin:0;display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:800;color:var(--tx2)}
+.kcard{display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:11px;background:var(--s2);border:1px solid var(--ln);text-align:left;color:var(--tx);cursor:pointer;width:100%}
+.kcard:hover{border-color:rgba(242,194,48,.4)}.kcard.on{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold) inset}
+.tabs-u{display:flex;gap:4px;border-bottom:1px solid var(--ln);flex-wrap:wrap}
+.tabs-u button{height:42px;padding:0 14px;border:0;background:none;color:var(--tx2);font-weight:700;font-size:13.5px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
+.tabs-u button.on{color:var(--tx);border-bottom-color:var(--gold)}
+.mtop,.tabbar,.msheet,.mscrim,.mback,.mact,.m-only{display:none}
+@media (max-width:760px){
+.pn{display:block;font-size:15px;-webkit-tap-highlight-color:transparent}
+.side,.top,.d-only{display:none!important}
+.m-only{display:block}
+.mtop{display:flex;position:sticky;top:0;z-index:40;align-items:center;gap:6px;height:calc(56px + env(safe-area-inset-top));padding:env(safe-area-inset-top) 8px 0 16px;background:rgba(8,12,11,.86);-webkit-backdrop-filter:saturate(1.4) blur(18px);backdrop-filter:saturate(1.4) blur(18px);border-bottom:1px solid transparent;transition:border-color .2s}
+.pn-scrolled .mtop{border-bottom-color:var(--ln)}
+.mtop .mt{flex:1;min-width:0;font-weight:800;font-size:16.5px;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:0;transform:translateY(5px);transition:opacity .2s,transform .2s}
+.pn-scrolled .mtop .mt,.mtop .mt.always{opacity:1;transform:none}
+.mtop .brand{padding:0;flex:1}.mtop .brand b{font-size:17px}
+.mtop .icb{width:44px;height:44px;border:0;background:transparent;color:var(--tx)}
+.mtop .icb em{top:4px;right:4px}
+.mtop .mback{display:grid;margin-left:-10px}
+.wrap{padding:6px 16px calc(108px + env(safe-area-inset-bottom));gap:14px}
+.ph{gap:10px 12px}.ph>*{min-width:0;max-width:100%}.ibc .pill-row{flex-wrap:wrap!important;overflow:visible}.ibc *{min-width:0;overflow-wrap:anywhere}.ibc .kv b span{white-space:normal}.ph h1{font-size:31px;letter-spacing:-.025em}.ph p{font-size:14px;margin-top:6px}
+.ph .acts{margin:2px -16px 0;padding:0 16px 2px;width:calc(100% + 32px);flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+.ph .acts .live{display:none}
+.card{border-radius:18px;padding:16px}
+.card .hd{margin-bottom:12px}
+.tbx{margin:0 -16px -16px;overflow:visible}
+.grid{gap:12px}
+.g4{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.g2,.g3{grid-template-columns:minmax(0,1fr)}
+.kpi{padding:14px}.kpi b{font-size:23px}.kpi span,.kpi small{font-size:12px}
+.btn{min-height:46px;border-radius:13px;font-size:15px}.btn.sm{min-height:40px;font-size:13.5px}
+.icb{width:44px;height:44px}
+.fpill{height:40px;flex:none}
+.fld input,.fld select{height:48px;font-size:16px}.fld textarea,.cmp textarea,input[type=search]{font-size:16px}
+.srch{height:46px!important;border-radius:13px}.srch kbd{display:none}
+.pill-row,.seg,.tabs-u{flex-wrap:nowrap!important;overflow-x:auto;scrollbar-width:none;max-width:100%}
+.pill-row::-webkit-scrollbar,.seg::-webkit-scrollbar,.tabs-u::-webkit-scrollbar,.ph .acts::-webkit-scrollbar,.kb::-webkit-scrollbar{display:none}
+.seg{border-radius:12px}.seg button{height:38px;white-space:nowrap;flex:none;border-radius:9px}
+.tabs-u button{white-space:nowrap;flex:none;height:46px}
+.alert{padding:16px;gap:12px;border-radius:18px}.alert .tx{flex:1 1 calc(100% - 60px)}.alert .acts{width:100%}.alert .acts>*{flex:1}
+.claude{padding:14px;border-radius:16px}
+table.t,.t tbody{display:block}.t thead{display:none}
+.t tr{position:relative;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 14px;padding:14px 16px;border-bottom:1px solid var(--ln)}
+.t tbody tr:last-child{border-bottom:0}
+.t td{display:block;padding:0;border:0!important;white-space:normal!important;max-width:none!important;min-width:0;text-align:left!important}
+.t td:first-child{grid-column:1/-1}
+.t td[data-l]:not(:first-child):before{content:attr(data-l);display:block;font-size:11.5px;font-weight:600;color:var(--mu);margin-bottom:2px}
+.t tr:has(>td:first-child .cb) td:first-child{position:absolute;right:12px;top:10px;grid-column:auto}
+.t tr:has(>td:first-child .cb) td:nth-child(2){grid-column:1/-1;padding-right:44px}
+.t tr:has(>td:first-child .cb) td:nth-child(2):before{display:none}
+.cb{width:24px;height:24px}
+.t tr:hover td{background:none}
+.kb{display:grid!important;grid-template-columns:none!important;grid-auto-flow:column;grid-auto-columns:84%;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -16px;padding:0 16px 8px;scrollbar-width:none}
+.kcol{scroll-snap-align:center}
+.funnel .fs{grid-template-columns:minmax(0,1fr) auto auto;gap:6px 10px}
+.funnel .fs>:nth-child(2){grid-column:1/-1;grid-row:2}
+.ibx{display:block;border:0;background:none;min-height:0;margin:0 -16px;border-radius:0;overflow:visible}
+.ibl{max-width:none;border:0}
+.ibl .srch{flex:none}
+.ibl .it{padding:14px 16px}
+.ibx:not(.mthr) .ibm,.ibx:not(.mthr) .ibc{display:none}
+.ibx.mthr .ibl{display:none}
+.ibm .mback{display:grid;margin-left:-6px}
+.ibm>div:first-child>.seg{flex:1 1 100%;order:3}.ibm>div:first-child>.sp{display:none}
+.ibx.mthr .ibm{min-height:100dvh}.ibm .snd,.cmp .tpl-l{display:none}
+.cmp .pill-row{margin:0 -12px;padding:0 12px}
+.ibc{max-width:none;border:0;border-top:1px solid var(--ln);padding:16px}
+.msg{max-width:88%;font-size:15px}
+.cmp{position:sticky;bottom:0;z-index:20;padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:rgba(8,12,11,.95);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}
+.cmp textarea{min-height:64px}
+.pn:has(.ibx.mthr) .tabbar,.pn:has(.ibx.mthr) .mtop,.pn:has(.ibx.mthr) .ph{display:none}
+.pn:has(.ibx.mthr) .wrap{padding:0;gap:0}.pn:has(.ibx.mthr) .ibx{margin:0}
+.ibm>div:first-child{position:sticky;top:0;z-index:20;background:rgba(8,12,11,.94);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);padding:calc(10px + env(safe-area-inset-top)) 12px 10px!important}
+.mact{display:flex;position:fixed;left:10px;right:10px;bottom:calc(78px + env(safe-area-inset-bottom));z-index:35;align-items:center;gap:12px;padding:10px 10px 10px 16px;border-radius:20px;background:rgba(20,29,25,.95);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);border:1px solid var(--ln2);box-shadow:0 18px 44px -16px rgba(0,0,0,.85)}
+.mact .mv{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.25}.mact .mv b{font-size:19px;letter-spacing:-.01em}.mact .mv small{font-size:12px;color:var(--tx2)}
+.mact .btn{flex:none}
+.pn:has(.mact) .wrap{padding-bottom:calc(184px + env(safe-area-inset-bottom))}
+.tabbar{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:0;right:0;bottom:0;z-index:40;padding:6px 4px calc(8px + env(safe-area-inset-bottom));background:rgba(5,8,7,.9);-webkit-backdrop-filter:saturate(1.4) blur(18px);backdrop-filter:saturate(1.4) blur(18px);border-top:1px solid var(--ln)}
+.tabbar>a,.tabbar>label{display:flex;flex-direction:column;align-items:center;gap:4px;min-height:56px;justify-content:center;color:var(--mu);font-size:11.5px;font-weight:700;position:relative;cursor:pointer}
+.tabbar .ti{width:58px;height:32px;border-radius:16px;display:grid;place-items:center;transition:background .2s,color .2s}
+.tabbar .on{color:var(--gold)}.tabbar .on .ti{background:rgba(242,194,48,.15)}
+.tabbar em{position:absolute;top:3px;left:calc(50% + 5px);min-width:19px;height:19px;padding:0 5px;border-radius:10px;background:var(--gold);color:#151005;font:800 11px/19px Manrope;font-style:normal;box-shadow:0 0 0 2px #050807}
+.tabbar em.r{background:var(--bad);color:#1a0703}
+.mscrim{display:block;position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.6);opacity:0;pointer-events:none;transition:opacity .22s}
+.msheet{display:block;position:fixed;left:0;right:0;bottom:0;z-index:51;max-height:88vh;overflow:auto;border-radius:26px 26px 0 0;background:var(--s1);border-top:1px solid var(--ln2);padding:10px 16px calc(22px + env(safe-area-inset-bottom));transform:translateY(105%);transition:transform .3s cubic-bezier(.2,.8,.2,1);box-shadow:0 -20px 60px -20px rgba(0,0,0,.8)}
+.mchk:checked~.mscrim{opacity:1;pointer-events:auto}
+.mchk:checked~.msheet{transform:none}
+.msheet .grab{display:block;width:42px;height:5px;border-radius:3px;background:var(--ln2);margin:0 auto 16px}
+.msheet h6{margin:18px 2px 10px;font-size:12.5px;font-weight:700;color:var(--mu)}
+.mstat{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:14px;background:var(--s2);border:1px solid var(--ln);font-size:13.5px;color:var(--tx2)}
+.mstat i{width:9px;height:9px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 3px rgba(99,210,150,.18);flex:none}
+.mgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.mtile{display:flex;flex-direction:column;align-items:flex-start;justify-content:space-between;gap:12px;padding:14px 12px 12px;border-radius:16px;background:var(--s2);border:1px solid var(--ln);color:var(--tx)!important;font-weight:700;font-size:13px;line-height:1.25;position:relative;min-height:92px}
+.mtile .ic{color:var(--gold)}
+.mtile em{position:absolute;top:10px;right:10px;min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:var(--gold);color:#151005;font:800 11px/20px Manrope;font-style:normal}
+.mtile.cur{border-color:rgba(242,194,48,.5);background:rgba(242,194,48,.08)}
+.mwho{display:flex;align-items:center;gap:12px;margin-top:18px;padding-top:16px;border-top:1px solid var(--ln)}
+a.card,.btn,.kcard,.ibl .it,.mtile,.tabbar>a,.tabbar>label{transition:transform .12s ease}
+a.card:active,.btn:active,.kcard:active,.ibl .it:active,.mtile:active,.tabbar>a:active,.tabbar>label:active{transform:scale(.97)}
+}
+@media (max-width:760px) and (prefers-reduced-motion:reduce){.msheet,.mscrim,.mtop .mt,a.card,.btn,.kcard,.ibl .it,.mtile{transition:none}}
+</style>
+<style>.tile{border:1px solid var(--ln);color:var(--tx)}.tile:hover{border-color:rgba(242,194,48,.4)}.tile.on{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold) inset}.tile[disabled]{opacity:.38;cursor:not-allowed}.fpill[disabled]{opacity:.38;cursor:not-allowed}</style>
+</helmet>
+<div class="pn"><svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><symbol id="sg-skrzat" viewBox="0 0 100 100"><path d="M50 14L30 52h40z"/><path d="M27 52h46"/><circle cx="42" cy="60" r="3" class="f"/><circle cx="58" cy="60" r="3" class="f"/><path d="M34 66q16 20 32 0"/><path d="M50 14l9-4"/></symbol><symbol id="sg-licho" viewBox="0 0 100 100"><path d="M18 50Q50 22 82 50Q50 78 18 50Z"/><circle cx="50" cy="50" r="11.5"/>
+<ellipse cx="50" cy="50" rx="3.4" ry="9" class="f"/><path d="M34 37l-4-8M50 31v-9M66 37l4-8M26 44l-7-4M74 44l7-4"/></symbol><symbol id="sg-bies" viewBox="0 0 100 100"><path d="M24 28Q50 18 76 28Q50 38 24 28"/><path d="M29 39Q50 31 71 39Q50 47 31 41"/><path d="M35 50Q51 44 65 50Q51 56 37 52"/>
+<path d="M41 60Q52 56 60 60Q52 64 43 62"/><path d="M46 69Q53 66 56 69Q51 72 48 72"/><path d="M50 74Q52 79 49 84"/>
+<path class="f" d="M78 46q6-4 9 1q-6 3-9-1z"/><path class="f" d="M16 58q5-5 9-1q-5 4-9 1z"/><path class="f" d="M72 66q4-5 8-2q-4 5-8 2z"/></symbol><symbol id="sg-strzyga" viewBox="0 0 100 100"><path d="M30 28L36 36M70 28L64 36"/><path d="M36 36Q50 29 64 36Q76 47 70 61Q62 76 50 80Q38 76 30 61Q24 47 36 36Z"/>
+<circle cx="41" cy="47" r="8"/><circle cx="59" cy="47" r="8"/><circle class="f" cx="41" cy="47" r="2.6"/><circle class="f" cx="59" cy="47" r="2.6"/>
+<path d="M50 53l-3 5 3 4 3-5z"/><path class="f" d="M44 71.4C38.6 68.2 40.6 63.9 44 66.6C47.4 63.9 49.4 68.2 44 71.4Z"/><path class="f" d="M56 71.4C50.6 68.2 52.6 63.9 56 66.6C59.4 63.9 61.4 68.2 56 71.4Z"/></symbol><symbol id="sg-kikimora" viewBox="0 0 100 100"><path d="M50 14V86"/><path d="M50 22Q58 44 50 64Q42 44 50 22Z"/><path d="M46 34l8-3M45 41l10-3M45 48l10-3M46 55l8-3"/>
+<ellipse cx="50" cy="70" rx="11" ry="3.6"/><path d="M52 27C70 22 82 36 74 48S58 58 66 66s14 2 14 2"/>
+<path class="f" d="M26 22a9 9 0 1 0 9 13a7 7 0 1 1-9-13z"/></symbol><symbol id="sg-leszy" viewBox="0 0 100 100"><path d="M50 46V24M50 36L38 26L34 14M38 26H29M50 36L62 26L66 14M62 26H71M50 29L43 17M50 29L57 17"/>
+<path d="M32 50Q50 42 68 50Q72 66 50 80Q28 66 32 50Z"/><circle cx="41" cy="58" r="4"/><circle cx="59" cy="57" r="7"/>
+<circle class="f" cx="41" cy="58" r="1.4"/><circle class="f" cx="59" cy="57" r="2.4"/><path d="M42 72q8 4 16 0"/></symbol><symbol id="sg-czart" viewBox="0 0 100 100"><path d="M37 36Q29 24 35 13Q38 26 46 32"/><path d="M63 36Q71 24 65 13Q62 26 54 32"/>
+<circle cx="50" cy="57" r="22"/><circle cx="50" cy="57" r="15"/><circle class="f" cx="50" cy="57" r="4"/>
+<path d="M50 42V72M37 49.5L63 64.5M63 49.5L37 64.5"/>
+<g class="f"><rect x="47" y="31" width="6" height="8" transform="rotate(0 50 57)"/><rect x="47" y="31" width="6" height="8" transform="rotate(30 50 57)"/><rect x="47" y="31" width="6" height="8" transform="rotate(60 50 57)"/><rect x="47" y="31" width="6" height="8" transform="rotate(90 50 57)"/><rect x="47" y="31" width="6" height="8" transform="rotate(120 50 57)"/><rect x="47" y="31" width="6" height="8" transform="rotate(150 50 57)"/><rect x="47" y="31" width="6" height="8" transform="rotate(180 50 57)"/><rect x="47" y="31" width="6" height="8" transform="rotate(210 50 57)"/><rect x="47" y="31" width="6" height="8" transform="rotate(240 50 57)"/><rect x="47" y="31" width="6" height="8" transform="rotate(270 50 57)"/><rect x="47" y="31" width="6" height="8" transform="rotate(300 50 57)"/><rect x="47" y="31" width="6" height="8" transform="rotate(330 50 57)"/></g></symbol><symbol id="sg-rusalka" viewBox="0 0 100 100"><g class="f"><ellipse cx="67.0" cy="44.0" rx="6.2" ry="2.8" transform="rotate(108 67.0 44.0)"/><ellipse cx="64.3" cy="53.2" rx="6.2" ry="2.8" transform="rotate(141 64.3 53.2)"/><ellipse cx="57.1" cy="59.5" rx="6.2" ry="2.8" transform="rotate(173 57.1 59.5)"/><ellipse cx="47.6" cy="60.8" rx="6.2" ry="2.8" transform="rotate(206 47.6 60.8)"/><ellipse cx="38.9" cy="56.8" rx="6.2" ry="2.8" transform="rotate(239 38.9 56.8)"/><ellipse cx="33.7" cy="48.8" rx="6.2" ry="2.8" transform="rotate(272 33.7 48.8)"/><ellipse cx="33.7" cy="39.2" rx="6.2" ry="2.8" transform="rotate(304 33.7 39.2)"/><ellipse cx="38.9" cy="31.2" rx="6.2" ry="2.8" transform="rotate(337 38.9 31.2)"/><ellipse cx="47.6" cy="27.2" rx="6.2" ry="2.8" transform="rotate(370 47.6 27.2)"/><ellipse cx="57.1" cy="28.5" rx="6.2" ry="2.8" transform="rotate(403 57.1 28.5)"/><ellipse cx="64.3" cy="34.8" rx="6.2" ry="2.8" transform="rotate(435 64.3 34.8)"/></g><circle class="f" cx="38" cy="33" r="2.6"/><circle class="f" cx="62" cy="31" r="2.6"/><circle class="f" cx="66" cy="50" r="2.4"/>
+<path d="M44 60q-3 8 2 14M56 60q4 8-1 15"/><path d="M18 76q8-6 16 0t16 0 16 0 16 0"/><path d="M24 85q7-5 13 0t13 0 13 0 13 0"/></symbol><symbol id="sg-baba" viewBox="0 0 100 100"><path d="M28 46L50 25L72 46"/><path d="M33 44V64H67V44"/><rect x="45" y="50" width="10" height="8"/><path d="M60 34V24h5v15"/>
+<path d="M42 64L37 74L42 83M42 83l-7 2M42 83l1 5M42 83l7 1"/><path d="M58 64L63 74L58 83M58 83l7 2M58 83l-1 5M58 83l-7 1"/>
+<path class="f" d="M64 18q3-5 7-3q-2 4-7 3z"/></symbol><symbol id="sg-bazyliszek" viewBox="0 0 100 100"><ellipse cx="50" cy="42" rx="17" ry="21"/><ellipse cx="50" cy="42" rx="12" ry="16"/>
+<path d="M41 42Q50 34 59 42Q50 50 41 42Z"/><circle class="f" cx="50" cy="42" r="3"/>
+<path d="M50 63V86M44 70H56"/><path d="M40 21q2-7 5-1q2-8 5-1q3-8 5 1q3-6 5 1"/></symbol><symbol id="sg-wampir" viewBox="0 0 100 100"><path d="M68 22A30 30 0 1 0 74 72A24 24 0 1 1 68 22Z"/>
+<path class="f" d="M50 47C44 41 33 39 20 43C25 47 27 51 25 56C31 53 36 55 38 60C42 55 46 55 50 60C54 55 58 55 62 60C64 55 69 53 75 56C73 51 75 47 80 43C67 39 56 41 50 47Z"/>
+<path class="f" d="M46.5 47L45.5 40.5L49 44H51L54.5 40.5L53.5 47Z"/></symbol><symbol id="sg-dama" viewBox="0 0 100 100"><rect x="31" y="20" width="38" height="60" rx="2"/><rect x="36" y="25" width="28" height="50"/>
+<circle cx="31" cy="20" r="3"/><circle cx="69" cy="20" r="3"/><circle cx="31" cy="80" r="3"/><circle cx="69" cy="80" r="3"/>
+<path d="M44 64V52h12v12M44 64h12"/><path class="f" d="M50 38q5 6 0 12q-5-6 0-12z"/><path d="M50 50v2"/></symbol><symbol id="sg-kosciej" viewBox="0 0 100 100"><path d="M50 18C64 18 74 40 74 56C74 72 63 82 50 82C37 82 26 72 26 56C26 40 36 18 50 18Z"/><path d="M30 74L72 26"/><circle cx="71" cy="27" r="3"/><path d="M36 44q8 -6 14 0" class="o"/><path class="f" d="M27 76l6 1l-1 -6z"/></symbol><symbol id="sg-zima" viewBox="0 0 100 100"><path d="M50 50L50.0 20.0"/><path d="M50.0 33.5L43.6 27.1"/><path d="M50.0 33.5L56.4 27.1"/><path d="M50.0 26.0L45.8 21.8"/><path d="M50.0 26.0L54.2 21.8"/><path d="M50 50L76.0 35.0"/><path d="M64.3 41.8L66.6 33.1"/><path d="M64.3 41.8L73.0 44.1"/><path d="M70.8 38.0L72.3 32.2"/><path d="M70.8 38.0L76.6 39.6"/><path d="M50 50L76.0 65.0"/><path d="M64.3 58.2L73.0 55.9"/><path d="M64.3 58.2L66.6 66.9"/><path d="M70.8 62.0L76.6 60.4"/><path d="M70.8 62.0L72.3 67.8"/><path d="M50 50L50.0 80.0"/><path d="M50.0 66.5L56.4 72.9"/><path d="M50.0 66.5L43.6 72.9"/><path d="M50.0 74.0L54.2 78.2"/><path d="M50.0 74.0L45.8 78.2"/><path d="M50 50L24.0 65.0"/><path d="M35.7 58.2L33.4 66.9"/><path d="M35.7 58.2L27.0 55.9"/><path d="M29.2 62.0L27.7 67.8"/><path d="M29.2 62.0L23.4 60.4"/><path d="M50 50L24.0 35.0"/><path d="M35.7 41.8L27.0 44.1"/><path d="M35.7 41.8L33.4 33.1"/><path d="M29.2 38.0L23.4 39.6"/><path d="M29.2 38.0L27.7 32.2"/><circle cx="50" cy="50" r="5"/></symbol><symbol id="sg-zmij" viewBox="0 0 100 100"><g class="f" transform="translate(6 26) scale(.3)"><path d="M148 74C120 42 84 14 22 22C52 32 62 46 72 56C52 52 36 58 26 66C60 64 92 70 124 80Z"/><path d="M168 72C182 46 206 26 246 22C228 34 222 46 218 56C232 54 244 58 252 64C226 66 200 72 182 82Z" opacity=".75"/><path d="M60 82C100 72 140 68 180 72C210 74 238 64 266 48L278 54C252 76 222 88 182 88C142 90 102 94 72 98Z"/><path d="M72 94C42 102 22 98 6 86C24 110 52 114 82 100Z"/><path d="M266 48l20-8l-6 11l12 2l-16 7Z"/></g>
+<path d="M24 72q26 10 52 0" class="o"/></symbol><symbol id="sg-weles" viewBox="0 0 100 100"><path d="M30 40Q20 26 26 14Q30 28 42 34"/><path d="M70 40Q80 26 74 14Q70 28 58 34"/>
+<path d="M50 40C66 40 72 52 66 62C60 72 44 72 40 63C36 55 44 48 52 52C58 55 56 63 50 63"/><path d="M50 40C38 40 30 48 30 58"/>
+<path d="M30 58C30 70 38 80 50 82C62 84 74 78 78 68"/><circle class="f" cx="46" cy="44" r="1.8"/><path d="M78 68l6 -2M78 68l3 5"/>
+<path d="M24 86h52" class="o"/></symbol><symbol id="sg-perun" viewBox="0 0 100 100"><circle cx="50" cy="50" r="26"/><path d="M27.5 37.0A26 26 0 0 0 72.5 37.0"/><path d="M50.0 24.0A26 26 0 0 0 72.5 63.0"/><path d="M72.5 37.0A26 26 0 0 0 50.0 76.0"/><path d="M72.5 63.0A26 26 0 0 0 27.5 63.0"/><path d="M50.0 76.0A26 26 0 0 0 27.5 37.0"/><path d="M27.5 63.0A26 26 0 0 0 50.0 24.0"/><path class="f" d="M55 14L39 51H50L43 86L63 43H52L60 14Z"/></symbol><symbol id="sg-wodnik" viewBox="0 0 100 100"><path d="M50 20Q59 33 50 40Q41 33 50 20Z" class="f"/><path d="M50 58L68 56A19 9 0 1 1 68 60Z"/>
+<ellipse cx="50" cy="60" rx="34" ry="11"/><ellipse cx="50" cy="61" rx="42" ry="16" class="o"/><path d="M40 56q4-4 8 0"/></symbol><symbol id="sg-wilkolak" viewBox="0 0 100 100"><circle cx="60" cy="40" r="22"/>
+<g class="f" transform="translate(14 22) scale(.4)"><path d="M70 132C64 124 62 112 66 100C70 90 78 84 84 72C88 62 90 52 94 42L90 26L96 30L100 12L104 28L110 20L112 36C118 46 118 58 114 68C110 80 112 92 116 104C120 114 128 122 134 130L122 132C116 124 110 116 106 108L104 132L92 132L94 112C86 120 80 128 78 132Z"/></g>
+<path d="M20 76Q50 68 80 76"/></symbol><symbol id="sg-zmora" viewBox="0 0 100 100"><path d="M50 40C42 26 22 26 22 42C22 52 36 55 47 50C36 56 30 66 38 73C45 77 48 64 50 56C52 64 55 77 62 73C70 66 64 56 53 50C64 55 78 52 78 42C78 26 58 26 50 40Z"/>
+<ellipse class="f" cx="50" cy="50" rx="3" ry="11"/><path d="M48 39q-6-10-12-10M52 39q6-10 12-10"/><circle cx="34" cy="42" r="4"/><circle cx="66" cy="42" r="4"/></symbol><symbol id="sg-p_dziecko" viewBox="0 0 100 100"><path d="M50 18L76 28V50C76 66 64 78 50 84C36 78 24 66 24 50V28Z"/><path class="f" d="M50 64C40 57 36 52 36 46C36 41 40 38 44 38C47 38 49 40 50 42C51 40 53 38 56 38C60 38 64 41 64 46C64 52 60 57 50 64Z"/></symbol><symbol id="sg-p_gra" viewBox="0 0 100 100"><path d="M30 40H70C80 40 86 50 86 62C86 72 80 78 74 76C68 74 66 66 58 66H42C34 66 32 74 26 76C20 78 14 72 14 62C14 50 20 40 30 40Z"/><path d="M30 50v12M24 56h12"/><circle class="f" cx="66" cy="52" r="3"/><circle class="f" cx="73" cy="59" r="3"/><path d="M44 30q6-8 12 0"/></symbol><symbol id="sg-p_czesci" viewBox="0 0 100 100"><rect x="30" y="30" width="40" height="40" rx="3"/><rect x="40" y="40" width="20" height="20"/><path d="M38 30V20M50 30V20M62 30V20M38 80V70M50 80V70M62 80V70M30 38H20M30 50H20M30 62H20M80 38H70M80 50H70M80 62H70"/><path class="f" d="M47 44L53 44L50 50L54 50L46 58L48 51L45 51Z"/></symbol></defs></svg><aside class="side"><a class="brand" href="Main.dc.html" aria-label="Panel PRO-KOM Gaming, pulpit"><span><b>PRO<i>–</i>KOM</b><small>GAMING</small></span><span class="tagp">Panel</span></a>
+<nav class="navg" aria-label="Codziennie"><h6>Codziennie</h6><a class="ni" href="Main.dc.html"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg><span>Pulpit</span></a><a class="ni" href="Zapytania.dc.html"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg><span>Zapytania</span><span class="bd r">3</span></a><a class="ni" href="Zamowienia.dc.html"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4M12 11v10"/></svg><span>Zamówienia</span><span class="bd ">5</span></a><a class="ni" href="Klient.dc.html"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span>Klienci</span></a></nav><nav class="navg" aria-label="Ceny"><h6>Ceny</h6><a class="ni" href="Ceny.dc.html"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg><span>Centrum cen</span></a><a class="ni" href="Raport.dc.html"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h7M9 17h5"/></svg><span>Raporty cen</span><span class="bd g">1</span></a><a class="ni" href="Publikacja.dc.html"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg><span>Do zatwierdzenia</span><span class="bd g">11</span></a></nav><nav class="navg" aria-label="Oferta"><h6>Oferta</h6><a class="ni on" aria-current="page" href="Zestawy.dc.html"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="2" width="10" height="20" rx="1.5"/><circle cx="12" cy="17" r="1.6"/><path d="M10 6h4M10 9h4"/></svg><span>Gotowe zestawy</span></a><a class="ni" href="Opcje.dc.html"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/></svg><span>Opcje konfiguratora</span></a></nav><nav class="navg" aria-label="Analiza"><h6>Analiza</h6><a class="ni" href="Statystyki.dc.html"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Statystyki strony</span></a></nav><nav class="navg" aria-label="System"><h6>System</h6><a class="ni" href="Ustawienia.dc.html"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg><span>Ustawienia</span></a></nav>
+<div class="sidefoot"><div class="who"><span class="av">KP</span><span>Krystian<br><small style="color:var(--mu)">administrator</small></span></div></div></aside><input type="checkbox" id="pn-more" class="mchk" hidden>
+<label class="mscrim" for="pn-more" aria-label="Zamknij menu"></label>
+<section class="msheet" aria-label="Więcej"><span class="grab"></span>
+<div class="mstat"><i></i><span style="flex:1">Strona działa · ceny z 25.10.2026</span><span class="chip warn"><i></i>11 do zatw.</span></div>
+<a class="btn gold" href="Raport.dc.html" style="width:100%;margin-top:12px"><svg class="ic" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 10-2.3 5.7"/><path d="M20 4v7h-7"/></svg>Sprawdź ceny</a>
+<h6>Panel</h6><div class="mgrid"><a class="mtile" href="Zamowienia.dc.html"><svg class="ic" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4M12 11v10"/></svg><span>Zamówienia</span><em>5</em></a><a class="mtile" href="Klient.dc.html"><svg class="ic" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span>Klienci</span></a><a class="mtile" href="Ceny.dc.html"><svg class="ic" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg><span>Centrum cen</span></a><a class="mtile" href="Raport.dc.html"><svg class="ic" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h7M9 17h5"/></svg><span>Raporty cen</span><em>1</em></a><a class="mtile" href="Opcje.dc.html"><svg class="ic" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/></svg><span>Opcje</span></a><a class="mtile" href="Statystyki.dc.html"><svg class="ic" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Statystyki</span></a><a class="mtile" href="Ustawienia.dc.html"><svg class="ic" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg><span>Ustawienia</span></a><span class="mtile"><svg class="ic" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="5" rx="1"/><path d="M5 9v11h14V9M10 13h4"/></svg><span>Dane (listy)</span></span><span class="mtile"><svg class="ic" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9"/><path d="M18 14v6H4V6h6"/></svg><span>Strona</span></span></div>
+<div class="mwho"><span class="av" style="width:40px;height:40px">KP</span><span style="flex:1">Krystian<br><small style="color:var(--mu)">administrator</small></span><span class="btn ghost sm" style="cursor:default">Wyloguj</span></div>
+</section>
+<nav class="tabbar" aria-label="Panel, nawigacja dolna"><a href="Main.dc.html" class=""><span class="ti"><svg class="ic" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg></span>Pulpit</a><a href="Zapytania.dc.html" class=""><span class="ti"><svg class="ic" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></span>Zapytania<em class="r">3</em></a><a href="Publikacja.dc.html" class=""><span class="ti"><svg class="ic" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg></span>Zatwierdź<em class="">11</em></a><a href="Zestawy.dc.html" class="on" aria-current="page"><span class="ti"><svg class="ic" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="2" width="10" height="20" rx="1.5"/><circle cx="12" cy="17" r="1.6"/><path d="M10 6h4M10 9h4"/></svg></span>Zestawy</a><label for="pn-more" class=""><span class="ti"><svg class="ic" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></span>Więcej</label></nav><main class="main"><header class="mtop"><a class="icb mback" href="Zestawy.dc.html" aria-label="Wróć: Gotowe zestawy"><svg class="ic" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></a><span class="mt">Bazyliszek</span><button type="button" class="icb" aria-label="Szukaj w panelu"><svg class="ic" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></button><a class="icb" href="Zapytania.dc.html" aria-label="Powiadomienia, 3 nowe"><svg class="ic" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16V11a6 6 0 0112 0v5l2 2H4z"/><path d="M10 20a2 2 0 004 0"/></svg><em>3</em></a></header><header class="top"><div class="crumb">Panel <span aria-hidden="true">/</span> Gotowe zestawy <span aria-hidden="true">/</span> <b>Bazyliszek</b></div>
+<label class="srch"><svg class="ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input type="search" placeholder="Szukaj zestawu, części, obudowy…" aria-label="Szukaj w panelu"><kbd>Ctrl K</kbd></label>
+<span class="sp"></span>
+<span class="live"><i></i>Strona działa · ceny z 25.10.2026</span>
+
+<a class="icb" href="Zapytania.dc.html" aria-label="Powiadomienia, 3 nowe"><svg class="ic" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16V11a6 6 0 0112 0v5l2 2H4z"/><path d="M10 20a2 2 0 004 0"/></svg><em>3</em></a>
+<a class="btn gold" href="Raport.dc.html"><svg class="ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 10-2.3 5.7"/><path d="M20 4v7h-7"/></svg>Sprawdź ceny</a></header>
+<div class="wrap">
+<div class="ph"><div style="display:flex;gap:16px;align-items:center"><span style="width:64px;height:64px;border-radius:16px;display:grid;place-items:center;background:#0B110F;border:1px solid var(--ln2);color:#59E0C5"><svg class="sg" width="44" height="44" viewBox="0 0 100 100" aria-hidden="true"><use href="#sg-bazyliszek"></use></svg></span>
+<div><h1 class="cn" style="font-size:30px">Bazyliszek</h1><p style="margin:2px 0 0">/zestawy/bazyliszek · Moc VI, 2K wysokie · ostatnia zmiana 25.10.2026</p></div></div>
+<div class="acts"><div class="seg" role="group" aria-label="Status zestawu"><sc-for list="{{sts}}" as="s" hint-placeholder-count="3"><button type="button" class="{{s.cls}}" aria-pressed="{{s.on}}" onClick="{{s.pick}}">{{s.t}}</button></sc-for></div></div></div>
+
+<div class="seg" role="tablist" aria-label="Sekcje zestawu" style="align-self:flex-start"><sc-for list="{{tabs}}" as="t" hint-placeholder-count="3"><button type="button" role="tab" class="{{t.cls}}" aria-selected="{{t.on}}" onClick="{{t.pick}}">{{t.t}}</button></sc-for></div>
+
+<div style="display:flex;flex-wrap:wrap;gap:18px;align-items:flex-start">
+<div style="flex:999 1 620px;min-width:0;display:flex;flex-direction:column;gap:16px">
+<sc-if value="{{tRecipe}}" hint-placeholder-val="{{true}}">
+<section class="card" aria-labelledby="lv-h"><div class="hd"><span style="color:var(--gold)"><svg class="ic" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="1"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/></svg></span><h2 id="lv-h">Poziom mocy</h2><p>procesor, karta, płyta i zasilacz w jednym pakiecie</p></div>
+<div class="fld"><label for="lvl">Poziom</label><select id="lvl" value="{{level}}" onChange="{{setLevel}}"><sc-for list="{{lvOpts}}" as="o" hint-placeholder-count="16"><option value="{{o.c}}">{{o.label}}</option></sc-for></select>
+<small>{{lvInfo}}</small></div></section>
+
+<section class="card" aria-labelledby="ca-h"><div class="hd"><span style="color:var(--gold)"><svg class="ic" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="1.5"/><path d="M9 6h6M9 18h6"/></svg></span><h2 id="ca-h">Obudowa</h2><p>{{caCount}}</p></div>
+<div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px">
+<sc-for list="{{cases}}" as="o" hint-placeholder-count="24"><button type="button" class="{{o.cls}}" disabled="{{o.dis}}" onClick="{{o.pick}}" aria-pressed="{{o.on}}" title="{{o.why}}" style="text-align:left;display:flex;flex-direction:column;gap:6px;padding:10px;border-radius:12px;background:#0B110F;cursor:pointer;min-height:44px">
+<span style="height:84px;display:grid;place-items:center"><img src="{{o.img}}" alt="" style="max-height:84px;max-width:100%;object-fit:contain"></span>
+<b style="font-size:12.5px;line-height:1.3">{{o.n}}</b><small style="color: {{o.dc}};font-weight:700;font-size:12px">{{o.d}}</small></button></sc-for></div></section>
+
+<section class="card" aria-labelledby="co-h"><div class="hd"><span style="color:var(--gold)"><svg class="ic" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="2"/><path d="M12 10c0-4 1-7 4-7 2 0 3 2 2 4l-4 4M14 12c4 0 7 1 7 4 0 2-2 3-4 2l-4-4M12 14c0 4-1 7-4 7-2 0-3-2-2-4l4-4M10 12c-4 0-7-1-7-4 0-2 2-3 4-2l4 4"/></svg></span><h2 id="co-h">Chłodzenie</h2><p>{{coCount}}</p></div>
+<div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px">
+<sc-for list="{{coolers}}" as="o" hint-placeholder-count="22"><button type="button" class="{{o.cls}}" disabled="{{o.dis}}" onClick="{{o.pick}}" aria-pressed="{{o.on}}" title="{{o.why}}" style="text-align:left;display:flex;flex-direction:column;gap:6px;padding:10px;border-radius:12px;background:#0B110F;cursor:pointer">
+<span style="height:72px;display:grid;place-items:center"><img src="{{o.img}}" alt="" style="max-height:72px;max-width:100%;object-fit:contain"></span>
+<b style="font-size:12.5px;line-height:1.3">{{o.n}}</b><small style="color: {{o.dc}};font-weight:700;font-size:12px">{{o.d}}</small></button></sc-for></div></section>
+
+<section class="card" aria-labelledby="rd-h"><div class="hd"><span style="color:var(--gold)"><svg class="ic" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/></svg></span><h2 id="rd-h">RAM i dysk</h2></div>
+<div class="pill-row" style="margin-bottom:12px"><sc-for list="{{rams}}" as="o" hint-placeholder-count="7"><button type="button" class="{{o.cls}}" disabled="{{o.dis}}" onClick="{{o.pick}}" aria-pressed="{{o.on}}" title="{{o.why}}">{{o.n}} <b style="color: {{o.dc}}">{{o.d}}</b></button></sc-for></div>
+<div class="pill-row"><sc-for list="{{ssds}}" as="o" hint-placeholder-count="4"><button type="button" class="{{o.cls}}" disabled="{{o.dis}}" onClick="{{o.pick}}" aria-pressed="{{o.on}}" title="{{o.why}}">{{o.n}} <b style="color: {{o.dc}}">{{o.d}}</b></button></sc-for></div>
+<p class="note" style="margin:12px 0 0">Wyszarzone opcje nie pasują do tego poziomu; powód widać po najechaniu. Te same reguły działają w konfiguratorze na stronie.</p></section>
+</sc-if>
+
+<sc-if value="{{tText}}" hint-placeholder-val="{{false}}">
+<section class="card"><div class="hd"><h2>Treść na stronie zestawu</h2><p>z karty istoty; edytujesz tutaj, strona czyta z panelu</p></div>
+<div class="grid" style="gap:14px">
+<div class="fld"><label for="tx1">Przydomek</label><input id="tx1" type="text" value="Z Krzywego Koła"></div>
+<div class="fld"><label for="tx2">Krótki opis na karcie</label><textarea id="tx2">Zabijał wzrokiem w piwnicy przy Krzywym Kole.</textarea></div>
+<div class="fld"><label for="tx3">Dlaczego Bazyliszek</label><textarea id="tx3" style="min-height:110px">Zabójcze spojrzenie to jego żywioł: monitory 2K z wysokim odświeżaniem.</textarea></div>
+<div class="fld"><label>Zdjęcia egzemplarza</label><div class="pill-row"><span class="chip warn"><i></i>przód: zdjęcie poglądowe</span><span class="chip mu">wnętrze: brak</span><span class="chip mu">w ciemności: brak</span><span class="chip mu">film z testu: brak</span></div><small>Po pierwszym montażu wgraj 4 zdjęcia i film; do tego czasu strona pokazuje zdjęcie poglądowe z podpisem.</small></div>
+</div></section>
+</sc-if>
+
+<sc-if value="{{tHist}}" hint-placeholder-val="{{false}}">
+<section class="card"><div class="hd"><h2>Historia ceny</h2><p>z partii publikacji; tu panel liczy najniższą cenę z 30 dni przy promocjach</p></div>
+<ul class="feed"><li><span class="fi"><svg class="ic" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 103-6.7"/><path d="M3 4v5h5M12 8v4l3 2"/></svg></span><div><p>11 930 zł · partia #1</p><small>od 25.10.2026 · start sprzedaży</small></div></li>
+<li><span class="fi" style="color:var(--gold)"><svg class="ic" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3c.6 4.2 2.8 6.4 7 7-4.2.6-6.4 2.8-7 7-.6-4.2-2.8-6.4-7-7 4.2-.6 6.4-2.8 7-7z"/><path d="M19 15c.3 1.6 1 2.4 2.6 2.7-1.6.3-2.3 1-2.6 2.6-.3-1.6-1-2.3-2.6-2.6 1.6-.3 2.3-1.1 2.6-2.7z"/></svg></span><div><p>Propozycja: 12 080 zł (RAM i dysk z raportu 30.10)</p><small>czeka w „Do zatwierdzenia”</small></div></li></ul></section>
+</sc-if>
+</div>
+
+<aside style="flex:1 1 340px;min-width:0;display:flex;flex-direction:column;gap:16px;position:sticky;top:16px">
+<section class="card" aria-labelledby="pr-h"><div class="hd"><h2 id="pr-h">Cena zestawu</h2><div class="r"><span class="{{matchC}}"><i></i>{{matchT}}</span></div></div>
+<div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap"><b style="font-size:34px;letter-spacing:-.02em">{{priceT}}</b><span class="{{dC}}">{{dT}}</span></div>
+<p class="note" style="margin:2px 0 14px">na stronie dziś 11 930 zł · ta sama konfiguracja w konfiguratorze ma tę samą cenę</p>
+<div class="kv"><sc-for list="{{bd}}" as="x" hint-placeholder-count="6"><span>{{x.k}}</span><b>{{x.v}}</b></sc-for></div>
+<div style="height:1px;background:var(--ln);margin:14px 0"></div>
+<div class="kv"><span>Koszt części i usługi</span><b>{{costT}}</b><span>Marża</span><b style="color: {{mCol}}">{{mT}}</b><span>Marża przy dzisiejszych kosztach</span><b style="color: {{m1Col}}">{{m1T}}</b></div>
+<div class="{{bar}}" style="margin-top:12px"><s style="width: {{w}}"></s><u style="left: 37.5%"></u></div>
+<p class="note" style="margin:6px 0 0">linia = minimum 11%</p>
+<sc-if value="{{hasWarn}}" hint-placeholder-val="{{false}}"><div class="claude" style="margin-top:14px;border-color:rgba(242,165,74,.35);background:rgba(242,165,74,.06)"><span class="ci" style="color:var(--warn);background:rgba(242,165,74,.14)"><svg class="ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.01"/></svg></span><div>{{warn}}</div></div></sc-if>
+<div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap"><button type="button" class="btn ghost" style="flex:1">Zapisz szkic</button><a class="btn gold" href="Publikacja.dc.html" style="flex:1">Do zatwierdzenia</a></div>
+</section>
+<section class="card"><div class="hd"><h2>Konkurencja</h2></div><div class="kv"><span>GoblinPC Minotaur (24–25.10)</span><b>12 360 zł</b><span>My vs Goblin</span><b class="{{gC}}">{{gT}}</b></div></section>
+</aside>
+</div>
+</div><div class="mact" role="region" aria-label="Cena zestawu"><div class="mv"><b>{{priceT}}</b><small>marża {{mT}} · dziś {{m1T}}</small></div><a class="btn gold" href="Publikacja.dc.html">Do zatwierdzenia</a></div>
+</main></div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":2200}}'>
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { level: 'P10', case: 'SPXL', cooler: 'ARC', ram: 'R32', ssd: 'NM1', st: 0, tab: 0 }; }
+  renderVals() {
+
+const NB = ' ';
+const zl = (n) => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, NB) + NB + 'zł';
+const pc = (x, d) => (x * 100).toFixed(d == null ? 1 : d).replace('.', ',').replace('-', '−') + '%';
+const pcs = (x, d) => (x >= 0 ? '+' : '') + pc(x, d);
+const mcls = (m) => m < 0.11 ? 'bad' : (m < 0.12 ? 'warn' : 'ok');
+const ceil10 = (x) => Math.ceil(Math.round(x * 1e6) / 1e6 / 10) * 10;
+
+    const L = [{"c": "P01", "t": "P01 · Moc I FullHD start", "p": "Ryzen 5 5500 + RX 7600 8 GB", "s": 3330, "k0": 2847, "k1": 2847, "g": 282, "rt": "DDR4", "aio": false, "mr": 16, "ms": 512, "mc": 1, "mk": 1}, {"c": "P02", "t": "P02 · Moc II FullHD", "p": "Ryzen 5 5600 + RTX 5060 8 GB", "s": 3960, "k0": 3383, "k1": 3383, "g": 197, "rt": "DDR4", "aio": false, "mr": 16, "ms": 512, "mc": 1, "mk": 1}, {"c": "P03", "t": "P03 · Moc III FullHD wysokie (GeForce)", "p": "Ryzen 5 7500F + RTX 5060 8 GB", "s": 4100, "k0": 3497, "k1": 3497, "g": 197, "rt": "DDR5", "aio": false, "mr": 16, "ms": 1000, "mc": 1, "mk": 1}, {"c": "P04", "t": "P04 · Moc III FullHD wysokie (Intel)", "p": "Core i5-14400F + RTX 5060 8 GB", "s": 4250, "k0": 3624, "k1": 3624, "g": 228, "rt": "DDR5", "aio": false, "mr": 16, "ms": 1000, "mc": 1, "mk": 1}, {"c": "P05", "t": "P05 · Moc IV FullHD ultra / 2K", "p": "Ryzen 5 7500F + RX 9070 GRE 12 GB", "s": 4730, "k0": 4036, "k1": 4036, "g": 288, "rt": "DDR5", "aio": false, "mr": 16, "ms": 1000, "mc": 1, "mk": 1}, {"c": "P06", "t": "P06 · Moc V 2K (GeForce)", "p": "Ryzen 5 7500F + RTX 5070 12 GB", "s": 6320, "k0": 5446, "k1": 5446, "g": 282, "rt": "DDR5", "aio": false, "mr": 16, "ms": 1000, "mc": 2, "mk": 2}, {"c": "P07", "t": "P07 · Moc V 2K (Radeon)", "p": "Ryzen 5 9600X + RX 9070 16 GB", "s": 5640, "k0": 4856, "k1": 4856, "g": 304, "rt": "DDR5", "aio": false, "mr": 16, "ms": 1000, "mc": 2, "mk": 2}, {"c": "P08", "t": "P08 · Moc V 2K (biały GeForce)", "p": "Ryzen 5 7500F + RTX 5070 12 GB (biała)", "s": 6620, "k0": 5444, "k1": 5444, "g": 282, "rt": "DDR5", "aio": false, "mr": 16, "ms": 1000, "mc": 2, "mk": 2}, {"c": "P09", "t": "P09 · Moc VI 2K wysokie (GeForce)", "p": "Ryzen 7 7800X3D + RTX 5070 12 GB", "s": 7190, "k0": 6198, "k1": 6198, "g": 282, "rt": "DDR5", "aio": false, "mr": 32, "ms": 1000, "mc": 2, "mk": 2}, {"c": "P10", "t": "P10 · Moc VI 2K wysokie (Radeon)", "p": "Ryzen 7 7800X3D + RX 9070 XT 16 GB", "s": 7310, "k0": 6298, "k1": 6403, "g": 288, "rt": "DDR5", "aio": false, "mr": 32, "ms": 1000, "mc": 2, "mk": 2}, {"c": "P11", "t": "P11 · Moc VI 2K wysokie (biały Radeon)", "p": "Ryzen 7 7800X3D + RX 9070 XT 16 GB (biała)", "s": 7430, "k0": 6140, "k1": 6240, "g": 288, "rt": "DDR5", "aio": false, "mr": 32, "ms": 1000, "mc": 2, "mk": 2}, {"c": "P12", "t": "P12 · Moc VII 4K (Intel)", "p": "Core Ultra 7 270K Plus + RTX 5070 Ti 16 GB (3 wentylatory)", "s": 9780, "k0": 8537, "k1": 8301, "g": 338, "rt": "DDR5", "aio": true, "mr": 32, "ms": 1000, "mc": 3, "mk": 2}, {"c": "P13", "t": "P13 · Moc VII 4K (GeForce)", "p": "Ryzen 7 9800X3D + RTX 5070 Ti 16 GB", "s": 9800, "k0": 8558, "k1": 8326, "g": 303, "rt": "DDR5", "aio": false, "mr": 32, "ms": 1000, "mc": 2, "mk": 2}, {"c": "P14", "t": "P14 · Moc VIII 4K ultra (GeForce)", "p": "Ryzen 7 9800X3D + RTX 5080 16 GB", "s": 11880, "k0": 10374, "k1": 10374, "g": 303, "rt": "DDR5", "aio": false, "mr": 32, "ms": 1000, "mc": 2, "mk": 2}, {"c": "P15", "t": "P15 · Moc VIII 4K ultra (premium)", "p": "Ryzen 7 9850X3D + RTX 5080 16 GB (3 wentylatory, premium)", "s": 13670, "k0": 11933, "k1": 11933, "g": 338, "rt": "DDR5", "aio": false, "mr": 32, "ms": 1000, "mc": 2, "mk": 2}, {"c": "P16", "t": "P16 · Moc IX Bez kompromisów", "p": "Ryzen 7 9850X3D + RTX 5090 32 GB", "s": 44630, "k0": 39321, "k1": 39321, "g": 342, "rt": "DDR5", "aio": false, "mr": 64, "ms": 2000, "mc": 3, "mk": 3}];
+    const O = [{"c": "SIG3A", "t": "case", "n": "Endorfy Signum 300 ARGB", "img": "img/SIG3A.webp", "s": 250, "k0": 223, "k1": 223, "cl": 1, "col": "czarny", "gm": 325, "cm": 161, "aio": "front"}, {"c": "VEN2A", "t": "case", "n": "Endorfy Ventum 200 ARGB", "img": "img/VEN2A.webp", "s": 220, "k0": 199, "k1": 199, "cl": 1, "col": "czarny", "gm": 315, "cm": 161, "aio": "front"}, {"c": "EXO", "t": "case", "n": "Krux Exo RGB czarna", "img": "img/EXO.webp", "s": 280, "k0": 259, "k1": 259, "cl": 2, "col": "czarny", "gm": 405, "cm": 181, "aio": "top_only"}, {"c": "REG4", "t": "case", "n": "Endorfy Regnum 400 ARGB", "img": "img/REG4.webp", "s": 290, "k0": 265, "k1": 265, "cl": 2, "col": "czarny", "gm": 370, "cm": 162, "aio": "front"}, {"c": "VEN4", "t": "case", "n": "Endorfy Ventum 400 ARGB", "img": "img/VEN4.webp", "s": 330, "k0": 309, "k1": 309, "cl": 2, "col": "czarny", "gm": 345, "cm": 164, "aio": "front"}, {"c": "PANO130", "t": "case", "n": "MSI MAG PANO 130R PZ czarna", "img": "img/PANO130.webp", "s": 340, "k0": 319, "k1": 319, "cl": 2, "col": "czarny", "gm": 400, "cm": 165, "aio": "yes"}, {"c": "STEL5", "t": "case", "n": "Modecom Volcano Stellar ARGB 5F czarna", "img": "img/STEL5.webp", "s": 420, "k0": 399, "k1": 399, "cl": 2, "col": "czarny", "gm": 420, "cm": 175, "aio": "top_only"}, {"c": "STP5", "t": "case", "n": "Modecom Volcano Stellar Plus ARGB 5F czarna", "img": "img/STP5.webp", "s": 420, "k0": 399, "k1": 399, "cl": 2, "col": "czarny", "gm": 420, "cm": 175, "aio": "yes"}, {"c": "PANO100", "t": "case", "n": "MSI MAG PANO 100R PZ czarna", "img": "img/PANO100.webp", "s": 440, "k0": 419, "k1": 419, "cl": 2, "col": "czarny", "gm": 380, "cm": 166, "aio": "yes"}, {"c": "ARX5", "t": "case", "n": "Endorfy Arx 500 ARGB", "img": "img/ARX5.webp", "s": 380, "k0": 360, "k1": 360, "cl": 2, "col": "czarny", "gm": 350, "cm": 179, "aio": "front"}, {"c": "ARX7", "t": "case", "n": "Endorfy Arx 700 ARGB", "img": "img/ARX7.webp", "s": 430, "k0": 402, "k1": 402, "cl": 2, "col": "czarny", "gm": 410, "cm": 179, "aio": "yes"}, {"c": "ARX7A", "t": "case", "n": "Endorfy Arx 700 Air", "img": "img/ARX7A.webp", "s": 400, "k0": 379, "k1": 379, "cl": 2, "col": "czarny", "gm": 410, "cm": 179, "aio": "yes"}, {"c": "F4000D", "t": "case", "n": "Corsair FRAME 4000D RS ARGB czarna", "img": "img/F4000D.webp", "s": 480, "k0": 460, "k1": 460, "cl": 2, "col": "czarny", "gm": 430, "cm": 170, "aio": "yes"}, {"c": "PANOR5", "t": "case", "n": "Modecom Volcano Panorama APEX ARGB 5F szara", "img": "img/PANOR5.webp", "s": 410, "k0": 389, "k1": 389, "cl": 2, "col": "szary", "gm": 400, "cm": 175, "aio": "yes"}, {"c": "SPACE", "t": "case", "n": "Modecom Volcano Space APEX ARGB czarna", "img": "img/SPACE.webp", "s": 520, "k0": 500, "k1": 500, "cl": 2, "col": "czarny", "gm": 430, "cm": 183, "aio": "yes"}, {"c": "SPACEW", "t": "case", "n": "Modecom Volcano Space APEX ARGB biała", "img": "img/SPACEW.webp", "s": 540, "k0": 520, "k1": 520, "cl": 2, "col": "biały", "gm": 430, "cm": 183, "aio": "yes"}, {"c": "SPXL", "t": "case", "n": "Modecom Volcano Space XL ARGB 5F czarna (Full Tower)", "img": "img/SPXL.webp", "s": 550, "k0": 525, "k1": 525, "cl": 2, "col": "czarny", "gm": 440, "cm": 180, "aio": "yes"}, {"c": "AQ500", "t": "case", "n": "Modecom Volcano AQ500 ARGB czarna", "img": "img/AQ500.webp", "s": 470, "k0": 449, "k1": 449, "cl": 2, "col": "czarny", "gm": 400, "cm": 180, "aio": "top_only"}, {"c": "AQ", "t": "case", "n": "Endorfy Aquarius 8000 Corona", "img": "img/AQ.webp", "s": 470, "k0": 449, "k1": 449, "cl": 2, "col": "czarny", "gm": 450, "cm": 179, "aio": "yes"}, {"c": "FISH", "t": "case", "n": "Endorfy Fishtank 6000 Corona", "img": "img/FISH.webp", "s": 410, "k0": 389, "k1": 389, "cl": 2, "col": "czarny", "gm": 445, "cm": 182, "aio": "yes"}, {"c": "LB500", "t": "case", "n": "be quiet! Light Base 500 LX czarna", "img": "img/LB500.webp", "s": 580, "k0": 559, "k1": 559, "cl": 3, "col": "czarny", "gm": 400, "cm": 185, "aio": "top_only"}, {"c": "4500XB", "t": "case", "n": "Corsair FRAME 4500X RS-R ARGB czarna", "img": "img/4500XB.webp", "s": 430, "k0": 406, "k1": 406, "cl": 3, "col": "czarny", "gm": 460, "cm": 185, "aio": "yes"}, {"c": "4500XW", "t": "case", "n": "Corsair FRAME 4500X RS-R ARGB biała", "img": "img/4500XW.webp", "s": 570, "k0": 550, "k1": 550, "cl": 3, "col": "biały", "gm": 460, "cm": 185, "aio": "yes"}, {"c": "H9", "t": "case", "n": "NZXT H9 Flow RGB+ czarna", "img": "img/H9.webp", "s": 870, "k0": 850, "k1": 850, "cl": 3, "col": "czarny", "gm": 459, "cm": 165, "aio": "yes"}, {"c": "SPARTAN", "t": "cooler", "n": "Endorfy Spartan 5 ARGB", "img": "img/SPARTAN.webp", "s": 80, "k0": 59, "k1": 59, "cl": 1, "col": "czarny", "kind": "air", "h": 146, "th": 0}, {"c": "T101", "t": "cooler", "n": "Modecom Volcano 0C T101 ARGB 120", "img": "img/T101.webp", "s": 110, "k0": 89, "k1": 89, "cl": 1, "col": "czarny", "kind": "air", "h": 153, "th": 0}, {"c": "T102", "t": "cooler", "n": "Modecom Volcano 0C T102 LCD ARGB 120 czarne", "img": "img/T102.webp", "s": 150, "k0": 125, "k1": 125, "cl": 1, "col": "czarny", "kind": "air", "h": 153, "th": 0}, {"c": "AK400", "t": "cooler", "n": "Deepcool AK400 Digital SE", "img": "img/AK400.webp", "s": 150, "k0": 123, "k1": 123, "cl": 2, "col": "czarny", "kind": "air", "h": 157, "th": 0}, {"c": "FERA", "t": "cooler", "n": "Endorfy Fera 5", "img": "img/FERA.webp", "s": 120, "k0": 95, "k1": 95, "cl": 2, "col": "czarny", "kind": "air", "h": 155, "th": 0}, {"c": "FORTIS", "t": "cooler", "n": "Endorfy Fortis 5", "img": "img/FORTIS.webp", "s": 160, "k0": 139, "k1": 139, "cl": 2, "col": "czarny", "kind": "air", "h": 159, "th": 0}, {"c": "AK620", "t": "cooler", "n": "Deepcool AK620 Digital SE", "img": "img/AK620.webp", "s": 230, "k0": 208, "k1": 208, "cl": 2, "col": "czarny", "kind": "air", "h": 161, "th": 0}, {"c": "LE360", "t": "cooler", "n": "Deepcool LE360 V2", "img": "img/LE360.webp", "s": 300, "k0": 274, "k1": 274, "cl": 3, "col": "czarny", "kind": "aio360", "h": 0, "th": 27}, {"c": "NAV360", "t": "cooler", "n": "Endorfy Navis F360 ARGB", "img": "img/NAV360.webp", "s": 310, "k0": 285, "k1": 285, "cl": 3, "col": "czarny", "kind": "aio360", "h": 0, "th": 28}, {"c": "A13", "t": "cooler", "n": "MSI MAG CoreLiquid A13 360 czarny", "img": "img/A13.webp", "s": 320, "k0": 299, "k1": 299, "cl": 3, "col": "czarny", "kind": "aio360", "h": 0, "th": 27}, {"c": "A13W", "t": "cooler", "n": "MSI MAG CoreLiquid A13 360 White", "img": "img/A13W.webp", "s": 330, "k0": 301, "k1": 301, "cl": 3, "col": "biały", "kind": "aio360", "h": 0, "th": 27}, {"c": "ARC", "t": "cooler", "n": "Arctic Liquid Freezer III Pro 360", "img": "img/ARC.webp", "s": 350, "k0": 325, "k1": 325, "cl": 3, "col": "czarny", "kind": "aio360", "h": 0, "th": 38}, {"c": "ARCA", "t": "cooler", "n": "Arctic Liquid Freezer III Pro 360 A-RGB", "img": "img/ARCA.webp", "s": 400, "k0": 374, "k1": 374, "cl": 3, "col": "czarny", "kind": "aio360", "h": 0, "th": 38}, {"c": "ARCAW", "t": "cooler", "n": "Arctic Liquid Freezer III Pro 360 A-RGB White", "img": "img/ARCAW.webp", "s": 480, "k0": 459, "k1": 459, "cl": 3, "col": "biały", "kind": "aio360", "h": 0, "th": 38}, {"c": "CMNEX", "t": "cooler", "n": "Cooler Master MasterLiquid Core Nex Digital 360 ARGB", "img": "img/CMNEX.webp", "s": 410, "k0": 384, "k1": 384, "cl": 3, "col": "czarny", "kind": "aio360", "h": 0, "th": 27}, {"c": "PL3LX", "t": "cooler", "n": "be quiet! Pure Loop 3 LX 360 mm", "img": "img/PL3LX.webp", "s": 440, "k0": 417, "k1": 417, "cl": 3, "col": "czarny", "kind": "aio360", "h": 0, "th": 27}, {"c": "LM360", "t": "cooler", "n": "Deepcool LM360 (ekran LCD 2,4\")", "img": "img/LM360.webp", "s": 480, "k0": 453, "k1": 453, "cl": 3, "col": "czarny", "kind": "aio360", "h": 0, "th": 27}, {"c": "NAUTB", "t": "cooler", "n": "Corsair Nautilus 360 RS ARGB czarny", "img": "img/NAUTB.webp", "s": 510, "k0": 490, "k1": 490, "cl": 3, "col": "czarny", "kind": "aio360", "h": 0, "th": 27}, {"c": "NAUTW", "t": "cooler", "n": "Corsair Nautilus 360 RS ARGB biały", "img": "img/NAUTW.webp", "s": 550, "k0": 524, "k1": 524, "cl": 3, "col": "biały", "kind": "aio360", "h": 0, "th": 27}, {"c": "LL360", "t": "cooler", "n": "be quiet! Light Loop 360 ARGB czarny", "img": "img/LL360.webp", "s": 520, "k0": 499, "k1": 499, "cl": 3, "col": "czarny", "kind": "aio360", "h": 0, "th": 27}, {"c": "LL360W", "t": "cooler", "n": "be quiet! Light Loop 360 ARGB White", "img": "img/LL360W.webp", "s": 520, "k0": 499, "k1": 499, "cl": 3, "col": "biały", "kind": "aio360", "h": 0, "th": 27}, {"c": "KRAKEN", "t": "cooler", "n": "NZXT Kraken Plus 360 RGB (LCD)", "img": "img/KRAKEN.webp", "s": 880, "k0": 859, "k1": 859, "cl": 3, "col": "czarny", "kind": "aio360", "h": 0, "th": 27}, {"c": "R16D4", "t": "ram", "n": "16 GB DDR4 3200 (2x8)", "img": "", "s": 690, "k0": 594, "k1": 618, "cl": 0, "col": "", "gb": 16, "rt": "DDR4"}, {"c": "R32D4", "t": "ram", "n": "32 GB DDR4 3200 (2x16)", "img": "", "s": 1100, "k0": 948, "k1": 986, "cl": 0, "col": "", "gb": 32, "rt": "DDR4"}, {"c": "R16", "t": "ram", "n": "16 GB DDR5 6000 (2x8)", "img": "", "s": 1250, "k0": 1080, "k1": 1166, "cl": 0, "col": "", "gb": 16, "rt": "DDR5"}, {"c": "R32", "t": "ram", "n": "32 GB DDR5 6000 CL30 (2x16)", "img": "", "s": 2560, "k0": 2219, "k1": 2397, "cl": 0, "col": "", "gb": 32, "rt": "DDR5"}, {"c": "R32RGB", "t": "ram", "n": "32 GB DDR5 6000 RGB (2x16)", "img": "", "s": 2650, "k0": 2300, "k1": 2484, "cl": 0, "col": "", "gb": 32, "rt": "DDR5"}, {"c": "R32WP", "t": "ram", "n": "32 GB DDR5 6000 CL30 RGB biała (2x16)", "img": "", "s": 2530, "k0": 2197, "k1": 2373, "cl": 0, "col": "", "gb": 32, "rt": "DDR5"}, {"c": "R64", "t": "ram", "n": "64 GB DDR5 6000 (2x32)", "img": "", "s": 5750, "k0": 4999, "k1": 5399, "cl": 0, "col": "", "gb": 64, "rt": "DDR5"}, {"c": "PXL512", "t": "ssd", "n": "512 GB NVMe PCIe 4.0", "img": "", "s": 460, "k0": 399, "k1": 379, "cl": 0, "col": "", "gb": 512, "rt": ""}, {"c": "PX1", "t": "ssd", "n": "1 TB NVMe PCIe 4.0", "img": "", "s": 750, "k0": 650, "k1": 618, "cl": 0, "col": "", "gb": 1000, "rt": ""}, {"c": "NM1", "t": "ssd", "n": "1 TB NVMe PCIe 4.0, szybki (do 7 400 MB/s)", "img": "", "s": 980, "k0": 849, "k1": 807, "cl": 0, "col": "", "gb": 1000, "rt": ""}, {"c": "NM2", "t": "ssd", "n": "2 TB NVMe PCIe 4.0, szybki (do 7 400 MB/s)", "img": "", "s": 1590, "k0": 1377, "k1": 1308, "cl": 0, "col": "", "gb": 2000, "rt": ""}];
+    const BL = [{"slug": "skrzat", "name": "Skrzat", "r": {"level": "P01", "case": "SIG3A", "cooler": "SPARTAN", "ram": "R16D4", "ssd": "PXL512"}, "price": 4990}, {"slug": "licho", "name": "Licho", "r": {"level": "P02", "case": "VEN2A", "cooler": "T102", "ram": "R16D4", "ssd": "PX1"}, "price": 5950}, {"slug": "bies", "name": "Bies", "r": {"level": "P03", "case": "EXO", "cooler": "AK400", "ram": "R16", "ssd": "PX1"}, "price": 6710}, {"slug": "wodnik", "name": "Wodnik", "r": {"level": "P04", "case": "REG4", "cooler": "T102", "ram": "R16", "ssd": "PX1"}, "price": 6870}, {"slug": "strzyga", "name": "Strzyga", "r": {"level": "P05", "case": "PANO130", "cooler": "AK400", "ram": "R16", "ssd": "PX1"}, "price": 7400}, {"slug": "kikimora", "name": "Kikimora", "r": {"level": "P06", "case": "STEL5", "cooler": "LE360", "ram": "R16", "ssd": "PX1"}, "price": 9220}, {"slug": "zmora", "name": "Zmora", "r": {"level": "P07", "case": "PANO100", "cooler": "NAV360", "ram": "R32", "ssd": "NM1"}, "price": 10110}, {"slug": "rusalka", "name": "Rusałka", "r": {"level": "P08", "case": "SPACEW", "cooler": "A13W", "ram": "R32WP", "ssd": "PX1"}, "price": 10950}, {"slug": "baba-jaga", "name": "Baba Jaga", "r": {"level": "P09", "case": "ARX7", "cooler": "NAV360", "ram": "R32", "ssd": "NM1"}, "price": 11650}, {"slug": "bazyliszek", "name": "Bazyliszek", "r": {"level": "P10", "case": "SPXL", "cooler": "ARC", "ram": "R32", "ssd": "NM1"}, "price": 11930}, {"slug": "pani-zimy", "name": "Pani Zimy", "r": {"level": "P11", "case": "4500XW", "cooler": "NAUTW", "ram": "R32WP", "ssd": "NM1"}, "price": 12240}, {"slug": "wilkolak", "name": "Wilkołak", "r": {"level": "P12", "case": "4500XB", "cooler": "NAUTB", "ram": "R32", "ssd": "NM1"}, "price": 14440}, {"slug": "wampir", "name": "Wampir", "r": {"level": "P13", "case": "LB500", "cooler": "PL3LX", "ram": "R32", "ssd": "NM1"}, "price": 14540}, {"slug": "weles", "name": "Weles", "r": {"level": "P14", "case": "FISH", "cooler": "LM360", "ram": "R32", "ssd": "NM2"}, "price": 17100}, {"slug": "zmij", "name": "Żmij", "r": {"level": "P15", "case": "H9", "cooler": "KRAKEN", "ram": "R32RGB", "ssd": "NM2"}, "price": 19840}, {"slug": "perun", "name": "Perun", "r": {"level": "P16", "case": "H9", "cooler": "KRAKEN", "ram": "R64", "ssd": "NM2"}, "price": 53900}];
+    const SVC = 180, SVCK = 150;
+    const S = this.state; const by = {}; O.forEach((o) => { by[o.c] = o; });
+    const l = L.find((x) => x.c === S.level);
+    const why = (o) => {
+      const c = o.t === 'case' ? o : by[S.case], k = o.t === 'cooler' ? o : by[S.cooler], r = o.t === 'ram' ? o : by[S.ram], d = o.t === 'ssd' ? o : by[S.ssd];
+      if (o.t === 'case' && l.g > c.gm) return 'Karta tego poziomu się nie zmieści';
+      if (o.t === 'case' && c.cl < l.mk) return 'Za prosta obudowa do tego poziomu';
+      if ((o.t === 'case' || o.t === 'cooler') && k.kind === 'air' && k.h > c.cm) return 'Chłodzenie za wysokie do tej obudowy';
+      if ((o.t === 'case' || o.t === 'cooler') && k.kind === 'aio360' && c.aio === 'none') return 'Brak miejsca na chłodnicę 360 mm';
+      if (o.t === 'cooler' && l.aio && k.kind !== 'aio360') return 'Ten procesor wymaga chłodzenia wodnego 360 mm';
+      if (o.t === 'cooler' && k.cl < l.mc) return 'Za słabe chłodzenie do tego poziomu';
+      if (o.t === 'ram' && r.rt !== l.rt) return 'Ten poziom używa pamięci ' + l.rt;
+      if (o.t === 'ram' && r.gb < l.mr) return 'Za mało pamięci do tego poziomu (min. ' + l.mr + ' GB)';
+      if (o.t === 'ssd' && d.gb < l.ms) return 'Za mały dysk do tego poziomu';
+      return '';
+    };
+    const tiles = (t, big) => O.filter((o) => o.t === t).map((o) => {
+      const w = why(o); const on = S[t] === o.c; const d = o.s - by[S[t]].s;
+      return { n: o.n, img: o.img, on: on ? 'true' : 'false', dis: !!w && !on, why: w || (on ? 'Wybrane' : ''),
+        cls: big ? ('tile' + (on ? ' on' : '')) : ('fpill' + (on ? ' on' : '')),
+        d: on ? 'wybrane' : (w ? w : (d === 0 ? 'bez dopłaty' : (d > 0 ? '+' : '') + zl(d))), dc: on ? 'var(--gold)' : (w ? 'var(--mu)' : (d > 0 ? 'var(--tx2)' : 'var(--ok)')),
+        pick: () => { const n = {}; n[t] = o.c; this.setState(n); } };
+    });
+    const cases = tiles('case', true), coolers = tiles('cooler', true), rams = tiles('ram', false), ssds = tiles('ssd', false);
+    const sel = [by[S.case], by[S.cooler], by[S.ram], by[S.ssd]];
+    const price = l.s + sel.reduce((a, o) => a + o.s, 0) + SVC;
+    const cost0 = l.k0 + sel.reduce((a, o) => a + o.k0, 0) + SVCK, cost1 = l.k1 + sel.reduce((a, o) => a + o.k1, 0) + SVCK;
+    const m = 1 - cost0 / price, m1 = 1 - cost1 / price;
+    const bad = [by[S.case], by[S.cooler], by[S.ram], by[S.ssd]].map(why).filter((x) => x);
+    const k = by[S.cooler], c = by[S.case];
+    let warn = bad.length ? ('Konfiguracja niezgodna: ' + bad.join('; ') + '.') : '';
+    if (!warn && k.kind === 'aio360' && k.th >= 38 && c.aio === 'top_only') warn = 'Gruba chłodnica na górze: sprawdź prześwit nad pamięcią przy montażu.';
+    if (!warn && S.case === 'H9') warn = 'NZXT H9 Flow jest dziś niedostępna w sklepach (raport 30.10).';
+    const match = BL.find((b) => b.r.level === S.level && b.r.case === S.case && b.r.cooler === S.cooler && b.r.ram === S.ram && b.r.ssd === S.ssd);
+    const d = price - 11930;
+    const sts = ['Na stronie', 'Szkic', 'Ukryty'].map((t, i) => ({ t, cls: i === S.st ? 'on' : '', on: i === S.st ? 'true' : 'false', pick: () => this.setState({ st: i }) }));
+    const tabs = ['Przepis', 'Treść i zdjęcia', 'Historia ceny'].map((t, i) => ({ t, cls: i === S.tab ? 'on' : '', on: i === S.tab ? 'true' : 'false', pick: () => this.setState({ tab: i }) }));
+    return {
+      sts, tabs, tRecipe: S.tab === 0, tText: S.tab === 1, tHist: S.tab === 2,
+      level: S.level, lvOpts: L.map((x) => ({ c: x.c, label: x.t + ' · ' + x.p + ' · ' + zl(x.s) })),
+      setLevel: (e) => this.setState({ level: e.target.value }),
+      lvInfo: l.p + ' · ' + l.rt + ' · karta ' + l.g + ' mm' + (l.aio ? ' · wymaga AIO 360' : '') + ' · min. ' + l.mr + ' GB RAM, ' + l.ms + ' GB dysku',
+      cases, coolers, rams, ssds,
+      caCount: cases.filter((x) => !x.dis).length + ' z 24 pasuje do tego poziomu', coCount: coolers.filter((x) => !x.dis).length + ' z 22 pasuje',
+      priceT: zl(price), dT: d === 0 ? 'bez zmiany' : (d > 0 ? '+' : '') + zl(d), dC: d > 0 ? 'up delta' : (d < 0 ? 'dn delta' : 'mu'),
+      bd: [['Poziom mocy', zl(l.s)], ['Obudowa', zl(by[S.case].s)], ['Chłodzenie', zl(by[S.cooler].s)], ['RAM', zl(by[S.ram].s)], ['Dysk', zl(by[S.ssd].s)], ['Usługa (Windows, wysyłka)', zl(SVC)]].map((x) => ({ k: x[0], v: x[1] })),
+      costT: zl(cost0), mT: pc(m), mCol: m < 0.11 ? 'var(--bad)' : (m < 0.12 ? 'var(--warn)' : 'var(--ok)'), m1T: pc(m1), m1Col: m1 < 0.11 ? 'var(--bad)' : (m1 < 0.12 ? 'var(--warn)' : 'var(--ok)'),
+      bar: 'mbar ' + mcls(m), w: Math.max(2, Math.min(100, (m - 0.08) / 0.08 * 100)).toFixed(1) + '%',
+      hasWarn: !!warn, warn,
+      matchT: match ? ('przepis: ' + match.name) : 'zmieniony przepis', matchC: match ? 'chip ok' : 'chip gold',
+      gT: (price - 12360 > 0 ? '+' : '') + zl(price - 12360), gC: price > 12360 ? 'up' : 'dn'
+    };
+  }
+}
+</script>
+<script>
+(function () {
+  function label() {
+    document.querySelectorAll('table.t').forEach(function (tb) {
+      var hs = Array.prototype.map.call(tb.querySelectorAll('thead th'), function (h) { return h.textContent.trim(); });
+      tb.querySelectorAll('tbody tr').forEach(function (tr) {
+        Array.prototype.forEach.call(tr.children, function (td, i) { if (hs[i] && !td.hasAttribute('data-l')) td.setAttribute('data-l', hs[i]); });
+      });
+    });
+  }
+  new MutationObserver(label).observe(document.documentElement, { childList: true, subtree: true });
+  function sc() { document.documentElement.classList.toggle('pn-scrolled', window.scrollY > 40); }
+  window.addEventListener('scroll', sc, { passive: true }); label(); sc();
+})();
+</script>
+</body>
+</html>
