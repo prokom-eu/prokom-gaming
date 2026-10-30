@@ -398,4 +398,23 @@
   --ct-veil-phone: rgba(5, 8, 7, 0.8);
   --ct-veil-phone-top: rgba(5, 8, 7, 0.4);
   --ct-shadow: rgba(0, 0, 0, 0.6);
+  --ct-channel-bg: rgba(8, 14, 12, 0.92); /* kafle kanałów kontaktu nad sceną */
+  --ct-channel-line: rgba(236, 228, 208, 0.12);
+  --ct-channel-hl-line: rgba(242, 194, 48, 0.5);
+  --ct-channel-hl-glow: rgba(242, 194, 48, 0.12);
+  --ct-channel-hl-shadow: rgba(242, 194, 48, 0.35);
+  --ct-icon-line: rgba(242, 194, 48, 0.45);
+  --ct-body: #cfc6b0; /* tekst kafli, godziny */
+  --ct-ask-to: #081009; /* tło sekcji „Krótkie pytanie?” na dole */
+  --ct-ok-line: rgba(79, 210, 138, 0.45); /* „Wiadomość wysłana” */
+  --ct-ok-bg: #0d2219;
+  --ct-ok-head: #c9f7d9;
+  --ct-ok-text: #9ccfb0;
+  --ct-map-ground: #0a1310; /* rysunek mapy sklepu */
+  --ct-map-road: #1d2b26;
+  --ct-map-street: #15211d;
+  --ct-map-glow: rgba(242, 194, 48, 0.14);
+  --ct-map-shade: rgba(0, 0, 0, 0.35);
+  --ct-map-halo: rgba(242, 194, 48, 0.12);
+  --ct-gold-line: rgba(242, 194, 48, 0.45);
 }

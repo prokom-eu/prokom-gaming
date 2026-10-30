@@ -271,3 +271,293 @@
     font-size: 38px;
   }
 }
+
+/* ---------- shared bits ---------- */
+.lnk.ct-gold {
+  color: var(--grom);
+  border-color: var(--ct-gold-line);
+}
+.ct-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 40px;
+}
+.ct-h2 {
+  margin: 0;
+  font-size: 52px;
+  line-height: 1.04;
+  color: var(--ct-title);
+}
+.ct-p {
+  max-width: 620px;
+  margin: 14px 0 0;
+  font-size: 16.5px;
+  line-height: 1.65;
+  color: var(--ct-text);
+}
+.ct-p a {
+  color: var(--grom);
+  text-decoration: underline;
+}
+
+/* ---------- Kontakt (board: .hdk, .kc6, .ks6, .kq6) ---------- */
+.ct-head--tall .ct-head__in {
+  padding-bottom: 110px;
+}
+.ct-channels {
+  position: relative;
+  z-index: 6;
+  margin-top: -70px;
+}
+.ct-channels__grid {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr 1fr;
+  gap: 16px;
+}
+.ct-channel {
+  display: flex;
+  flex-direction: column;
+  padding: 28px;
+  border: 1px solid var(--ct-channel-line);
+  background: var(--ct-channel-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.ct-channel--hl {
+  border-color: var(--ct-channel-hl-line);
+  background:
+    radial-gradient(90% 90% at 0 0, var(--ct-channel-hl-glow), transparent), var(--ct-channel-bg);
+  box-shadow: 0 30px 80px -30px var(--ct-channel-hl-shadow);
+}
+.ct-channel__icon {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 1px solid var(--ct-icon-line);
+  color: var(--grom);
+}
+.ct-channel h2 {
+  margin: 18px 0 0;
+  font-size: 30px;
+  color: var(--ct-title);
+}
+.ct-channel p {
+  margin: 8px 0 0;
+  font-size: 15.5px;
+  line-height: 1.55;
+  color: var(--ct-body);
+}
+.ct-channel small {
+  display: block;
+  margin-top: 8px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--grom);
+}
+.ct-channel .btn {
+  align-self: flex-start;
+  margin-top: auto;
+}
+/* The button keeps its distance from the text whether or not the gold line is there. */
+.ct-channel > :nth-last-child(2) {
+  margin-bottom: 22px;
+}
+.ct-stores {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-top: 40px;
+}
+.ct-store {
+  border: 1px solid var(--ct-channel-line);
+  background: var(--ct-card);
+  overflow: hidden;
+}
+.ct-store__map {
+  display: block;
+  height: 230px;
+  border-bottom: 1px solid var(--line);
+}
+.ct-store__map:focus-visible {
+  outline: 2px solid var(--grom);
+  outline-offset: -2px;
+}
+.ct-map {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.ct-map__ground {
+  fill: var(--ct-map-ground);
+}
+.ct-map__road {
+  stroke: var(--ct-map-road);
+}
+.ct-map__street {
+  stroke: var(--ct-map-street);
+}
+.ct-map__halo {
+  fill: var(--ct-map-halo);
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: ct-pulse 3s ease-in-out infinite;
+}
+@keyframes ct-pulse {
+  50% {
+    transform: scale(0.5);
+    opacity: 0.4;
+  }
+}
+.ct-map__pin {
+  fill: var(--grom);
+}
+.ct-map__dot {
+  fill: var(--on-grom);
+}
+.ct-map__label {
+  font-family: var(--font-text);
+  font-size: 13px;
+  font-weight: 800;
+  fill: var(--kosc);
+}
+.ct-store__body {
+  padding: 24px 26px 28px;
+}
+.ct-store__body h3 {
+  margin: 0;
+  font-size: 32px;
+  color: var(--ct-title);
+}
+.ct-store__body p {
+  margin: 10px 0 0;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--ct-text);
+}
+.ct-store__body .ct-store__address {
+  margin-top: 6px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ct-strong);
+}
+.ct-store__go {
+  margin-top: 16px;
+}
+.ct-sec--ask {
+  background: linear-gradient(180deg, var(--ct-page), var(--ct-ask-to));
+}
+.ct-ask {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 60px;
+  align-items: start;
+}
+.ct-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 28px;
+}
+.ct-form .btn {
+  align-self: flex-start;
+}
+.ct-form .iq-err--send {
+  margin: 0;
+}
+.ct-form__two {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+.ct-ok {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 28px;
+  padding: 22px;
+  border: 1px solid var(--ct-ok-line);
+  background: var(--ct-ok-bg);
+  font-size: 14.5px;
+  color: var(--ct-ok-text);
+}
+.ct-ok b {
+  font-size: 18px;
+  color: var(--ct-ok-head);
+}
+.ct-ok strong {
+  color: var(--ct-ok-head);
+}
+.ct-owner {
+  padding: 28px;
+  border: 1px solid var(--ct-help-line);
+  background: var(--ct-help-bg);
+}
+.ct-owner h3 {
+  margin: 0;
+  font-size: 30px;
+  color: var(--ct-title);
+}
+.ct-owner p {
+  margin: 10px 0 0;
+  font-size: 15.5px;
+  line-height: 1.6;
+  color: var(--ct-text);
+}
+.ct-owner__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 18px;
+  margin-top: 18px;
+}
+.ct-owner__faq {
+  margin-top: 26px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ct-map__halo {
+    animation: none;
+  }
+}
+@media (max-width: 1023px) {
+  .ct-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .ct-h2 {
+    font-size: 38px;
+  }
+  .ct-head--tall .ct-head__in {
+    padding-top: 130px;
+    padding-bottom: 90px;
+  }
+  .ct-channels {
+    margin-top: -50px;
+  }
+  .ct-channels__grid,
+  .ct-stores,
+  .ct-ask {
+    grid-template-columns: 1fr;
+  }
+  .ct-ask {
+    gap: 44px;
+  }
+}
+@media (max-width: 640px) {
+  .ct-h2 {
+    font-size: 33px;
+  }
+  .ct-channel {
+    padding: 22px;
+  }
+  .ct-form__two {
+    grid-template-columns: 1fr;
+  }
+  .ct-store__map {
+    height: 180px;
+  }
+}

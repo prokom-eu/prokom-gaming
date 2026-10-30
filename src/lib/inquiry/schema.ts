@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 import { ITEM_CODE } from '../pricing/types'
-import { CONSENT_CLAUSE } from './consent'
+import { CONSENT_VERSIONS } from './consent'
 import { isValidNip, normalizeNip } from './nip'
 import { isPhone, MAX, PAYLOAD_EMAIL } from './rules'
 import {
@@ -102,7 +102,7 @@ const baseSchema = z.object({
   message: optionalText(MAX.message),
   consent: z.object({
     accepted: z.literal(true),
-    clauseVersion: z.literal(CONSENT_CLAUSE.version),
+    clauseVersion: z.enum(CONSENT_VERSIONS),
   }),
   marketingConsent: z.boolean().default(false),
   source: z.object({

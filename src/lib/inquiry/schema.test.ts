@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { CONSENT_CLAUSE } from './consent'
+import { CONSENT_CLAUSE, CONTACT_CONSENT_CLAUSE } from './consent'
 import { isValidNip, normalizeNip } from './nip'
 import { inquiryFieldErrors, parseInquiryInput } from './schema'
 
@@ -140,6 +140,11 @@ describe('parseInquiryInput', () => {
   it('contact needs a message', () => {
     expect(fields({ ...base, type: 'contact' })).toContain('message')
     expect(fields({ ...base, type: 'contact', message: 'Czy wysyłacie za granicę?' })).toEqual([])
+  })
+
+  it('accepts the clause of „Krótkie pytanie?” (/kontakt) with its own version', () => {
+    const consent = { accepted: true, clauseVersion: CONTACT_CONSENT_CLAUSE.version }
+    expect(fields({ ...base, type: 'contact', message: 'Pytanie', consent })).toEqual([])
   })
 
   it('games and extras: known shapes, no duplicates', () => {
