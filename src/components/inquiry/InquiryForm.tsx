@@ -70,7 +70,10 @@ export function InquiryForm({
 
   const update = (patch: Partial<FormState>) => setState((s) => ({ ...s, ...patch }))
   const set = (next: (state: FormState) => FormState) => setState(next)
+  // The step fades in only after a move: on page load the first step is simply there.
+  const [moved, setMoved] = useState(false)
   const go = (target: Step) => {
+    setMoved(true)
     setSendError(null)
     setState((s) => goTo(s, data, target))
   }
@@ -164,7 +167,7 @@ export function InquiryForm({
 
   return (
     <div className="iq-grid">
-      <section className="iq-main" aria-label="Formularz zapytania">
+      <section className="iq-main" aria-label="Formularz zapytania" data-moved={moved || undefined}>
         <ol className="iq-steps">
           {STEPS.map((title, i) => {
             const status = i < state.step ? 'done' : i === state.step ? 'now' : ''

@@ -112,7 +112,7 @@
   outline-offset: 4px;
 }
 
-.iq-step {
+.iq-main[data-moved] .iq-step {
   animation: iq-in 0.45s cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 @keyframes iq-in {
@@ -1007,7 +1007,7 @@ textarea.iq-in {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .iq-step,
+  .iq-main[data-moved] .iq-step,
   .iq-seal::before,
   .iq-seal__sg,
   .iq-seal__ok {
