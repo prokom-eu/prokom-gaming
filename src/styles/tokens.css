@@ -448,4 +448,9 @@
   --ct-summary-text: #d8cfb8;
   --ct-toc-label: #9a9583;
   --ct-toc-line: rgba(236, 228, 208, 0.06);
+  --ct-article-text: #ddd4bf; /* treść poradnika (Cormorant) */
+  --ct-article-lead: #f2ead6;
+  --ct-crumbs: #a9a18c;
+  --ct-guide-fade: rgba(8, 16, 13, 0); /* przejście sceny karty poradnika w tło */
+  --ct-more-to: #07100c; /* „Czytaj dalej” */
 }

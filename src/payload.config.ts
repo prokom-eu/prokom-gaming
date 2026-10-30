@@ -9,6 +9,7 @@ import { fileURLToPath } from 'url'
 import { isPanelUser } from './access/panel'
 import { Builds } from './collections/Builds'
 import { Faq } from './collections/Faq'
+import { Guides } from './collections/Guides'
 import { FpsResults } from './collections/FpsResults'
 import { Games } from './collections/Games'
 import { Inquiries } from './collections/Inquiries'
@@ -61,6 +62,7 @@ export default buildConfig({
     Inquiries,
     InquiryDeletions,
     Faq,
+    Guides,
   ],
   globals: [PricingSettings, SiteSettings, LegalTerms, LegalPrivacy],
   // Background jobs (ADR-G002 §4.4: margin alarm; ADR-G005: daily inquiry retention). Run inside the Next process

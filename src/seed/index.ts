@@ -20,6 +20,7 @@ import config from '../payload.config'
 import { assertSeedAllowed, parseSeedEnv } from './config'
 import { legalFeatures } from '../globals/Legal'
 import { mapBuildFaq, mapFaq } from './faq'
+import { guideSeeds } from './guides'
 import { fpsSeed, mapFpsResult, mapGame, planFpsResults, type ExistingFpsResult } from './fps'
 import { legalSeeds, splitLineBreaks } from './legal'
 import {
@@ -333,6 +334,38 @@ async function seedLegal(payload: Payload): Promise<void> {
   payload.logger.info('Seed: terms and privacy policy.')
 }
 
+/**
+ * Guides by `slug`: the ready one published with its text from the board, the six titles as
+ * drafts (they never reach the site until written and published in the panel).
+ */
+async function seedGuides(payload: Payload): Promise<void> {
+  const editorConfig = await editorConfigFactory.default({ config: payload.config })
+  const guides = guideSeeds()
+  for (const guide of guides) {
+    const content = guide.markdown
+      ? (convertMarkdownToLexical({ editorConfig, markdown: guide.markdown }) as never)
+      : undefined
+    const data = {
+      ...guide.data,
+      ...(content ? { content } : {}),
+      _status: guide.published ? ('published' as const) : ('draft' as const),
+    }
+    const found = await payload.find({
+      collection: 'guides',
+      where: { slug: { equals: guide.data.slug } },
+      draft: true,
+      limit: 1,
+      ...asSeed,
+    })
+    const id = found.docs[0]?.id
+    const draft = !guide.published
+    if (id !== undefined) await payload.update({ collection: 'guides', id, data, draft, ...asSeed })
+    else await payload.create({ collection: 'guides', data: data as never, draft, ...asSeed })
+  }
+  const ready = guides.filter((g) => g.published).length
+  payload.logger.info(`Seed: ${guides.length} guides (${ready} published).`)
+}
+
 const payload = await getPayload({ config })
 
 try {
@@ -343,6 +376,7 @@ try {
   await seedFpsResults(payload)
   await seedFaq(payload)
   await seedLegal(payload)
+  await seedGuides(payload)
 } finally {
   await payload.destroy()
 }

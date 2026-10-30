@@ -79,6 +79,7 @@ export interface Config {
     inquiries: Inquiry;
     'inquiry-deletions': InquiryDeletion;
     faq: Faq;
+    guides: Guide;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
     'payload-locked-documents': PayloadLockedDocument;
@@ -99,6 +100,7 @@ export interface Config {
     inquiries: InquiriesSelect<false> | InquiriesSelect<true>;
     'inquiry-deletions': InquiryDeletionsSelect<false> | InquiryDeletionsSelect<true>;
     faq: FaqSelect<false> | FaqSelect<true>;
+    guides: GuidesSelect<false> | GuidesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -546,6 +548,87 @@ export interface Faq {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "guides".
+ */
+export interface Guide {
+  id: number;
+  title: string;
+  slug: string;
+  category: 'parents' | 'hardware' | 'games' | 'after';
+  lead: string;
+  /**
+   * Pierwszy akapit = wstęp (większa czcionka). Nagłówek H2 = pozycja „W tym poradniku”. Cytat = ramka „Ściągawka”.
+   */
+  content: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  readingTime: number;
+  creature:
+    | 'skrzat'
+    | 'licho'
+    | 'bies'
+    | 'wodnik'
+    | 'strzyga'
+    | 'kikimora'
+    | 'zmora'
+    | 'rusalka'
+    | 'baba-jaga'
+    | 'bazyliszek'
+    | 'pani-zimy'
+    | 'wilkolak'
+    | 'wampir'
+    | 'weles'
+    | 'zmij'
+    | 'perun';
+  author: string;
+  /**
+   * Ustaw przy publikacji. Puste = data się nie pokazuje.
+   */
+  publishedAt?: string | null;
+  /**
+   * Puste = ramka się nie pokazuje.
+   */
+  recommended?:
+    | {
+        creature:
+          | 'skrzat'
+          | 'licho'
+          | 'bies'
+          | 'wodnik'
+          | 'strzyga'
+          | 'kikimora'
+          | 'zmora'
+          | 'rusalka'
+          | 'baba-jaga'
+          | 'bazyliszek'
+          | 'pani-zimy'
+          | 'wilkolak'
+          | 'wampir'
+          | 'weles'
+          | 'zmij'
+          | 'perun';
+        note: string;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -716,6 +799,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'faq';
         value: number | Faq;
+      } | null)
+    | ({
+        relationTo: 'guides';
+        value: number | Guide;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -1075,6 +1162,31 @@ export interface FaqSelect<T extends boolean = true> {
   order?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "guides_select".
+ */
+export interface GuidesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  category?: T;
+  lead?: T;
+  content?: T;
+  readingTime?: T;
+  creature?: T;
+  author?: T;
+  publishedAt?: T;
+  recommended?:
+    | T
+    | {
+        creature?: T;
+        note?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
