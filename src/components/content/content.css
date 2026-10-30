@@ -1063,3 +1063,222 @@
     font-size: 34px;
   }
 }
+
+/* ---------- Regulamin, polityka prywatności (boards: .dc7, .toc7, .dr7, .tl7) ---------- */
+.ct-legal {
+  padding: 70px 0 110px;
+  background: var(--ct-page);
+}
+.ct-legal__grid {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  gap: 64px;
+  align-items: start;
+}
+.ct-legal__grid > * {
+  min-width: 0;
+}
+.ct-toc {
+  position: sticky;
+  top: 24px;
+  padding: 22px;
+  border: 1px solid var(--ct-card-line);
+  background: var(--ct-card);
+}
+.ct-toc small {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 800;
+  color: var(--ct-toc-label);
+}
+.ct-toc ol {
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.ct-toc a {
+  display: flex;
+  gap: 10px;
+  min-height: 34px;
+  align-items: center;
+  padding: 4px 0;
+  font-size: 14px;
+  color: var(--ct-nav-text);
+  border-top: 1px solid var(--ct-toc-line);
+}
+.ct-toc a span {
+  flex: none;
+  width: 20px;
+  font-weight: 800;
+  color: var(--grom);
+}
+.ct-toc a:hover {
+  color: var(--white);
+}
+.ct-doc {
+  max-width: 780px;
+}
+.ct-doc__draft {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  margin: 0 0 34px;
+  padding: 18px 20px;
+  border: 1px solid var(--ct-draft-line);
+  background: var(--ct-draft-bg);
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--ct-draft-text);
+}
+.ct-doc__draft svg {
+  flex: none;
+  margin-top: 2px;
+  color: var(--grom);
+}
+.ct-doc__summary {
+  margin-bottom: 40px;
+  padding: 22px 24px;
+  border: 1px solid var(--ct-card-line);
+  background: var(--ct-card);
+}
+.ct-doc__summary b {
+  font-size: 15px;
+  color: var(--grom);
+}
+.ct-doc__summary ul {
+  list-style: disc;
+  margin: 10px 0 0;
+  padding: 0 0 0 18px;
+}
+.ct-doc__summary li {
+  margin: 6px 0;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--ct-summary-text);
+}
+.ct-doc__text h2 {
+  display: flex;
+  gap: 16px;
+  align-items: baseline;
+  /* The board draws a line above each paragraph; here on the heading (flat rich text). */
+  margin: 40px 0 0;
+  padding-top: 30px;
+  border-top: 1px solid var(--line);
+  font-family: var(--font-head);
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 1.15;
+  color: var(--ct-title);
+  scroll-margin-top: 24px;
+}
+.ct-doc__text h2 span {
+  font-size: 16px;
+  color: var(--grom);
+}
+.ct-doc__text h3 {
+  margin: 22px 0 0;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--ct-strong);
+}
+.ct-doc__text p,
+.ct-doc__text li {
+  font-size: 15.5px;
+  line-height: 1.75;
+  color: var(--ct-doc-text);
+}
+.ct-doc__text p {
+  margin: 12px 0 0;
+}
+.ct-doc__text ol {
+  list-style: decimal;
+}
+.ct-doc__text ul {
+  list-style: disc;
+}
+.ct-doc__text ol,
+.ct-doc__text ul {
+  margin: 12px 0 0;
+  padding-left: 22px;
+}
+.ct-doc__text li {
+  margin: 6px 0;
+}
+.ct-doc__text a {
+  color: var(--grom);
+  text-decoration: underline;
+}
+.ct-doc__text strong {
+  color: var(--ct-strong);
+}
+.ct-doc__text blockquote {
+  margin: 16px 0 0;
+  padding: 18px 20px;
+  border-left: 2px solid var(--grom);
+  background: var(--ct-card);
+  font-size: 15px;
+  line-height: 1.75;
+  color: var(--ct-body);
+}
+.ct-table {
+  margin-top: 16px;
+  overflow-x: auto;
+}
+.ct-table:focus-visible {
+  outline: 2px solid var(--grom);
+  outline-offset: 3px;
+}
+.ct-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14.5px;
+}
+.ct-table th,
+.ct-table td {
+  padding: 10px 12px;
+  border: 1px solid var(--ct-card-line);
+  text-align: left;
+  vertical-align: top;
+}
+.ct-table th {
+  background: var(--ct-card);
+  color: var(--ct-strong);
+}
+.ct-table td {
+  color: var(--ct-doc-text);
+}
+/* Cells are paragraphs in Lexical: no extra space inside them. */
+.ct-table th p,
+.ct-table td p {
+  margin: 0;
+  font-size: inherit;
+  line-height: 1.5;
+  color: inherit;
+}
+.ct-doc__version {
+  margin-top: 40px;
+  font-size: 13px;
+  color: var(--ct-muted);
+}
+
+@media (max-width: 1000px) {
+  .ct-legal__grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+  }
+  .ct-toc {
+    position: static;
+  }
+  .ct-doc__text h2 {
+    font-size: 26px;
+    /* The phone header is fixed: a jump from the table of contents must not hide the heading. */
+    scroll-margin-top: 84px;
+  }
+  .ct-table table {
+    font-size: 13px;
+  }
+  .ct-table th,
+  .ct-table td {
+    padding: 8px 6px;
+  }
+}

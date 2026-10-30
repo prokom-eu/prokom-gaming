@@ -19,6 +19,7 @@ import { PowerLevels } from './collections/PowerLevels'
 import { PriceHistory } from './collections/PriceHistory'
 import { PublishedPrices } from './collections/PublishedPrices'
 import { Users } from './collections/Users'
+import { LegalPrivacy, LegalTerms } from './globals/Legal'
 import { PricingSettings } from './globals/PricingSettings'
 import { SiteSettings } from './globals/SiteSettings'
 import { InquiryRetentionTask } from './jobs/inquiryRetention'
@@ -61,7 +62,7 @@ export default buildConfig({
     InquiryDeletions,
     Faq,
   ],
-  globals: [PricingSettings, SiteSettings],
+  globals: [PricingSettings, SiteSettings, LegalTerms, LegalPrivacy],
   // Background jobs (ADR-G002 §4.4: margin alarm; ADR-G005: daily inquiry retention). Run inside the Next process
   // (one VPS, not serverless) every minute; the cron starts with the first panel/API request.
   // Running and queueing through the REST API is panel-only: by default any signed-in account

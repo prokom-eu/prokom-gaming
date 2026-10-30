@@ -14,11 +14,14 @@ import {
 } from 'payload'
 import type { CollectionSlug, Payload, RequiredDataFromCollectionSlug } from 'payload'
 import { fileURLToPath } from 'url'
+import { convertMarkdownToLexical, editorConfigFactory } from '@payloadcms/richtext-lexical'
 
 import config from '../payload.config'
 import { assertSeedAllowed, parseSeedEnv } from './config'
+import { legalFeatures } from '../globals/Legal'
 import { mapBuildFaq, mapFaq } from './faq'
 import { fpsSeed, mapFpsResult, mapGame, planFpsResults, type ExistingFpsResult } from './fps'
+import { legalSeeds, splitLineBreaks } from './legal'
 import {
   firstBatch,
   firstBatchPublishedAt,
@@ -304,6 +307,32 @@ async function seedFaq(payload: Payload): Promise<void> {
   payload.logger.info(`Seed: ${faq.length} FAQ questions.`)
 }
 
+/**
+ * Terms and privacy policy, overwritten on every run like `site-settings` (local only: edits made
+ * in a local panel go back to the board text).
+ */
+async function seedLegal(payload: Payload): Promise<void> {
+  const editorConfig = await editorConfigFactory.fromFeatures({
+    config: payload.config,
+    features: legalFeatures,
+  })
+  for (const legal of legalSeeds()) {
+    await payload.updateGlobal({
+      slug: legal.slug,
+      data: {
+        draft: legal.draft,
+        version: legal.version,
+        summary: legal.summary,
+        content: splitLineBreaks(
+          convertMarkdownToLexical({ editorConfig, markdown: legal.markdown }),
+        ) as never,
+      },
+      ...asSeed,
+    })
+  }
+  payload.logger.info('Seed: terms and privacy policy.')
+}
+
 const payload = await getPayload({ config })
 
 try {
@@ -313,6 +342,7 @@ try {
   await seedGames(payload)
   await seedFpsResults(payload)
   await seedFaq(payload)
+  await seedLegal(payload)
 } finally {
   await payload.destroy()
 }

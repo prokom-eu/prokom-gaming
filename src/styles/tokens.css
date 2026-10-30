@@ -441,4 +441,11 @@
   --ct-tl-glow: rgba(242, 194, 48, 0.5);
   --ct-line-hover: rgba(242, 194, 48, 0.5);
   --ct-final-glow: rgba(242, 194, 48, 0.12);
+  --ct-draft-line: rgba(242, 194, 48, 0.4); /* „Projekt do weryfikacji przez prawnika” */
+  --ct-draft-bg: rgba(242, 194, 48, 0.06);
+  --ct-draft-text: #e6ddc7;
+  --ct-doc-text: #c4bba5; /* treść regulaminu i polityki */
+  --ct-summary-text: #d8cfb8;
+  --ct-toc-label: #9a9583;
+  --ct-toc-line: rgba(236, 228, 208, 0.06);
 }

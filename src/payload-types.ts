@@ -112,11 +112,15 @@ export interface Config {
   globals: {
     'pricing-settings': PricingSetting;
     'site-settings': SiteSetting;
+    'legal-terms': LegalTerm;
+    'legal-privacy': LegalPrivacy;
     'payload-jobs-stats': PayloadJobsStat;
   };
   globalsSelect: {
     'pricing-settings': PricingSettingsSelect<false> | PricingSettingsSelect<true>;
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
+    'legal-terms': LegalTermsSelect<false> | LegalTermsSelect<true>;
+    'legal-privacy': LegalPrivacySelect<false> | LegalPrivacySelect<true>;
     'payload-jobs-stats': PayloadJobsStatsSelect<false> | PayloadJobsStatsSelect<true>;
   };
   locale: null;
@@ -1241,6 +1245,96 @@ export interface SiteSetting {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "legal-terms".
+ */
+export interface LegalTerm {
+  id: number;
+  /**
+   * Zaznaczone = nad treścią napis „Projekt do weryfikacji przez prawnika”. Odznacz po akceptacji prawnika i właściciela.
+   */
+  draft?: boolean | null;
+  /**
+   * Np. 1.0. Zmień przy każdej zmianie treści.
+   */
+  version: string;
+  /**
+   * Na stronie „Wersja z …”. Puste = linia się nie pokazuje.
+   */
+  effectiveDate?: string | null;
+  summary?:
+    | {
+        point: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Nagłówek H2 = kolejny paragraf (§) i pozycja spisu treści. Cytat = ramka z uwagą.
+   */
+  content: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "legal-privacy".
+ */
+export interface LegalPrivacy {
+  id: number;
+  /**
+   * Zaznaczone = nad treścią napis „Projekt do weryfikacji przez prawnika”. Odznacz po akceptacji prawnika i właściciela.
+   */
+  draft?: boolean | null;
+  /**
+   * Np. 1.0. Zmień przy każdej zmianie treści.
+   */
+  version: string;
+  /**
+   * Na stronie „Wersja z …”. Puste = linia się nie pokazuje.
+   */
+  effectiveDate?: string | null;
+  summary?:
+    | {
+        point: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Nagłówek H2 = kolejny paragraf (§) i pozycja spisu treści. Cytat = ramka z uwagą.
+   */
+  content: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-jobs-stats".
  */
 export interface PayloadJobsStat {
@@ -1326,6 +1420,44 @@ export interface SiteSettingsSelect<T extends boolean = true> {
         tiktokUrl?: T;
       };
   cookieBannerEnabled?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "legal-terms_select".
+ */
+export interface LegalTermsSelect<T extends boolean = true> {
+  draft?: T;
+  version?: T;
+  effectiveDate?: T;
+  summary?:
+    | T
+    | {
+        point?: T;
+        id?: T;
+      };
+  content?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "legal-privacy_select".
+ */
+export interface LegalPrivacySelect<T extends boolean = true> {
+  draft?: T;
+  version?: T;
+  effectiveDate?: T;
+  summary?:
+    | T
+    | {
+        point?: T;
+        id?: T;
+      };
+  content?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

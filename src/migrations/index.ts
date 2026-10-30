@@ -8,6 +8,7 @@ import * as migration_20261027_225655_faq from './20261027_225655_faq'
 import * as migration_20261028_200007_faq_build from './20261028_200007_faq_build'
 import * as migration_20261028_224243_games_intro from './20261028_224243_games_intro'
 import * as migration_20261030_181905_inquiries_light_color from './20261030_181905_inquiries_light_color'
+import * as migration_20261030_201740_legal_globals from './20261030_201740_legal_globals'
 
 export const migrations = [
   {
@@ -59,5 +60,10 @@ export const migrations = [
     up: migration_20261030_181905_inquiries_light_color.up,
     down: migration_20261030_181905_inquiries_light_color.down,
     name: '20261030_181905_inquiries_light_color',
+  },
+  {
+    up: migration_20261030_201740_legal_globals.up,
+    down: migration_20261030_201740_legal_globals.down,
+    name: '20261030_201740_legal_globals',
   },
 ]
