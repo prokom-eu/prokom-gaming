@@ -104,7 +104,7 @@ tests/fixtures/              # oczekiwane ceny i wyniki zgodności (testy G4)
 ## Komendy projektu
 - `/zadanie <G-numer lub opis>` — kontekst, plan, czekasz na „ok”, potem kod.
 - `/przeglad` — niezależny przegląd zmian przed PR.
-- `/pr` — tytuł i opis, po akceptacji `gh pr create --base develop`.
+- `/pr` — push i `gh pr create --base develop` od razu przy zielonych sprawdzeniach; `ok` tylko przy decyzji do potwierdzenia.
 - `/wdrozenie staging|produkcja` — checklista przed wdrożeniem.
 - `/koniec-sesji` — aktualizacja `docs/STAN.md` i podsumowanie.
 - Skrypty Krystiana (nie uruchamiaj ich sam): `scripts\start.ps1`, `scripts\koniec.ps1`.

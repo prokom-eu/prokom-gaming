@@ -24,7 +24,7 @@ Oba projekty mogą działać naraz (różne porty i bazy), ale **jedna sesja Cla
 ## Szybciej (decyzja Krystiana 30.10.2026)
 - **Lokalnie tylko e2e zmienionego obszaru** (`docs/jakosc.md`) — np. nowa strona: jej plik e2e i jej wiersze w `a11y.e2e.spec.ts` (`-g`). Pełne e2e puszcza CI. Szerszą regresję lokalnie tylko, gdy zmienia się kod wspólny: `lib/inquiry/` (API zapytań), powłoka (`SiteHeader`, `MenuSheet`, `SiteFooter`, layout), `lib/pricing/`, `payload.config.ts`.
 - **`next dev` nie optymalizuje obrazów** (`images.unoptimized` tylko w trybie dev, `next.config.ts`) — podglądy stron ze scenami są od razu. Wydajność i Lighthouse mierzymy na `pnpm build` + `pnpm start`, nie na `next dev`.
-- **`/pr` bez osobnego „ok”**, gdy sprawdzenia są zielone: wywołanie `/pr` to zgoda na push gałęzi i PR do `develop`; „ok” tylko przy decyzji do potwierdzenia. Plan w `/zadanie` dalej czeka na „ok”. (Wymaga zmiany `.claude/commands/pr.md` i linii `/pr` w `CLAUDE.md` — Krystian.)
+- **`/pr` bez osobnego „ok”**, gdy sprawdzenia są zielone: wywołanie `/pr` to zgoda na push gałęzi i PR do `develop`; „ok” tylko przy decyzji do potwierdzenia. Plan w `/zadanie` dalej czeka na „ok”. Uprawnienia: `.claude/settings.json` (bez pytania: commity, push gałęzi roboczych, PR, migracje i seed lokalnie; pytanie: scalanie PR, zależności, Docker, SSH).
 
 ## Asana i 00-STAN
 Zadania Gaming w projekcie „PRO-KOM Cyfryzacja” z prefiksem „G”. Po każdej ważnej decyzji — wpis w `claude/00-STAN-PROJEKTU.md` (czat) i w `docs/STAN.md` (repo).
