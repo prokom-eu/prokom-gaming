@@ -6,8 +6,9 @@ Właściciel kodu: firma PRO-KOM Tadeusz Wójciak — organizacja GitHub `prokom
 
 ## Zanim zaczniesz zadanie
 1. Przeczytaj `docs/STAN.md` — co zrobione, co w toku, następny krok.
-2. Sesja → jej opis w `docs/zadania/prokomgaming.md` (zakres, „gotowe, gdy”, plansze). **Nie wykraczaj poza zakres sesji.**
+2. Sesja → jej opis w `docs/zadania/prokomgaming.md` (zakres, „gotowe, gdy”, plansze); **sesja P (panel) → `docs/zadania/prokomgaming-panel.md`**. **Nie wykraczaj poza zakres sesji.**
 3. **Specyfikacja `docs/strony/prokomgaming.md` jest źródłem prawdy dla treści i zakresu.** Wygląd: `docs/design/prokomgaming/` (zrzuty 1440 i 414, stany telefonu, plansze `.dc.html`, tokeny, grafiki). Teksty przenosisz z planszy bez zmian. Braki oznacz `TODO(krystian):`, nie zgaduj.
+   **Panel `/admin`:** specyfikacja `docs/strony/prokomgaming-panel.md` (w sprawach panelu wygrywa nad spec. strony), wygląd `docs/design/prokomgaming/panel/` (zrzuty 1440 i 414, stany telefonu `stany/tel-*`). Na telefonie panel działa jak aplikacja (spec. panelu §2a) — to nie jest ściśnięty desktop.
 4. Decyzje: `docs/decyzje/ADR-G*.md`. Nie zmieniaj ich po cichu — jeśli trzeba, zaproponuj nowy ADR.
 5. Ceny: **tylko** `lib/pricing/` (ADR-G002). Klatki: **tylko** dane z `fps-results` (ADR-G004) — strona nie liczy klatek.
 6. Wersje bibliotek: zanim użyjesz API Payload / Next.js, sprawdź **dokumentację zainstalowanej wersji** — nie pisz z pamięci. Next.js → `node_modules/next/dist/docs/`; Payload → `node_modules/payload/skills/payload/SKILL.md`, a dopóki go nie ma — `https://payloadcms.com/llms-full.txt` + typy `node_modules/payload/dist/**/*.d.ts`. Źródło milczy → „nie wiem”.
@@ -83,6 +84,7 @@ tests/fixtures/              # oczekiwane ceny i wyniki zgodności (testy G4)
 - Sekrety tylko w `.env*` (nie commitujemy). Wzór: `.env.example`. Aplikacja nie startuje bez wymaganych zmiennych (`lib/env.ts`). Nie czytaj i nie edytuj `.env*` poza `.env.example`.
 - **Produkcja tylko po akceptacji szefa w Asanie** i tylko przez pipeline (`docs/wdrozenia.md` — powstaje w G16; wzór: `docs/wzorce-prokom-web/docs/wdrozenia.md`). Nie wdrażaj ręcznie, nie uruchamiaj migracji na serwerze bez zgody Krystiana.
 - Przed wdrożeniem produkcji: kopia bazy. Każde wdrożenie da się cofnąć do poprzedniego obrazu.
+- Panel: każdy własny widok i każda akcja sprawdza dostęp po stronie serwera (ADR-G006); koszty i marże nigdy poza panelem; dane osobowe nigdy do Claude, do statystyk, do treści powiadomień ani do adresów.
 
 ## Git
 - `main` = produkcja, `develop` = staging. Gałęzie: `feat/<opis>`, `fix/<opis>`, `chore/<opis>`, `docs/<opis>`; w nazwie numer sesji, np. `feat/g4-cennik`.
@@ -108,6 +110,6 @@ tests/fixtures/              # oczekiwane ceny i wyniki zgodności (testy G4)
 - Skrypty Krystiana (nie uruchamiaj ich sam): `scripts\start.ps1`, `scripts\koniec.ps1`.
 
 ## Wtyczki Claude Code
-- frontend-design: przy każdym UI, ALE wygląd jest zamknięty: kolory, kroje, sceny i ruch wyłącznie wg ADR-G003 i `docs/design/prokomgaming/`. Przy sprzeczności wygrywa wzorzec.
+- frontend-design: przy każdym UI, ALE wygląd jest zamknięty: kolory, kroje, sceny i ruch wyłącznie wg ADR-G003 i `docs/design/prokomgaming/`. Przy sprzeczności wygrywa wzorzec. W panelu wygląd wg `docs/design/prokomgaming/panel/` i tokenów `src/admin/styles/panel-tokens.css`.
 - Superpowers: brainstorming, writing-plans, systematic-debugging, verification-before-completion. NIE: worktree, subagent-driven-development, finishing-a-development-branch — obowiązuje nasz flow (`/zadanie` → plan → PR, `/przeglad`).
 - Przy sprzeczności skilla z tym plikiem albo ze specyfikacją wygrywa ten plik i specyfikacja.
