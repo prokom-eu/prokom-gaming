@@ -13,7 +13,7 @@ Ostatnia aktualizacja: 30.10.2026 (sesja G13 — PR 2: gotowe od ręki i bon).
   - Testy: Vitest 537; e2e `sale-pages` (bon → rekord + maile, rezerwacja → rekord z ceną egzemplarza i zniknięcie z listy, wyścig dwóch rezerwacji → 201 + 400, strażnik blokuje za duży rabat, `/api/stock` 403), axe `/bon` i `/gotowe`, regresja `inquiry-api`, `inquiry-form`, `shell`, `content-pages`, `admin`, `offer-api`; `pnpm build` zielony; migracja up → down → up czysta.
 - `/przeglad` (recenzent): „poprawki wymagane” — poprawione: rezerwacja atomowa w SQL (+ test wyścigu), strażnik także przy wyświetlaniu i sprzedaży, strażnik nie blokuje zdjęcia egzemplarza, `stock` tylko panel, rabat w pełnych zł, CI kończy się błędem, gdy flag brak, `prefers-reduced-motion`, `TODO` (kod bonu w formularzu, retencja bonów, JSON-LD).
 - Niesprawdzone: Lighthouse mobile `/bon` i `/gotowe`, prawdziwy telefon.
-- **Następny krok:** `/pr` (PR 2 G13) → CI → squash → potem P0 albo G14 (kolejność: `docs/zadania/prokomgaming-panel.md` §1).
+- **Następny krok:** PR 2 G13 → CI → squash → G14 (z dopiskami panelu; P0 zrobione 30.10, kolejność: `docs/zadania/prokomgaming-panel.md` §1).
 
 ## Uwagi na później (G13)
 - **Treści do potwierdzenia (`TODO(krystian)`):** klauzula `CONTACT_CONSENT_CLAUSE` (prawnik, razem z polityką), komunikaty wysyłki kontaktu i „Wysyłam…”, tekst pustej listy poradników, komunikat stron prawnych przy awarii bazy, wiadomość „Wyślij go komuś”, telefon Gaming i godziny telefonu oraz sklepów [SZEF], lata salonu i serwisu kas w historii („O nas”), kwoty w poradniku „rodzice” (zdanie z „[konkretne kwoty…]” usunięte — wpisać w panelu po ustaleniu cennika).

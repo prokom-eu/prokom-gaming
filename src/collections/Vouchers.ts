@@ -4,7 +4,7 @@ import type { CollectionBeforeChangeHook, CollectionConfig } from 'payload'
 
 import { panelOnly } from '../access/panel'
 import { VOUCHER_AMOUNTS, VOUCHER_DESIGN_CHOICES } from '../lib/inquiry/types'
-import { GROUP_SALES } from './shared'
+import { GROUP_OFFER } from './shared'
 
 // No 0/O and 1/I/L: the code is read from paper.
 const ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'
@@ -28,7 +28,7 @@ export const Vouchers: CollectionConfig = {
   slug: 'vouchers',
   labels: { singular: 'Bon', plural: 'Bony podarunkowe' },
   admin: {
-    group: GROUP_SALES,
+    group: GROUP_OFFER,
     useAsTitle: 'code',
     defaultColumns: ['code', 'amount', 'status', 'validUntil'],
     description:
