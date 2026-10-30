@@ -99,10 +99,8 @@ describe('notificationEmail', () => {
 })
 
 describe('confirmationEmail', () => {
-  const mail = confirmationEmail(inquiry, {
-    responseTime: 'zwykle w godzinę, codziennie 8–22',
-    replyTo: 'gaming@example.test',
-  })
+  const opts = { responseTime: 'zwykle w godzinę, codziennie 8–22', replyTo: 'gaming@example.test' }
+  const mail = confirmationEmail(inquiry, opts)
 
   it('goes to the customer with the number, the computer and the price; replies to Gaming', () => {
     expect(mail.to).toBe('jan@example.test')
@@ -118,6 +116,13 @@ describe('confirmationEmail', () => {
     for (const text of ['Proszę o kontakt', '+48 600 100 200', '7352511447', 'Blender', '(P13)']) {
       expect(mail.text).not.toContain(text)
     }
+  })
+
+  it("names the picked light colour; nothing when it is the creature's own", () => {
+    expect(confirmationEmail({ ...inquiry, lightColor: 'lod' }, opts).text).toContain(
+      '- Światło: Lód\n',
+    )
+    expect(mail.text).not.toContain('Światło')
   })
 
   it('works without a response time in the settings', () => {

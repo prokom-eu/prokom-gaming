@@ -7,6 +7,7 @@ import { checkCompat, indexOffer, resolveParts } from './compat'
 import { fpsFor, RESOLUTION_LABELS, RESOLUTIONS, type FpsTable, type Resolution } from './fps'
 import type { HeroBuild } from './home'
 import { priceFromSnapshot, surcharge, type PriceList } from './pricing/snapshot'
+import { LIGHT_COLOR_CHOICES, type LightColor } from './inquiry/types'
 import type { CompatLevel, CompatOption, Config } from './pricing/types'
 
 // ---------------------------------------------------------------------------------------------
@@ -227,17 +228,12 @@ export function tuneChoices(
   return [...best.values()].sort((a, b) => a.capacityGb - b.capacityGb)
 }
 
-/** Light colours of „Dopasuj” (board `LIGHTS`); the creature's own light is the default. */
-export const LIGHTS = [
-  { key: 'piorun', label: 'Piorun' },
-  { key: 'krew', label: 'Krew' },
-  { key: 'las', label: 'Las' },
-  { key: 'czary', label: 'Czary' },
-  { key: 'lod', label: 'Lód' },
-  { key: 'ogien', label: 'Ogień' },
-] as const
+export type LightKey = LightColor
 
-export type LightKey = (typeof LIGHTS)[number]['key']
+/** Light colours of „Dopasuj” (board `LIGHTS`); the creature's own light is the default. */
+export const LIGHTS: readonly { key: LightKey; label: string }[] = LIGHT_COLOR_CHOICES.map(
+  ({ value, label }) => ({ key: value, label }),
+)
 
 /** „czerwone światło” from `look` = „czarna, czerwone światło” (board `lightDef`). */
 export function ownLight(look: string): string {

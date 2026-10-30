@@ -164,6 +164,7 @@ export async function submitInquiryWith(
       config: priced?.config ?? {},
       priceAtInquiry: priced?.price ?? null,
       priceBatch: priced?.batch ?? null,
+      lightColor: input.lightColor,
       forWhom: input.forWhom,
       budget: input.budget,
       customList: input.customList,

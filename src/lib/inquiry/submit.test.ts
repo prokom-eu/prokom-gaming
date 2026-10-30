@@ -91,7 +91,7 @@ describe('submitInquiryWith', () => {
     const { deps, sent, logs } = setup()
     const result = await submitInquiryWith(deps, {
       ip: '203.0.113.5',
-      body: body({ price: 1, priceAtInquiry: 1 }),
+      body: body({ price: 1, priceAtInquiry: 1, lightColor: 'lod' }),
     })
     expect(result).toEqual({ ok: true, id: 41, number: 'PKG-2026-0041' })
 
@@ -104,6 +104,7 @@ describe('submitInquiryWith', () => {
       config: wampir.config,
       priceAtInquiry: wampir.price,
       priceBatch: 2,
+      lightColor: 'lod',
       games: [7],
       consent: {
         accepted: true,

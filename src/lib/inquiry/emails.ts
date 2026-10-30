@@ -8,6 +8,7 @@ import {
   INQUIRY_TYPE_CHOICES,
   INVOICE_CHOICES,
   labelOf,
+  LIGHT_COLOR_CHOICES,
   LIGHTING_CHOICES,
   MONITOR_CHOICES,
   PICKUP_CHOICES,
@@ -34,6 +35,8 @@ export type InquiryForEmail = {
   number: string
   type: InquiryType
   computer: ComputerForEmail | null
+  /** Empty = the creature's own light. */
+  lightColor?: Choice<typeof LIGHT_COLOR_CHOICES>
   forWhom?: Choice<typeof FOR_WHOM_CHOICES>
   budget?: Choice<typeof BUDGET_CHOICES>
   customList?: string
@@ -99,7 +102,11 @@ const optional = <V extends string>(
   value: V | undefined,
 ) => (value === undefined ? undefined : labelOf(choices, value))
 
-function computerLines(computer: ComputerForEmail, withCodes: boolean): string[] {
+function computerLines(
+  computer: ComputerForEmail,
+  withCodes: boolean,
+  lightColor: InquiryForEmail['lightColor'],
+): string[] {
   return [
     ...(computer.buildName ? [`Zestaw: ${computer.buildName}`] : []),
     ...PART_KEYS.map((key) => {
@@ -107,6 +114,7 @@ function computerLines(computer: ComputerForEmail, withCodes: boolean): string[]
       const label = computer.labels[key] ?? code
       return `- ${PART_LABELS[key]}: ${label}${withCodes && label !== code ? ` (${code})` : ''}`
     }),
+    ...(lightColor ? [`- Światło: ${labelOf(LIGHT_COLOR_CHOICES, lightColor)}`] : []),
     `Cena: ${zl(computer.price)} brutto (cena z dnia ${dateFormat.format(new Date(computer.publishedAt))})`,
   ]
 }
@@ -141,7 +149,7 @@ export function notificationEmail(
     `Nowe zapytanie ${inquiry.number} ze strony PRO-KOM Gaming.`,
     '',
     `Rodzaj: ${typeLabel(inquiry.type)}`,
-    ...(inquiry.computer ? computerLines(inquiry.computer, true) : []),
+    ...(inquiry.computer ? computerLines(inquiry.computer, true, inquiry.lightColor) : []),
     ...rows([
       ['Dla kogo', optional(FOR_WHOM_CHOICES, inquiry.forWhom)],
       ['Budżet', optional(BUDGET_CHOICES, inquiry.budget)],
@@ -206,7 +214,7 @@ export function confirmationEmail(
       `dziękujemy za zapytanie ${inquiry.number}.` +
         (responseTime ? ` Odpiszemy ${responseTime}.` : ' Odpiszemy najszybciej, jak się da.'),
       ...(inquiry.computer
-        ? ['', 'Twoja konfiguracja:', ...computerLines(inquiry.computer, false)]
+        ? ['', 'Twoja konfiguracja:', ...computerLines(inquiry.computer, false, inquiry.lightColor)]
         : []),
       '',
       'Oferta z imienną listą części, ceną i terminem przyjdzie w odpowiedzi na ten e-mail.',
