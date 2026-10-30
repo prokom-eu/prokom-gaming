@@ -10,6 +10,8 @@ import { isPanelUser } from './access/panel'
 import { Builds } from './collections/Builds'
 import { Faq } from './collections/Faq'
 import { Guides } from './collections/Guides'
+import { Stock } from './collections/Stock'
+import { Vouchers } from './collections/Vouchers'
 import { FpsResults } from './collections/FpsResults'
 import { Games } from './collections/Games'
 import { Inquiries } from './collections/Inquiries'
@@ -63,6 +65,8 @@ export default buildConfig({
     InquiryDeletions,
     Faq,
     Guides,
+    Stock,
+    Vouchers,
   ],
   globals: [PricingSettings, SiteSettings, LegalTerms, LegalPrivacy],
   // Background jobs (ADR-G002 §4.4: margin alarm; ADR-G005: daily inquiry retention). Run inside the Next process

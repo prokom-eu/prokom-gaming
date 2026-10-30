@@ -27,8 +27,7 @@ export const INQUIRY_TYPE_CHOICES = [
 export const INQUIRY_TYPES = values(INQUIRY_TYPE_CHOICES)
 export type InquiryType = (typeof INQUIRY_TYPES)[number]
 
-/** Types `POST /api/inquiry` accepts today. `voucher` and `ready` need G13 collections. */
-// TODO(G13): accept `voucher` (vouchers) and `ready` (stock) with their own rules.
+/** Types `POST /api/inquiry` accepts — all of them since G13 (`voucher`, `ready`). */
 export const ACCEPTED_TYPES = [
   'build',
   'config',
@@ -36,6 +35,8 @@ export const ACCEPTED_TYPES = [
   'custom_list',
   'compare',
   'contact',
+  'voucher',
+  'ready',
 ] as const satisfies readonly InquiryType[]
 
 /** Types that carry a priced configuration (server recomputes price and compatibility). */
@@ -137,6 +138,28 @@ export const PREFERRED_CONTACT_CHOICES = [
   { value: 'phone', label: 'Telefon' },
 ] as const satisfies readonly Choice<string>[]
 
+/**
+ * Gift voucher (spec. §12, board Bon): amounts with the board's notes and four looks.
+ * TODO(krystian): amounts and the 12-month validity — the boss's decision before the page is
+ * switched on (FEATURE_VOUCHER).
+ */
+export const VOUCHER_AMOUNTS = [
+  { amount: 500, note: 'na akcesoria' },
+  { amount: 1000, note: 'najczęściej' },
+  { amount: 2000, note: 'spora część' },
+  { amount: 3000, note: 'pół komputera' },
+] as const
+export type VoucherAmount = (typeof VOUCHER_AMOUNTS)[number]['amount']
+export const VOUCHER_VALID_MONTHS = 12
+
+export const VOUCHER_DESIGN_CHOICES = [
+  { value: 'perun', label: 'Perun' },
+  { value: 'wampir', label: 'Wampir' },
+  { value: 'rusalka', label: 'Rusałka' },
+  { value: 'skrzat', label: 'Skrzat' },
+] as const satisfies readonly Choice<string>[]
+export type VoucherDesign = (typeof VOUCHER_DESIGN_CHOICES)[number]['value']
+
 export const CHOICES = {
   forWhom: FOR_WHOM_CHOICES,
   budget: BUDGET_CHOICES,
@@ -149,6 +172,7 @@ export const CHOICES = {
   pickup: PICKUP_CHOICES,
   invoice: INVOICE_CHOICES,
   preferredContact: PREFERRED_CONTACT_CHOICES,
+  voucherDesign: VOUCHER_DESIGN_CHOICES,
 } as const
 
 export const choiceValues = values

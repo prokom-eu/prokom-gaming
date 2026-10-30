@@ -24,4 +24,6 @@ export const MAX = {
   otherGames: 300,
   customList: 5000,
   message: 5000,
+  voucherRecipient: 60,
+  voucherDedication: 120,
 } as const

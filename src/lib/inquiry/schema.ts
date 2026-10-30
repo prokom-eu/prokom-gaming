@@ -19,6 +19,8 @@ import {
   PICKUP_CHOICES,
   PREFERRED_CONTACT_CHOICES,
   REFRESH_CHOICES,
+  VOUCHER_AMOUNTS,
+  VOUCHER_DESIGN_CHOICES,
   type InquiryType,
 } from './types'
 
@@ -105,6 +107,19 @@ const baseSchema = z.object({
     clauseVersion: z.enum(CONSENT_VERSIONS),
   }),
   marketingConsent: z.boolean().default(false),
+  // Gift voucher (type `voucher`, spec. §12): amount from the list, look, for whom, dedication.
+  voucher: z
+    .object({
+      amount: z
+        .number()
+        .refine((a) => VOUCHER_AMOUNTS.some((v) => v.amount === a), 'unknown amount'),
+      design: z.enum(choiceValues(VOUCHER_DESIGN_CHOICES)),
+      recipient: optionalText(MAX.voucherRecipient),
+      dedication: optionalText(MAX.voucherDedication),
+    })
+    .optional(),
+  // „Gotowe od ręki” (type `ready`, spec. §11): the id of the unit; the server prices it.
+  stock: z.number().int().positive().optional(),
   source: z.object({
     url: z.url({ protocol: /^https?$/ }).max(2000),
     utmSource: optionalText(200),
@@ -151,6 +166,10 @@ const inquirySchema = baseSchema.superRefine((data, ctx) => {
   if (data.type !== 'custom_list' && data.customList !== undefined) {
     issue('customList', 'only in custom_list')
   }
+  if (data.type === 'voucher' && data.voucher === undefined) issue('voucher', 'voucher required')
+  if (data.type !== 'voucher' && data.voucher !== undefined) issue('voucher', 'only in voucher')
+  if (data.type === 'ready' && data.stock === undefined) issue('stock', 'unit required')
+  if (data.type !== 'ready' && data.stock !== undefined) issue('stock', 'only in ready')
   // „Krótkie pytanie” is the message itself.
   if (data.type === 'contact' && data.message === undefined) issue('message', 'message required')
 

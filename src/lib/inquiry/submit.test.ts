@@ -6,7 +6,7 @@ import { seedCatalog } from '../pricing/testing/seedCatalog'
 import { CONSENT_CLAUSE } from './consent'
 import type { Email } from './emails'
 import { issueFormToken } from './spam'
-import { submitInquiryWith, type Pricing, type SubmitDeps } from './submit'
+import { submitInquiryWith, type Pricing, type StockUnit, type SubmitDeps } from './submit'
 
 const secret = 's'.repeat(32)
 const t0 = Date.UTC(2026, 9, 27, 12)
@@ -68,6 +68,9 @@ function setup(overrides: Partial<SubmitDeps> = {}) {
     limiter: { hit: vi.fn(() => true) },
     loadPricing: vi.fn(async () => pricing),
     findGames: vi.fn(async () => [{ id: 7, slug: 'cs2', name: 'Counter-Strike 2' }]),
+    loadStock: vi.fn(async () => null),
+    reserveStock: vi.fn(async () => true),
+    releaseStock: vi.fn(async () => {}),
     save: vi.fn(async () => ({ id: 41, number: 'PKG-2026-0041' })),
     sendEmail: vi.fn(async (email: Email) => {
       sent.push(email)
@@ -254,5 +257,101 @@ describe('submitInquiryWith', () => {
     await submitInquiryWith(deps, { ip: null, body: body() })
     expect(sent.map((e) => e.to)).toEqual([personal.email])
     expect(sent[0]?.replyTo).toBeUndefined()
+  })
+})
+
+describe('submitInquiryWith — voucher and „Gotowe od ręki” (G13)', () => {
+  const unit: StockUnit = {
+    id: 9,
+    buildSlug: 'wampir',
+    changes: {},
+    discount: 300,
+    active: true,
+    reservedUntil: null,
+    location: 'rabka',
+    conditionNote: 'egzemplarz pokazowy',
+  }
+  const ready = (extra: Record<string, unknown> = {}) =>
+    body({ type: 'ready', build: undefined, games: [], stock: 9, ...extra })
+
+  it('voucher: saved with amount and look, both e-mails, no computer', async () => {
+    const { deps, sent, logs } = setup()
+    const voucher = { amount: 1000, design: 'perun', recipient: 'Dla Kuby', dedication: 'Sto lat!' }
+    const result = await submitInquiryWith(deps, {
+      ip: null,
+      body: body({ type: 'voucher', build: undefined, games: [], voucher }),
+    })
+    expect(result).toMatchObject({ ok: true })
+    expect(vi.mocked(deps.save).mock.calls[0]?.[0]).toMatchObject({
+      type: 'voucher',
+      build: null,
+      priceAtInquiry: null,
+      voucher,
+      stock: null,
+    })
+    expect(deps.loadPricing).not.toHaveBeenCalled()
+    expect(sent[0]?.text).toMatch(/Bon: 1\s000 zł, wygląd Perun/)
+    expect(sent[0]?.text).toContain('Dedykacja: Sto lat!')
+    // The confirmation does not repeat what the person typed (recipient, dedication).
+    expect(sent[1]?.text).toMatch(/Bon podarunkowy: 1\s000 zł, wygląd Perun/)
+    expect(sent[1]?.text).not.toContain('Sto lat!')
+    noPersonalData(logs)
+  })
+
+  it('ready: the unit priced by the server (build minus discount), reserved for 24 h', async () => {
+    const { deps, sent } = setup({ loadStock: vi.fn(async () => unit) })
+    const result = await submitInquiryWith(deps, { ip: null, body: ready({ price: 1 }) })
+    expect(result).toMatchObject({ ok: true })
+    expect(deps.reserveStock).toHaveBeenCalledWith(
+      9,
+      new Date(t0 + 86_400_000).toISOString(),
+      new Date(t0).toISOString(),
+    )
+    expect(vi.mocked(deps.save).mock.calls[0]?.[0]).toMatchObject({
+      type: 'ready',
+      stock: 9,
+      build: wampirId,
+      config: wampir.config,
+      priceAtInquiry: wampir.price - 300,
+    })
+    expect(sent[0]?.text).toContain('Zarezerwowany do:')
+    expect(sent[1]?.text).toContain('Zarezerwowany egzemplarz:')
+  })
+
+  it('ready: a unit that is gone, off the site or reserved is refused without saving', async () => {
+    for (const found of [
+      null,
+      { ...unit, active: false },
+      { ...unit, reservedUntil: new Date(t0 + 60_000).toISOString() },
+    ]) {
+      const { deps } = setup({ loadStock: vi.fn(async () => found) })
+      const result = await submitInquiryWith(deps, { ip: null, body: ready() })
+      expect(result).toEqual({ ok: false, error: 'invalid', fields: ['stock'] })
+      expect(deps.save).not.toHaveBeenCalled()
+      expect(deps.reserveStock).not.toHaveBeenCalled()
+    }
+  })
+
+  it('ready: someone else claimed it first → refused; a failed save gives the unit back', async () => {
+    const lost = setup({
+      loadStock: vi.fn(async () => unit),
+      reserveStock: vi.fn(async () => false),
+    })
+    expect(await submitInquiryWith(lost.deps, { ip: null, body: ready() })).toEqual({
+      ok: false,
+      error: 'invalid',
+      fields: ['stock'],
+    })
+    expect(lost.deps.save).not.toHaveBeenCalled()
+
+    const broken = setup({
+      loadStock: vi.fn(async () => unit),
+      save: vi.fn(async () => Promise.reject(new Error('db down'))),
+    })
+    expect(await submitInquiryWith(broken.deps, { ip: null, body: ready() })).toEqual({
+      ok: false,
+      error: 'unavailable',
+    })
+    expect(broken.deps.releaseStock).toHaveBeenCalledWith(9)
   })
 })

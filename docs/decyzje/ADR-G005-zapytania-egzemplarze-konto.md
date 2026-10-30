@@ -65,3 +65,10 @@ Decyzje Krystiana przy planie G12.
 - **Porównanie (`/zapytanie?z=a,b,c`) bez zmiany kontraktu:** typ `compare`, `build` = pierwszy zestaw z porównania (klient może zmienić w kroku 1), pozostałe formularz dopisuje do uwag („Z porównania: …”). Relacja do kilku zestawów — dopiero, gdy okaże się potrzebna.
 - **Token formularza** wydaje strona `/zapytanie` (renderowana per żądanie), bez osobnego `GET`.
 - **Maile po odpowiedzi** (`after()` z `next/server`): rekord i numer są zapisane przed odpowiedzią 201, wysyłka nie wydłuża czekania klienta. Błąd SMTP nadal tylko w logu.
+
+## Uzupełnienie 30.10.2026 (G13 — bon i „Gotowe od ręki”)
+- `POST /api/inquiry` przyjmuje `voucher` i `ready` (wszystkie typy ze słownika). Nowe pola `inquiries` (migracja `stock_vouchers`): `voucher { amount, design, recipient, dedication }` (kwota z listy `VOUCHER_AMOUNTS`, wygląd: perun \| wampir \| rusalka \| skrzat) i `stock` (relacja do egzemplarza). Każde pole tylko w swoim typie.
+- `ready`: serwer wczytuje egzemplarz, liczy jego cenę (ADR-G002 §7, uzupełnienie 30.10) i **przed zapisem** rezerwuje go na 24 h warunkową aktualizacją (`reservedUntil` tylko, gdy egzemplarz jest wolny) — z dwóch równoczesnych rezerwacji jedna dostaje 400 `stock`. Nieudany zapis zapytania zwalnia rezerwację. Zajęty, niewidoczny albo niewyceniany egzemplarz → 400 `stock`.
+- `vouchers` (tylko panel): bon wystawiany po wpłacie; kod `XXXX-XXXX` losowany (`crypto`) przy zapisie, statusy ordered → paid → issued → used, relacja do zapytania. PDF bonu — poza G13 (panel).
+- Maile: powiadomienie z kwotą, wyglądem, odbiorcą i dedykacją bonu albo z egzemplarzem i terminem rezerwacji; potwierdzenie dla klienta bez odbiorcy i dedykacji (to, co wpisała osoba), z krokami „Co będzie dalej” dla bonu i egzemplarza (`nextSteps()`, teksty robocze — `TODO(krystian)`).
+- Strony `/bon` i `/gotowe` za flagami `FEATURE_VOUCHER` / `FEATURE_READY` (zmienne środowiskowe, domyślnie wyłączone).

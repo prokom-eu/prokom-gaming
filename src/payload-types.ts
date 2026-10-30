@@ -80,6 +80,8 @@ export interface Config {
     'inquiry-deletions': InquiryDeletion;
     faq: Faq;
     guides: Guide;
+    stock: Stock;
+    vouchers: Voucher;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
     'payload-locked-documents': PayloadLockedDocument;
@@ -101,6 +103,8 @@ export interface Config {
     'inquiry-deletions': InquiryDeletionsSelect<false> | InquiryDeletionsSelect<true>;
     faq: FaqSelect<false> | FaqSelect<true>;
     guides: GuidesSelect<false> | GuidesSelect<true>;
+    stock: StockSelect<false> | StockSelect<true>;
+    vouchers: VouchersSelect<false> | VouchersSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -486,6 +490,16 @@ export interface Inquiry {
   forWhom?: ('self' | 'child' | 'gift') | null;
   budget?: ('upto_6k' | '6k_9k' | '9k_14k' | 'over_14k' | 'unsure') | null;
   customList?: string | null;
+  voucher?: {
+    amount?: number | null;
+    design?: ('perun' | 'wampir' | 'rusalka' | 'skrzat') | null;
+    recipient?: string | null;
+    dedication?: string | null;
+  };
+  /**
+   * Rezerwacja na 24 h ustawiona przy zapisie zapytania.
+   */
+  stock?: (number | null) | Stock;
   games?: (number | Game)[] | null;
   otherGames?: string | null;
   monitor?: ('fullhd' | 'qhd' | 'uhd' | 'unsure') | null;
@@ -513,6 +527,40 @@ export interface Inquiry {
     utmMedium?: string | null;
     utmCampaign?: string | null;
   };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Egzemplarze do kupienia od ręki. Cena = cena konfiguracji z cennika minus rabat (strażnik marży). Strona widoczna po włączeniu FEATURE_READY.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "stock".
+ */
+export interface Stock {
+  id: number;
+  build: number | Build;
+  location: 'rabka' | 'zakopane';
+  condition: 'new' | 'demo' | 'returned';
+  changes?: {
+    level?: string | null;
+    case?: string | null;
+    cooler?: string | null;
+    ram?: string | null;
+    ssd?: string | null;
+  };
+  /**
+   * Np. „egzemplarz pokazowy, nieużywany, pełna gwarancja”.
+   */
+  conditionNote: string;
+  /**
+   * Odejmowany od ceny konfiguracji. Strażnik pilnuje marży.
+   */
+  discount?: number | null;
+  active?: boolean | null;
+  /**
+   * Ustawia rezerwacja ze strony (24 h). Wyczyść, żeby zwolnić.
+   */
+  reservedUntil?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -626,6 +674,28 @@ export interface Guide {
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
+}
+/**
+ * Bon wystawiasz po wpłacie za zapytanie typu „Bon podarunkowy”. Kod nadaje się sam.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "vouchers".
+ */
+export interface Voucher {
+  id: number;
+  /**
+   * Nadawany przy zapisie.
+   */
+  code?: string | null;
+  amount: number;
+  status: 'ordered' | 'paid' | 'issued' | 'used';
+  design: 'perun' | 'wampir' | 'rusalka' | 'skrzat';
+  recipient?: string | null;
+  dedication?: string | null;
+  validUntil?: string | null;
+  inquiry?: (number | null) | Inquiry;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -803,6 +873,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'guides';
         value: number | Guide;
+      } | null)
+    | ({
+        relationTo: 'stock';
+        value: number | Stock;
+      } | null)
+    | ({
+        relationTo: 'vouchers';
+        value: number | Voucher;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -1104,6 +1182,15 @@ export interface InquiriesSelect<T extends boolean = true> {
   forWhom?: T;
   budget?: T;
   customList?: T;
+  voucher?:
+    | T
+    | {
+        amount?: T;
+        design?: T;
+        recipient?: T;
+        dedication?: T;
+      };
+  stock?: T;
   games?: T;
   otherGames?: T;
   monitor?: T;
@@ -1187,6 +1274,46 @@ export interface GuidesSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "stock_select".
+ */
+export interface StockSelect<T extends boolean = true> {
+  build?: T;
+  location?: T;
+  condition?: T;
+  changes?:
+    | T
+    | {
+        level?: T;
+        case?: T;
+        cooler?: T;
+        ram?: T;
+        ssd?: T;
+      };
+  conditionNote?: T;
+  discount?: T;
+  active?: T;
+  reservedUntil?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "vouchers_select".
+ */
+export interface VouchersSelect<T extends boolean = true> {
+  code?: T;
+  amount?: T;
+  status?: T;
+  design?: T;
+  recipient?: T;
+  dedication?: T;
+  validUntil?: T;
+  inquiry?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
