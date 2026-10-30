@@ -7,6 +7,14 @@
       "runtimeArgs": ["dev"],
       "port": 3100,
       "url": "http://localhost:3100"
+    },
+    {
+      "name": "dev-gotowe-bon",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["dev"],
+      "env": { "FEATURE_READY": "1", "FEATURE_VOUCHER": "1" },
+      "port": 3100,
+      "url": "http://localhost:3100"
     }
   ]
 }
