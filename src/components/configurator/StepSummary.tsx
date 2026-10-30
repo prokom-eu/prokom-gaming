@@ -1,5 +1,6 @@
 import type { RefObject } from 'react'
 
+import { SaveConfigButton } from '@/components/account/SaveConfigButton'
 import { Sigil } from '@/components/Sigil'
 import { IconBars, IconMail } from '@/components/icons'
 import { PROMISES } from '@/components/promises'
@@ -131,6 +132,11 @@ export function StepSummary({
             Dodaj do porównania
           </ButtonLink>
         )}
+        <SaveConfigButton
+          config={state.config}
+          light={state.light}
+          label={`Moc ${view.level.tier}, ${view.optionLabel(state.config.case)}`}
+        />
       </div>
       {/* TODO(krystian): the label „albo SMS-em” is ours, not from the board (as on the build page). */}
       <p className="cf-sms">

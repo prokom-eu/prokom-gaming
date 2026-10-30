@@ -485,6 +485,9 @@
   --mt-gw-line: rgba(242, 194, 48, 0.3); /* ramka gwarancji PRO-KOM */
   --mt-gw-bg: rgba(242, 194, 48, 0.06);
   --mt-gw-text: #d8cfb8;
+  --kt-menu-on: rgba(242, 194, 48, 0.1); /* konto: wybrana pozycja menu */
+  --kt-sub: #a9a18c; /* konto: „Egzemplarz nr …”, zgoda na pomoc zdalną */
+  --kt-input-bg: rgba(0, 0, 0, 0.25);
   --print-ink: #000000; /* metryka do druku (wkładka do pudełka) */
   --print-line: #999999;
   --print-line-soft: #cccccc;
