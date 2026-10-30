@@ -39,7 +39,6 @@ const data: FormData = {
     levelFrom: {},
   },
   labels: {
-    level: {},
     option: { R32: '32 GB DDR5', R64: '64 GB DDR5', NM1: '1 TB NVMe', NM2: '2 TB NVMe' },
   },
   builds: expected.builds.map((b) => ({

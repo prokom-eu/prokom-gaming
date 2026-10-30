@@ -667,11 +667,16 @@ textarea.iq-in {
   .iq-steps {
     gap: 4px;
   }
-  .iq-steps b {
-    display: none;
+  /* Titles of the other steps stay for screen readers (the button's name), out of sight. */
+  .iq-steps li:not(.now) b {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
   .iq-steps .now b {
-    display: inline;
     font-size: 13px;
   }
   .iq-steps button {

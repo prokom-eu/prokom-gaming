@@ -87,7 +87,8 @@ export type FormData = {
   offer: InquiryOffer
   /** Newest published batch; `null` before the first publication (no price shown). */
   snapshot: PriceSnapshot | null
-  labels: { level: Record<string, string>; option: Record<string, string> }
+  /** Public names of options (`publicLabel`) by code. */
+  labels: { option: Record<string, string> }
   /** In tier order, like the board's grid. */
   builds: FormBuild[]
   levels: Record<string, FormLevel>

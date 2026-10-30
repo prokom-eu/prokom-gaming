@@ -98,7 +98,8 @@ export async function loadInquiryForm(): Promise<FormData> {
   return {
     offer: offer.offer,
     snapshot: batch?.snapshot ?? null,
-    labels: offer.labels,
+    // Only the options' names: the levels are shown by tier and CPU/GPU class (`levels`).
+    labels: { option: offer.labels.option },
     builds: formBuilds,
     levels: formLevels,
     games: FORM_GAMES.flatMap((slug) => {
