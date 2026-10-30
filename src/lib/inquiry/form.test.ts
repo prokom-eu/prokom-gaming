@@ -296,7 +296,7 @@ describe('summary, review and the sent page', () => {
       { label: 'Karta', value: 'RTX' },
       { label: 'Pamięć', value: '64 GB DDR5' },
       { label: 'Dysk', value: '1 TB NVMe' },
-      { label: 'Odbiór', value: 'kurier' },
+      { label: 'Odbiór', value: 'kurier, w cenie' },
     ])
     expect(JSON.stringify(sent)).not.toMatch(/P13|R64|cost/)
   })

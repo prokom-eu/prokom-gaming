@@ -132,7 +132,9 @@ export function InquiryForm({
         restoring.current = true
         writeItem(storageKeys.inquiry, '[]')
         notifyStorage()
-        router.push(`${routes.inquiry}/wyslane?nr=${encodeURIComponent(body.number)}`)
+        const params = new URLSearchParams({ nr: body.number })
+        if (summary.key) params.set('istota', summary.key)
+        router.push(`${routes.inquiry}/wyslane?${params.toString()}`)
         return
       }
       const error = sendErrorOf(response.status, body)

@@ -618,7 +618,12 @@ export type SentSummary = { key: string | null; title: string; sub: string; rows
 export function sentSummaryOf(state: FormState, data: FormData): SentSummary {
   const summary = summaryOf(state, data)
   const recipe = recipeOf(state, data)
-  const pickup: Row = { label: 'Odbiór', value: lower(labelOf(PICKUP_CHOICES, state.pickup)) }
+  // „Wysyłka w cenie” is one of the promises under every price (`components/promises.ts`).
+  const pickupText = lower(labelOf(PICKUP_CHOICES, state.pickup))
+  const pickup: Row = {
+    label: 'Odbiór',
+    value: state.pickup === 'courier' ? `${pickupText}, w cenie` : pickupText,
+  }
   if (!recipe) {
     return { key: null, title: summary.title, sub: summary.sub, rows: [...summary.rows] }
   }

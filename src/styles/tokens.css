@@ -365,4 +365,14 @@
   --iq-nav-bg: rgba(7, 12, 10, 0.95); /* przyklejony pasek „Dalej” na telefonie */
   --iq-page: #050807;
   --iq-shadow: #000;
+  --iq-sent-lead: #d0c7b1; /* „Zapytanie wysłane”: tekst pod nagłówkiem */
+  --iq-sent-nr: #a9a18c; /* „Numer zapytania”, opisy etapów */
+  --iq-sent-veil: rgba(5, 8, 7, 0.55); /* przyciemnienie sceny */
+  --iq-sent-veil-top: rgba(5, 8, 7, 0.35);
+  --iq-sent-vignette: rgba(3, 6, 5, 0.7);
+  --iq-ok-glow: rgba(242, 194, 48, 0.6); /* znaczek ✓ przy pieczęci */
+  --iq-tl-dot: rgba(236, 228, 208, 0.25); /* oś „Co będzie dalej” */
+  --iq-tl-line: rgba(236, 228, 208, 0.1);
+  --iq-tl-now: rgba(242, 194, 48, 0.15);
+  --iq-card-muted: #9a9583;
 }
