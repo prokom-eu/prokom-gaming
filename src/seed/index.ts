@@ -21,6 +21,8 @@ import { assertSeedAllowed, parseSeedEnv } from './config'
 import { legalFeatures } from '../globals/Legal'
 import { mapBuildFaq, mapFaq } from './faq'
 import { guideSeeds } from './guides'
+import stockSeed from '../../seed/prokomgaming/stock.json'
+import { SKIP_STOCK_GUARD } from '../lib/stock'
 import { fpsSeed, mapFpsResult, mapGame, planFpsResults, type ExistingFpsResult } from './fps'
 import { legalSeeds, splitLineBreaks } from './legal'
 import {
@@ -366,6 +368,44 @@ async function seedGuides(payload: Payload): Promise<void> {
   payload.logger.info(`Seed: ${guides.length} guides (${ready} published).`)
 }
 
+/**
+ * Sample „Gotowe od ręki” units of the board (local and e2e only), matched by build + location.
+ * Every run frees their reservations, so repeated e2e runs can reserve them again.
+ */
+async function seedStock(payload: Payload): Promise<void> {
+  const builds = await payload.find({
+    collection: 'builds',
+    select: { slug: true },
+    pagination: false,
+    ...asSeed,
+  })
+  const buildId = new Map(builds.docs.map((b) => [b.slug, b.id]))
+  for (const item of stockSeed.items) {
+    const build = buildId.get(item.build)
+    if (build === undefined) throw new Error(`Seed: stock for unknown build „${item.build}”.`)
+    const data = {
+      build,
+      location: item.location as 'rabka' | 'zakopane',
+      condition: item.condition as 'new' | 'demo' | 'returned',
+      conditionNote: item.conditionNote,
+      discount: item.discount,
+      active: true,
+      reservedUntil: null,
+    }
+    const found = await payload.find({
+      collection: 'stock',
+      where: { and: [{ build: { equals: build } }, { location: { equals: data.location } }] },
+      limit: 1,
+      ...asSeed,
+    })
+    const id = found.docs[0]?.id
+    const options = { ...asSeed, context: { ...asSeed.context, [SKIP_STOCK_GUARD]: true } }
+    if (id !== undefined) await payload.update({ collection: 'stock', id, data, ...options })
+    else await payload.create({ collection: 'stock', data, ...options })
+  }
+  payload.logger.info(`Seed: ${stockSeed.items.length} sample stock units.`)
+}
+
 const payload = await getPayload({ config })
 
 try {
@@ -377,6 +417,7 @@ try {
   await seedFaq(payload)
   await seedLegal(payload)
   await seedGuides(payload)
+  await seedStock(payload)
 } finally {
   await payload.destroy()
 }

@@ -1,0 +1,26 @@
+{
+  "_info": "Gotowe od ręki (spec. §11) — PRZYKŁADOWE egzemplarze z planszy Gotowe, tylko do pracy lokalnej i e2e (seed nie działa na produkcji). Prawdziwe egzemplarze dodaje szef w panelu [SZEF]. Rabat 0 zł (cena = cena zestawu); seed zwalnia rezerwacje przy każdym uruchomieniu.",
+  "items": [
+    {
+      "build": "wampir",
+      "location": "rabka",
+      "condition": "demo",
+      "conditionNote": "egzemplarz pokazowy, nieużywany, pełna gwarancja",
+      "discount": 0
+    },
+    {
+      "build": "rusalka",
+      "location": "zakopane",
+      "condition": "demo",
+      "conditionNote": "egzemplarz z wystawy, test i metryka gotowe",
+      "discount": 0
+    },
+    {
+      "build": "bies",
+      "location": "rabka",
+      "condition": "returned",
+      "conditionNote": "zwrot w 14 dni od klienta, sprawdzony, nowa metryka",
+      "discount": 0
+    }
+  ]
+}
