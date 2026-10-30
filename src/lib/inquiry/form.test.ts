@@ -6,11 +6,12 @@ import { seedCatalog } from '../pricing/testing/seedCatalog'
 import {
   canSend,
   draftOf,
+  draftQuery,
   goTo,
+  hasComputer,
   initialState,
   inquiryType,
   MESSAGES,
-  parseDraft,
   pickBuild,
   priceOf,
   reviewOf,
@@ -45,11 +46,11 @@ const data: FormData = {
     slug: b.slug,
     name: b.name,
     key: b.slug === 'baba-jaga' ? 'baba' : b.slug,
-    tierRoman: 'Moc VII',
+    power: 'Moc VII',
     realm: '4K',
   })),
   levels: {
-    P13: { tierRoman: 'Moc VII', realm: '4K', build: 'wampir', cpu: 'Ryzen 7', gpu: 'RTX' },
+    P13: { power: 'Moc VII', realm: '4K', build: 'wampir', cpu: 'Ryzen 7', gpu: 'RTX' },
   },
   games: [
     { slug: 'counter-strike-2', name: 'Counter-Strike 2' },
@@ -59,8 +60,7 @@ const data: FormData = {
 }
 
 const wampir = expected.builds.find((b) => b.slug === 'wampir')!
-const start = (query: string, draft: Parameters<typeof initialState>[2] = null) =>
-  initialState(new URLSearchParams(query), data, draft)
+const start = (query: string) => initialState(new URLSearchParams(query), data)
 
 /** Contact data that passes step 3. */
 const contact = (state: FormState): FormState => ({
@@ -117,26 +117,33 @@ describe('initialState: entry from the address', () => {
     expect(start('zestaw=wampir&ram=R64;DROP').changes).toEqual({})
   })
 
-  it('without a computer in the address, the saved draft; the address wins over it', () => {
-    const draft = { build: 'weles', light: 'krew' as const }
-    expect(start('', draft)).toMatchObject({ build: 'weles', light: 'krew' })
-    expect(start('zestaw=wampir', draft)).toMatchObject({ build: 'wampir', light: null })
-    expect(start('', { config: { ...wampir.config, ram: 'x y' } }).config).toBeNull()
+  it('the computer parameters', () => {
+    expect(hasComputer(new URLSearchParams('zestaw=wampir'))).toBe(true)
+    expect(hasComputer(new URLSearchParams('swiatlo=lod&inne=x'))).toBe(false)
   })
 })
 
 describe('draft (inquiry counter)', () => {
-  it('keeps only a picked computer and reads it back', () => {
+  const restore = (state: FormState) => start(draftQuery(JSON.stringify(draftOf(state))) ?? 'none')
+
+  it('keeps the address of the picked computer and opens it again', () => {
     const state = start('zestaw=wampir&ram=R64&swiatlo=lod')
-    const stored = JSON.stringify(draftOf(state))
-    expect(start('', parseDraft(stored))).toMatchObject({
-      build: 'wampir',
-      changes: { ram: 'R64' },
-      light: 'lod',
+    expect(restore(state)).toMatchObject({ build: 'wampir', changes: { ram: 'R64' }, light: 'lod' })
+    const config = start('k=P13.LB500.PL3LX.R32.NM1')
+    expect(restore(config).config).toEqual(wampir.config)
+    // A comparison keeps all builds, the one now picked first.
+    const compared = pickBuild(start('z=wampir,weles'), 'weles')
+    expect(restore({ ...compared, compared: ['wampir', 'weles'] })).toMatchObject({
+      build: 'weles',
+      compared: ['weles', 'wampir'],
     })
-    expect(draftOf({ ...state, mode: 'advice' })).toEqual([])
+  })
+
+  it('nothing without a computer; unreadable storage is ignored', () => {
+    expect(draftOf({ ...start('zestaw=wampir'), mode: 'advice' })).toEqual([])
     expect(draftOf(start(''))).toEqual([])
-    expect(parseDraft('{nope')).toBeNull()
+    expect(draftQuery('{nope')).toBeNull()
+    expect(draftQuery('[1]')).toBeNull()
   })
 })
 

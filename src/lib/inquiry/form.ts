@@ -5,7 +5,7 @@
  * everything (ADR-G005) — the price shown here is only a preview from the same function.
  */
 import { compatMessage } from '../compat'
-import { decodeConfig } from '../configurator'
+import { decodeConfig, encodeConfig } from '../configurator'
 import type { PriceSnapshot } from '../pricing/snapshot'
 import { ITEM_CODE, type Config } from '../pricing/types'
 import { CONSENT_CLAUSE } from './consent'
@@ -69,13 +69,13 @@ export type FormBuild = {
   slug: string
   name: string
   key: string
-  tierRoman: string
+  power: string
   realm: string
 }
 
 /** Public face of a power level: its tier and the class of CPU and GPU (`publicLabel`). */
 export type FormLevel = {
-  tierRoman: string
+  power: string
   realm: string
   build: string
   cpu: string
@@ -167,15 +167,6 @@ const EMPTY: FormState = {
 // Entry: from the address (build page, configurator, comparison) or the saved draft
 // ---------------------------------------------------------------------------------------------
 
-/** The computer kept in `pkg:inquiry` (the shell counts its items). */
-export type DraftItem = {
-  build?: string
-  changes?: Partial<Config>
-  config?: Config
-  light?: LightColor
-  compared?: string[]
-}
-
 const isLight = (value: unknown): value is LightColor =>
   LIGHT_COLOR_CHOICES.some((c) => c.value === value)
 
@@ -189,27 +180,15 @@ function cleanChanges(value: unknown): Partial<Config> {
   return out
 }
 
-function cleanConfig(value: unknown): Config | null {
-  if (!value || typeof value !== 'object') return null
-  const v = value as Record<string, unknown>
-  const keys = ['level', 'case', 'cooler', 'ram', 'ssd'] as const
-  if (!keys.every((key) => typeof v[key] === 'string' && ITEM_CODE.test(v[key]))) return null
-  return Object.fromEntries(keys.map((key) => [key, v[key]])) as Config
-}
-
 /** Longest text carried in an address (`inne` of the configurator). */
 const ADDRESS_TEXT_MAX = 200
 
 /**
  * Starting state. Priority of the address: `k` (configurator) > `z` (comparison) > `zestaw`
- * (build page); without any, the saved draft. Unknown slugs and malformed codes are ignored — a
+ * (build page). Unknown slugs and malformed codes are ignored — a
  * stale link opens an empty first step, never an error.
  */
-export function initialState(
-  params: URLSearchParams,
-  data: Pick<FormData, 'builds'>,
-  draft: DraftItem | null = null,
-): FormState {
+export function initialState(params: URLSearchParams, data: Pick<FormData, 'builds'>): FormState {
   const known = new Set(data.builds.map((b) => b.slug))
   const nameOf = (slug: string) => data.builds.find((b) => b.slug === slug)?.name ?? slug
   const state: FormState = { ...EMPTY, tried: [false, false, false, false] }
@@ -230,16 +209,6 @@ export function initialState(
   } else if (build && known.has(build)) {
     state.build = build
     state.changes = cleanChanges({ ram: params.get('ram'), ssd: params.get('ssd') })
-  } else if (draft) {
-    const saved = cleanConfig(draft.config)
-    if (saved) {
-      state.config = saved
-    } else if (draft.build && known.has(draft.build)) {
-      state.build = draft.build
-      state.changes = cleanChanges(draft.changes)
-      state.compared = (draft.compared ?? []).filter((slug) => known.has(slug)).slice(0, 3)
-    }
-    if (isLight(draft.light)) state.light = draft.light
   }
 
   const light = params.get('swiatlo')
@@ -254,29 +223,40 @@ export function initialState(
   return state
 }
 
-/** What `pkg:inquiry` keeps: the picked computer, or nothing (the counter shows 0). */
-export function draftOf(state: FormState): DraftItem[] {
-  if (state.mode !== 'build') return []
-  const light = state.light ? { light: state.light } : {}
-  if (state.config) return [{ config: state.config, ...light }]
-  if (!state.build) return []
-  return [
-    {
-      build: state.build,
-      ...(Object.keys(state.changes).length > 0 ? { changes: state.changes } : {}),
-      ...(state.compared.length > 0 ? { compared: state.compared } : {}),
-      ...light,
-    },
-  ]
+/** Parameters that name a computer; without them the form returns to the saved draft. */
+export function hasComputer(params: URLSearchParams): boolean {
+  return ['k', 'z', 'zestaw'].some((key) => params.has(key))
 }
 
-/** First item of a stored draft; `null` for anything unreadable. */
-export function parseDraft(raw: string | null): DraftItem | null {
+/**
+ * What `pkg:inquiry` keeps (the shell counts its items): the address that opens the picked
+ * computer again, or nothing. A return visit to `/zapytanie` goes to that address, so the address
+ * stays the one way into the form.
+ */
+export function draftOf(state: FormState): string[] {
+  if (state.mode !== 'build') return []
+  const params = new URLSearchParams()
+  if (state.config) params.set('k', encodeConfig(state.config))
+  else if (!state.build) return []
+  else if (state.compared.length > 0) {
+    const others = state.compared.filter((slug) => slug !== state.build)
+    params.set('z', [state.build, ...others].join(','))
+  } else {
+    params.set('zestaw', state.build)
+    if (state.changes.ram) params.set('ram', state.changes.ram)
+    if (state.changes.ssd) params.set('ssd', state.changes.ssd)
+  }
+  if (state.light) params.set('swiatlo', state.light)
+  return [params.toString()]
+}
+
+/** Query of a stored draft; `null` for anything unreadable (the form parses it like any link). */
+export function draftQuery(raw: string | null): string | null {
   if (!raw) return null
   try {
     const value: unknown = JSON.parse(raw)
     const first: unknown = Array.isArray(value) ? value[0] : null
-    return first && typeof first === 'object' ? (first as DraftItem) : null
+    return typeof first === 'string' && first.length > 0 && first.length <= 500 ? first : null
   } catch {
     return null
   }
@@ -502,7 +482,7 @@ const lightText = (state: FormState) =>
   state.light ? `światło ${labelOf(LIGHT_COLOR_CHOICES, state.light)}` : null
 
 /** „Wampir, Moc VII, 4K, pamięć 64 GB, światło Lód” — what the customer asks about. */
-function computerText(state: FormState, data: FormData): string {
+export function computerText(state: FormState, data: FormData): string {
   if (state.mode === 'advice') {
     const who = label(FOR_WHOM_CHOICES, state.forWhom) ?? 'dla kogo: nie podano'
     const budget = label(BUDGET_CHOICES, state.budget)
@@ -515,7 +495,7 @@ function computerText(state: FormState, data: FormData): string {
   const parts: (string | null)[] = state.config
     ? [
         `${creature.name}, konfiguracja`,
-        data.levels[state.config.level]?.tierRoman ?? null,
+        data.levels[state.config.level]?.power ?? null,
         option[state.config.case] ?? null,
         option[state.config.cooler] ?? null,
         option[state.config.ram] ?? null,
@@ -523,7 +503,7 @@ function computerText(state: FormState, data: FormData): string {
       ]
     : [
         creature.name,
-        creature.tierRoman,
+        creature.power,
         creature.realm,
         state.changes.ram ? `pamięć ${option[state.changes.ram] ?? state.changes.ram}` : null,
         state.changes.ssd ? `dysk ${option[state.changes.ssd] ?? state.changes.ssd}` : null,
@@ -556,7 +536,7 @@ export function summaryOf(state: FormState, data: FormData): Summary {
   } else if (creature) {
     title = creature.name
     sub = [
-      state.config ? 'Twoja konfiguracja' : `${creature.tierRoman}, ${creature.realm}`,
+      state.config ? 'Twoja konfiguracja' : `${creature.power}, ${creature.realm}`,
       lightText(state),
     ]
       .filter(Boolean)
@@ -651,7 +631,7 @@ export function sentSummaryOf(state: FormState, data: FormData): SentSummary {
     { label: 'Dysk', value: option[recipe.ssd] ?? '' },
   ].filter((row) => row.value)
   const sub = [
-    level?.tierRoman,
+    level?.power,
     option[recipe.case] ? `obudowa ${option[recipe.case]}` : null,
     lightText(state),
   ]
