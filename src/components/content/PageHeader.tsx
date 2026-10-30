@@ -9,8 +9,8 @@ type Props = {
   lead?: ReactNode
   /** Extra content under the lead (buttons, notice). */
   children?: ReactNode
-  /** `tall`: header with more room below the lead (O nas, Kontakt). */
-  size?: 'default' | 'tall'
+  /** `tall`: more room below the lead for cards over its edge (Kontakt); `hero`: big header (O nas). */
+  size?: 'default' | 'tall' | 'hero'
 }
 
 /**
@@ -20,7 +20,7 @@ type Props = {
  */
 export function PageHeader({ scene, title, lead, children, size = 'default' }: Props) {
   return (
-    <header className={size === 'tall' ? 'ct-head ct-head--tall' : 'ct-head'} data-scene-top>
+    <header className={size === 'default' ? 'ct-head' : `ct-head ct-head--${size}`} data-scene-top>
       <Scene id={scene} fit="wide" eager />
       <div className="ct-head__veil" aria-hidden="true" />
       <div className="wrap ct-head__in">

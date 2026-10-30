@@ -433,4 +433,12 @@
   --par-game-text: #b9b19c;
   --par-btn-text: #efe6d0;
   --par-safe-lead: #c4bba5;
+  --ct-band-bg: rgba(7, 12, 10, 0.88); /* O nas: pas liczb nad sceną */
+  --ct-band-line: rgba(242, 194, 48, 0.28);
+  --ct-band-text: #c9c0a9;
+  --ct-tl-from: #f2c230; /* oś historii */
+  --ct-tl-to: rgba(242, 194, 48, 0.1);
+  --ct-tl-glow: rgba(242, 194, 48, 0.5);
+  --ct-line-hover: rgba(242, 194, 48, 0.5);
+  --ct-final-glow: rgba(242, 194, 48, 0.12);
 }
