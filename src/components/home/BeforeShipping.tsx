@@ -4,6 +4,7 @@ import type { ReactNode } from 'react'
 
 import { sourceOf } from '@/lib/fps'
 import type { MetricSample } from '@/lib/home'
+import { plural } from '@/lib/pl'
 
 const icon = (children: ReactNode) => (
   <svg
@@ -71,7 +72,14 @@ const PEOPLE = [
 ] as const
 
 /** "Zanim komputer wyjedzie z Rabki" (spec. §4 pt 7). */
-export function BeforeShipping({ metric }: { metric: MetricSample | null }) {
+export function BeforeShipping({
+  metric,
+  inWorkshop = 0,
+}: {
+  metric: MetricSample | null
+  /** Paid orders not shipped yet (`loadWorkshop()`); 0 = the line is hidden. */
+  inWorkshop?: number
+}) {
   return (
     <section className="hm-sec hm-proc" aria-labelledby="proc-title">
       <div className="wrap hm-proc__grid">
@@ -130,10 +138,20 @@ export function BeforeShipping({ metric }: { metric: MetricSample | null }) {
 
         <div className="hm-proc__side">
           {metric && <MetricPaper metric={metric} />}
-          {/* TODO(G14): "W warsztacie teraz: N komputerów" from `GET /api/warsztat`. */}
-          <Link className="lnk hm-proc__see" href="/metryka">
-            Zobacz metrykę
-          </Link>
+          <div className="hm-proc__live">
+            {inWorkshop > 0 && (
+              <span className="hm-proc__count">
+                <span className="workshop__live" aria-hidden="true" />
+                <span>
+                  W warsztacie teraz: <b>{inWorkshop}</b>{' '}
+                  {plural(inWorkshop, ['komputer', 'komputery', 'komputerów'])}
+                </span>
+              </span>
+            )}
+            <Link className="lnk hm-proc__see" href="/metryka">
+              Zobacz metrykę
+            </Link>
+          </div>
         </div>
       </div>
     </section>

@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload'
 
-import { anyone, panelOnly } from '../access/panel'
+import { anyone, adminOnly } from '../access/panel'
 import { GROUP_CONTENT } from './shared'
 
 /**
@@ -30,7 +30,7 @@ export const Faq: CollectionConfig = {
     defaultColumns: ['question', 'group', 'order'],
   },
   defaultSort: 'order',
-  access: { read: anyone, create: panelOnly, update: panelOnly, delete: panelOnly },
+  access: { read: anyone, create: adminOnly, update: adminOnly, delete: adminOnly },
   fields: [
     { name: 'question', label: 'Pytanie', type: 'text', required: true },
     { name: 'answer', label: 'Odpowiedź', type: 'textarea', required: true },

@@ -6,8 +6,9 @@ import { buildConfig } from 'payload'
 import sharp from 'sharp'
 import { fileURLToPath } from 'url'
 
-import { isPanelUser } from './access/panel'
+import { isAdmin } from './access/panel'
 import { Builds } from './collections/Builds'
+import { Customers } from './collections/Customers'
 import { Faq } from './collections/Faq'
 import { Guides } from './collections/Guides'
 import { Stock } from './collections/Stock'
@@ -18,9 +19,12 @@ import { Inquiries } from './collections/Inquiries'
 import { InquiryDeletions } from './collections/InquiryDeletions'
 import { Media } from './collections/Media'
 import { Options } from './collections/Options'
+import { Orders } from './collections/Orders'
 import { PowerLevels } from './collections/PowerLevels'
 import { PriceHistory } from './collections/PriceHistory'
 import { PublishedPrices } from './collections/PublishedPrices'
+import { Tickets } from './collections/Tickets'
+import { Units } from './collections/Units'
 import { Users } from './collections/Users'
 import { LegalPrivacy, LegalTerms } from './globals/Legal'
 import { PricingSettings } from './globals/PricingSettings'
@@ -67,6 +71,10 @@ export default buildConfig({
     Guides,
     Stock,
     Vouchers,
+    Customers,
+    Orders,
+    Units,
+    Tickets,
   ],
   globals: [PricingSettings, SiteSettings, LegalTerms, LegalPrivacy],
   // Background jobs (ADR-G002 §4.4: margin alarm; ADR-G005: daily inquiry retention). Run inside the Next process
@@ -78,9 +86,9 @@ export default buildConfig({
     autoRun: [{ cron: '* * * * *', queue: 'default', limit: 5 }],
     deleteJobOnComplete: true,
     access: {
-      run: ({ req }) => isPanelUser(req),
-      queue: ({ req }) => isPanelUser(req),
-      cancel: ({ req }) => isPanelUser(req),
+      run: ({ req }) => isAdmin(req),
+      queue: ({ req }) => isAdmin(req),
+      cancel: ({ req }) => isAdmin(req),
     },
   },
   editor: lexicalEditor(),

@@ -132,6 +132,7 @@
   );
   --tick-bg: #050907; /* taśma „Teraz w warsztacie” */
   --tick-text: #bdb39b;
+  --live: #5bc23e; /* kropka „na żywo” (plansza Main, `.live`) */
 }
 
 /* Materiał imienia istoty (plansza Main, `--m1…--m4`): cztery przystanki gradientu od światła do

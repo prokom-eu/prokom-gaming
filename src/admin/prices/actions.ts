@@ -7,7 +7,7 @@ import { getPayload } from 'payload'
 import type { Payload } from 'payload'
 import { z } from 'zod'
 
-import { isPanelUser } from '../../access/panel'
+import { isAdmin } from '../../access/panel'
 import { queueMarginAlarm } from '../../jobs/queue'
 import { errorFields, log } from '../../lib/logger'
 import { CatalogError } from '../../lib/pricing/catalog'
@@ -177,6 +177,6 @@ const rowMessage = (e: { line: number; message: string }) =>
 async function panelSession(): Promise<{ payload: Payload; user: User } | null> {
   const payload = await getPayload({ config })
   const { user } = await payload.auth({ headers: await headers() })
-  if (!user || !isPanelUser({ user })) return null
+  if (!user || !isAdmin({ user })) return null
   return { payload, user: user as User }
 }

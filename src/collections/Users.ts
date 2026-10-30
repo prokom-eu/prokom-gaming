@@ -1,34 +1,30 @@
-import { ValidationError } from 'payload'
-import type { CollectionBeforeOperationHook, CollectionConfig } from 'payload'
+import type { Access, CollectionBeforeChangeHook, CollectionConfig } from 'payload'
 
-import { passwordProblem } from '../lib/auth/password'
+import { isAdmin, isPanelUser, USER_ROLES } from '../access/panel'
+import { enforcePasswordPolicy } from './passwordPolicy'
 import { GROUP_ADMIN } from './shared'
 
-// `updateByID` runs `beforeOperation` with `operation: 'update'`.
-const PASSWORD_OPERATIONS = new Set(['create', 'update', 'resetPassword'])
-
 /**
- * Payload hard-codes a 3-character minimum when hashing. `beforeOperation` is the one hook
- * that also runs for `resetPassword` (which skips `beforeValidate`), so the policy lives here.
+ * The very first account (`/admin/create-first-user`, nobody signed in) must be an admin, or no one
+ * could ever grant roles. Every later account keeps what an admin chose (default `serwis`).
  */
-const enforcePasswordPolicy: CollectionBeforeOperationHook = ({ args, operation, req }) => {
-  if (!PASSWORD_OPERATIONS.has(operation)) return args
-  const data = 'data' in args ? (args.data as { password?: unknown } | undefined) : undefined
-  const problem = passwordProblem(data?.password, { emptyMeansUnchanged: operation === 'update' })
-  if (problem) {
-    throw new ValidationError({
-      collection: 'users',
-      errors: [{ message: problem, path: 'password' }],
-      req,
-    })
-  }
-  return args
+const firstUserIsAdmin: CollectionBeforeChangeHook = async ({ data, operation, req }) => {
+  if (operation !== 'create') return data
+  const { totalDocs } = await req.payload.count({ collection: 'users', overrideAccess: true, req })
+  return totalDocs === 0 ? { ...data, role: 'admin' } : data
+}
+
+/** Admins see every account; anyone else on the panel only their own. */
+const adminOrSelf: Access = ({ req }) => {
+  if (isAdmin(req)) return true
+  if (isPanelUser(req) && req.user) return { id: { equals: req.user.id } }
+  return false
 }
 
 /**
- * Panel accounts (PRO-KOM staff). Customers log in through a separate `customers` collection
- * (ADR-G005, G14). No roles: every panel user may do everything, and Payload's default access
- * (signed in = allowed) applies.
+ * Panel accounts (PRO-KOM staff), roles `admin` and `serwis` (panel spec §15). Customers log in
+ * through the separate `customers` collection (ADR-G005) and never pass these rules: Payload's
+ * default ("signed in = allowed") would let a signed-in customer list or even create panel accounts.
  */
 export const Users: CollectionConfig = {
   slug: 'users',
@@ -36,6 +32,7 @@ export const Users: CollectionConfig = {
   admin: {
     group: GROUP_ADMIN,
     useAsTitle: 'email',
+    defaultColumns: ['email', 'role'],
   },
   // ADR-G001 §3: login attempt limit and a short session.
   auth: {
@@ -43,9 +40,33 @@ export const Users: CollectionConfig = {
     lockTime: 15 * 60 * 1000,
     tokenExpiration: 2 * 60 * 60,
   },
+  access: {
+    admin: ({ req }) => isPanelUser(req),
+    read: adminOrSelf,
+    create: ({ req }) => isAdmin(req),
+    update: adminOrSelf,
+    delete: ({ req }) => isAdmin(req),
+    unlock: ({ req }) => isAdmin(req),
+  },
   hooks: {
-    beforeOperation: [enforcePasswordPolicy],
+    beforeOperation: [enforcePasswordPolicy('users')],
+    beforeChange: [firstUserIsAdmin],
   },
   // Email and password are added by `auth`.
-  fields: [],
+  fields: [
+    {
+      name: 'role',
+      label: 'Rola',
+      type: 'select',
+      required: true,
+      // New accounts get the narrower role; the G14 migration made existing accounts admins.
+      defaultValue: 'serwis',
+      options: USER_ROLES.map(({ value, label }) => ({ value, label })),
+      // Only an admin changes roles — a `serwis` account editing itself cannot promote itself.
+      access: { create: ({ req }) => isAdmin(req), update: ({ req }) => isAdmin(req) },
+      // `saveToJWT` keeps the role on `req.user` for the access checks above.
+      saveToJWT: true,
+      admin: { position: 'sidebar' },
+    },
+  ],
 }

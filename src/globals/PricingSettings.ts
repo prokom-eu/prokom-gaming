@@ -1,6 +1,6 @@
 import type { Field, GlobalConfig } from 'payload'
 
-import { panelOnly } from '../access/panel'
+import { adminOnly } from '../access/panel'
 import { GROUP_OFFER } from '../collections/shared'
 
 const share = (name: string, label: string, max = 1): Field => ({
@@ -28,7 +28,7 @@ export const PricingSettings: GlobalConfig = {
   slug: 'pricing-settings',
   label: 'Ustawienia cen',
   admin: { group: GROUP_OFFER },
-  access: { read: panelOnly, update: panelOnly },
+  access: { read: adminOnly, update: adminOnly },
   fields: [
     {
       type: 'row',

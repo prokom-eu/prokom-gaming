@@ -17,22 +17,35 @@ export function formatInquiryNumber(year: number, seq: number): string {
   return `${NUMBER_PREFIX}-${year}-${String(seq).padStart(4, '0')}`
 }
 
+/** Yearly counter tables (outside Payload's schema): inquiries (G6) and orders (G14). */
+export type YearlyCounter = 'inquiry_counters' | 'order_counters'
+
 /**
- * Next number in the year, from the `inquiry_counters` table (migration `inquiries`). The upsert
- * locks the year's row until the transaction ends, so two inquiries never share a number, and it
- * runs in the transaction of the insert (`req`): when the insert fails, the counter rolls back
- * with it — no gaps within a year (G6 brief). Payload's `create` always opens that transaction.
+ * Next number in the year from a counter table. The upsert locks the year's row until the
+ * transaction ends, so two records never share a number, and it runs in the transaction of the
+ * insert (`req`): when the insert fails, the counter rolls back with it — no gaps within a year
+ * (G6 brief). Payload's `create` always opens that transaction.
  */
-export async function nextInquirySeq(req: PayloadRequest, year: number): Promise<number> {
+export async function nextYearlySeq(
+  req: PayloadRequest,
+  counter: YearlyCounter,
+  year: number,
+): Promise<number> {
   const adapter = req.payload.db as unknown as PostgresAdapter
   const transactionID = req.transactionID ? await req.transactionID : undefined
   const db = (transactionID !== undefined && adapter.sessions[transactionID]?.db) || adapter.drizzle
+  const table = sql.identifier(counter)
   const result = await db.execute<{ last: number }>(sql`
-    INSERT INTO "inquiry_counters" ("year", "last") VALUES (${year}, 1)
-    ON CONFLICT ("year") DO UPDATE SET "last" = "inquiry_counters"."last" + 1
+    INSERT INTO ${table} ("year", "last") VALUES (${year}, 1)
+    ON CONFLICT ("year") DO UPDATE SET "last" = ${table}."last" + 1
     RETURNING "last"
   `)
   const last = result.rows[0]?.last
-  if (typeof last !== 'number') throw new Error('Inquiry counter returned no value')
+  if (typeof last !== 'number') throw new Error(`Counter ${counter} returned no value`)
   return last
+}
+
+/** Next inquiry number in the year (`inquiry_counters`, migration `inquiries`). */
+export function nextInquirySeq(req: PayloadRequest, year: number): Promise<number> {
+  return nextYearlySeq(req, 'inquiry_counters', year)
 }

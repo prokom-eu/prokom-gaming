@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload'
 
-import { nobody, panelOnly } from '../access/panel'
+import { nobody, adminOnly } from '../access/panel'
 import { GROUP_OFFER, PRICE_ITEM_TYPES } from './shared'
 
 /**
@@ -17,7 +17,7 @@ export const PriceHistory: CollectionConfig = {
     defaultColumns: ['itemType', 'itemCode', 'sellPrice', 'validFrom', 'validTo'],
   },
   defaultSort: '-validFrom',
-  access: { read: panelOnly, create: nobody, update: nobody, delete: nobody },
+  access: { read: adminOnly, create: nobody, update: nobody, delete: nobody },
   fields: [
     { name: 'batch', label: 'Partia', type: 'number', required: true, min: 1 },
     {

@@ -88,6 +88,8 @@ const baseSchema = z.object({
   email: z
     .string()
     .trim()
+    // Lower case: one customer = one e-mail across inquiries, orders and accounts (panel spec §6).
+    .toLowerCase()
     .max(MAX.email)
     .pipe(z.email())
     .refine((v) => PAYLOAD_EMAIL.test(v), 'invalid e-mail'),

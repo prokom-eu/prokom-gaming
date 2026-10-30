@@ -1083,6 +1083,38 @@
   font-weight: 700;
   color: var(--grom);
 }
+/* Live orders (G14): sigil in the creature colour, build name, stage (board Main `.tk`). */
+.workshop__title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.workshop__live {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--live);
+  box-shadow: 0 0 10px var(--live);
+  animation: workshop-pulse 2s infinite;
+}
+@keyframes workshop-pulse {
+  50% {
+    opacity: 0.45;
+  }
+}
+.workshop__list--live li::before {
+  content: none;
+}
+.workshop__list--live li {
+  color: var(--tick-text);
+}
+.workshop__list--live b {
+  color: var(--kosc);
+}
+.workshop__sigil {
+  flex: none;
+  color: var(--c);
+}
 @media (max-width: 1023px) {
   .workshop {
     grid-template-columns: 1fr;
@@ -1099,6 +1131,9 @@
 
 /* ---------- reduced motion: no scene animation, parallax or transitions (ADR-G003 §5) ---------- */
 @media (prefers-reduced-motion: reduce) {
+  .workshop__live {
+    animation: none;
+  }
   .hero *,
   .hero *::before,
   .hero *::after {

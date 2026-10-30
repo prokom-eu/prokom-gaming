@@ -1,6 +1,6 @@
 import type { CollectionConfig, Field } from 'payload'
 
-import { anyone, panelField, panelOnly } from '../access/panel'
+import { anyone, adminField, adminOnly } from '../access/panel'
 import { blockDeleteWithFpsResults } from './FpsResults'
 import { GROUP_OFFER } from './shared'
 
@@ -30,7 +30,7 @@ export const Builds: CollectionConfig = {
     useAsTitle: 'name',
     defaultColumns: ['name', 'slug', 'level'],
   },
-  access: { read: anyone, create: panelOnly, update: panelOnly, delete: panelOnly },
+  access: { read: anyone, create: adminOnly, update: adminOnly, delete: adminOnly },
   hooks: { beforeDelete: [blockDeleteWithFpsResults('build')] },
   fields: [
     {
@@ -156,7 +156,7 @@ export const Builds: CollectionConfig = {
       name: 'internalRef',
       label: 'Odniesienie wewnętrzne (tylko panel)',
       type: 'text',
-      ...panelField,
+      ...adminField,
     },
   ],
 }

@@ -477,6 +477,23 @@
   flex-direction: column;
   gap: 56px;
 }
+.hm-proc__live {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px 24px;
+}
+.hm-proc__count {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--kosc2);
+}
+.hm-proc__count b {
+  color: var(--kosc);
+}
 .hm-proc__see {
   align-self: flex-end;
   color: var(--grom);

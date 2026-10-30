@@ -1,6 +1,6 @@
 import { ValidationError, type CollectionBeforeChangeHook, type CollectionConfig } from 'payload'
 
-import { panelOnly } from '../access/panel'
+import { adminOnly } from '../access/panel'
 import { SKIP_STOCK_GUARD, STOCK_CONDITIONS, STOCK_LOCATIONS } from '../lib/stock'
 import { GROUP_OFFER } from './shared'
 
@@ -75,7 +75,7 @@ export const Stock: CollectionConfig = {
   },
   // Panel only: the site reads units through the Local API (`lib/stock.server.ts`), so nothing
   // about units — not even a hidden one or a discount — is public while the page is off.
-  access: { read: panelOnly, create: panelOnly, update: panelOnly, delete: panelOnly },
+  access: { read: adminOnly, create: adminOnly, update: adminOnly, delete: adminOnly },
   hooks: { beforeChange: [guardMargin] },
   fields: [
     {

@@ -1,0 +1,53 @@
+{
+  "_info": "G14 — przykładowe zamówienia i egzemplarz z metryką (tylko lokalnie i w CI). Dane fikcyjne: imiona i adresy @example.test, bez kont klientów (e2e zakłada je samo). Klucz zamówienia: para e-mail + zestaw (numer `Z-…` nadaje się przy zapisie). Egzemplarz rozpoznaje po stałym `code`. Części egzemplarza: przykład z planszy Metryka (karta, procesor, płyta, pamięć, dysk, zasilacz) — producent i model to wartości przykładowe do testów.",
+  "units": [
+    {
+      "code": "WMPR-7KQ2-M9XA-B3CD",
+      "build": "wampir",
+      "published": true,
+      "email": "jan@example.test",
+      "serial": "PKG-WMP-0001",
+      "testedAt": "2026-11-14",
+      "warrantyUntil": "2028-11-14",
+      "assembledBy": "",
+      "stressTest": { "minutes": 60, "errors": 0 },
+      "temps": { "cpuMax": 78, "gpuMax": 71 },
+      "fpsSetup": { "resolution": "qhd", "settings": "wysokie", "driver": "576.40" },
+      "fps": [
+        { "game": "cyberpunk-2077", "fps": 96 },
+        { "game": "counter-strike-2", "fps": 412 },
+        { "game": "wiedzmin-3", "fps": 138 }
+      ],
+      "parts": [
+        { "role": "gpu", "label": "Karta graficzna RTX 5070 Ti 16 GB", "manufacturer": "Przykład", "model": "RTX 5070 Ti 16G", "serial": "SN-GPU-0001", "warrantyUntil": "2029-11-14" },
+        { "role": "cpu", "label": "Procesor Ryzen 7 9800X3D", "manufacturer": "AMD", "model": "Ryzen 7 9800X3D", "serial": "SN-CPU-0001", "warrantyUntil": "2029-11-14" },
+        { "role": "motherboard", "label": "Płyta główna B850", "manufacturer": "Przykład", "model": "B850 WIFI", "serial": "SN-MB-0001", "warrantyUntil": "2029-11-14" },
+        { "role": "ram", "label": "Pamięć 32 GB DDR5", "manufacturer": "Przykład", "model": "32 GB 6000", "serial": "", "warrantyUntil": "2036-11-14" },
+        { "role": "ssd", "label": "Dysk 2 TB NVMe", "manufacturer": "Przykład", "model": "2 TB NVMe", "serial": "SN-SSD-0001", "warrantyUntil": "2031-11-14" },
+        { "role": "psu", "label": "Zasilacz 850 W 80+ Gold", "manufacturer": "Przykład", "model": "850 W Gold", "serial": "SN-PSU-0001", "warrantyUntil": "2036-11-14" }
+      ]
+    },
+    {
+      "code": "B7ES-2DRF-8NWT-QK4M",
+      "build": "bies",
+      "published": false,
+      "email": "ola@example.test",
+      "serial": "PKG-BIE-0001",
+      "testedAt": null,
+      "warrantyUntil": null,
+      "assembledBy": "",
+      "stressTest": { "minutes": null, "errors": null },
+      "temps": { "cpuMax": null, "gpuMax": null },
+      "fpsSetup": { "resolution": "qhd", "settings": "wysokie", "driver": "" },
+      "fps": [],
+      "parts": []
+    }
+  ],
+  "orders": [
+    { "build": "wampir", "stage": "test", "name": "Jan", "email": "jan@example.test", "price": 14540, "unit": "WMPR-7KQ2-M9XA-B3CD", "dueDate": "2026-11-18" },
+    { "build": "bies", "stage": "assembly", "name": "Ola", "email": "ola@example.test", "price": 6710, "unit": "B7ES-2DRF-8NWT-QK4M", "dueDate": "2026-11-21" },
+    { "build": "perun", "stage": "parts", "name": "Kuba", "email": "kuba@example.test", "price": 53900, "unit": null, "dueDate": "2026-11-28" },
+    { "build": "rusalka", "stage": "metric_ready", "name": "Ewa", "email": "ewa@example.test", "price": 10950, "unit": null, "dueDate": "2026-11-17" },
+    { "build": "weles", "stage": "offer", "name": "Piotr", "email": "piotr@example.test", "price": 17100, "unit": null, "dueDate": null }
+  ]
+}

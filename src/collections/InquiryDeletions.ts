@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload'
 
-import { nobody, panelOnly } from '../access/panel'
+import { nobody, adminOnly } from '../access/panel'
 import { GROUP_SALES } from './shared'
 
 /**
@@ -16,7 +16,7 @@ export const InquiryDeletions: CollectionConfig = {
     defaultColumns: ['createdAt', 'number', 'reason', 'deletedByEmail'],
   },
   defaultSort: '-createdAt',
-  access: { read: panelOnly, create: nobody, update: nobody, delete: nobody },
+  access: { read: adminOnly, create: nobody, update: nobody, delete: nobody },
   fields: [
     { name: 'inquiryId', label: 'ID zapytania', type: 'number', required: true },
     { name: 'number', label: 'Numer', type: 'text' },

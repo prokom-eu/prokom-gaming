@@ -2,7 +2,7 @@ import { DefaultTemplate } from '@payloadcms/next/templates'
 import { Banner, Gutter } from '@payloadcms/ui'
 import type { AdminViewServerProps, Payload } from 'payload'
 
-import { isPanelUser } from '../../access/panel'
+import { isAdmin } from '../../access/panel'
 import { CatalogError } from '../../lib/pricing/catalog'
 import { buildQueue, buildsOverview, problemMessage } from '../../lib/pricing/publish'
 import { loadBatch, loadOffer, type BatchInfo } from '../../lib/pricing/store'
@@ -28,7 +28,7 @@ export async function PricesView({ initPageResult, params, searchParams }: Admin
   const { payload } = req
   // A message, not `redirect()`: inside Payload's admin page the redirect only reaches the RSC
   // stream and the browser stays on a blank page. Nothing about prices is loaded before this.
-  if (!isPanelUser(req)) {
+  if (!isAdmin(req)) {
     const login = `${payload.config.routes.admin}/login?redirect=${encodeURIComponent(`${payload.config.routes.admin}/ceny`)}`
     return (
       <Gutter className={styles.page}>

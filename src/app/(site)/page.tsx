@@ -15,6 +15,7 @@ import { WorkshopStrip } from '@/components/home/WorkshopStrip'
 import { EMPTY_HOME, type HomeData } from '@/lib/home'
 import { loadHome } from '@/lib/home.server'
 import { errorFields, log } from '@/lib/logger'
+import { EMPTY_WORKSHOP, loadWorkshop, type Workshop } from '@/lib/workshop.server'
 
 import '@/components/home/home.css'
 import '@/components/home/sections.css'
@@ -32,15 +33,23 @@ export default async function HomePage() {
     log.error({ ...errorFields(error) }, 'home data failed')
     home = EMPTY_HOME
   }
+  let workshop: Workshop
+  try {
+    workshop = await loadWorkshop()
+  } catch (error) {
+    // Without orders the strip shows the fixed process — as before G14.
+    log.error({ ...errorFields(error) }, 'workshop strip failed')
+    workshop = EMPTY_WORKSHOP
+  }
   return (
     <>
       <Hero data={home.hero} />
-      <WorkshopStrip />
+      <WorkshopStrip items={workshop.items} />
       <StartPaths />
       <Bestiary hero={home.hero} games={home.panel?.games ?? []} />
       <HowToBuy />
       <Games panel={home.panel} />
-      <BeforeShipping metric={home.metric} />
+      <BeforeShipping metric={home.metric} inWorkshop={workshop.inWorkshop} />
       {/* §4 pt 8 "Co mówią o nas klienci" stays hidden until real Google reviews exist (only
           genuine ones, 1:1, dated). TODO(krystian): rating and reviews in `site-settings`. */}
       <ForParents />

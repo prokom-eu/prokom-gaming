@@ -1,7 +1,7 @@
 import path from 'path'
 import type { CollectionConfig } from 'payload'
 
-import { anyone, panelOnly } from '../access/panel'
+import { anyone, adminOnly } from '../access/panel'
 import { getEnv } from '../lib/env'
 import { GROUP_OFFER } from './shared'
 
@@ -14,7 +14,7 @@ export const Media: CollectionConfig = {
   slug: 'media',
   labels: { singular: 'Plik', plural: 'Media' },
   admin: { group: GROUP_OFFER, useAsTitle: 'alt' },
-  access: { read: anyone, create: panelOnly, update: panelOnly, delete: panelOnly },
+  access: { read: anyone, create: adminOnly, update: adminOnly, delete: adminOnly },
   upload: {
     // Relative values are resolved against the app's working directory, once, here.
     staticDir: path.resolve(getEnv().MEDIA_DIR),
