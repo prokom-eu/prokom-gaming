@@ -1,0 +1,347 @@
+/* Certificate `/metryka` and `/metryka/<kod>` (G14, board Metryka `.mt`). Colours only from
+   tokens.css (ADR-G003 §2); the paper itself is `components/paper.css`. */
+
+.mt {
+  padding: 50px 0 110px;
+  background:
+    radial-gradient(60% 50% at 80% 20%, var(--mt-page-glow), transparent 70%), var(--mt-page);
+}
+.mt__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 460px;
+  gap: 60px;
+  align-items: start;
+}
+.mt__title {
+  margin: 0;
+  font-size: 58px;
+}
+.mt__lead {
+  margin: 14px 0 0;
+  max-width: 620px;
+  font-size: 17px;
+  line-height: 1.65;
+  color: var(--lead);
+}
+
+/* order timeline (shared with the account) */
+.tl {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 6px;
+  margin: 34px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.tl li {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 12.5px;
+  color: var(--mt-tl-todo);
+}
+.tl li i {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--mt-tl-track);
+}
+.tl li.done {
+  color: var(--mt-tl-done);
+}
+.tl li.done i {
+  background: var(--grom);
+}
+.tl li.now {
+  font-weight: 800;
+  color: var(--mt-tl-now);
+}
+.tl li.now i {
+  background: linear-gradient(90deg, var(--grom) 50%, var(--mt-tl-track) 50%);
+}
+
+/* panels */
+.mt-box {
+  margin-top: 26px;
+  padding: 26px 28px;
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, var(--panel-from), var(--panel-to));
+}
+.mt-box h2 {
+  margin: 0;
+  font-size: 30px;
+}
+.mt-box__note {
+  margin: 6px 0 0;
+  font-size: 14px;
+  color: var(--note);
+}
+.mt-kv {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin: 16px 0 0;
+}
+.mt-kv dt {
+  font-size: 12.5px;
+  color: var(--mt-label);
+}
+.mt-kv dd {
+  margin: 2px 0 0;
+  font-size: 22px;
+  font-weight: 700;
+}
+.mt-kv .ok {
+  color: var(--mt-ok);
+}
+.mt-kv .bad {
+  color: var(--mt-bad);
+}
+.mt-fps {
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.mt-fps li {
+  display: grid;
+  grid-template-columns: 160px 1fr auto;
+  gap: 14px;
+  align-items: center;
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+  font-size: 15px;
+}
+.mt-fps i {
+  height: 7px;
+  border-radius: 4px;
+  background: var(--mt-bar-track);
+}
+.mt-fps s {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+  background: var(--mt-bar);
+  box-shadow: 0 0 10px var(--mt-bar);
+}
+.mt-fps b {
+  text-align: right;
+}
+.mt-parts {
+  margin: 14px 0 0;
+}
+.mt-parts div {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+}
+.mt-parts dt {
+  font-weight: 700;
+}
+.mt-parts dd {
+  margin: 0;
+  text-align: right;
+  color: var(--mt-dd);
+}
+.mt-parts small {
+  display: block;
+  font-size: 12.5px;
+  color: var(--mt-small);
+}
+.mt-gw {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 16px;
+  padding: 14px 16px;
+  border: 1px solid var(--mt-gw-line);
+  background: var(--mt-gw-bg);
+  color: var(--grom);
+}
+.mt-gw span {
+  font-size: 14.5px;
+  color: var(--mt-gw-text);
+}
+.mt-gw b {
+  color: var(--kosc);
+}
+
+/* right column */
+.mt__side {
+  position: sticky;
+  top: 90px;
+}
+.mt__actions {
+  display: grid;
+  gap: 10px;
+  margin-top: 40px;
+}
+.mt__actions .btn {
+  width: 100%;
+}
+.mt-who {
+  margin-top: 16px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, var(--panel-from), var(--panel-to));
+}
+.mt-who small {
+  display: block;
+  font-size: 12.5px;
+  color: var(--mt-label);
+}
+.mt-who b {
+  display: block;
+  font-size: 17px;
+}
+.mt-who span {
+  font-size: 13px;
+  color: var(--mt-label);
+}
+
+/* /metryka without a code */
+.mt-code {
+  max-width: 520px;
+  margin-top: 30px;
+}
+.mt-code label {
+  display: block;
+  font-weight: 700;
+}
+.mt-code__row {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+.mt-code input {
+  flex: 1;
+  min-width: 0;
+  min-height: 48px;
+  padding: 0 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--panel-to);
+  color: var(--kosc);
+  font: inherit;
+  font-size: 17px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.mt-code input:focus-visible {
+  outline: 2px solid var(--grom);
+  outline-offset: 2px;
+}
+.mt-code__hint {
+  margin: 10px 0 0;
+  font-size: 14px;
+  color: var(--note);
+}
+.mt-code__error {
+  margin: 10px 0 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--mt-bad);
+}
+
+@media (max-width: 1000px) {
+  .mt__grid {
+    grid-template-columns: 1fr;
+  }
+  .mt__side {
+    position: static;
+  }
+  .tl {
+    grid-template-columns: repeat(4, 1fr);
+    row-gap: 14px;
+  }
+}
+@media (max-width: 760px) {
+  .mt {
+    padding: 32px 0 60px;
+  }
+  .mt__title {
+    font-size: 44px;
+  }
+  .mt-box {
+    padding: 22px 20px;
+  }
+  .mt-kv {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .mt-kv dd {
+    font-size: 19px;
+  }
+  .mt-fps li {
+    grid-template-columns: minmax(0, 1fr) 64px auto;
+  }
+  .mt-parts div {
+    flex-wrap: wrap;
+  }
+  .mt__actions {
+    margin-top: 28px;
+  }
+}
+
+/* Print = the certificate for the box (decision 31.10.2026: PDF through the browser). Results,
+   parts and warranty on paper; the site, the timeline, buttons and the 3D paper stay off. */
+@media print {
+  .nav,
+  .foot,
+  .tabbar,
+  .skip-link,
+  .tl,
+  .mt__side,
+  .mt__lead {
+    display: none !important;
+  }
+  .mt {
+    padding: 0;
+    background: none;
+    color: var(--print-ink);
+  }
+  .mt__grid {
+    display: block;
+  }
+  .mt__title {
+    font-size: 30px;
+    color: var(--print-ink);
+  }
+  .mt-box {
+    margin-top: 14px;
+    padding: 12px 0 0;
+    border: 0;
+    border-top: 1px solid var(--print-line);
+    background: none;
+    break-inside: avoid;
+  }
+  .mt-box h2 {
+    font-size: 18px;
+  }
+  .mt-kv dd {
+    font-size: 15px;
+  }
+  .mt-kv dt,
+  .mt-parts small,
+  .mt-parts dd,
+  .mt-box__note,
+  .mt-gw span,
+  .mt-gw b {
+    color: var(--print-ink);
+  }
+  .mt-fps li,
+  .mt-parts div {
+    padding: 5px 0;
+    border-color: var(--print-line-soft);
+    font-size: 12px;
+  }
+  .mt-fps s {
+    background: var(--print-ink);
+    box-shadow: none;
+  }
+  .mt-gw {
+    border-color: var(--print-line);
+    background: none;
+    color: var(--print-ink);
+  }
+}

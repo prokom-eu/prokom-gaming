@@ -19,6 +19,7 @@ import { EMPTY_WORKSHOP, loadWorkshop, type Workshop } from '@/lib/workshop.serv
 
 import '@/components/home/home.css'
 import '@/components/home/sections.css'
+import '@/components/paper.css'
 
 // Home page, sections in the order of spec. §4.
 export default async function HomePage() {
