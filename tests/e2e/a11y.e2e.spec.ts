@@ -5,7 +5,8 @@ import { expect, test } from '@playwright/test'
 // Each UI session adds its pages here. G1: home (temporary) and the panel login; G2: 404
 // (the shell itself is on every page; the open menu is checked in shell.e2e.spec.ts); G9: /zestawy, /zestawy/wampir;
 // G10: the configurator — the level step and the case step (option cards greyed out with reasons);
-// G11: the game picker, a game page and the comparison (with „Tylko różnice” and a capped game).
+// G11: the game picker, a game page and the comparison (with „Tylko różnice” and a capped game);
+// G12: the inquiry form (first step, with a configuration) and the sent page.
 const PAGES = [
   { path: '/', status: 200 },
   { path: '/zestawy', status: 200 },
@@ -22,6 +23,9 @@ const PAGES = [
   { path: '/komputer-do/cyberpunk-2077', status: 200 },
   { path: '/porownaj?z=baba-jaga,wampir,weles&gra=cyberpunk-2077&rozdz=2k&hz=144', status: 200 },
   { path: '/porownaj?z=skrzat,licho&gra=elden-ring&rozdz=4k&hz=60&roznice=1', status: 200 },
+  { path: '/zapytanie?zestaw=wampir', status: 200 },
+  { path: '/zapytanie?k=P13.LB500.PL3LX.R32.NM1&swiatlo=lod', status: 200 },
+  { path: '/zapytanie/wyslane?nr=PKG-2026-0001&istota=wampir', status: 200 },
   { path: '/admin/login', status: 200 },
   { path: '/nie-ma-takiej-strony', status: 404 },
 ]

@@ -119,6 +119,13 @@ describe('parseInquiryInput', () => {
       const advice = { ...base, type: 'advice' }
       expect(fields({ ...advice, build: 'wampir' })).toContain('build')
       expect(fields({ ...advice, config: full })).toContain('config')
+      expect(fields({ ...advice, lightColor: 'lod' })).toContain('lightColor')
+    })
+
+    it('light colour: one of six, optional, only with a computer', () => {
+      expect(fields({ ...build, lightColor: 'lod' })).toEqual([])
+      expect(fields({ ...build, lightColor: '' })).toEqual([])
+      expect(fields({ ...build, lightColor: 'neon' })).toContain('lightColor')
     })
   })
 

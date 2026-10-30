@@ -72,6 +72,7 @@ function setup(overrides: Partial<SubmitDeps> = {}) {
     sendEmail: vi.fn(async (email: Email) => {
       sent.push(email)
     }),
+    defer: (task) => task(),
     notifyTo: 'gaming@example.test',
     responseTime: async () => 'zwykle w godzinę, codziennie 8–22',
     panelUrl: (id) => `http://localhost:3100/admin/collections/inquiries/${id}`,
@@ -87,11 +88,22 @@ const noPersonalData = (logs: unknown[]) => {
 }
 
 describe('submitInquiryWith', () => {
+  it('answers before the e-mails: they run in the deferred task (after the response)', async () => {
+    const tasks: (() => Promise<void>)[] = []
+    const { deps, sent } = setup({ defer: (task) => void tasks.push(task) })
+    const result = await submitInquiryWith(deps, { ip: '203.0.113.5', body: body() })
+    expect(result).toMatchObject({ ok: true, number: 'PKG-2026-0041' })
+    expect(deps.save).toHaveBeenCalledOnce()
+    expect(sent).toEqual([])
+    await Promise.all(tasks.map((task) => task()))
+    expect(sent).toHaveLength(2)
+  })
+
   it('saves the build priced by the server, sends both e-mails and returns the number', async () => {
     const { deps, sent, logs } = setup()
     const result = await submitInquiryWith(deps, {
       ip: '203.0.113.5',
-      body: body({ price: 1, priceAtInquiry: 1 }),
+      body: body({ price: 1, priceAtInquiry: 1, lightColor: 'lod' }),
     })
     expect(result).toEqual({ ok: true, id: 41, number: 'PKG-2026-0041' })
 
@@ -104,6 +116,7 @@ describe('submitInquiryWith', () => {
       config: wampir.config,
       priceAtInquiry: wampir.price,
       priceBatch: 2,
+      lightColor: 'lod',
       games: [7],
       consent: {
         accepted: true,

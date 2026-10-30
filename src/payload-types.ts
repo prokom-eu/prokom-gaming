@@ -471,6 +471,7 @@ export interface Inquiry {
     ram?: string | null;
     ssd?: string | null;
   };
+  lightColor?: ('piorun' | 'krew' | 'las' | 'czary' | 'lod' | 'ogien') | null;
   /**
    * Policzona przez serwer z opublikowanych cen.
    */
@@ -1006,6 +1007,7 @@ export interface InquiriesSelect<T extends boolean = true> {
         ram?: T;
         ssd?: T;
       };
+  lightColor?: T;
   priceAtInquiry?: T;
   priceBatch?: T;
   forWhom?: T;

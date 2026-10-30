@@ -95,6 +95,24 @@ export const LIGHTING_CHOICES = [
   { value: 'none', label: 'Bez podświetlenia' },
 ] as const satisfies readonly Choice<string>[]
 
+/**
+ * Light colour picked on the build page („Dopasuj”) or in the configurator (spec. §7). Empty = the
+ * creature's own light. Labels 1:1 from the board `LIGHTS`; `lib/buildPage.ts` reads this list.
+ */
+export const LIGHT_COLOR_CHOICES = [
+  { value: 'piorun', label: 'Piorun' },
+  { value: 'krew', label: 'Krew' },
+  { value: 'las', label: 'Las' },
+  { value: 'czary', label: 'Czary' },
+  { value: 'lod', label: 'Lód' },
+  { value: 'ogien', label: 'Ogień' },
+] as const satisfies readonly Choice<string>[]
+export type LightColor = (typeof LIGHT_COLOR_CHOICES)[number]['value']
+
+/** One of the six light colours (an address or a stored value may hold anything). */
+export const isLight = (value: unknown): value is LightColor =>
+  LIGHT_COLOR_CHOICES.some((c) => c.value === value)
+
 export const EXTRA_CHOICES = [
   { value: 'monitor', label: 'Monitor' },
   { value: 'mouse_keyboard', label: 'Mysz i klawiatura' },
@@ -126,6 +144,7 @@ export const CHOICES = {
   refresh: REFRESH_CHOICES,
   caseColor: CASE_COLOR_CHOICES,
   lighting: LIGHTING_CHOICES,
+  lightColor: LIGHT_COLOR_CHOICES,
   extras: EXTRA_CHOICES,
   pickup: PICKUP_CHOICES,
   invoice: INVOICE_CHOICES,

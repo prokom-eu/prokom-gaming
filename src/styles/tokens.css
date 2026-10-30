@@ -330,4 +330,49 @@
   --cmp-full-key-line: #4fd28a;
   --cmp-cap-bg: #141c19;
   --cmp-low-verdict: #ff8a5b; /* werdykt „Za mało mocy” */
+
+  /* ---------- G12: zapytanie (plansze Formularz, Zapytanie) ---------- */
+  --iq-lead: #c9c0a9; /* podtytuł strony */
+  --iq-panel-from: #0b1411; /* karta formularza */
+  --iq-panel-to: #070c0a;
+  --iq-panel-line: rgba(236, 228, 208, 0.12);
+  --iq-label: #e6ddc7; /* etykiety pól */
+  --iq-muted: #8f8a78; /* „(opcjonalnie)”, kroki, etykiety podsumowania */
+  --iq-hint: #a49d89; /* podpowiedzi pod nagłówkami */
+  --iq-h3: #efe6d0;
+  --iq-input-bg: #0a110f;
+  --iq-input-line: rgba(236, 228, 208, 0.18);
+  --iq-placeholder: #8a8576; /* rozjaśniony z #6f6c61 planszy: podpowiedzi ≥ 4,5:1 */
+  --iq-ring: rgba(242, 194, 48, 0.18); /* fokus pola */
+  --iq-err-line: #e0675b;
+  --iq-err-ring: rgba(224, 103, 91, 0.15);
+  --iq-err-text: #ff9a8f;
+  --iq-check-text: #cfc6b0;
+  --iq-check-line: rgba(236, 228, 208, 0.35);
+  --iq-opt-text: #d8cfb8;
+  --iq-opt-hover: rgba(242, 194, 48, 0.5);
+  --iq-step-line: rgba(236, 228, 208, 0.25);
+  --iq-step-done: #cfc6b0;
+  --iq-step-done-line: rgba(242, 194, 48, 0.45);
+  --iq-step-done-bg: rgba(242, 194, 48, 0.15);
+  --iq-step-glow: rgba(242, 194, 48, 0.5);
+  --iq-card: #08100d; /* pieczęć zestawu, podsumowanie */
+  --iq-card-line: rgba(236, 228, 208, 0.1);
+  --iq-card-on: #0a120f;
+  --iq-card-name: #e9e1cc;
+  --iq-sum-line: rgba(242, 194, 48, 0.28);
+  --iq-sum-glow: rgba(242, 194, 48, 0.08);
+  --iq-nav-bg: rgba(7, 12, 10, 0.95); /* przyklejony pasek „Dalej” na telefonie */
+  --iq-page: #050807;
+  --iq-shadow: #000;
+  --iq-sent-lead: #d0c7b1; /* „Zapytanie wysłane”: tekst pod nagłówkiem */
+  --iq-sent-nr: #a9a18c; /* „Numer zapytania”, opisy etapów */
+  --iq-sent-veil: rgba(5, 8, 7, 0.55); /* przyciemnienie sceny */
+  --iq-sent-veil-top: rgba(5, 8, 7, 0.35);
+  --iq-sent-vignette: rgba(3, 6, 5, 0.7);
+  --iq-ok-glow: rgba(242, 194, 48, 0.6); /* znaczek ✓ przy pieczęci */
+  --iq-tl-dot: rgba(236, 228, 208, 0.25); /* oś „Co będzie dalej” */
+  --iq-tl-line: rgba(236, 228, 208, 0.1);
+  --iq-tl-now: rgba(242, 194, 48, 0.15);
+  --iq-card-muted: #9a9583;
 }

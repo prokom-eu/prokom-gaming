@@ -7,6 +7,7 @@ import { checkCompat, indexOffer, resolveParts } from './compat'
 import { fpsFor, RESOLUTION_LABELS, RESOLUTIONS, type FpsTable, type Resolution } from './fps'
 import type { HeroBuild } from './home'
 import { priceFromSnapshot, surcharge, type PriceList } from './pricing/snapshot'
+import { LIGHT_COLOR_CHOICES, type LightColor } from './inquiry/types'
 import type { CompatLevel, CompatOption, Config } from './pricing/types'
 
 // ---------------------------------------------------------------------------------------------
@@ -227,17 +228,12 @@ export function tuneChoices(
   return [...best.values()].sort((a, b) => a.capacityGb - b.capacityGb)
 }
 
-/** Light colours of „Dopasuj” (board `LIGHTS`); the creature's own light is the default. */
-export const LIGHTS = [
-  { key: 'piorun', label: 'Piorun' },
-  { key: 'krew', label: 'Krew' },
-  { key: 'las', label: 'Las' },
-  { key: 'czary', label: 'Czary' },
-  { key: 'lod', label: 'Lód' },
-  { key: 'ogien', label: 'Ogień' },
-] as const
+export type LightKey = LightColor
 
-export type LightKey = (typeof LIGHTS)[number]['key']
+/** Light colours of „Dopasuj” (board `LIGHTS`); the creature's own light is the default. */
+export const LIGHTS: readonly { key: LightKey; label: string }[] = LIGHT_COLOR_CHOICES.map(
+  ({ value, label }) => ({ key: value, label }),
+)
 
 /** „czerwone światło” from `look` = „czarna, czerwone światło” (board `lightDef`). */
 export function ownLight(look: string): string {
@@ -266,8 +262,7 @@ export function tunedNote(diff: number, light: LightKey | null, zl: (v: number) 
 
 /**
  * „Zapytaj o tę wersję” → `/zapytanie?zestaw=wampir&ram=R64&ssd=NM2&swiatlo=lod`, only what
- * differs from the build. The light colour has no field in the inquiry yet — `TODO(G12)`: the form
- * decides how to keep it (decision of Krystian, 28.10.2026: address only, API unchanged).
+ * differs from the build. The form saves the light colour as `lightColor` (ADR-G005, 30.10.2026).
  */
 export function inquiryHref(slug: string, config: Config, tuned?: Tuned): string {
   const params = new URLSearchParams({ zestaw: slug })

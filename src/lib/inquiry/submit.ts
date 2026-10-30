@@ -47,6 +47,11 @@ export type SubmitDeps = {
   /** Returns the record after the hooks, so with its number. */
   save: (data: NewInquiry) => Promise<{ id: number; number?: string | null }>
   sendEmail: (email: Email) => Promise<unknown>
+  /**
+   * Runs the e-mails: after the response in the app (`after()` from `next/server` — the customer
+   * does not wait for SMTP), awaited in tests. The record is saved before either way.
+   */
+  defer: (task: () => Promise<void>) => void | Promise<void>
   /** Gaming inbox (`INQUIRY_NOTIFY_EMAIL`); `null` locally without it. */
   notifyTo: string | null
   /** „Odpowiedź na zapytanie” from `site-settings`; `null` when empty or unreadable. */
@@ -164,6 +169,7 @@ export async function submitInquiryWith(
       config: priced?.config ?? {},
       priceAtInquiry: priced?.price ?? null,
       priceBatch: priced?.batch ?? null,
+      lightColor: input.lightColor,
       forWhom: input.forWhom,
       budget: input.budget,
       customList: input.customList,
@@ -204,29 +210,31 @@ export async function submitInquiryWith(
     games: games.map((g) => g.name),
     consent: { clauseVersion: input.consent.clauseVersion, acceptedAt },
   }
-  const emails: { kind: string; email: Email }[] = []
-  if (deps.notifyTo) {
-    emails.push({
-      kind: 'notification',
-      email: notificationEmail(forEmail, { to: deps.notifyTo, panelUrl: deps.panelUrl(id) }),
-    })
-  } else {
-    deps.log.warn({ inquiry: id }, 'INQUIRY_NOTIFY_EMAIL not set: no notification sent')
-  }
-  const responseTime = await deps.responseTime().catch(() => null)
-  emails.push({
-    kind: 'confirmation',
-    email: confirmationEmail(forEmail, { responseTime, replyTo: deps.notifyTo }),
-  })
-
-  const results = await Promise.allSettled(emails.map(({ email }) => deps.sendEmail(email)))
-  results.forEach((result, i) => {
-    if (result.status === 'rejected') {
-      deps.log.error(
-        { inquiry: id, email: emails[i]?.kind, ...errorFields(result.reason) },
-        'Inquiry e-mail not sent',
-      )
+  await deps.defer(async () => {
+    const emails: { kind: string; email: Email }[] = []
+    if (deps.notifyTo) {
+      emails.push({
+        kind: 'notification',
+        email: notificationEmail(forEmail, { to: deps.notifyTo, panelUrl: deps.panelUrl(id) }),
+      })
+    } else {
+      deps.log.warn({ inquiry: id }, 'INQUIRY_NOTIFY_EMAIL not set: no notification sent')
     }
+    const responseTime = await deps.responseTime().catch(() => null)
+    emails.push({
+      kind: 'confirmation',
+      email: confirmationEmail(forEmail, { responseTime, replyTo: deps.notifyTo }),
+    })
+
+    const results = await Promise.allSettled(emails.map(({ email }) => deps.sendEmail(email)))
+    results.forEach((result, i) => {
+      if (result.status === 'rejected') {
+        deps.log.error(
+          { inquiry: id, email: emails[i]?.kind, ...errorFields(result.reason) },
+          'Inquiry e-mail not sent',
+        )
+      }
+    })
   })
 
   return { ok: true, id, number }
@@ -242,7 +250,7 @@ const limiter = (store[LIMITER_KEY] ??= createRateLimiter({ limit: 5, windowMs: 
 
 /**
  * Accepts an inquiry from the site (ADR-G005): spam checks, validation, the computer priced and
- * checked on the server, save with a number, two e-mails. In 2027 `save` moves to the Django API;
+ * checked on the server, save with a number, two e-mails after the response. In 2027 `save` moves to the Django API;
  * the forms stay as they are.
  */
 export async function submitInquiry(
@@ -250,13 +258,14 @@ export async function submitInquiry(
   context: { requestId: string },
 ): Promise<SubmitResult> {
   // Imported lazily: keeps the Payload config and the database out of unit tests.
-  const [{ getPayload }, { default: config }, { getEnv }, { log }, pricingStore] =
+  const [{ getPayload }, { default: config }, { getEnv }, { log }, pricingStore, { after }] =
     await Promise.all([
       import('payload'),
       import('@payload-config'),
       import('../env'),
       import('../logger'),
       import('./pricingStore'),
+      import('next/server'),
     ])
   let payload: Awaited<ReturnType<typeof getPayload>>
   let env: ReturnType<typeof getEnv>
@@ -290,6 +299,7 @@ export async function submitInquiry(
       save: (data) =>
         payload.create({ collection: 'inquiries', data, depth: 0, overrideAccess: true }),
       sendEmail: (email) => payload.sendEmail(email),
+      defer: (task) => after(task),
       notifyTo: env.INQUIRY_NOTIFY_EMAIL ?? null,
       responseTime: async () => {
         const settings = await payload.findGlobal({

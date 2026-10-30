@@ -156,6 +156,7 @@ export const Inquiries: CollectionConfig = {
             },
           ],
         },
+        select('lightColor', 'Kolor światła (puste = światło istoty)'),
         {
           type: 'row',
           fields: [
