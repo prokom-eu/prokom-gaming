@@ -194,12 +194,20 @@ export function notificationEmail(
   return { to, replyTo: inquiry.email, subject, text }
 }
 
+/** „Co będzie dalej” — the same four steps as `/zapytanie/wyslane` (board Zapytanie). */
+export const NEXT_STEPS = [
+  ['Teraz', 'Zapytanie jest u nas. Kopia poszła na Twój e-mail.'],
+  ['W ciągu godziny', 'Krystian odpisze z imienną listą części, ceną i terminem. Codziennie 8–22.'],
+  ['Gdy zaakceptujesz', 'Wystawimy fakturę pro forma. Płacisz przelewem albo BLIK-iem.'],
+  ['5–10 dni roboczych', 'Montaż, test obciążeniowy, pomiary w grach, metryka i wysyłka.'],
+] as const
+
 /**
- * Confirmation for the customer: number, computer and price, when we answer. It does not repeat
- * the message or the contact details: anyone can type someone else's address into a form, so the
- * mail must not carry what a person wrote to a stranger. Replies go to the Gaming inbox.
+ * Confirmation for the customer: number, computer and price, what comes next (spec. §10: the
+ * board's „Co będzie dalej”). It does not repeat the message or the contact details: anyone can
+ * type someone else's address into a form, so the mail must not carry what a person wrote to a
+ * stranger. Replies go to the Gaming inbox.
  */
-// TODO(G12): final wording from the „Co będzie dalej” board (spec. §10).
 export function confirmationEmail(
   inquiry: InquiryForEmail,
   { responseTime, replyTo }: { responseTime: string | null; replyTo: string | null },
@@ -217,7 +225,10 @@ export function confirmationEmail(
         ? ['', 'Twoja konfiguracja:', ...computerLines(inquiry.computer, false, inquiry.lightColor)]
         : []),
       '',
-      'Oferta z imienną listą części, ceną i terminem przyjdzie w odpowiedzi na ten e-mail.',
+      'Co będzie dalej:',
+      ...NEXT_STEPS.map(([title, text], i) => `${i + 1}. ${title}: ${text}`),
+      '',
+      'Coś się nie zgadza? Odpowiedz na tę wiadomość.',
       'Jeśli to nie Ty wysłałeś(-aś) ten formularz, zignoruj tę wiadomość.',
       '',
       'Pozdrawiamy',

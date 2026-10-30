@@ -112,6 +112,14 @@ describe('confirmationEmail', () => {
     expect(mail.text).toContain('Cena: 14 540 zł brutto')
   })
 
+  it('says what comes next, step by step like the „wysłane” page (board Zapytanie)', () => {
+    expect(mail.text).toContain('Co będzie dalej:')
+    expect(mail.text).toContain(
+      '3. Gdy zaakceptujesz: Wystawimy fakturę pro forma. Płacisz przelewem albo BLIK-iem.',
+    )
+    expect(mail.text).not.toMatch(/rat|bank/i)
+  })
+
   it('does not repeat what the person wrote or their contact details, nor item codes', () => {
     for (const text of ['Proszę o kontakt', '+48 600 100 200', '7352511447', 'Blender', '(P13)']) {
       expect(mail.text).not.toContain(text)

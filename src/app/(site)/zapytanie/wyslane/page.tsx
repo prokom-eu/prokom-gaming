@@ -5,6 +5,7 @@ import { SentSummaryCard } from '@/components/inquiry/SentSummaryCard'
 import { Scene } from '@/components/Scene'
 import { Sigil } from '@/components/Sigil'
 import { HERO_DEFAULT } from '@/lib/home'
+import { NEXT_STEPS } from '@/lib/inquiry/emails'
 import { INQUIRY_NUMBER } from '@/lib/inquiry/form'
 import { routes } from '@/lib/nav'
 import { company, menuCreatures } from '@/lib/site'
@@ -19,24 +20,8 @@ export const metadata: Metadata = {
 
 type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> }
 
-const STEPS = [
-  { title: 'Teraz', text: 'Zapytanie jest u nas. Kopia poszła na Twój e-mail.', state: 'done' },
-  {
-    title: 'W ciągu godziny',
-    text: 'Krystian odpisze z imienną listą części, ceną i terminem. Codziennie 8–22.',
-    state: 'now',
-  },
-  {
-    title: 'Gdy zaakceptujesz',
-    text: 'Wystawimy fakturę pro forma. Płacisz przelewem albo BLIK-iem.',
-    state: '',
-  },
-  {
-    title: '5–10 dni roboczych',
-    text: 'Montaż, test obciążeniowy, pomiary w grach, metryka i wysyłka.',
-    state: '',
-  },
-] as const
+// The timeline's state per step: done, now, later (board Zapytanie `.qt`).
+const STEP_STATES = ['done', 'now', '', ''] as const
 
 /**
  * „Zapytanie wysłane” (spec. §10, boards Zapytanie / Zapytanie-telefon, `stany/tel-12`). The
@@ -90,11 +75,11 @@ export default async function InquirySentPage({ searchParams }: Props) {
           <div>
             <h2 className="h">Co będzie dalej</h2>
             <ol className="iq-tl">
-              {STEPS.map((step) => (
-                <li key={step.title} className={step.state}>
+              {NEXT_STEPS.map(([title, text], i) => (
+                <li key={title} className={STEP_STATES[i]}>
                   <i aria-hidden="true" />
-                  <b>{step.title}</b>
-                  <p>{step.text}</p>
+                  <b>{title}</b>
+                  <p>{text}</p>
                 </li>
               ))}
             </ol>
