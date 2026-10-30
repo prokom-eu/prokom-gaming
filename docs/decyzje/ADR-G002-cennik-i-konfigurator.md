@@ -103,5 +103,7 @@ Rabat kwotowy albo procentowy na **poziom albo opcję**, nigdy na sam zestaw (ob
 7. Żaden ciąg `internalModel` ani pola `cost`, `costAtPublish`, `components` nie występują w HTML ani w odpowiedziach publicznych (test e2e na stronie zestawu, konfiguratora i w API; porównujemy z listą `internalModel` z bazy — nie z listą marek, bo nazwy układów, np. „RTX 5070”, i producenci obudów są na stronie celowo). **Zakres listy (G0, 25.10.2026):** `internalModel` części poziomu mocy (`power-levels.components[]`: cpu, gpu, mobo, psu) oraz opcji `ram` i `ssd`. **Obudowy i chłodzenia są wyłączone** — pokazujemy je z pełną nazwą celowo (§1.3), a w 39 z 46 ich `internalModel` jest identyczny z `publicLabel`, więc test dawałby fałszywe alarmy. Pola `cost` i `costAtPublish` sprawdzamy dla wszystkich typów, także obudów i chłodzeń.
 8. `lib/pricing/cost.ts` nie trafia do paczki przeglądarki (`server-only`).
 
+**Uzupełnienie 31.10.2026 (G14) — metryka egzemplarza:** `/metryka/<kod>` pokazuje producenta, model i numer seryjny części **tego jednego egzemplarza** (spec. §13, plansza Metryka) — to jedyny wyjątek od „tylko klasa (`publicLabel`)”. Dane pochodzą z `units.parts[]` (wpisuje serwis), nie z `internalModel` oferty; metryka jest `noindex`, otwierana kodem z naklejki i tylko dla opublikowanych egzemplarzy. Test pkt 7 nie obejmuje `/metryka/*`. Koszty i marże nie trafiają tam nigdy.
+
 ## 9. Poza zakresem v1
 Automatyczny import z API hurtowni (v1: CSV) · raty i płatności online · zmiana procesora lub karty poza poziomami (poziomy pilnują sensu i zasilacza).

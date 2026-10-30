@@ -1,19 +1,29 @@
 # STAN — prokom-gaming
 
-Ostatnia aktualizacja: 30.10.2026 (sesja G13 — PR 2: gotowe od ręki i bon).
+Ostatnia aktualizacja: 31.10.2026 (sesja G14 — metryka, warsztat, konto, role).
 
 ## W toku
-- **G13 — PR 2: gotowe od ręki i bon (za flagami).** PR 1 (strony treści) scalony 30.10 (#29). Gałąź `feat/g13-gotowe-bon` od `develop`, jeden PR (decyzja Krystiana 30.10). Decyzje Krystiana (30.10): cena egzemplarza = cena konfiguracji z partii **minus rabat egzemplarza** (uzupełnienie ADR-G002 §7) ze strażnikiem marży; dane kontaktowe w **arkuszu na stronie** (nie przez 4 kroki G12).
+- **G14 — metryka, warsztat, konto, zgłoszenia + dopiski panelu.** G13 PR 2 scalony (#31/#33). Gałąź `feat/g14-metryka-konto` od `develop`, **jeden PR** (decyzja Krystiana 31.10), 3 commity: dane i dostęp → metryka → konto. Decyzje 31.10: PDF metryki = druk z przeglądarki; klient widzi zamówienia dopiero po weryfikacji e-maila; strony bez plansz z istniejących komponentów i tekstami `TODO(krystian)`. Szczegóły: ADR-G005 (uzupełnienie 31.10), ADR-G002 §8 (wyjątek metryki).
 - Zrobione:
-  - Flagi `FEATURE_READY` / `FEATURE_VOUCHER` (`lib/features.ts`, domyślnie wyłączone): strona 404, linki w stopce i menu znikają; CI e2e włącza obie; lokalnie konfiguracja `dev-gotowe-bon` w `.claude/launch.json`. **Zmiana względem planu:** zmienne środowiskowe zamiast pola w `site-settings` — layout nie czyta bazy; uzasadnienie w ADR-G005 (uzupełnienie 30.10).
-  - Kolekcje `stock` (zestaw + zmiany kodów, miejsce, stan, opis, rabat w pełnych zł, `reservedUntil`, tylko panel) i `vouchers` (kod `XXXX-XXXX` z `crypto`, statusy, tylko panel); pola `inquiries.voucher` i `inquiries.stock`; migracja `stock_vouchers` (down poprawiony jak w `faq`).
-  - Strażnik marży egzemplarza (`lib/pricing/stock.ts`, `collections/stockGuard.server.ts`): przy zapisie w panelu (zdjęcie ze strony i zwolnienie rezerwacji przechodzą zawsze) **i** przy każdym wyświetleniu oraz rezerwacji — egzemplarz łamiący marżę po nowej partii lub wzroście kosztów znika ze strony (log `stock unit hidden`).
-  - API: `voucher` (kwota z listy, wygląd) i `ready` (cena z serwera, rezerwacja 24 h jednym `UPDATE … RETURNING` przed zapisem, zwolnienie przy błędzie zapisu); maile z bonem/egzemplarzem i własnymi krokami „Co będzie dalej”.
-  - `/bon` (podgląd na żywo, kwota, wygląd, dla kogo, dedykacja, arkusz `QuickInquirySheet`), `/gotowe` (karty z `stockCards`, rezerwacja w arkuszu, „Powiadom mnie” → `/zapytanie`). Seed: 3 przykładowe egzemplarze z planszy (lokalnie i w CI, każde uruchomienie zwalnia rezerwacje).
-  - Testy: Vitest 537; e2e `sale-pages` (bon → rekord + maile, rezerwacja → rekord z ceną egzemplarza i zniknięcie z listy, wyścig dwóch rezerwacji → 201 + 400, strażnik blokuje za duży rabat, `/api/stock` 403), axe `/bon` i `/gotowe`, regresja `inquiry-api`, `inquiry-form`, `shell`, `content-pages`, `admin`, `offer-api`; `pnpm build` zielony; migracja up → down → up czysta.
-- `/przeglad` (recenzent): „poprawki wymagane” — poprawione: rezerwacja atomowa w SQL (+ test wyścigu), strażnik także przy wyświetlaniu i sprzedaży, strażnik nie blokuje zdjęcia egzemplarza, `stock` tylko panel, rabat w pełnych zł, CI kończy się błędem, gdy flag brak, `prefers-reduced-motion`, `TODO` (kod bonu w formularzu, retencja bonów, JSON-LD).
-- Niesprawdzone: Lighthouse mobile `/bon` i `/gotowe`, prawdziwy telefon.
-- **Następny krok:** PR 2 G13 → CI → squash → G14 (z dopiskami panelu; P0 zrobione 30.10, kolejność: `docs/zadania/prokomgaming-panel.md` §1).
+  - Role `admin`/`serwis` (`src/access/panel.ts`: `isAdmin`, `adminOnly`, `staffOnly`); wszystko z G3–G13 „tylko panel” = admin; `users` z jawnym dostępem; pierwsze konto = admin.
+  - Kolekcje `customers` (auth, weryfikacja, reset, REST create/update tylko admin), `orders` (`Z-RRRR-NNNN`, etapy z historią, pola P5), `units` (kod metryki z `crypto`), `tickets`; `fps-results.unit`; e-mail małymi literami w zapytaniach; migracja `g14_orders_units_customers` (up → down → up czysta).
+  - `GET /api/warsztat` + taśma na głównej z danymi i licznik „W warsztacie teraz”; seed: 5 zamówień, 2 egzemplarze (jeden opublikowany: `/metryka/WMPR-7KQ2-M9XA-B3CD`).
+  - `/metryka` (kod z naklejki) i `/metryka/[kod]` wg planszy, druk = metryka do pudełka; style papieru wspólne z główną (`components/paper.css`).
+  - `/konto` (komputery z osią etapów, gwarancje, zgłoszenia, zapisane konfiguracje, dane), `/konto/logowanie`, `rejestracja`, `haslo`, `weryfikacja`; `/api/konto/*`; „Zapisz na koncie” w konfiguratorze; „Załóż konto i śledź zamówienie” po wysłaniu zapytania.
+  - Testy: Vitest 584; e2e `workshop-access` (anonim, serwis, klient A ≠ B, niezweryfikowany, wymuszone `_verified`), `certificate`, `account` (rejestracja → Mailpit → weryfikacja → konto → zgłoszenie → reset hasła, 1440 i 414), axe metryki i konta; regresja `offer-api`, `admin`, `prices-*`, `home*`, `inquiry-*`, `configurator`.
+- Niesprawdzone: `/przeglad` (recenzent), pełne e2e i `pnpm build` (CI), Lighthouse `/metryka` i `/konto`, prawdziwy telefon.
+- **Następny krok:** `/przeglad` (dostęp, migracja, formularze) → poprawki → `/pr` → CI → squash → P1 (kolejność: `docs/zadania/prokomgaming-panel.md` §1).
+
+## Uwagi na później (G14)
+- **Treści do potwierdzenia (`TODO(krystian)`):** maile weryfikacji i resetu hasła, teksty stron logowania/rejestracji/hasła/weryfikacji i `/metryka` bez kodu, puste stany konta, zdania „Teraz: …” etapów poza testem (`CUSTOMER_STAGE_TEXT`), opisy etapów na taśmie `paid`/`shipped`, etykieta etapu `delivered` w panelu, klauzula zgody konta (`ACCOUNT_CONSENT_CLAUSE`, prawnik).
+- **Świadome odstępstwa od plansz:** bez wykresu temperatur na metryce (mamy maksima, nie przebieg); bez „Faktura” i „Ulubione zestawy” w koncie; bez linku „Tablica warsztatu” na taśmie (`/warsztat` poza 20.11); karta „Złożył i przetestował” tylko z imieniem (za zgodą), bez zdjęcia; kod QR na papierze metryki jest ikoną (prawdziwy QR drukuje serwis na naklejce); oś etapów: „jeszcze nie” `#8a8576` zamiast `#7f7c70` (kontrast).
+- **Migracja `g14_orders_units_customers` — `down` kasuje konta klientów, zamówienia, egzemplarze i zgłoszenia oraz role** (wszyscy wracają do „panel = wszystko”); e-maile zapytań zostają małymi literami. Przed `migrate:down` na serwerze kopia tabel.
+- **Usunięcie zestawu z egzemplarzami kończy się błędem bazy** (`units.build_id NOT NULL` + `set null`, jak w `stock`) — najpierw egzemplarz; tak samo zgłoszenie blokuje usunięcie egzemplarza.
+- **Ciasteczko logowania wspólne dla panelu i konta** (`payload-token`): zalogowanie się jako klient w tej samej przeglądarce wylogowuje z panelu i odwrotnie. Do zespołu: panel w innej przeglądarce/profilu.
+- **Payload 3.91:** pole tablicy bez dostępu wraca jako `[]` (jak `components` w G3) — dotyczy `orders.checklist` u klienta; `/api/access` pomija wartości `false`.
+- **P5:** widoki tablicy warsztatu na polach z G14; e-mail etapu do klienta; agregacja klienta po e-mailu (`lib/email.ts`).
+- **G15:** Lighthouse `/metryka/*` i `/konto`; `noindex` już jest; sitemap bez metryk i konta.
+- **G16:** po wdrożeniu sprawdzić maile weryfikacji i resetu z obrazu `standalone`; `SITE_URL` w linkach.
 
 ## Uwagi na później (G13)
 - **Treści do potwierdzenia (`TODO(krystian)`):** klauzula `CONTACT_CONSENT_CLAUSE` (prawnik, razem z polityką), komunikaty wysyłki kontaktu i „Wysyłam…”, tekst pustej listy poradników, komunikat stron prawnych przy awarii bazy, wiadomość „Wyślij go komuś”, telefon Gaming i godziny telefonu oraz sklepów [SZEF], lata salonu i serwisu kas w historii („O nas”), kwoty w poradniku „rodzice” (zdanie z „[konkretne kwoty…]” usunięte — wpisać w panelu po ustaleniu cennika).
@@ -195,4 +205,8 @@ G1 → G2 → G3 → G4 → G5 → G6 → G7 → G8 → G9 → (kontrola 8.11) �
 - Alarm marży (mail) wymieniający egzemplarze ukryte przez strażnika — dziś tylko wpis w logu.
 - Newsletter „Nowy poradnik co dwa tygodnie” (plansza Poradniki) — wymaga narzędzia mailingowego i zgody marketingowej (ADR).
 - Panel: własne widoki „Gotowe od ręki” (`stock`) i „Bony” (`vouchers`) — w v1 listy Payload (P0).
+- „Ulubione zestawy” w koncie (plansza Konto): serce na kartach zestawów + lista w koncie (pole `customers.favorites` już jest).
+- Wykres temperatur na metryce (przebieg z testu obciążeniowego) — wymaga zapisu krzywej z narzędzia testowego.
+- Prawdziwy kod QR na papierze metryki (dziś ikona) — biblioteka QR albo SVG generowany na serwerze.
+- Mail do właściciela adresu przy próbie rejestracji na istniejące konto (`TODO(krystian)` w `/api/konto/rejestracja`).
 - Pełna strona `/warsztat`, edycje limitowane, raty (po umowie z bankiem i ADR), import cen z API hurtowni (odrzucone 30.10.2026 — bez AB/Action, ADR-G007), Strefa Klienta w Django (2027).
