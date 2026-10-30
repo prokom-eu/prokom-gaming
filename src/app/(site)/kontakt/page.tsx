@@ -134,7 +134,8 @@ export default async function ContactPage() {
                   href={store.maps}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label={`Otwórz mapę: ${store.address}`}
+                  // Visible text of the map first (WCAG 2.5.3 Label in Name).
+                  aria-label={`${store.pin}: otwórz mapę, ${store.address}`}
                 >
                   <StoreMap id={`ct-map-${store.key}`} label={store.pin} />
                 </a>
