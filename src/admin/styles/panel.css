@@ -1932,6 +1932,63 @@
 .pn-kv__note--bad {
   color: var(--p-bad);
 }
+/* Settings → Powiadomienia na telefon (P4). */
+.pn-push__note {
+  margin: 0 0 12px;
+  color: var(--p-tx2);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.pn-push__on {
+  margin-bottom: 12px;
+}
+.pn-push__list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.pn-push__dev {
+  padding: 12px 14px;
+  border: 1px solid var(--p-ln);
+  border-radius: 12px;
+}
+.pn-push__hd {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.pn-push__hd b {
+  display: block;
+  font-weight: 700;
+}
+.pn-push__hd b small {
+  color: var(--p-ok);
+  font-weight: 400;
+}
+.pn-push__hd > div > small {
+  color: var(--p-mu);
+  font-size: 12px;
+}
+.pn-push__hd .pn-push__bad {
+  color: var(--p-bad);
+}
+.pn-push__acts {
+  display: flex;
+  gap: 8px;
+}
+.pn-push__kinds {
+  margin: 8px 0 0;
+  padding: 0;
+  border: 0;
+}
+.pn-push__kinds .pn-togrow:last-child {
+  border-bottom: 0;
+}
 .pn-ibc__hint {
   margin: 0;
   color: var(--p-tx2);

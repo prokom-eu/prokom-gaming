@@ -1,12 +1,23 @@
 # STAN — prokom-gaming
 
-Ostatnia aktualizacja: 31.10.2026 (P4 PR 1 — odbiór poczty IMAP, PR do `develop`).
+Ostatnia aktualizacja: 31.10.2026 (P4 PR 2 — push i `lib/notify`, PR do `develop`; PR 1 scalony #43).
 
 ## W toku
-- **Gałąź:** `feat/p4-odbior-poczty` (P4 PR 1 — odbiór odpowiedzi klientów przez IMAP). PR 2 (`feat/p4-push`) po scaleniu.
-- **Zrobione w PR 1:** `imapflow` 2.5.2 + `mailparser` 3.9.40 (+ `nodemailer` 10.1.2 wprost, pod `MailComposer` kopii w „Wysłane”); `src/lib/mail/` — parsowanie (tylko tekst, cytat obcięty, załączniki: nazwa i rozmiar, pomijane własne i autorespondery), dopasowanie (numer → In-Reply-To/References → „Nieprzypisane”, „inny nadawca”), przebieg na interfejsie skrzynki (UID + UIDVALIDITY, INBOX tylko do odczytu, alarm e-mail przy 3 błędach z rzędu), kopia odpowiedzi w „Wysłane” (APPEND, `after()`); zadanie `mail-intake` co 2 min; kolekcja `mail-intake-unmatched` (retencja 90 dni w `inquiry-retention`), global `mail-intake-state`, `inquiry-messages.otherSender`, migracja `p4_mail_intake`; env `IMAP_*` (brak = odbiór wyłączony); panel: filtr „Nieprzypisane” (przypnij po numerze / odrzuć), znacznik „nowa wiadomość”, zerowanie przy otwarciu wątku, wiersz „Odpowiedzi klientów” w Ustawieniach. Testy: 7 plików `.eml`, atrapa skrzynki, e2e 1440 + 414.
-- **Niedokończone:** prawdziwy test odbioru na skrzynce testowej (Mailpit nie ma IMAP — przed G16, ADR-G008 pkt 8); prawdziwy telefon i Lighthouse (z P3).
-- **Następny krok:** po scaleniu PR 1 — `/zadanie P4` PR 2: `web-push` 3.6.7, VAPID w env, `push-subscriptions`, service worker `/admin/sw.js`, `lib/notify` + zadanie `notify-send`, przepięcie alarmów SLA, marży i `mail_error` (dziś e-mail wprost w `runMailIntake`) na `notify()`, `inquiry_new` i `inquiry_reply`, Ustawienia → Powiadomienia.
+- **Gałąź:** `feat/p4-push` (P4 PR 2 — powiadomienia push). PR 1 (odbiór IMAP) scalony 31.10 (#43).
+- **Zrobione w PR 2:** `web-push` 3.6.7; env `VAPID_*` (brak = push wyłączony, e-maile działają; w CI jednorazowa para na przebieg); `src/lib/notify/` — tabela zdarzeń (spec. §14), treść bez danych osobowych („Nowe zapytanie PKG-… · Wampir”), wybór urządzeń wg rodzajów i roli, `notify()` → zadanie `notify-send` (najpierw e-mail z ponowieniem, potem push; 404/410 usuwa urządzenie, 5 błędów wyłącza); kolekcja `push-subscriptions` (endpoint i klucze bez odczytu przez API), migracja `p4_push`; service worker `/admin/sw.js` (tylko push i otwarcie ekranu, bez cache); przepięte: alarm SLA, alarm marży, `mail_error`; nowe `inquiry_new` (z formularza, w `after()`, od razu) i `inquiry_reply` (z odbioru poczty); Ustawienia → „Powiadomienia na telefon” (włącz, rodzaje, próbne, usuń, instrukcja iPhone). Testy: Vitest (treść, odbiorcy, atrapa web-push, env), e2e z atrapą `pushManager` 1440 + 414.
+- **Niedokończone:** prawdziwy push na Androidzie i iPhonie (z ekranu głównego) — ręcznie, przed G16; prawdziwy test odbioru IMAP na skrzynce testowej; prawdziwy telefon i Lighthouse (P3).
+- **Następny krok:** po scaleniu PR 2 — `/zadanie P2` (Pulpit „Dziś”); przed nim ręczny test push na telefonie z kluczami VAPID w `.env` (`pnpm dlx web-push@3.6.7 generate-vapid-keys`).
+
+## Uwagi na później (P4 PR 2)
+- **Kiedy wychodzi powiadomienie:** `notify()` kolejkuje `notify-send`; od razu (`runNow`) tylko nowe zapytanie (w `after()` formularza), alarm marży (po imporcie CSV — ADR-G002 §4.4) i „Wyślij próbne”. SLA, `inquiry_reply` i `mail_error` bierze cron zadań w ciągu minuty.
+- **Alarm marży** zwraca `alarmed: true` po zakolejkowaniu; błąd SMTP ponawia już zadanie `notify-send` (2 razy), nie `margin-alarm`. Bez `ALERT_EMAIL` i bez VAPID alarm tylko loguje ostrzeżenie.
+- **Alarm SLA** bez `ALERT_EMAIL` nie jest już pomijany: zapytanie dostaje `slaAlertedAt`, a push idzie, jeśli jest VAPID.
+- **„Wyślij próbne”** ocenia wynik po stanie urządzenia (`lastOkAt` / usunięte / `failCount`) — zadanie po zakończeniu jest kasowane (`deleteJobOnComplete`).
+- **Endpoint urządzenia** trafia tylko do HTML Ustawień właściciela (oznaczenie „to urządzenie”); REST kolekcji nie zwraca endpointu ani kluczy.
+- **Kanały osobno:** `notify()` kolejkuje osobny job `notify-send` na e-mail i na push (przegląd P4) — leżący SMTP nie blokuje pusha, ponowienie e-maila nie dubluje pusha. Usunięcie konta panelu kasuje jego urządzenia (hak w `users`).
+- **Do rozważenia (przegląd P4):** `runByID` w Payload 3.91 nie sprawdza `processing` — cron może w tej samej chwili wziąć job z `runNow` (rzadkie; podwójny push się nadpisuje tagiem, e-mail alarmu przyszedłby dwa razy); endpoint urządzenia bez listy dozwolonych hostów usług push (POST pod adres podany przez admina — tylko admin); treść maila alarmu marży (koszty, marże) leży w `payload_jobs.input` jobu, który wyczerpał ponowienia (API go nie zwraca).
+- **Teksty spoza planszy (`TODO(krystian)`):** treści powiadomień, etykiety rodzajów, cała sekcja „Powiadomienia na telefon” (brak planszy, spec. §13).
+- **G16:** `VAPID_PUBLIC_KEY/PRIVATE_KEY/SUBJECT` w `compose.*.yml` — osobna para dla stagingu i produkcji (zmiana pary unieważnia wszystkie subskrypcje); Nginx nie może cache'ować `/admin/sw.js`.
 
 ## Uwagi na później (P4 PR 1)
 - **Blokada nakładania przebiegów** = domyślne `defaultBeforeSchedule` Payload 3.91 (nie kolejkuje, gdy poprzedni czeka albo trwa) — bez `enableConcurrencyControl` i migracji tabeli zadań. Restart kontenera w trakcie przebiegu zostawia zadanie `processing` na zawsze i odbiór staje bez błędu (dotyczy też `inquiry-sla`): Ustawienia pokazują wtedy na czerwono „brak odczytu od ponad 10 min”. Do G16: sprzątanie zablokowanych zadań przy starcie (przegląd P4).
@@ -174,7 +185,7 @@ Ostatnia aktualizacja: 31.10.2026 (P4 PR 1 — odbiór poczty IMAP, PR do `devel
 - 25.10.2026 — pakiet startowy (pierwszy commit, podpisany): CLAUDE.md, specyfikacja `docs/strony/prokomgaming.md`, ADR-G001…G005, plan G0–G16, wzorzec wyglądu v36 (`docs/design/prokomgaming/`), seed (`seed/prokomgaming/`), oczekiwane wyniki testów cen (`tests/fixtures/pricing-expected.json`).
 
 ## Następne kroki
-G1 → G2 → G3 → G4 → G5 → G6 → G7 → G8 → G9 → (kontrola 8.11) → G10 → G11 → G12 → (kontrola 13.11) → G13 → ~~G14~~ (zrobione 31.10) → ~~P1~~ → ~~P3~~ (zrobione 31.10) → **P4 → P2** → G15 (+ Umami) → G16 (produkcja 20.11) → **P6 → P7 → P5 → P8**. Panel: `docs/zadania/prokomgaming-panel.md` (P0 zrobione 30.10 — spec. v1.1).
+G1 → G2 → G3 → G4 → G5 → G6 → G7 → G8 → G9 → (kontrola 8.11) → G10 → G11 → G12 → (kontrola 13.11) → G13 → ~~G14~~ (zrobione 31.10) → ~~P1~~ → ~~P3~~ → ~~P4~~ (31.10; push w PR 2) → **P2** → G15 (+ Umami) → G16 (produkcja 20.11) → **P6 → P7 → P5 → P8**. Panel: `docs/zadania/prokomgaming-panel.md` (P0 zrobione 30.10 — spec. v1.1).
 
 ## Decyzje (skrót)
 - Osobne repo, ten sam stos i wersje co `prokom-web` (ADR-G001), porty 3100 / 54321 / 1026 / 8026.
