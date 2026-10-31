@@ -139,7 +139,7 @@ export async function importCosts(raw: unknown): Promise<CostImportResult> {
     const written = await applyCostImport(payload, preview.changes, user)
     log.info({ ...written, rows: preview.changes.length, userId: user.id }, 'costs imported')
     revalidatePath('/admin/ceny')
-    // Margin alarm (and autoPublish) right away, not at the next cron tick: the person who
+    // Margin alarm right away, not at the next cron tick: the person who
     // imported is looking at the screen. A failed check never undoes the saved costs.
     let check: MarginCheck
     try {

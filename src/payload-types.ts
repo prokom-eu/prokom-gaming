@@ -1801,6 +1801,7 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
 export interface PricingSetting {
   id: number;
   minMargin: number;
+  warnMargin: number;
   publishThreshold: number;
   autoPublish?: boolean | null;
   serviceCost: number;
@@ -2003,6 +2004,7 @@ export interface PayloadJobsStat {
  */
 export interface PricingSettingsSelect<T extends boolean = true> {
   minMargin?: T;
+  warnMargin?: T;
   publishThreshold?: T;
   autoPublish?: T;
   serviceCost?: T;
@@ -2137,7 +2139,6 @@ export interface TaskMarginAlarm {
     reason: string;
   };
   output: {
-    published?: number | null;
     alarmed: boolean;
     levels:
       | {

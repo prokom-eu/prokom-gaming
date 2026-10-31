@@ -75,6 +75,12 @@ export default buildConfig({
           exact: true,
           meta: { title: 'Ceny' },
         },
+        settings: {
+          Component: '/admin/settings/SettingsView#SettingsView',
+          path: '/ustawienia',
+          exact: true,
+          meta: { title: 'Ustawienia' },
+        },
         data: {
           Component: '/admin/shell/DataView#DataView',
           path: '/dane',

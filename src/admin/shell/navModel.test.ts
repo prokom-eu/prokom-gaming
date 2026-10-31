@@ -39,6 +39,11 @@ describe('panel navigation', () => {
     ])
   })
 
+  it('shows the settings to the admin only (P1 PR 2)', () => {
+    expect(navMore('admin').map((i) => i.key)).toContain('settings')
+    expect(navMore('serwis').map((i) => i.key)).not.toContain('settings')
+  })
+
   it('points "Zatwierdź" at the G4 prices screen until P6', () => {
     expect(navTabs('admin').find((i) => i.key === 'approve')?.path).toBe('/ceny')
   })

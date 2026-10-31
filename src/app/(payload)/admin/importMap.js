@@ -24,6 +24,7 @@ import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0
 import { TableFeatureClient as TableFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { PanelNavLinks as PanelNavLinks_1dd5ad7d4298b584766e3b4523aa86a2 } from '../../../admin/shell/PanelNavLinks'
 import { PricesView as PricesView_e5c8601078d4f9f1e1b644aae45338b4 } from '../../../admin/prices/PricesView'
+import { SettingsView as SettingsView_6e97004d35601209e35838a90c0fbc84 } from '../../../admin/settings/SettingsView'
 import { DataView as DataView_ba5c2e5f2f9a3e4ab57326938558337a } from '../../../admin/shell/DataView'
 import { PanelPreviewView as PanelPreviewView_d36a78726155b3387125fe3e0b739977 } from '../../../admin/preview/PanelPreviewView'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
@@ -56,6 +57,7 @@ export const importMap = {
   "@payloadcms/richtext-lexical/client#TableFeatureClient": TableFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "/admin/shell/PanelNavLinks#PanelNavLinks": PanelNavLinks_1dd5ad7d4298b584766e3b4523aa86a2,
   "/admin/prices/PricesView#PricesView": PricesView_e5c8601078d4f9f1e1b644aae45338b4,
+  "/admin/settings/SettingsView#SettingsView": SettingsView_6e97004d35601209e35838a90c0fbc84,
   "/admin/shell/DataView#DataView": DataView_ba5c2e5f2f9a3e4ab57326938558337a,
   "/admin/preview/PanelPreviewView#PanelPreviewView": PanelPreviewView_d36a78726155b3387125fe3e0b739977,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1

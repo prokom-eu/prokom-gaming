@@ -3,8 +3,9 @@ import type { APIRequestContext, Page } from '@playwright/test'
 
 /**
  * Cost import and margin alarm (ADR-G002 §4.1–§4.4) on the real database and the real Mailpit:
- * a bad row blocks saving, a cost that breaks the margin sends the alarm (prices stay), and with
- * `autoPublish` an import publishes itself. Every test puts the seed costs and prices back.
+ * a bad row blocks saving, a cost that breaks the margin sends the alarm (prices stay), and an
+ * import never publishes by itself — `autoPublish` is gone (P1, panel spec §0 pt 3). Every test
+ * puts the seed costs and prices back.
  */
 
 // Writes to the database: once, in the desktop project.
@@ -74,14 +75,6 @@ async function save(page: Page, outcome: RegExp) {
   await page.waitForLoadState('networkidle')
 }
 
-async function setAutoPublish(value: boolean) {
-  const response = await panel.post('/api/globals/pricing-settings', {
-    headers,
-    data: { autoPublish: value },
-  })
-  expect(response.status()).toBe(200)
-}
-
 test.beforeAll(async ({ playwright, baseURL }) => {
   // Panel account in its own context: its cookie must not reach the anonymous `request` fixture.
   panel = await playwright.request.newContext({ baseURL })
@@ -93,13 +86,12 @@ test.beforeAll(async ({ playwright, baseURL }) => {
 })
 
 test.afterAll(async () => {
-  // Seed costs back, autoPublish off — whatever happened above.
+  // Seed costs back — whatever happened above.
   await panel.patch(`/api/power-levels/${p13.id}`, {
     headers,
     data: { components: p13.components },
   })
   await panel.patch(`/api/options/${r16.id}`, { headers, data: { cost: r16.cost } })
-  await setAutoPublish(false)
   await panel.dispose()
 })
 
@@ -161,7 +153,7 @@ test('a cost that breaks the margin sends the alarm; prices on the site stay', a
   expect((await newestBatch(request))[0]!.batch).toBe(before[0]!.batch)
 })
 
-test('with autoPublish on, an import publishes itself when the guard allows it', async ({
+test('autoPublish cannot be switched on and an import never publishes by itself', async ({
   page,
   request,
 }) => {
@@ -169,27 +161,26 @@ test('with autoPublish on, an import publishes itself when the guard allows it',
     headers,
     data: { components: p13.components },
   })
+  // The field is read-only for everyone: the API ignores the value.
+  const tried = await panel.post('/api/globals/pricing-settings', {
+    headers,
+    data: { autoPublish: true },
+  })
+  expect(tried.status()).toBe(200)
+  const settings = (await (
+    await panel.get('/api/globals/pricing-settings', { headers })
+  ).json()) as { autoPublish?: boolean | null }
+  expect(settings.autoPublish).not.toBe(true)
+
   const before = await newestBatch(request)
-  const r16Price = before.find((p) => p.itemType === 'option' && p.itemCode === 'R16')!.sellPrice
-  await setAutoPublish(true)
-
   await logIn(page)
-  // RAM 16 GB +10%: above the 3% threshold; its new price keeps every margin, so it publishes.
-  const dearer = Math.round(r16.cost * 1.1)
-  await importCsv(page, `R16;${dearer}`)
+  // RAM 16 GB +10%: above the 3% threshold and within every margin — before P1 this published.
+  await importCsv(page, `R16;${Math.round(r16.cost * 1.1)}`)
   await save(page, /Zapisano koszty: 1 opcji, 0 poziomów mocy/)
+  expect((await newestBatch(request))[0]!.batch).toBe(before[0]!.batch)
+  // The new price waits in the queue for approval instead.
+  await expect(page.locator('section[aria-labelledby="queue"]')).toContainText('R16')
 
-  const after = await newestBatch(request)
-  expect(after[0]!.batch).toBe(before[0]!.batch + 1)
-  expect(
-    after.find((p) => p.itemType === 'option' && p.itemCode === 'R16')!.sellPrice,
-  ).toBeGreaterThan(r16Price)
-
-  // Back: the seed cost, published automatically too → seed prices again.
   await importCsv(page, `R16;${r16.cost}`)
   await save(page, /Zapisano koszty: 1 opcji/)
-  const restored = await newestBatch(request)
-  expect(restored.find((p) => p.itemType === 'option' && p.itemCode === 'R16')!.sellPrice).toBe(
-    r16Price,
-  )
 })

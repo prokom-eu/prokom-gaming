@@ -12,6 +12,7 @@ import * as migration_20261030_201740_legal_globals from './20261030_201740_lega
 import * as migration_20261030_202851_guides from './20261030_202851_guides'
 import * as migration_20261030_212115_stock_vouchers from './20261030_212115_stock_vouchers'
 import * as migration_20261030_231049_g14_orders_units_customers from './20261030_231049_g14_orders_units_customers'
+import * as migration_20261031_180205_p1_warn_margin from './20261031_180205_p1_warn_margin'
 
 export const migrations = [
   {
@@ -83,5 +84,10 @@ export const migrations = [
     up: migration_20261030_231049_g14_orders_units_customers.up,
     down: migration_20261030_231049_g14_orders_units_customers.down,
     name: '20261030_231049_g14_orders_units_customers',
+  },
+  {
+    up: migration_20261031_180205_p1_warn_margin.up,
+    down: migration_20261031_180205_p1_warn_margin.down,
+    name: '20261031_180205_p1_warn_margin',
   },
 ]
