@@ -1,5 +1,6 @@
 import type { AdminViewServerProps, Payload } from 'payload'
 
+import { getEnv } from '../../lib/env'
 import { zl } from '../../lib/pricing/format'
 import { loadBatch } from '../../lib/pricing/store'
 import { panelAccess } from '../access'
@@ -9,15 +10,17 @@ import { PanelDenied } from '../ui/PanelDenied'
 import { PanelPage } from '../ui/PanelPage'
 import { PanelShell } from '../ui/PanelShell'
 import { percentText, toFormValues, type FieldName } from './form'
+import { MailSettingsForm } from './MailSettingsForm'
+import { toMailFormValues } from './mailForm'
 import { SettingsForm } from './SettingsForm'
 
 const TITLE = 'Ustawienia'
 
 /**
  * /admin/ustawienia (panel spec §13, board Ustawienia). Admin only — `serwis` gets "403"
- * (spec §15). P1 builds the skeleton with the section "Marża i narzuty" (`pricing-settings`);
- * the other sections come with their sessions (P3 mail, P4 notifications, P5 orders, P7 price
- * check, P8 statistics).
+ * (spec §15). Sections: "Marża i narzuty" (`pricing-settings`, P1), "Zapytania i poczta"
+ * (`mail-settings`, P3); the others come with their sessions (P4 notifications, P5 orders,
+ * P7 price check, P8 statistics).
  */
 export async function SettingsView({ initPageResult }: AdminViewServerProps) {
   const { req } = initPageResult
@@ -35,9 +38,10 @@ export async function SettingsView({ initPageResult }: AdminViewServerProps) {
   }
 
   const { payload } = req
-  const [settings, hints] = await Promise.all([
+  const [settings, hints, mail] = await Promise.all([
     payload.findGlobal({ slug: 'pricing-settings', depth: 0, overrideAccess: true }),
     loadHints(payload),
+    payload.findGlobal({ slug: 'mail-settings', depth: 0, overrideAccess: true }),
   ])
   const values = toFormValues({
     minMargin: settings.minMargin,
@@ -72,6 +76,31 @@ export async function SettingsView({ initPageResult }: AdminViewServerProps) {
       <div className="pn-settings">
         <Card title="Marża i narzuty" className="pn-card--section">
           <SettingsForm values={values} hints={hints} />
+        </Card>
+        <Card title="Zapytania i poczta" className="pn-card--section">
+          {/* The mailbox is the sender from env (decision 31.10: one Gaming mailbox for all
+              mail). Customers' answers by IMAP come in P4 — that row of the board waits. */}
+          <dl className="pn-kv">
+            <dt>Skrzynka</dt>
+            <dd>{getEnv().MAIL_FROM_ADDRESS}</dd>
+            <dt>Wysyłka</dt>
+            <dd>SMTP skrzynki (Seohost)</dd>
+          </dl>
+          <div className="pn-manual">
+            <Icon name="check" size={20} />
+            <div>
+              <b>Automatyczne potwierdzenie z numerem</b>
+              <small>klient od razu dostaje numer i swoją konfigurację</small>
+            </div>
+          </div>
+          <MailSettingsForm
+            values={toMailFormValues({
+              replyHours: mail.replyHours,
+              replySlaMinutes: mail.replySlaMinutes,
+              replyAlarmMinutes: mail.replyAlarmMinutes,
+              signature: mail.signature,
+            })}
+          />
         </Card>
       </div>
     </PanelShell>

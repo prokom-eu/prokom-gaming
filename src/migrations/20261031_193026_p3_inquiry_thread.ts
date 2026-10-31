@@ -39,8 +39,8 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"reply_hours_to" numeric DEFAULT 22 NOT NULL,
   	"reply_sla_minutes" numeric DEFAULT 60 NOT NULL,
   	"reply_alarm_minutes" numeric DEFAULT 45 NOT NULL,
-  	"signature" varchar DEFAULT 'Pozdrawiam,
-  Krystian · PRO-KOM Gaming' NOT NULL,
+  	"signature" varchar DEFAULT 'Krystian · PRO-KOM Gaming
+Rabka-Zdrój, ul. Orkana 16B · +48 18 267 65 11' NOT NULL,
   	"updated_at" timestamp(3) with time zone,
   	"created_at" timestamp(3) with time zone
   );

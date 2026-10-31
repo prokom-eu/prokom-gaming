@@ -8297,7 +8297,7 @@
           "type": "varchar",
           "primaryKey": false,
           "notNull": true,
-          "default": "'Pozdrawiam,\nKrystian · PRO-KOM Gaming'"
+          "default": "'Krystian · PRO-KOM Gaming\nRabka-Zdrój, ul. Orkana 16B · +48 18 267 65 11'"
         },
         "updated_at": {
           "name": "updated_at",

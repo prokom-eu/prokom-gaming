@@ -21,6 +21,8 @@ import { assertSeedAllowed, parseSeedEnv } from './config'
 import { legalFeatures } from '../globals/Legal'
 import { mapBuildFaq, mapFaq } from './faq'
 import { guideSeeds } from './guides'
+import mailSettingsSeed from '../../seed/prokomgaming/mail-settings.json'
+import replyTemplatesSeed from '../../seed/prokomgaming/reply-templates.json'
 import stockSeed from '../../seed/prokomgaming/stock.json'
 import workshopSeed from '../../seed/prokomgaming/workshop.json'
 import type { OrderStage } from '../lib/orders'
@@ -492,6 +494,29 @@ async function seedWorkshop(payload: Payload): Promise<void> {
   )
 }
 
+/**
+ * Reply templates of the inquiry inbox (P3): 4 from the Zapytania board 1:1 and the stage e-mail
+ * (panel spec §4), upserted by name; mail settings overwritten like `site-settings` (local only).
+ */
+async function seedMail(payload: Payload): Promise<void> {
+  for (const { name, kind, order, body } of replyTemplatesSeed.templates) {
+    const data = { name, kind: kind as 'reply' | 'offer' | 'stage', order, body, active: true }
+    const id = await findIdBy(payload, 'reply-templates', 'name', name)
+    if (id !== undefined)
+      await payload.update({ collection: 'reply-templates', id, data, ...asSeed })
+    else await payload.create({ collection: 'reply-templates', data, ...asSeed })
+  }
+  const { replyHours, replySlaMinutes, replyAlarmMinutes, signature } = mailSettingsSeed
+  await payload.updateGlobal({
+    slug: 'mail-settings',
+    data: { replyHours, replySlaMinutes, replyAlarmMinutes, signature },
+    ...asSeed,
+  })
+  payload.logger.info(
+    `Seed: ${replyTemplatesSeed.templates.length} reply templates, mail settings.`,
+  )
+}
+
 const payload = await getPayload({ config })
 
 try {
@@ -505,6 +530,7 @@ try {
   await seedGuides(payload)
   await seedStock(payload)
   await seedWorkshop(payload)
+  await seedMail(payload)
 } finally {
   await payload.destroy()
 }

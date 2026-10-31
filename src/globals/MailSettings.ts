@@ -74,7 +74,8 @@ export const MailSettings: GlobalConfig = {
       type: 'textarea',
       required: true,
       maxLength: 500,
-      defaultValue: 'Pozdrawiam,\nKrystian · PRO-KOM Gaming',
+      // Board Ustawienia, field „Podpis”, 1:1.
+      defaultValue: 'Krystian · PRO-KOM Gaming\nRabka-Zdrój, ul. Orkana 16B · +48 18 267 65 11',
     },
   ],
 }
