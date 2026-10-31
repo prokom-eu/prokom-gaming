@@ -231,3 +231,33 @@ test('an account that has not verified its e-mail cannot sign in', async ({
   expect(response.status()).not.toBe(200)
   await context.dispose()
 })
+
+test('the certificate code is set by the system only', async () => {
+  const build = await anyBuildId()
+  const unit = await create('units', { build, code: 'AAAA-AAAA-AAAA-AAAA', number: 99 })
+  expect(unit.code).not.toBe('AAAA-AAAA-AAAA-AAAA')
+  expect(String(unit.code)).toMatch(/^[2-9A-HJKMNP-Z]{4}(-[2-9A-HJKMNP-Z]{4}){3}$/)
+  expect(unit.number).not.toBe(99)
+})
+
+test('a build with units and a unit with tickets cannot be deleted (clear message)', async () => {
+  // A throwaway build would need a full recipe; the seed build with its seed unit is enough.
+  const builds = (await (
+    await admin.get('/api/builds?where[slug][equals]=wampir&depth=0')
+  ).json()) as List
+  const build = builds.docs[0]!.id
+  const refused = await admin.delete(`/api/builds/${build}`, { headers: adminHeaders })
+  expect(refused.status()).toBe(400)
+  expect(await refused.text()).toContain('egzemplarze tego zestawu')
+
+  const unit = await create('units', { build })
+  await create('tickets', {
+    unit: unit.id,
+    category: 'other',
+    description: 'x',
+    email: mail('del'),
+  })
+  const blocked = await admin.delete(`/api/units/${unit.id}`, { headers: adminHeaders })
+  expect(blocked.status()).toBe(400)
+  expect(await blocked.text()).toContain('zgłoszenia tego egzemplarza')
+})

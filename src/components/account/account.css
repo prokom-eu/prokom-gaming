@@ -48,7 +48,7 @@
 .kt-menu button:hover {
   color: var(--kosc);
 }
-.kt-menu a[aria-current='true'] {
+.kt-menu a:first-child {
   background: var(--kt-menu-on);
   color: var(--mt-tl-now);
   box-shadow: inset 3px 0 0 var(--grom);
@@ -247,8 +247,7 @@
 .kt-saved__item img {
   flex: none;
   width: 52px;
-  height: 64px;
-  object-fit: contain;
+  height: auto;
 }
 .kt-saved__item > span {
   flex: 1;

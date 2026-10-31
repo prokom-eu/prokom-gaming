@@ -2,7 +2,7 @@ import { DefaultTemplate } from '@payloadcms/next/templates'
 import { Banner, Gutter } from '@payloadcms/ui'
 import type { AdminViewServerProps, Payload } from 'payload'
 
-import { isAdmin } from '../../access/panel'
+import { isAdmin, isPanelUser } from '../../access/panel'
 import { CatalogError } from '../../lib/pricing/catalog'
 import { buildQueue, buildsOverview, problemMessage } from '../../lib/pricing/publish'
 import { loadBatch, loadOffer, type BatchInfo } from '../../lib/pricing/store'
@@ -33,9 +33,14 @@ export async function PricesView({ initPageResult, params, searchParams }: Admin
     return (
       <Gutter className={styles.page}>
         <h1>Ceny — publikacja i marże</h1>
-        <p>
-          Ten ekran jest tylko dla pracowników PRO-KOM. <a href={login}>Zaloguj się do panelu</a>.
-        </p>
+        {isPanelUser(req) ? (
+          // Signed in with the `serwis` role: prices and margins are admin-only (panel spec §15).
+          <p>Ten ekran jest tylko dla administratora. Twoje konto ma rolę „Serwis”.</p>
+        ) : (
+          <p>
+            Ten ekran jest tylko dla pracowników PRO-KOM. <a href={login}>Zaloguj się do panelu</a>.
+          </p>
+        )}
       </Gutter>
     )
   }

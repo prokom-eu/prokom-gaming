@@ -48,12 +48,17 @@ export async function DELETE(request: Request) {
   const rows = (customer.savedConfigs ?? []) as Row[]
   const kept = rows.filter((r) => r.id !== id)
   if (!id || kept.length === rows.length) return json({ error: 'not_found' }, 404)
-  await payload.update({
-    collection: 'customers',
-    id: customer.id,
-    data: { savedConfigs: kept },
-    overrideAccess: true,
-    depth: 0,
-  })
-  return json({ ok: true }, 200)
+  try {
+    await payload.update({
+      collection: 'customers',
+      id: customer.id,
+      data: { savedConfigs: kept },
+      overrideAccess: true,
+      depth: 0,
+    })
+    return json({ ok: true }, 200)
+  } catch (error) {
+    log.error({ ...errorFields(error) }, 'saved configuration delete failed')
+    return json({ error: 'unavailable' }, 503)
+  }
 }

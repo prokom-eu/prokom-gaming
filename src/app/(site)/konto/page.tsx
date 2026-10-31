@@ -45,7 +45,7 @@ export default async function AccountPage() {
         <aside className="kt-menu" aria-label="Konto">
           <p className="kt-menu__who">Zalogowano jako {account.email}</p>
           <nav>
-            <a href="#komputery" aria-current="true">
+            <a href="#komputery">
               Moje komputery<em>{account.computers.length}</em>
             </a>
             <a href="#zgloszenia">
@@ -122,7 +122,7 @@ export default async function AccountPage() {
               <div className="kt-saved">
                 {account.configs.map((c) => (
                   <div className="kt-saved__item" key={c.id}>
-                    {c.photo && <Image src={c.photo.src} alt="" width={52} height={64} />}
+                    {c.photo && <Image src={c.photo.src} alt="" width={52} height={59} />}
                     <span>
                       <b>{c.label}</b>
                       <small>{c.details}</small>
@@ -213,8 +213,8 @@ function Warranties({ computers }: { computers: readonly AccountComputer[] }) {
               <dl>
                 {unit.parts
                   .filter((p) => p.warrantyUntil)
-                  .map((p) => (
-                    <div key={p.label}>
+                  .map((p, i) => (
+                    <div key={`${i}-${p.label}`}>
                       <dt>{p.label}</dt>
                       <dd>
                         producent do {p.warrantyUntil}

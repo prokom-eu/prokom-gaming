@@ -488,23 +488,33 @@ export function ProfileForm({ name, phone }: { name: string; phone: string }) {
   )
 }
 
-/** Removes one saved configuration. */
+/** Removes one saved configuration; says so when it did not work. */
 export function DeleteSavedButton({ id, label }: { id: string; label: string }) {
   const router = useRouter()
+  const [failed, setFailed] = useState(false)
   return (
-    <button
-      type="button"
-      className="kt-saved__del"
-      aria-label={`Usuń konfigurację ${label}`}
-      onClick={async () => {
-        await fetch(`/api/konto/konfiguracje?id=${encodeURIComponent(id)}`, {
-          method: 'DELETE',
-          credentials: 'same-origin',
-        }).catch(() => undefined)
-        router.refresh()
-      }}
-    >
-      Usuń
-    </button>
+    <>
+      <button
+        type="button"
+        className="kt-saved__del"
+        aria-label={`Usuń konfigurację ${label}`}
+        onClick={async () => {
+          setFailed(false)
+          const response = await fetch(`/api/konto/konfiguracje?id=${encodeURIComponent(id)}`, {
+            method: 'DELETE',
+            credentials: 'same-origin',
+          }).catch(() => null)
+          if (response?.ok) router.refresh()
+          else setFailed(true)
+        }}
+      >
+        Usuń
+      </button>
+      {failed && (
+        <span className="iq-err" role="alert">
+          Nie udało się usunąć.
+        </span>
+      )}
+    </>
   )
 }

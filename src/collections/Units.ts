@@ -3,6 +3,7 @@ import type { CollectionBeforeChangeHook, CollectionConfig } from 'payload'
 import { staffField, staffOrOwnRecords } from '../access/customer'
 import { adminOnly, staffOnly } from '../access/panel'
 import { generateUnitCode } from '../lib/units'
+import { blockDeleteWhenReferenced } from './workshopGuards'
 import { GROUP_WORKSHOP, normalizeEmailHook, RESOLUTIONS } from './shared'
 
 /** Parts on the certificate (board Metryka, „Części i gwarancje”). */
@@ -42,7 +43,12 @@ const assignCodeAndNumber: CollectionBeforeChangeHook = async ({ data, operation
   return next
 }
 
-const locked = { access: { update: () => false }, admin: { readOnly: true } } as const
+// Set only by the system (hook below): a code outside the pattern would make the certificate
+// unreachable. Field access drops a value sent through the API; the collection hook runs after.
+const locked = {
+  access: { create: () => false, update: () => false },
+  admin: { readOnly: true },
+} as const
 
 /**
  * Units = built computers with their certificate (ADR-G005). The service fills them in the panel;
@@ -63,7 +69,10 @@ export const Units: CollectionConfig = {
   defaultSort: '-createdAt',
   access: { read: staffOrOwnRecords, create: staffOnly, update: staffOnly, delete: adminOnly },
   indexes: [{ fields: ['build', 'number'], unique: true }],
-  hooks: { beforeChange: [assignCodeAndNumber] },
+  hooks: {
+    beforeChange: [assignCodeAndNumber],
+    beforeDelete: [blockDeleteWhenReferenced('tickets', 'unit', 'zgłoszenia tego egzemplarza')],
+  },
   fields: [
     {
       type: 'row',

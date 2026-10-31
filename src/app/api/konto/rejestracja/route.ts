@@ -1,6 +1,9 @@
+import { randomBytes } from 'node:crypto'
+
 import config from '@payload-config'
 import { getPayload } from 'payload'
 
+import { VERIFY_SUBJECT, verifyEmailHtml, verifyUrl } from '@/lib/account/emails'
 import { readJsonBody } from '@/lib/account/session.server'
 import { fieldErrors, registerSchema } from '@/lib/account/schema'
 import { getEnv } from '@/lib/env'
@@ -27,7 +30,7 @@ const limiter = (store[LIMITER_KEY] ??= createRateLimiter({ limit: 5, windowMs: 
  * `POST /api/konto/rejestracja` — sets up a customer account (ADR-G005). The account starts
  * unverified: Payload e-mails the link (`verify`), and only then the customer can sign in and
  * see orders by their e-mail. The same answer for a new and an existing e-mail, so the form does
- * not tell who has an account. Spam protection as in inquiries (honeypot, signed time, limit).
+ * not tell who has an account; an unverified account gets a fresh link (see below). Spam protection as in inquiries (honeypot, signed time, limit).
  */
 export async function POST(request: Request) {
   const body = await readJsonBody(request)
@@ -49,13 +52,46 @@ export async function POST(request: Request) {
   const input = parsed.data
 
   const payload = await getPayload({ config })
-  const existing = await payload.count({
+  const consent = {
+    clauseVersion: input.consent.clauseVersion,
+    acceptedAt: new Date().toISOString(),
+  }
+  const existing = await payload.find({
     collection: 'customers',
     where: { email: { equals: input.email } },
+    select: { _verified: true },
+    limit: 1,
+    depth: 0,
     overrideAccess: true,
   })
-  if (existing.totalDocs > 0) {
+  const found = existing.docs[0] as { id: number; _verified?: boolean | null } | undefined
+  if (found?._verified === true) {
     // TODO(krystian): e-mail the owner "someone tried to set up an account on your address"?
+    return json({ ok: true }, 201)
+  }
+  if (found) {
+    // Not verified yet: nobody has proven they own this address, so a new sign-up takes over
+    // the account (name, password, consent) and gets a fresh link. Without this a lost link — or
+    // a stranger who signed up first — would lock the address for good (Payload 3.91 has no
+    // "resend", and a password reset does not verify). Ownership is still proven by the link.
+    try {
+      const token = randomBytes(20).toString('hex')
+      await payload.update({
+        collection: 'customers',
+        id: found.id,
+        data: { name: input.name, password: input.password, consent, _verificationToken: token },
+        overrideAccess: true,
+        depth: 0,
+      })
+      await payload.sendEmail({
+        to: input.email,
+        subject: VERIFY_SUBJECT,
+        html: verifyEmailHtml({ name: input.name, link: verifyUrl(env.SITE_URL, token) }),
+      })
+    } catch (error) {
+      log.error({ ...errorFields(error) }, 'customer re-registration failed')
+      return json({ error: 'unavailable' }, 503)
+    }
     return json({ ok: true }, 201)
   }
   try {
@@ -66,10 +102,7 @@ export async function POST(request: Request) {
         email: input.email,
         password: input.password,
         name: input.name,
-        consent: {
-          clauseVersion: input.consent.clauseVersion,
-          acceptedAt: new Date().toISOString(),
-        },
+        consent,
       },
       overrideAccess: true,
       depth: 0,

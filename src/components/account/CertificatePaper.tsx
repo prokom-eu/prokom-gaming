@@ -83,8 +83,8 @@ export function CertificatePaper({ view }: { view: CertificateView }) {
         </div>
       )}
       <ul className="hm-doc__parts">
-        {parts.map((part) => (
-          <li key={part.label}>
+        {parts.map((part, i) => (
+          <li key={`${i}-${part.label}`}>
             <span>{part.maker ? `${part.label}, ${part.maker}` : part.label}</span>
             {part.serial && <em>SN {part.serial}</em>}
           </li>

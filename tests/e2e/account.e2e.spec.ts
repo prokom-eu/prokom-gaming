@@ -57,6 +57,12 @@ async function mailLink(
   return new URL(link!).pathname + new URL(link!).search
 }
 
+// Each test signs up from its own address: the sign-up and reset limits count per IP (Nginx sets
+// `X-Real-IP` in production), and both projects run these tests.
+test.beforeEach(async ({ page }) => {
+  await page.setExtraHTTPHeaders({ 'x-real-ip': `10.14.${randomBytes(1)[0]}.${randomBytes(1)[0]}` })
+})
+
 test.beforeAll(async ({ playwright, baseURL }) => {
   const email = process.env.SEED_ADMIN_EMAIL
   const password = process.env.SEED_ADMIN_PASSWORD
@@ -202,6 +208,52 @@ test('sign up, verify, see the order, report a problem, reset the password', asy
     })
   ).json()) as { docs: Doc[] }
   created.unshift({ collection: 'customers', id: account.docs[0]!.id })
+})
+
+test('signing up again on an unverified address sends a fresh link and takes over', async ({
+  page,
+  request,
+}, testInfo) => {
+  test.setTimeout(90_000)
+  const email = `g14-again-${testInfo.project.name}-${randomBytes(3).toString('hex')}@example.test`
+  const signUp = async (password: string) => {
+    await page.goto('/konto/rejestracja')
+    await page.getByLabel('Imię').fill('Ola')
+    await page.getByLabel(/^E-mail/).fill(email)
+    await page.getByLabel(/^Hasło/).fill(password)
+    await page.getByRole('checkbox').check()
+    await page.waitForTimeout(3_200)
+    await page.getByRole('button', { name: 'Załóż konto' }).click()
+    await expect(page.getByRole('status')).toContainText('Sprawdź skrzynkę')
+  }
+  const first = randomBytes(9).toString('hex')
+  const second = randomBytes(9).toString('hex')
+  await signUp(first)
+  const firstLink = await mailLink(request, email, 'Potwierdź adres', '/konto/weryfikacja')
+  // The first link was lost; a second sign-up (another person or the same one) gets a new one.
+  await signUp(second)
+  await expect
+    .poll(async () => mailLink(request, email, 'Potwierdź adres', '/konto/weryfikacja'), {
+      timeout: 20_000,
+    })
+    .not.toBe(firstLink)
+  await page.goto(await mailLink(request, email, 'Potwierdź adres', '/konto/weryfikacja'))
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Adres potwierdzony')
+  // The newest sign-up's password is the one that works.
+  expect(
+    (await request.post('/api/customers/login', { data: { email, password: first } })).ok(),
+  ).toBe(false)
+  expect(
+    (await request.post('/api/customers/login', { data: { email, password: second } })).ok(),
+  ).toBe(true)
+
+  const account = (await (
+    await admin.get(`/api/customers?where[email][equals]=${encodeURIComponent(email)}&depth=0`, {
+      headers: adminHeaders,
+    })
+  ).json()) as { docs: Doc[] }
+  expect(account.docs).toHaveLength(1)
+  created.push({ collection: 'customers', id: account.docs[0]!.id })
 })
 
 test('sign-up without the signed form token is refused as spam', async ({ request }) => {

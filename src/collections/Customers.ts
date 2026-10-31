@@ -12,6 +12,7 @@ import {
 } from '../lib/account/emails'
 import { getEnv } from '../lib/env'
 import { enforcePasswordPolicy } from './passwordPolicy'
+import { limitForgotPassword } from './workshopGuards'
 import { GROUP_SALES } from './shared'
 
 /** Admins see every account, a customer only their own. */
@@ -74,7 +75,7 @@ export const Customers: CollectionConfig = {
     unlock: adminOnly,
   },
   hooks: {
-    beforeOperation: [enforcePasswordPolicy('customers')],
+    beforeOperation: [enforcePasswordPolicy('customers'), limitForgotPassword],
   },
   // E-mail and password are added by `auth` (Payload stores the e-mail in lower case).
   fields: [

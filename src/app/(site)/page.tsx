@@ -26,22 +26,19 @@ export default async function HomePage() {
   // Rendered per request: the page reads builds, prices and FPS from the database, and the image
   // build (`docker build`) has none. A few Local API queries cost milliseconds.
   await connection()
-  let home: HomeData
-  try {
-    home = await loadHome()
-  } catch (error) {
-    // A database hiccup must not take the home page down: text and buttons stay.
-    log.error({ ...errorFields(error) }, 'home data failed')
-    home = EMPTY_HOME
-  }
-  let workshop: Workshop
-  try {
-    workshop = await loadWorkshop()
-  } catch (error) {
-    // Without orders the strip shows the fixed process — as before G14.
-    log.error({ ...errorFields(error) }, 'workshop strip failed')
-    workshop = EMPTY_WORKSHOP
-  }
+  // Both reads at once; each falls back on its own, so one failing never takes the page down.
+  const [home, workshop] = await Promise.all([
+    loadHome().catch((error: unknown): HomeData => {
+      // A database hiccup must not take the home page down: text and buttons stay.
+      log.error({ ...errorFields(error) }, 'home data failed')
+      return EMPTY_HOME
+    }),
+    loadWorkshop().catch((error: unknown): Workshop => {
+      // Without orders the strip shows the fixed process — as before G14.
+      log.error({ ...errorFields(error) }, 'workshop strip failed')
+      return EMPTY_WORKSHOP
+    }),
+  ])
   return (
     <>
       <Hero data={home.hero} />

@@ -21,7 +21,7 @@ const load = cache(loadCertificate)
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   await connection()
-  const view = await load(decodeURIComponent((await params).kod))
+  const view = await load((await params).kod)
   // Private by nature (spec. §13): a code from one sticker, never in search results.
   const robots = { index: false, follow: false }
   if (!view) return { robots }
@@ -35,7 +35,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
  */
 export default async function CertificatePage({ params }: Props) {
   await connection()
-  const view = await load(decodeURIComponent((await params).kod))
+  const view = await load((await params).kod)
   if (!view) notFound()
 
   return (
@@ -103,8 +103,8 @@ export default async function CertificatePage({ params }: Props) {
             <h2 className="h">Części i gwarancje</h2>
             {view.parts.length > 0 && (
               <dl className="mt-parts">
-                {view.parts.map((part) => (
-                  <div key={part.label}>
+                {view.parts.map((part, i) => (
+                  <div key={`${i}-${part.label}`}>
                     <dt>{part.label}</dt>
                     <dd>
                       {part.maker}
