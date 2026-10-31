@@ -1100,6 +1100,30 @@
   color: var(--p-mu);
   font-size: 12.5px;
 }
+/* key–value list (settings, inquiry aside) */
+.pn-kv {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 8px 16px;
+  margin: 0;
+  font-size: 13.5px;
+}
+.pn-kv dt {
+  color: var(--p-mu);
+}
+.pn-kv dd {
+  margin: 0;
+  color: var(--p-tx);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}
+.pn-fld--wide {
+  grid-column: 1 / -1;
+}
+.pn-card--section + .pn-card--section {
+  margin-top: 18px;
+}
 .pn-formstatus {
   min-height: 1.5em;
   margin-top: 12px;

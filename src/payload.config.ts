@@ -18,19 +18,23 @@ import { FpsResults } from './collections/FpsResults'
 import { Games } from './collections/Games'
 import { Inquiries } from './collections/Inquiries'
 import { InquiryDeletions } from './collections/InquiryDeletions'
+import { InquiryMessages } from './collections/InquiryMessages'
 import { Media } from './collections/Media'
 import { Options } from './collections/Options'
 import { Orders } from './collections/Orders'
 import { PowerLevels } from './collections/PowerLevels'
 import { PriceHistory } from './collections/PriceHistory'
 import { PublishedPrices } from './collections/PublishedPrices'
+import { ReplyTemplates } from './collections/ReplyTemplates'
 import { Tickets } from './collections/Tickets'
 import { Units } from './collections/Units'
 import { Users } from './collections/Users'
 import { LegalPrivacy, LegalTerms } from './globals/Legal'
+import { MailSettings } from './globals/MailSettings'
 import { PricingSettings } from './globals/PricingSettings'
 import { SiteSettings } from './globals/SiteSettings'
 import { InquiryRetentionTask } from './jobs/inquiryRetention'
+import { InquirySlaTask } from './jobs/inquirySla'
 import { MarginAlarmTask } from './jobs/marginAlarm'
 import { getEnv } from './lib/env'
 import { migrations } from './migrations'
@@ -119,14 +123,16 @@ export default buildConfig({
     Orders,
     Units,
     Tickets,
+    ReplyTemplates,
+    InquiryMessages,
   ],
-  globals: [PricingSettings, SiteSettings, LegalTerms, LegalPrivacy],
+  globals: [PricingSettings, SiteSettings, LegalTerms, LegalPrivacy, MailSettings],
   // Background jobs (ADR-G002 §4.4: margin alarm; ADR-G005: daily inquiry retention). Run inside the Next process
   // (one VPS, not serverless) every minute; the cron starts with the first panel/API request.
   // Running and queueing through the REST API is panel-only: by default any signed-in account
   // could, and customers (G14) sign in too. Finished jobs are removed — nothing to keep.
   jobs: {
-    tasks: [MarginAlarmTask, InquiryRetentionTask],
+    tasks: [MarginAlarmTask, InquiryRetentionTask, InquirySlaTask],
     autoRun: [{ cron: '* * * * *', queue: 'default', limit: 5 }],
     deleteJobOnComplete: true,
     access: {

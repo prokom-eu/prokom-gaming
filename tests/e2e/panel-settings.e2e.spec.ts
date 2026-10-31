@@ -16,6 +16,8 @@ test.describe.configure({ mode: 'serial' })
 
 let panel: APIRequestContext
 let headers: Record<string, string>
+const TEST_SIGNATURE = 'Krystian\nPRO-KOM Gaming (test)'
+let mailBefore: { replyAlarmMinutes: number; signature: string } | null = null
 
 async function stored(): Promise<{ minMargin: number; warnMargin: number }> {
   const response = await panel.get('/api/globals/pricing-settings', { headers })
@@ -33,6 +35,7 @@ test.beforeAll(async ({ playwright, baseURL }) => {
 
 test.afterAll(async () => {
   await panel.post('/api/globals/pricing-settings', { headers, data: { warnMargin: 0.12 } })
+  if (mailBefore) await panel.post('/api/globals/mail-settings', { headers, data: mailBefore })
   await panel.dispose()
 })
 
@@ -89,4 +92,39 @@ test('a valid change is saved as a share and shown again after reload', async ({
 
   await page.reload()
   await expect(page.getByLabel('Ostrzegaj, gdy zestaw ma mniej niż')).toHaveValue('12,5')
+})
+
+test('section „Zapytania i poczta” saves the alarm and the signature (P3)', async ({ page }) => {
+  const before = await panel.get('/api/globals/mail-settings', { headers })
+  expect(before.status()).toBe(200)
+  const { replyAlarmMinutes, signature } = (await before.json()) as {
+    replyAlarmMinutes: number
+    signature: string
+  }
+  mailBefore = { replyAlarmMinutes, signature }
+
+  await page.goto('/admin/ustawienia')
+  const section = page.locator('form#pn-mail')
+  await expect(page.getByRole('heading', { name: 'Zapytania i poczta' })).toBeVisible()
+
+  // The end hour before the start is refused, nothing saved.
+  await section.getByLabel('Odpowiadamy do godziny').fill('7')
+  await section.getByRole('button', { name: 'Zapisz zmiany' }).click()
+  await expect(section.getByLabel('Odpowiadamy do godziny')).toHaveAttribute('aria-invalid', 'true')
+
+  await section.getByLabel('Odpowiadamy do godziny').fill('22')
+  await section.getByLabel('Alarm: zapytanie bez odpowiedzi').fill('40')
+  await section.getByLabel('Podpis').fill(TEST_SIGNATURE)
+  await section.getByRole('button', { name: 'Zapisz zmiany' }).click()
+  await expect(section.getByRole('status')).toHaveText('Zapisano.')
+
+  const after = await panel.get('/api/globals/mail-settings', { headers })
+  expect(await after.json()).toMatchObject({
+    replyHours: { from: 8, to: 22 },
+    replyAlarmMinutes: 40,
+    signature: TEST_SIGNATURE,
+  })
+  expect(await new AxeBuilder({ page }).include('form#pn-mail').analyze()).toMatchObject({
+    violations: [],
+  })
 })

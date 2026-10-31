@@ -23,3 +23,17 @@ export function nextStatusChangedAt({
   }
   return previousChangedAt
 }
+
+/**
+ * Status after a reply from the panel (ADR-G008 pt 5): the first reply moves `new` to
+ * `in_progress`; a template of kind `offer` marks `offer_sent`. A finished inquiry (`won`, `lost`,
+ * `closed`) keeps its status — writing to a customer after the order does not reopen it.
+ */
+export function statusAfterReply(
+  current: InquiryStatus,
+  templateKind: 'reply' | 'offer' | 'stage' | null,
+): InquiryStatus {
+  if (current !== 'new' && current !== 'in_progress' && current !== 'offer_sent') return current
+  if (templateKind === 'offer') return 'offer_sent'
+  return current === 'new' ? 'in_progress' : current
+}

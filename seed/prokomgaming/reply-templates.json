@@ -1,0 +1,35 @@
+{
+  "_source": "Zapytania.dc.html (stała TPL) 1:1; szablon „stage” ze spec. panelu §4",
+  "templates": [
+    {
+      "name": "Potwierdzenie i termin",
+      "kind": "reply",
+      "order": 10,
+      "body": "Dzień dobry,\n\ndziękuję za zapytanie {nr}. {zestaw} składamy w Rabce-Zdroju w {termin} od wpłaty; przed wysyłką każdy egzemplarz przechodzi test i pomiar klatek w Twoich grach. Odbiór osobisty w Rabce albo w Zakopanem jest możliwy.\n\nZa chwilę wyślę ofertę z imienną listą części, ważną 48 godzin.\n\n{podpis}"
+    },
+    {
+      "name": "Oferta z listą części",
+      "kind": "offer",
+      "order": 20,
+      "body": "Dzień dobry,\n\nprzesyłam ofertę {nr}: {zestaw}, {cena} z montażem, testami, Windows 11 i wysyłką. Oferta ważna 48 godzin.\n\nSkład:\n{czesci}\n\nPłatność przelewem albo BLIK po pro formie. Gwarancja 2 lata, kurier odbiera od Ciebie.\n\n{podpis}"
+    },
+    {
+      "name": "Prośba o szczegóły",
+      "kind": "reply",
+      "order": 30,
+      "body": "Dzień dobry,\n\nżeby dobrze dobrać komputer, potrzebuję jeszcze dwóch informacji: na jakim monitorze (rozdzielczość i odświeżanie) i w jakie gry najczęściej. Wtedy zaproponuję 2 zestawy w budżecie i pokażę, ile klatek dadzą.\n\n{podpis}"
+    },
+    {
+      "name": "Raty: na start nie",
+      "kind": "reply",
+      "order": 40,
+      "body": "Dzień dobry,\n\nna start nie oferujemy rat. Płatność przelewem albo BLIK po pro formie. Chętnie przygotuję ofertę ważną 48 godzin.\n\n{podpis}"
+    },
+    {
+      "name": "Zmiana etapu zamówienia",
+      "kind": "stage",
+      "order": 100,
+      "body": "Dzień dobry,\n\nTwój komputer {zestaw} (zamówienie {nr_zam}) jest teraz na etapie: {etap}.\n\n{podpis}"
+    }
+  ]
+}

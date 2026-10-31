@@ -6,6 +6,7 @@ import { ValidationError } from 'payload'
 import { errorFields, log } from '../../lib/logger'
 import { panelActionSession } from '../session'
 import { fieldOfPath, keepUnchanged, parseSettingsForm, type FieldErrors } from './form'
+import { mailFieldOfPath, parseMailForm, type MailFieldErrors } from './mailForm'
 
 export type SaveState =
   | { status: 'idle' }
@@ -62,5 +63,52 @@ export async function saveSettings(_prev: SaveState, form: FormData): Promise<Sa
   log.info({ userId: user.id }, 'pricing settings saved')
   revalidatePath('/admin/ustawienia')
   revalidatePath('/admin/ceny')
+  return { status: 'saved', at: new Date().toISOString() }
+}
+
+export type MailSaveState =
+  | { status: 'idle' }
+  | { status: 'saved'; at: string }
+  | { status: 'error'; message: string; errors: MailFieldErrors }
+
+/**
+ * Save of the section „Zapytania i poczta” (panel spec §13, P3): reply hours, reply time, SLA
+ * alarm and the signature for {podpis}. Admin only, Local API with the person's access.
+ */
+export async function saveMailSettings(
+  _prev: MailSaveState,
+  form: FormData,
+): Promise<MailSaveState> {
+  const session = await panelActionSession('admin')
+  if (!session) {
+    return { status: 'error', message: 'Brak uprawnień — zaloguj się do panelu.', errors: {} }
+  }
+  const parsed = parseMailForm(Object.fromEntries(form.entries()))
+  if (!parsed.ok) {
+    return { status: 'error', message: 'Popraw zaznaczone pola.', errors: parsed.errors }
+  }
+  const { payload, user } = session
+  try {
+    await payload.updateGlobal({
+      slug: 'mail-settings',
+      data: parsed.data,
+      user,
+      overrideAccess: false,
+      depth: 0,
+    })
+  } catch (error) {
+    if (error instanceof ValidationError) {
+      const errors: MailFieldErrors = {}
+      for (const e of error.data.errors) {
+        const field = mailFieldOfPath(e.path)
+        if (field) errors[field] ??= e.message
+      }
+      return { status: 'error', message: 'Popraw zaznaczone pola.', errors }
+    }
+    log.error({ ...errorFields(error) }, 'settings: mail save failed')
+    return { status: 'error', message: 'Nie udało się zapisać. Spróbuj ponownie.', errors: {} }
+  }
+  log.info({ userId: user.id }, 'mail settings saved')
+  revalidatePath('/admin/ustawienia')
   return { status: 'saved', at: new Date().toISOString() }
 }
