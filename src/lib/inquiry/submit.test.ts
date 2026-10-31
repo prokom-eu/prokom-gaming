@@ -80,7 +80,7 @@ function setup(overrides: Partial<SubmitDeps> = {}) {
     defer: (task) => task(),
     notifyTo: 'gaming@example.test',
     responseTime: async () => 'zwykle w godzinę, codziennie 8–22',
-    panelUrl: (id) => `http://localhost:3100/admin/collections/inquiries/${id}`,
+    panelUrl: (_id, number) => `http://localhost:3100/admin/zapytania?nr=${number}`,
     log: { info: record, warn: record, error: record },
     ...overrides,
   }
@@ -261,6 +261,10 @@ describe('submitInquiryWith', () => {
     expect(confirmation?.messageId).toBe('<confirm-41@example.test>')
     expect(sent.find((e) => e.to === 'gaming@example.test')?.messageId).toBeUndefined()
     expect(deps.saveConfirmationId).toHaveBeenCalledWith(41, '<confirm-41@example.test>')
+    // The notification links the inbox by number (P3), not the Payload record.
+    expect(sent.find((e) => e.to === 'gaming@example.test')?.text).toContain(
+      'http://localhost:3100/admin/zapytania?nr=PKG-2026-0041',
+    )
   })
 
   it('a confirmation that failed leaves no Message-ID on the inquiry', async () => {

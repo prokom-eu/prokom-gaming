@@ -17,6 +17,7 @@ import {
 } from './emails'
 import { priceComputer, type InquiryOffer, type PricedComputer } from './price'
 import { newMessageId } from './replyMail'
+import { inquiryPanelPath } from './subject'
 import { inquiryFieldErrors, parseInquiryInput } from './schema'
 import {
   checkFormToken,
@@ -87,7 +88,8 @@ export type SubmitDeps = {
   notifyTo: string | null
   /** „Odpowiedź na zapytanie” from `site-settings`; `null` when empty or unreadable. */
   responseTime: () => Promise<string | null>
-  panelUrl: (id: number) => string
+  /** Link in the notification: the inquiry in the panel's inbox, by number (P3). */
+  panelUrl: (id: number, number: string) => string
   // Structured fields only: ids, codes, `errorFields()` of a caught error — never form data
   // (ADR-G005); database errors quote query parameters, SMTP errors the recipients.
   log: Record<'info' | 'warn' | 'error', (fields: LogFields, msg: string) => void>
@@ -312,7 +314,10 @@ export async function submitInquiryWith(
     if (deps.notifyTo) {
       emails.push({
         kind: 'notification',
-        email: notificationEmail(forEmail, { to: deps.notifyTo, panelUrl: deps.panelUrl(id) }),
+        email: notificationEmail(forEmail, {
+          to: deps.notifyTo,
+          panelUrl: deps.panelUrl(id, number),
+        }),
       })
     } else {
       deps.log.warn({ inquiry: id }, 'INQUIRY_NOTIFY_EMAIL not set: no notification sent')
@@ -485,7 +490,7 @@ export async function submitInquiry(
         })
         return settings.responseTime?.trim() || null
       },
-      panelUrl: (id) => `${env.SITE_URL}/admin/collections/inquiries/${id}`,
+      panelUrl: (_id, number) => `${env.SITE_URL}${inquiryPanelPath(number)}`,
       log: log.child({ requestId: context.requestId }),
     },
     request,

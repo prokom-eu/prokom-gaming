@@ -79,6 +79,12 @@ export default buildConfig({
           exact: true,
           meta: { title: 'Ceny' },
         },
+        inquiries: {
+          Component: '/admin/inquiries/InquiriesView#InquiriesView',
+          path: '/zapytania',
+          exact: true,
+          meta: { title: 'Zapytania' },
+        },
         settings: {
           Component: '/admin/settings/SettingsView#SettingsView',
           path: '/ustawienia',
