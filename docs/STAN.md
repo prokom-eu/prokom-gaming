@@ -1,19 +1,12 @@
 # STAN — prokom-gaming
 
-Ostatnia aktualizacja: 31.10.2026 (sesja G14 — metryka, warsztat, konto, role).
+Ostatnia aktualizacja: 31.10.2026 (koniec sesji G14 — scalona do `develop`, #34).
 
 ## W toku
-- **G14 — metryka, warsztat, konto, zgłoszenia + dopiski panelu.** G13 PR 2 scalony (#31/#33). Gałąź `feat/g14-metryka-konto` od `develop`, **jeden PR** (decyzja Krystiana 31.10), 3 commity: dane i dostęp → metryka → konto. Decyzje 31.10: PDF metryki = druk z przeglądarki; klient widzi zamówienia dopiero po weryfikacji e-maila; strony bez plansz z istniejących komponentów i tekstami `TODO(krystian)`. Szczegóły: ADR-G005 (uzupełnienie 31.10), ADR-G002 §8 (wyjątek metryki).
-- Zrobione:
-  - Role `admin`/`serwis` (`src/access/panel.ts`: `isAdmin`, `adminOnly`, `staffOnly`); wszystko z G3–G13 „tylko panel” = admin; `users` z jawnym dostępem; pierwsze konto = admin.
-  - Kolekcje `customers` (auth, weryfikacja, reset, REST create/update tylko admin), `orders` (`Z-RRRR-NNNN`, etapy z historią, pola P5), `units` (kod metryki z `crypto`), `tickets`; `fps-results.unit`; e-mail małymi literami w zapytaniach; migracja `g14_orders_units_customers` (up → down → up czysta).
-  - `GET /api/warsztat` + taśma na głównej z danymi i licznik „W warsztacie teraz”; seed: 5 zamówień, 2 egzemplarze (jeden opublikowany: `/metryka/WMPR-7KQ2-M9XA-B3CD`).
-  - `/metryka` (kod z naklejki) i `/metryka/[kod]` wg planszy, druk = metryka do pudełka; style papieru wspólne z główną (`components/paper.css`).
-  - `/konto` (komputery z osią etapów, gwarancje, zgłoszenia, zapisane konfiguracje, dane), `/konto/logowanie`, `rejestracja`, `haslo`, `weryfikacja`; `/api/konto/*`; „Zapisz na koncie” w konfiguratorze; „Załóż konto i śledź zamówienie” po wysłaniu zapytania.
-  - Testy: Vitest 584; e2e `workshop-access` (anonim, serwis, klient A ≠ B, niezweryfikowany, wymuszone `_verified`), `certificate`, `account` (rejestracja → Mailpit → weryfikacja → konto → zgłoszenie → reset hasła, 1440 i 414), axe metryki i konta; regresja `offer-api`, `admin`, `prices-*`, `home*`, `inquiry-*`, `configurator`.
-- `/przeglad` (recenzent): „poprawki wymagane” — poprawione: ponowna rejestracja na niezweryfikowany adres wysyła nowy link (wcześniej adres blokował się na zawsze), limit `forgot-password` na IP, blokada usuwania zestawu z egzemplarzami i egzemplarza ze zgłoszeniami, kod egzemplarza tylko z systemu, 404 zamiast 500 dla złego kodu w adresie, klucze Reacta części, komunikat roli serwis na ekranie Ceny, błąd usuwania zapisanej konfiguracji, równoległe odczyty głównej. Świadomie bez zmian: czas odpowiedzi rejestracji i 403 logowania zdradzają istnienie konta (ADR-G005).
-- Niesprawdzone: pełne e2e i `pnpm build` (CI), Lighthouse `/metryka` i `/konto`, prawdziwy telefon.
-- **Następny krok:** `/pr` → CI → squash → P1 (kolejność: `docs/zadania/prokomgaming-panel.md` §1).
+- **Gałąź:** brak — G14 scalona do `develop` (#34, squash 94f99d7); ten zapis na `docs/g14-koniec-sesji`.
+- **Zrobione w tej sesji:** G14 — role `admin`/`serwis`, kolekcje `customers`/`orders`/`units`/`tickets`, taśma warsztatu z `GET /api/warsztat`, metryka `/metryka/[kod]`, konto `/konto/*` (szczegóły w „Zrobione” i ADR-G005, uzupełnienie 31.10); `/przeglad` z poprawkami; CI zielone.
+- **Niedokończone:** Lighthouse `/metryka` i `/konto` (G15), test na prawdziwym telefonie (Android + iPhone), teksty `TODO(krystian)` z G14 (lista niżej).
+- **Następny krok:** `/zadanie P1` — powłoka panelu na komputerze i telefonie (`docs/zadania/prokomgaming-panel.md` §1–§2, spec. panelu §1–§2a, §13, §15; rola `serwis` z G14 → 403 na ustawieniach).
 
 ## Uwagi na później (G14)
 - **Treści do potwierdzenia (`TODO(krystian)`):** maile weryfikacji i resetu hasła, teksty stron logowania/rejestracji/hasła/weryfikacji i `/metryka` bez kodu, puste stany konta, zdania „Teraz: …” etapów poza testem (`CUSTOMER_STAGE_TEXT`), opisy etapów na taśmie `paid`/`shipped`, etykieta etapu `delivered` w panelu, klauzula zgody konta (`ACCOUNT_CONSENT_CLAUSE`, prawnik).
@@ -119,6 +112,7 @@ Ostatnia aktualizacja: 31.10.2026 (sesja G14 — metryka, warsztat, konto, role)
 - **Pozycja usunięta z oferty zostawia otwarty wpis `price-history`** (jest w partii N, nie ma jej w N+1, `writeBatch` jej nie zamyka). Dziś nieszkodliwe — części z zestawu nie da się usunąć — ale przed liczeniem „najniższej ceny z 30 dni” zamykać wpisy pozycji, których nie ma w nowej partii.
 
 ## Zrobione
+- 31.10.2026 — **G14 (metryka, warsztat, konto, zgłoszenia + role panelu)** scalona do `develop` (#34): role `admin`/`serwis` (dotychczasowe „tylko panel” = admin), `customers` z weryfikacją e-maila i resetem (REST create/update tylko admin — `_verified`), `orders` `Z-RRRR-NNNN` z etapami i polami P5, `units` z kodem metryki, `tickets`, e-mail małymi literami (+ migracja danych), taśma i licznik warsztatu, `/metryka` i `/metryka/[kod]` (druk = PDF), `/konto` z logowaniem, rejestracją, resetem, zgłoszeniami i zapisanymi konfiguracjami; Vitest 584, e2e dostępu/metryki/konta 1440 i 414. Lighthouse i prawdziwy telefon nadal do zrobienia.
 - 30.10.2026 — **P0 (dokumenty panelu, gałąź `docs/panel-p0`)**: spec. panelu v1.1 sprawdzona z kodem G3–G13. Kolejka „Do zatwierdzenia” = `buildQueue()` (wyliczana, bez tabeli). Decyzje Krystiana: zmiana przepisu zestawu zapisywana od razu po potwierdzeniu ceny (bez kolejki); `autoPublish` — P1 usuwa auto-publikację; godziny SLA w `mail-settings.replyHours`, `{termin}` = `site-settings.fulfilment`; `stock`/`vouchers` jako listy Payload w grupie „Oferta”. Dopisek G14: `inquiries.email` małymi literami.
 - 30.10.2026 — **G12 (formularz zapytania i „wysłane”)** scalona do `develop` (#27); test na prawdziwym telefonie nadal do zrobienia.
 - 29.10.2026 — **G11 (dobór pod grę, 33 strony gier, porównywarka)** scalona do `develop` (#26); Lighthouse stron gier 81–85 = odstępstwo do G15; test na prawdziwym telefonie nadal do zrobienia.
@@ -148,7 +142,7 @@ Ostatnia aktualizacja: 31.10.2026 (sesja G14 — metryka, warsztat, konto, role)
 - 25.10.2026 — pakiet startowy (pierwszy commit, podpisany): CLAUDE.md, specyfikacja `docs/strony/prokomgaming.md`, ADR-G001…G005, plan G0–G16, wzorzec wyglądu v36 (`docs/design/prokomgaming/`), seed (`seed/prokomgaming/`), oczekiwane wyniki testów cen (`tests/fixtures/pricing-expected.json`).
 
 ## Następne kroki
-G1 → G2 → G3 → G4 → G5 → G6 → G7 → G8 → G9 → (kontrola 8.11) → G10 → G11 → G12 → (kontrola 13.11) → G13 → G14 (+ role, pola `orders` dla panelu) → **P1 → P3 → P4 → P2** → G15 (+ Umami) → G16 (produkcja 20.11) → **P6 → P7 → P5 → P8**. Panel: `docs/zadania/prokomgaming-panel.md` (P0 zrobione 30.10 — spec. v1.1).
+G1 → G2 → G3 → G4 → G5 → G6 → G7 → G8 → G9 → (kontrola 8.11) → G10 → G11 → G12 → (kontrola 13.11) → G13 → ~~G14~~ (zrobione 31.10) → **P1 → P3 → P4 → P2** → G15 (+ Umami) → G16 (produkcja 20.11) → **P6 → P7 → P5 → P8**. Panel: `docs/zadania/prokomgaming-panel.md` (P0 zrobione 30.10 — spec. v1.1).
 
 ## Decyzje (skrót)
 - Osobne repo, ten sam stos i wersje co `prokom-web` (ADR-G001), porty 3100 / 54321 / 1026 / 8026.
