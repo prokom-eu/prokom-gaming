@@ -89,6 +89,7 @@ export interface Config {
     tickets: Ticket;
     'reply-templates': ReplyTemplate;
     'inquiry-messages': InquiryMessage;
+    'mail-intake-unmatched': MailIntakeUnmatched;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
     'payload-locked-documents': PayloadLockedDocument;
@@ -118,6 +119,7 @@ export interface Config {
     tickets: TicketsSelect<false> | TicketsSelect<true>;
     'reply-templates': ReplyTemplatesSelect<false> | ReplyTemplatesSelect<true>;
     'inquiry-messages': InquiryMessagesSelect<false> | InquiryMessagesSelect<true>;
+    'mail-intake-unmatched': MailIntakeUnmatchedSelect<false> | MailIntakeUnmatchedSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -134,6 +136,7 @@ export interface Config {
     'legal-terms': LegalTerm;
     'legal-privacy': LegalPrivacy;
     'mail-settings': MailSetting;
+    'mail-intake-state': MailIntakeState;
     'payload-jobs-stats': PayloadJobsStat;
   };
   globalsSelect: {
@@ -142,6 +145,7 @@ export interface Config {
     'legal-terms': LegalTermsSelect<false> | LegalTermsSelect<true>;
     'legal-privacy': LegalPrivacySelect<false> | LegalPrivacySelect<true>;
     'mail-settings': MailSettingsSelect<false> | MailSettingsSelect<true>;
+    'mail-intake-state': MailIntakeStateSelect<false> | MailIntakeStateSelect<true>;
     'payload-jobs-stats': PayloadJobsStatsSelect<false> | PayloadJobsStatsSelect<true>;
   };
   locale: null;
@@ -154,6 +158,7 @@ export interface Config {
       'margin-alarm': TaskMarginAlarm;
       'inquiry-retention': TaskInquiryRetention;
       'inquiry-sla': TaskInquirySla;
+      'mail-intake': TaskMailIntake;
       inline: {
         input: unknown;
         output: unknown;
@@ -954,7 +959,34 @@ export interface InquiryMessage {
   messageId?: string | null;
   inReplyTo?: string | null;
   attachmentsInfo?: string | null;
+  /**
+   * Adres nadawcy, gdy to nie adres klienta.
+   */
+  otherSender?: string | null;
   template?: (number | null) | ReplyTemplate;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Przypinasz albo odrzucasz w Zapytaniach → Nieprzypisane.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "mail-intake-unmatched".
+ */
+export interface MailIntakeUnmatched {
+  id: number;
+  from?: string | null;
+  subject?: string | null;
+  receivedAt: string;
+  body: string;
+  attachmentsInfo?: string | null;
+  messageId?: string | null;
+  /**
+   * Kolejne identyfikatory oddzielone spacją.
+   */
+  references?: string | null;
+  status: 'new' | 'attached' | 'rejected';
+  attachedTo?: (number | null) | Inquiry;
   updatedAt: string;
   createdAt: string;
 }
@@ -1027,7 +1059,7 @@ export interface PayloadJob {
     | {
         executedAt: string;
         completedAt: string;
-        taskSlug: 'inline' | 'margin-alarm' | 'inquiry-retention' | 'inquiry-sla';
+        taskSlug: 'inline' | 'margin-alarm' | 'inquiry-retention' | 'inquiry-sla' | 'mail-intake';
         taskID: string;
         input?:
           | {
@@ -1060,7 +1092,7 @@ export interface PayloadJob {
         id?: string | null;
       }[]
     | null;
-  taskSlug?: ('inline' | 'margin-alarm' | 'inquiry-retention' | 'inquiry-sla') | null;
+  taskSlug?: ('inline' | 'margin-alarm' | 'inquiry-retention' | 'inquiry-sla' | 'mail-intake') | null;
   queue?: string | null;
   waitUntil?: string | null;
   processing?: boolean | null;
@@ -1166,6 +1198,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'inquiry-messages';
         value: number | InquiryMessage;
+      } | null)
+    | ({
+        relationTo: 'mail-intake-unmatched';
+        value: number | MailIntakeUnmatched;
       } | null);
   globalSlug?: string | null;
   user:
@@ -1812,7 +1848,25 @@ export interface InquiryMessagesSelect<T extends boolean = true> {
   messageId?: T;
   inReplyTo?: T;
   attachmentsInfo?: T;
+  otherSender?: T;
   template?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "mail-intake-unmatched_select".
+ */
+export interface MailIntakeUnmatchedSelect<T extends boolean = true> {
+  from?: T;
+  subject?: T;
+  receivedAt?: T;
+  body?: T;
+  attachmentsInfo?: T;
+  messageId?: T;
+  references?: T;
+  status?: T;
+  attachedTo?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2092,6 +2146,20 @@ export interface MailSetting {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "mail-intake-state".
+ */
+export interface MailIntakeState {
+  id: number;
+  lastUid?: number | null;
+  uidValidity?: string | null;
+  lastRunAt?: string | null;
+  lastOkAt?: string | null;
+  errorCount?: number | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-jobs-stats".
  */
 export interface PayloadJobsStat {
@@ -2240,6 +2308,20 @@ export interface MailSettingsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "mail-intake-state_select".
+ */
+export interface MailIntakeStateSelect<T extends boolean = true> {
+  lastUid?: T;
+  uidValidity?: T;
+  lastRunAt?: T;
+  lastOkAt?: T;
+  errorCount?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-jobs-stats_select".
  */
 export interface PayloadJobsStatsSelect<T extends boolean = true> {
@@ -2287,6 +2369,7 @@ export interface TaskInquiryRetention {
   input?: unknown;
   output: {
     deleted: number;
+    unmatchedDeleted: number;
   };
 }
 /**
@@ -2297,6 +2380,19 @@ export interface TaskInquirySla {
   input?: unknown;
   output: {
     alerted: number;
+  };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskMail-intake".
+ */
+export interface TaskMailIntake {
+  input?: unknown;
+  output: {
+    taken: number;
+    unmatched: number;
+    skipped: number;
+    error: boolean;
   };
 }
 /**

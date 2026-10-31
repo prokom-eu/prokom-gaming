@@ -19,6 +19,7 @@ import { Games } from './collections/Games'
 import { Inquiries } from './collections/Inquiries'
 import { InquiryDeletions } from './collections/InquiryDeletions'
 import { InquiryMessages } from './collections/InquiryMessages'
+import { MailIntakeUnmatched } from './collections/MailIntakeUnmatched'
 import { Media } from './collections/Media'
 import { Options } from './collections/Options'
 import { Orders } from './collections/Orders'
@@ -30,11 +31,13 @@ import { Tickets } from './collections/Tickets'
 import { Units } from './collections/Units'
 import { Users } from './collections/Users'
 import { LegalPrivacy, LegalTerms } from './globals/Legal'
+import { MailIntakeState } from './globals/MailIntakeState'
 import { MailSettings } from './globals/MailSettings'
 import { PricingSettings } from './globals/PricingSettings'
 import { SiteSettings } from './globals/SiteSettings'
 import { InquiryRetentionTask } from './jobs/inquiryRetention'
 import { InquirySlaTask } from './jobs/inquirySla'
+import { MailIntakeTask } from './jobs/mailIntake'
 import { MarginAlarmTask } from './jobs/marginAlarm'
 import { getEnv } from './lib/env'
 import { migrations } from './migrations'
@@ -131,14 +134,15 @@ export default buildConfig({
     Tickets,
     ReplyTemplates,
     InquiryMessages,
+    MailIntakeUnmatched,
   ],
-  globals: [PricingSettings, SiteSettings, LegalTerms, LegalPrivacy, MailSettings],
+  globals: [PricingSettings, SiteSettings, LegalTerms, LegalPrivacy, MailSettings, MailIntakeState],
   // Background jobs (ADR-G002 §4.4: margin alarm; ADR-G005: daily inquiry retention). Run inside the Next process
   // (one VPS, not serverless) every minute; the cron starts with the first panel/API request.
   // Running and queueing through the REST API is panel-only: by default any signed-in account
   // could, and customers (G14) sign in too. Finished jobs are removed — nothing to keep.
   jobs: {
-    tasks: [MarginAlarmTask, InquiryRetentionTask, InquirySlaTask],
+    tasks: [MarginAlarmTask, InquiryRetentionTask, InquirySlaTask, MailIntakeTask],
     autoRun: [{ cron: '* * * * *', queue: 'default', limit: 5 }],
     deleteJobOnComplete: true,
     access: {

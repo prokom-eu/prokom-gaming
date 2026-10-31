@@ -88,6 +88,14 @@ export const InquiryMessages: CollectionConfig = {
       ],
     },
     { name: 'attachmentsInfo', label: 'Załączniki w poczcie', type: 'text', ...readOnly },
+    // ADR-G008 pt 3: a mail with the inquiry's number from another address is attached, marked.
+    {
+      name: 'otherSender',
+      label: 'Inny nadawca',
+      type: 'text',
+      admin: { readOnly: true, description: 'Adres nadawcy, gdy to nie adres klienta.' },
+      access: { update: () => false },
+    },
     {
       name: 'template',
       label: 'Szablon',

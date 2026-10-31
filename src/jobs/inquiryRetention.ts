@@ -1,6 +1,8 @@
 import type { TaskConfig } from 'payload'
 
+import { UNMATCHED_RETENTION_DAYS } from '../collections/MailIntakeUnmatched'
 import {
+  daysBefore,
   deleteExpiredInquiries,
   INQUIRY_RETENTION_TASK,
   RETENTION_CONTEXT,
@@ -8,11 +10,11 @@ import {
 
 export type InquiryRetentionIO = {
   input: Record<string, never>
-  output: { deleted: number }
+  output: { deleted: number; unmatchedDeleted: number }
 }
 
 /**
- * Daily retention of inquiries (ADR-G005), run by the in-process job runner (`jobs.autoRun`).
+ * Daily retention of inquiries (ADR-G005) and of unmatched mail (90 days, ADR-G008 pt 7), run by the in-process job runner (`jobs.autoRun`).
  * Deleting goes through Payload, so each record leaves a trail in `inquiry-deletions`. Logs the
  * count only — no personal data.
  */
@@ -21,7 +23,10 @@ export const InquiryRetentionTask: TaskConfig<InquiryRetentionIO> = {
   label: 'Usuwanie zakończonych zapytań po okresie przechowywania',
   // 03:00:00 server time — UTC in the container unless compose sets TZ (G16); seconds first; `schedule` queues the job, the `autoRun` cron runs it.
   schedule: [{ cron: '0 0 3 * * *', queue: 'default' }],
-  outputSchema: [{ name: 'deleted', type: 'number', required: true }],
+  outputSchema: [
+    { name: 'deleted', type: 'number', required: true },
+    { name: 'unmatchedDeleted', type: 'number', required: true },
+  ],
   retries: 2,
   handler: async ({ req }) => {
     const { getEnv } = await import('../lib/env')
@@ -62,7 +67,26 @@ export const InquiryRetentionTask: TaskConfig<InquiryRetentionIO> = {
         return docs.length
       },
     })
-    payload.logger.info({ deleted: result.deleted }, 'Inquiry retention done')
-    return { output: result }
+    // Unmatched mail from the mailbox: 90 days from arrival, whatever its status (ADR-G008 pt 7).
+    const unmatched = await payload.delete({
+      collection: 'mail-intake-unmatched',
+      where: {
+        receivedAt: {
+          less_than: daysBefore(new Date(), UNMATCHED_RETENTION_DAYS).toISOString(),
+        },
+      },
+      depth: 0,
+      overrideAccess: true,
+      req,
+    })
+    if (unmatched.errors.length > 0) {
+      payload.logger.error(
+        { failed: unmatched.errors.length },
+        'Inquiry retention: some unmatched mail not deleted',
+      )
+    }
+    const unmatchedDeleted = unmatched.docs.length
+    payload.logger.info({ deleted: result.deleted, unmatchedDeleted }, 'Inquiry retention done')
+    return { output: { ...result, unmatchedDeleted } }
   },
 }

@@ -10,7 +10,7 @@ import { zl } from '../pricing/format'
 import type { Config } from '../pricing/types'
 import { priceComputer } from './price'
 import { loadInquiryPricing } from './pricingStore'
-import { buildReplyMail, newMessageId } from './replyMail'
+import { buildReplyMail, newMessageId, type ReplyMail } from './replyMail'
 import { statusAfterReply } from './status'
 import { inquiryTopic } from './subject'
 import { partsList, placeholdersIn, type TemplateValues } from './templates'
@@ -144,7 +144,8 @@ export async function loadReplyContext(
 }
 
 export type SendReplyResult =
-  | { ok: true; status: Inquiry['status'] }
+  /** `mail` and `at`: what went out, for the copy in the mailbox's „Sent” (P4). */
+  | { ok: true; status: Inquiry['status']; mail: ReplyMail; at: string }
   | { ok: false; error: 'empty' | 'placeholders' | 'smtp'; missing?: string[] }
   /** Sent, but not recorded: the panel must say „do not send again” (customer has the mail). */
   | { ok: false; error: 'not_recorded'; messageId: string }
@@ -247,7 +248,7 @@ export async function sendInquiryReply(
     return { ok: false, error: 'not_recorded', messageId }
   }
   payload.logger.info({ inquiry: inquiry.id, status }, 'Inquiry reply sent')
-  return { ok: true, status }
+  return { ok: true, status, mail, at: now }
 }
 
 /** An internal note (blue in the thread): never e-mailed, the customer never sees it. */
