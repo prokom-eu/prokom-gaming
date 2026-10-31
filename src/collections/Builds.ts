@@ -34,8 +34,8 @@ export const Builds: CollectionConfig = {
   access: { read: anyone, create: adminOnly, update: adminOnly, delete: adminOnly },
   hooks: {
     beforeDelete: [
-      blockDeleteWhenReferenced('units', 'build', 'egzemplarze tego zestawu'),
       blockDeleteWithFpsResults('build'),
+      blockDeleteWhenReferenced('units', 'build', 'egzemplarze tego zestawu'),
     ],
   },
   fields: [

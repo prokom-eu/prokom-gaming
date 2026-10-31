@@ -248,7 +248,10 @@ test('a build with units and a unit with tickets cannot be deleted (clear messag
   const build = builds.docs[0]!.id
   const refused = await admin.delete(`/api/builds/${build}`, { headers: adminHeaders })
   expect(refused.status()).toBe(400)
-  expect(await refused.text()).toContain('egzemplarze tego zestawu')
+  // Every seed build has FPS results too, and that guard answers first (G5 test): what matters
+  // here is a clear 400 instead of the database error, and the build still being there.
+  expect(await refused.text()).toContain('Nie można usunąć')
+  expect((await admin.get(`/api/builds/${build}?depth=0`)).status()).toBe(200)
 
   const unit = await create('units', { build })
   await create('tickets', {
