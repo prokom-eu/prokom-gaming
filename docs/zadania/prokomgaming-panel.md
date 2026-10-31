@@ -20,7 +20,7 @@ Prefiks zadań: **P**. Zasady jak w `docs/zadania/prokomgaming.md` (jedna sesja 
 **Kalendarz:** zostaje ok. 10 wieczorów (P6 2 + P7 2 + P5 1,5 + G15 2 + P8 1,5 + G16 1) w oknie 2.11–19.11, a staging dla szefa najpóźniej 18.11 — razem z pracą w `prokom-web`. To **bardzo ciasno**, bez bufora na poprawki z prawdziwego telefonu i Lighthouse.
 - **Kontrola 3 — 9.11:** P6 scalone, P7 w toku.
 - **Kontrola 4 — 14.11:** P5 i P7 scalone, G15 w toku.
-- **Gdy kontrola pokaże poślizg:** `TODO(krystian)`: co wtedy — przesunięcie daty produkcji całości (rozmowa z szefem) czy jednak część panelu po starcie. Do rozstrzygnięcia najpóźniej przy kontroli 3.
+- **Gdy kontrola pokaże poślizg (decyzja Krystiana 01.11):** przesuwamy produkcję **całości** (strona + panel) — panelu nie tniemy i nie wdrażamy strony bez niego. Nową datę Krystian uzgadnia z szefem od razu przy kontroli, która pokazała poślizg; jakości (telefon, Lighthouse, axe) też nie tniemy.
 
 **Dopisek do G16 (panel w całości):** w `compose.prod.yml`/`compose.staging.yml` oprócz zmiennych strony: `IMAP_HOST/USER/PASSWORD` (P4), `VAPID_PUBLIC_KEY/PRIVATE_KEY/SUBJECT` (P4, osobna para na staging i produkcję), `ANTHROPIC_API_KEY` (P7), `UMAMI_*` i dane logowania API Umami (P8); prawdziwy push na Androidzie i iPhonie, prawdziwy odbiór IMAP i jeden ręczny przebieg sprawdzania cen na stagingu przed akceptacją szefa.
 

@@ -203,7 +203,7 @@ Ostatnia aktualizacja: 01.11.2026 (P2 — Pulpit „Dziś”, PR do `develop`; P
 G1 → G2 → G3 → G4 → G5 → G6 → G7 → G8 → G9 → (kontrola 8.11) → G10 → G11 → G12 → (kontrola 13.11) → G13 → ~~G14~~ (zrobione 31.10) → ~~P1~~ → ~~P3~~ → ~~P4~~ (31.10; push w PR 2) → ~~P2~~ (01.11, PR #48) → **P6 → P7 → P5** → G15 (+ Umami) → **P8** → G16 (produkcja 20.11 — strona **i cały panel** jednym wdrożeniem, decyzja Krystiana 01.11). Kontrole: 9.11 (P6 scalone), 14.11 (P5, P7 scalone). Panel: `docs/zadania/prokomgaming-panel.md` §1.
 
 ## Decyzje (skrót)
-- **Panel w całości na produkcję razem ze stroną (Krystian 01.11.2026):** P5–P8 przed G16, jedno wdrożenie; zastępuje zasadę z 30.10 „sesje P po starcie”.
+- **Panel w całości na produkcję razem ze stroną (Krystian 01.11.2026):** P5–P8 przed G16, jedno wdrożenie; zastępuje zasadę z 30.10 „sesje P po starcie”. Przy poślizgu (kontrole 9.11, 14.11) przesuwamy produkcję całości — nowa data z szefem, panelu nie tniemy.
 - Osobne repo, ten sam stos i wersje co `prokom-web` (ADR-G001), porty 3100 / 54321 / 1026 / 8026.
 - **Repo publiczne (decyzja Krystiana 31.10.2026):** `prokom-eu/prokom-gaming` jest publiczne (jak `prokom-web`), bo GitHub Actions w repo prywatnym zablokowało się na flagę płatności, a płacić nie planujemy. Świadomie jawne: koszty zakupu, modele części (`internalModel`) i narzuty w `seed/prokomgaming/` i `tests/fixtures/`, wzór ceny (ADR-G002), dokumenty w `docs/` — także w całej historii gita. Zasada „koszty, modele i marże nigdy na stronie ani w API” (ADR-G002 §8.7) dotyczy dalej strony i API, nie repo. Sekrety wyłącznie w `.env*` (gitleaks w haku i w CI); nowe dane wrażliwe (np. ceny od dostawców, dane klientów) nigdy do repo.
 - Pełny zakres na 20.11 z ustaloną kolejnością cięcia (`docs/zadania/prokomgaming.md` §4).
@@ -250,7 +250,6 @@ G1 → G2 → G3 → G4 → G5 → G6 → G7 → G8 → G9 → (kontrola 8.11) �
 ## Otwarte pytania — panel (30.10)
 - [SZEF, przed P4 — odbiór na prawdziwej skrzynce] skrzynka Gaming (`gaming@pro-kom.eu`?) z dostępem IMAP i kontem SMTP dla panelu (od P3 wszystkie maile wychodzą z niej).
 - [Krystian, na starcie P7] klucz `ANTHROPIC_API_KEY` — Krystian poda go, gdy zacznie się P7 (wpis tylko do `.env`, nigdy do repo ani czatu z logami). [SZEF] limit wydatków (propozycja 20 USD/mies., ADR-G007 §4).
-- [Krystian, do kontroli 9.11] co przy poślizgu: przesunięcie produkcji całości czy część panelu po starcie (`docs/zadania/prokomgaming-panel.md` §1).
 - [prawnik] polityka prywatności: statystyki bez ciasteczek (Umami), odpowiedzi z panelu.
 - [Krystian, przed G16] SPF/DKIM/DMARC domeny nadawcy w Seohost.
 

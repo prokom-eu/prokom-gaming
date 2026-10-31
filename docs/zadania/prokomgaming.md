@@ -38,7 +38,7 @@ Zasady:
 | G16 | wdrożenie: staging → szef → produkcja | 1 | 18–19.11 |
 | | **Razem** | **ok. 25,5** | |
 
-**Panel** (sesje P0–P8) — osobny plan: `docs/zadania/prokomgaming-panel.md` §1. **Decyzja Krystiana 01.11.2026: panel w całości idzie na produkcję razem ze stroną, jednym wdrożeniem (G16)** — kolejność do 19.11: P6 → P7 → P5 → G15 (+ Umami) → P8 → G16.
+**Panel** (sesje P0–P8) — osobny plan: `docs/zadania/prokomgaming-panel.md` §1. **Decyzja Krystiana 01.11.2026: panel w całości idzie na produkcję razem ze stroną, jednym wdrożeniem (G16)** — kolejność do 19.11: P6 → P7 → P5 → G15 (+ Umami) → P8 → G16. Przy poślizgu przesuwamy produkcję całości (nowa data z szefem), panelu nie tniemy.
 
 **Uczciwie:** pełny zakres to ok. 25,5 wieczoru bez żadnego bufora na poprawki, a w tym oknie jest ok. 25 — i równolegle produkcja prokombiznes.pl w `prokom-web` (kilka wieczorów). Daty w tabeli to plan ciągły bez przerw na Biznes. Bez cięcia zmieści się tylko przy dodatkowych sesjach w weekendy albo gdy Software i Instalacje stoją do 20.11 (decyzja szefa). Kolejność cięcia jest ustalona z góry (§4), żeby decyzja 8.11 i 13.11 zajęła minutę.
 
