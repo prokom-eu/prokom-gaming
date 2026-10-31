@@ -43,5 +43,7 @@ test('the code form takes the code as people type it', async ({ page }) => {
   await expect(page).toHaveURL(new RegExp(`/metryka/${PUBLISHED}$`))
 
   await page.goto('/metryka?kod=abc')
-  await expect(page.getByRole('alert')).toContainText('To nie wygląda na kod z naklejki')
+  // The form's own alert: Next's route announcer is a second `role="alert"` on production builds.
+  await expect(page.locator('#kod-error')).toHaveAttribute('role', 'alert')
+  await expect(page.locator('#kod-error')).toContainText('To nie wygląda na kod z naklejki')
 })
