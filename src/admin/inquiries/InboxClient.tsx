@@ -97,7 +97,8 @@ export function ReplyBox({
           ? await sendReply({ inquiryId, body: draft, templateId: template?.id ?? null })
           : await addNote({ inquiryId, body: draft })
       setResult(next)
-      if (next.ok) {
+      // Sent but not recorded: the customer has the mail — clear the box so it is not sent twice.
+      if (next.ok || next.code === 'not_recorded') {
         setDraft('')
         setTemplate(null)
         router.refresh()
@@ -161,7 +162,6 @@ export function ReplyBox({
           if (e.target.value === '') setTemplate(null)
         }}
         rows={5}
-        enterKeyHint="send"
         placeholder="Napisz odpowiedź… Klient dostanie ją e-mailem z numerem zapytania w temacie."
         aria-describedby={left.length > 0 ? 'reply-missing' : undefined}
       />
@@ -280,9 +280,10 @@ export function AsideActions({
 }
 
 /** Search by number, name or build — POST through an action, the name never in the address. */
-export function InboxSearch() {
+export function InboxSearch({ filter }: { filter: string | null }) {
   const [query, setQuery] = useState('')
-  const [found, setFound] = useState<SearchHit[] | null>(null)
+  // `null` from the action = no access or the search failed.
+  const [found, setFound] = useState<SearchHit[] | null | 'failed'>(null)
   const [pending, startTransition] = useTransition()
   // Under 2 characters the list is not searched (and old hits are not shown).
   const hits = query.trim().length < 2 ? null : found
@@ -291,7 +292,7 @@ export function InboxSearch() {
     const q = query.trim()
     if (q.length < 2) return
     const timer = setTimeout(() => {
-      startTransition(async () => setFound(await searchInquiries(q)))
+      startTransition(async () => setFound((await searchInquiries(q)) ?? 'failed'))
     }, 300)
     return () => clearTimeout(timer)
   }, [query])
@@ -317,14 +318,19 @@ export function InboxSearch() {
           aria-label="Wyniki wyszukiwania"
           aria-busy={pending}
         >
-          {hits.length === 0 ? (
+          {hits === 'failed' ? (
+            // TODO(krystian): text — not on the board.
+            <p className="pn-isrch__none">Wyszukiwanie się nie udało. Spróbuj ponownie.</p>
+          ) : hits.length === 0 ? (
             // TODO(krystian): text — not on the board.
             <p className="pn-isrch__none">Nic nie znaleziono.</p>
           ) : (
             <ul>
               {hits.map((h) => (
                 <li key={h.number}>
-                  <a href={`?nr=${encodeURIComponent(h.number)}`}>
+                  <a
+                    href={`?${new URLSearchParams({ ...(filter ? { filtr: filter } : {}), nr: h.number })}`}
+                  >
                     <b>{h.name}</b>
                     <span>
                       {h.number} · {h.topic} · {STATUS_CHIP[h.status].label}

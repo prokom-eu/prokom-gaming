@@ -78,7 +78,7 @@ export async function InquiriesView({ initPageResult, searchParams }: AdminViewS
       <div className="pn-ibx" data-thread={mode}>
         <section className="pn-ibl" aria-label="Lista zapytań">
           <div className="pn-ibl__hd">
-            <InboxSearch />
+            <InboxSearch filter={filter === 'wszystkie' ? null : filter} />
             <nav className="pn-pills" aria-label="Filtr zapytań">
               {INBOX_FILTERS.map((f) => (
                 <FilterPill

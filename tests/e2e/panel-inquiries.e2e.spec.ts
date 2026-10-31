@@ -200,6 +200,34 @@ test.describe('computer', () => {
     expect(orders.docs[0]?.price).toBeGreaterThan(0)
   })
 
+  test('the status switch and „Oznacz: bez zakupu” save the status; ordering stays possible', async ({
+    page,
+  }) => {
+    const { number } = await newInquiry('sta')
+    await openThread(page, number)
+    await page.getByRole('radio', { name: 'Zamówienie' }).click()
+    await expect(page.getByRole('radio', { name: 'Zamówienie' })).toHaveAttribute(
+      'aria-checked',
+      'true',
+    )
+    expect(await stored(number)).toMatchObject({ status: 'won' })
+    // Set by hand, without an order: the order can still be created.
+    await expect(page.getByRole('button', { name: 'Zamień w zamówienie' })).toBeVisible()
+
+    await page.getByRole('radio', { name: 'W toku' }).click()
+    await expect(page.getByRole('radio', { name: 'W toku' })).toHaveAttribute(
+      'aria-checked',
+      'true',
+    )
+    await page.getByRole('button', { name: 'Oznacz: bez zakupu' }).click()
+    await expect(page.getByRole('radio', { name: 'Bez zakupu' })).toHaveAttribute(
+      'aria-checked',
+      'true',
+    )
+    expect(await stored(number)).toMatchObject({ status: 'lost' })
+    await expect(page.getByRole('button', { name: 'Oznacz: bez zakupu' })).toHaveCount(0)
+  })
+
   test('search by name goes by POST — the name never lands in the address', async ({ page }) => {
     const { number, name } = await newInquiry('szu')
     await page.goto('/admin/zapytania')

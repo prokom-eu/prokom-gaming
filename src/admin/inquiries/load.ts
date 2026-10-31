@@ -109,7 +109,7 @@ const PART_LABEL: Record<keyof Config, string> = {
   ssd: 'Dysk',
 }
 
-const nameOfUser = (author: Inquiry['id'] | User | null | undefined) =>
+const nameOfUser = (author: number | User | null | undefined) =>
   typeof author === 'object' && author ? author.email.split('@')[0] || 'panel' : 'panel'
 
 function metaOf(
@@ -410,7 +410,8 @@ async function loadThread(
       inquiry.voucher?.amount && { label: 'Bon', value: zl(inquiry.voucher.amount) },
     ]),
     order: order?.number ? { number: order.number } : null,
-    canConvert: !order && inquiry.status !== 'won',
+    // Only an existing order hides it: a status set by hand to „Zamówienie” still allows it.
+    canConvert: !order,
   }
 }
 
