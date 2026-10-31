@@ -124,7 +124,7 @@ test.describe('phone (414)', () => {
   for (const width of [360, 414]) {
     test(`no sideways scrolling at ${width} px`, async ({ page }) => {
       await page.setViewportSize({ width, height: 800 })
-      for (const path of ['/admin/ceny', '/admin/dane']) {
+      for (const path of ['/admin/ceny', '/admin/dane', '/admin/ustawienia']) {
         await page.goto(path)
         await expect(page.locator('[data-panel]')).toBeVisible()
         const overflow = await page.evaluate(

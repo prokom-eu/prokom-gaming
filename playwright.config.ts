@@ -16,7 +16,7 @@ process.env.PORT = String(port)
 // Tests that change costs, publish price batches or try to break the offer (and put it back):
 // they run first, one at a time, and every other test starts after them — so a test reading
 // prices never sees a half-changed price list.
-const DB_WRITERS = /(prices-panel|prices-import|offer-integrity)\.e2e\.spec\.ts$/
+const DB_WRITERS = /(prices-panel|prices-import|offer-integrity|panel-settings)\.e2e\.spec\.ts$/
 
 export default defineConfig({
   testDir: './tests/e2e',

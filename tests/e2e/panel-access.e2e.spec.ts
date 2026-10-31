@@ -17,6 +17,7 @@ test.describe.configure({ mode: 'serial' })
 // The dev-only preview answers 404 in production builds (CI runs `next start`).
 const SCREENS = [
   '/admin/ceny',
+  '/admin/ustawienia',
   '/admin/dane',
   ...(process.env.E2E_SERVER === 'start' ? [] : ['/admin/podglad-panelu']),
 ]
@@ -71,14 +72,21 @@ test.describe('signed in with the serwis role', () => {
 
   test('admin screens answer "403" inside the workshop frame', async ({ page }) => {
     await logInAsSerwis(page)
-    await page.goto('/admin/ceny')
-    await expect(page.getByRole('heading', { level: 1, name: 'Brak dostępu (403)' })).toBeVisible()
-    await expect(page.locator('body')).not.toContainText('zł')
+    for (const path of ['/admin/ceny', '/admin/ustawienia']) {
+      await page.goto(path)
+      await expect(
+        page.getByRole('heading', { level: 1, name: 'Brak dostępu (403)' }),
+        path,
+      ).toBeVisible()
+      await expect(page.locator('body')).not.toContainText('zł')
+      await expect(page.locator('input')).toHaveCount(0)
+    }
     const workshop = page.getByRole('navigation', { name: 'Warsztat' })
     await expect(workshop.getByRole('link', { name: /Warsztat/ })).toBeVisible()
     await expect(workshop.getByRole('link', { name: /Zgłoszenia/ })).toBeVisible()
     await expect(page.getByRole('link', { name: /Zapytania/ })).toHaveCount(0)
     await expect(page.getByRole('link', { name: /Do zatwierdzenia/ })).toHaveCount(0)
+    await expect(page.getByRole('link', { name: /Ustawienia/ })).toHaveCount(0)
   })
 
   test('staff screens open for serwis', async ({ page }) => {

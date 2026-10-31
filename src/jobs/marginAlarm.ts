@@ -4,7 +4,7 @@ import { MARGIN_ALARM_TASK } from './queue'
 
 export type MarginAlarmIO = {
   input: { reason: string }
-  output: { published: number | null; alarmed: boolean; levels: string[] }
+  output: { alarmed: boolean; levels: string[] }
 }
 
 /**
@@ -16,7 +16,6 @@ export const MarginAlarmTask: TaskConfig<MarginAlarmIO> = {
   label: 'Alarm marży',
   inputSchema: [{ name: 'reason', type: 'text', required: true }],
   outputSchema: [
-    { name: 'published', type: 'number' },
     { name: 'alarmed', type: 'checkbox', required: true },
     { name: 'levels', type: 'json', required: true },
   ],

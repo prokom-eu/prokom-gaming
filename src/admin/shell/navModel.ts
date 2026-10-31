@@ -167,7 +167,7 @@ const ITEMS: Record<NavKey, NavItem> = {
     icon: 'gear',
     path: '/ustawienia',
     roles: ADMIN,
-    ready: false, // P1 PR 2
+    ready: true,
   },
   // The workshop of the `serwis` role (spec §2a pt 3); own screens in P5.
   tickets: {

@@ -1048,6 +1048,65 @@
   color: var(--p-mu);
 }
 
+/* ---------- settings form (board Ustawienia) ---------- */
+.pn-settings {
+  max-width: 620px;
+}
+.pn-fgrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 16px;
+}
+.pn-fld__in {
+  position: relative;
+  display: block;
+}
+.pn-fld__in input {
+  width: 100%;
+  padding-right: 40px;
+  font-variant-numeric: tabular-nums;
+}
+.pn-fld__in input[aria-invalid='true'] {
+  border-color: var(--p-bad);
+}
+.pn-fld__unit {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--p-mu);
+  font-size: 13px;
+  pointer-events: none;
+}
+.pn-fld .pn-fld__err {
+  color: var(--p-bad);
+  font-weight: 600;
+}
+.pn-manual {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-top: 22px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--p-ln);
+  color: var(--p-ok);
+}
+.pn-manual b {
+  display: block;
+  color: var(--p-tx);
+  font-weight: 700;
+}
+.pn-manual small {
+  color: var(--p-mu);
+  font-size: 12.5px;
+}
+.pn-formstatus {
+  min-height: 1.5em;
+  margin-top: 12px;
+  color: var(--p-tx2);
+  font-size: 13px;
+}
+
 /* ---------- lists of links (Dane) ---------- */
 .pn-datalist {
   display: flex;
@@ -1094,6 +1153,17 @@
   }
   .pn-m-only {
     display: block;
+  }
+  .pn-btn.pn-m-only {
+    display: flex;
+    width: 100%;
+    margin-top: 8px;
+  }
+  .pn-settings {
+    max-width: none;
+  }
+  .pn-fgrid {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   /* app bar */

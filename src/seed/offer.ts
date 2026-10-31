@@ -238,8 +238,11 @@ export function mapBuild(b: SeedBuild, c: SeedCreature, refs: BuildRefs): BuildD
 export function mapPricingSettings(s: typeof pricingSettingsSeed): DocData<PricingSetting> {
   return {
     minMargin: s.minMargin,
+    // Not in the price sheet: the panel's default warning threshold (panel spec §2, P1).
+    warnMargin: 0.12,
     publishThreshold: s.publishThreshold,
-    autoPublish: s.autoPublish,
+    // Publication is always manual (P1): never seed `autoPublish` on, whatever the sheet says.
+    autoPublish: false,
     serviceCost: s.serviceCost,
     caseCoolerBuffer: s.caseCoolerBuffer,
     whiteSurcharge: s.whiteSurcharge,

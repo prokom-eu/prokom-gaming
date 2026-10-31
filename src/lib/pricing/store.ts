@@ -130,7 +130,7 @@ export class StalePublicationError extends Error {
 export async function writeBatch(
   payload: Payload,
   plan: Extract<PublicationPlan, { ok: true }>,
-  /** `null` = published automatically (`autoPublish`, margin-alarm job). */
+  /** The admin who approved it; `null` = no panel account (nothing publishes by itself since P1). */
   user: User | null,
   basedOn: number,
 ): Promise<{ batch: number; publishedAt: string }> {

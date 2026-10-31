@@ -1,12 +1,13 @@
 # STAN — prokom-gaming
 
-Ostatnia aktualizacja: 31.10.2026 (P1 PR 1 — powłoka panelu, gałąź `feat/p1-powloka-panelu`).
+Ostatnia aktualizacja: 31.10.2026 (P1 PR 2 — ustawienia, gałąź `feat/p1-ustawienia`; PR 1 = #36).
 
 ## W toku
-- **Gałąź:** `feat/p1-powloka-panelu` (P1 PR 1 z 2).
+- **Gałąź:** `feat/p1-ustawienia` (P1 PR 2 z 2; zawiera PR 1 `feat/p1-powloka-panelu` = #36 — najpierw scalić #36).
 - **Zrobione:** tokeny `src/admin/styles/panel-tokens.css` + `panel.css` (klasy `pn-`, tryb telefonu ≤ 760 px), motyw Payload (ciemny, zmienne w `custom.scss`), kroje Manrope/Cinzel i `viewport-fit=cover` w `(payload)/layout.tsx`; jedna kontrola dostępu `panelAccess()` (`src/admin/access.ts`) + `panelActionSession()` dla akcji; `PanelShell` (pasek boczny i górny pasek / pasek aplikacji, dolne zakładki, arkusz „Więcej”), model nawigacji `src/admin/shell/navModel.ts` (grupy, zakładki admin/serwis, pozycje ukryte do swoich sesji), liczniki z `loadShell()`; komponenty `src/admin/ui/*` (PanelPage, Card, Kpi+Spark, Chip, Seg, FilterPill, DataTable z trybem kart, ActionBar, Sheet, MarginBar, Alert, Toggle, EmptyState); `marginStatus()` w `lib/pricing/format.ts`; ekran `/admin/ceny` w powłoce; `/admin/dane` (listy Payload), `/admin/podglad-panelu` (tylko dev); manifest PWA `/admin/manifest.webmanifest` + ikony „PK” (`scripts/admin-icons.mjs`); e2e `panel-shell`, `panel-access`.
-- **Niedokończone:** P1 PR 2; test na prawdziwym telefonie (Android: monit instalacji; iPhone: ikona i pełny ekran z ekranu głównego).
-- **Następny krok:** P1 PR 2 `feat/p1-ustawienia` — `/admin/ustawienia` z sekcją „Marża i narzuty” (`Ustawienia-1440`/`-414`), `warnMargin` (ułamek 0,12, migracja `p1_warn_margin`), usunięcie gałęzi `autoPublish` z `runMarginAlarm` (pole tylko do odczytu), `navModel.settings.ready = true`, e2e (zapis, granice, `serwis` → 403).
+- **Zrobione w PR 2:** `/admin/ustawienia` z sekcją „Marża i narzuty” (teksty 1:1 z planszy, procenty/zł z przecinkiem, `src/admin/settings/form.ts` z testami — zapis bez zmian = te same ułamki), zapis akcją serwera przez Local API z dostępem admina; `pricing-settings.warnMargin` (ułamek, domyślnie 0,12, nie niżej niż `minMargin`; migracja `20261031_180205_p1_warn_margin`, up → down → up czyste); `autoPublish` tylko do odczytu (dostęp pola `update: false`) i usunięta gałąź auto-publikacji z `runMarginAlarm` (wynik zadania bez `published`); e2e `panel-settings` (w `db-writers`), `prices-import` sprawdza, że import nigdy nie publikuje; jedno logowanie admina w e2e (`tests/e2e/auth.setup.ts`, pamięć: równoległe logowania gubią sesje Payload).
+- **Niedokończone:** test na prawdziwym telefonie (Android: monit instalacji; iPhone: ikona i pełny ekran z ekranu głównego).
+- **Następny krok:** scalić #36, potem `develop` do `feat/p1-ustawienia` i scalić PR 2; dalej `/zadanie P3` (zapytania: wątek i wysyłka, `docs/zadania/prokomgaming-panel.md`).
 
 ## Uwagi na później (P1)
 - **Świadome odstępstwa i decyzje P1:**
@@ -17,6 +18,8 @@ Ostatnia aktualizacja: 31.10.2026 (P1 PR 1 — powłoka panelu, gałąź `feat/p
   - Ukryte do swoich sesji: wyszukiwarka (P8), „Sprawdź ceny” (P7), Klienci (P5), Centrum cen i Opcje (P6), Raporty cen (P7), Statystyki (P8), Ustawienia (PR 2). „Zatwierdź”/„Do zatwierdzenia” → `/admin/ceny` z G4, „Zestawy”/„Zapytania”/„Zamówienia” → listy Payload (spec. §2a pt 3).
   - „Dane (listy)” to własny widok `/admin/dane` (lista kolekcji wg uprawnień) — po P2 dashboard Payload zniknie, więc listy muszą mieć własne wejście. Zdanie pod tytułem: `TODO(krystian)`.
   - Licznik kolejki w powłoce: `buildQueue()` kosztuje ok. 0,5 s (dev) — wynik zapamiętany w procesie pod kluczem: partia + najnowsze `updatedAt` i liczba opcji/poziomów + `pricing-settings.updatedAt` (`src/admin/shell/load.ts`).
+  - Ustawienia: jedno pole „Narzut RAM i dysków” zapisuje `categoryMarkup.ram` i `.ssd` (w cenniku równe); gdy ktoś rozdzieli je w listach Payload, ekran pokazuje ostrzeżenie (`TODO(krystian)` treść), a zapis bez zmiany tego pola zostawia obie wartości. Pola niezmienione zapisują dokładnie wartość z bazy (`keepUnchanged`) — zapis nie zaokrągla precyzji wpisanej w listach Payload. Ostatni zapis wygrywa (dwie karty naraz — przy jednej osobie świadomie).
+  - `warnMargin` czyta na razie tylko ekran ustawień — żółty znacznik na Pulpicie (P2) i w raporcie cen (P7) użyje `marginStatus()`. Narzuty obudów/chłodzeń/usługi (0 / 0 / 15%) nie są na planszy — zostają w „Dane → Ustawienia cen”. Komunikaty „Zapisuję…”/„Zapisano…” — `TODO(krystian)`. Pozostałe sekcje planszy (sprawdzanie cen, Claude, poczta, zamówienia, statystyki) w swoich sesjach.
   - Emulacja iPhone 13 (WebKit) nie w CI — tylko prawdziwy telefon; e2e na `mobile-414` (Chromium).
 - **`src/app/(payload)/layout.tsx` zmieniony ręcznie** (linie z „P1”): przy aktualizacji Payload sprawdzić, czy plik nie został wygenerowany od nowa.
 - **Ikony PWA** to monogram „PK” rysowany kreskami (bez kroju) — po decyzji o logo podmienić w `scripts/admin-icons.mjs` i wygenerować ponownie.
