@@ -189,6 +189,7 @@ G1 → G2 → G3 → G4 → G5 → G6 → G7 → G8 → G9 → (kontrola 8.11) �
 
 ## Decyzje (skrót)
 - Osobne repo, ten sam stos i wersje co `prokom-web` (ADR-G001), porty 3100 / 54321 / 1026 / 8026.
+- **Repo publiczne (decyzja Krystiana 31.10.2026):** `prokom-eu/prokom-gaming` jest publiczne (jak `prokom-web`), bo GitHub Actions w repo prywatnym zablokowało się na flagę płatności, a płacić nie planujemy. Świadomie jawne: koszty zakupu, modele części (`internalModel`) i narzuty w `seed/prokomgaming/` i `tests/fixtures/`, wzór ceny (ADR-G002), dokumenty w `docs/` — także w całej historii gita. Zasada „koszty, modele i marże nigdy na stronie ani w API” (ADR-G002 §8.7) dotyczy dalej strony i API, nie repo. Sekrety wyłącznie w `.env*` (gitleaks w haku i w CI); nowe dane wrażliwe (np. ceny od dostawców, dane klientów) nigdy do repo.
 - Pełny zakres na 20.11 z ustaloną kolejnością cięcia (`docs/zadania/prokomgaming.md` §4).
 - Domena `prokomgaming.pl`. Bez rat. Płatność przelew albo BLIK po pro formie.
 - Ceny liczone jedną funkcją, gwarancja marży 11% (ADR-G002). Klatki z testów z etykietą źródła (ADR-G004).
