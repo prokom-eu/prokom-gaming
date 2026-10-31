@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { imapConfig, parseEnv } from './env'
+import { imapConfig, parseEnv, vapidConfig } from './env'
 
 const valid = {
   NODE_ENV: 'test',
@@ -124,6 +124,24 @@ describe('parseEnv', () => {
     })
     expect(() => parseEnv({ ...valid, IMAP_HOST: 'imap.example.test' })).toThrow(/IMAP_PASSWORD/)
     expect(() => parseEnv({ ...valid, ...imap, IMAP_USER: undefined })).toThrow(/IMAP_PASSWORD/)
+  })
+
+  it('push is off without VAPID_*, on with all three (ADR-G010)', () => {
+    expect(vapidConfig(parseEnv(valid))).toBeNull()
+    const vapid = {
+      VAPID_PUBLIC_KEY: 'B'.repeat(87),
+      VAPID_PRIVATE_KEY: 'k'.repeat(43),
+      VAPID_SUBJECT: 'mailto:gaming@example.test',
+    }
+    expect(vapidConfig(parseEnv({ ...valid, ...vapid }))).toEqual({
+      publicKey: 'B'.repeat(87),
+      privateKey: 'k'.repeat(43),
+      subject: 'mailto:gaming@example.test',
+    })
+    expect(() => parseEnv({ ...valid, VAPID_PUBLIC_KEY: 'B'.repeat(87) })).toThrow(/VAPID_SUBJECT/)
+    expect(() => parseEnv({ ...valid, ...vapid, VAPID_SUBJECT: 'gaming@example.test' })).toThrow(
+      /VAPID_SUBJECT/,
+    )
   })
 
   it('rejects an invalid SMTP_PORT or SMTP_SECURE', () => {

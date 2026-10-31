@@ -1,6 +1,9 @@
+import { createHash } from 'node:crypto'
+
 import type { AdminViewServerProps, Payload } from 'payload'
 
-import { getEnv, imapConfig } from '../../lib/env'
+import { getEnv, imapConfig, vapidConfig } from '../../lib/env'
+import { PUSH_KINDS, type PushKind } from '../../lib/notify/kinds'
 import { zl } from '../../lib/pricing/format'
 import { loadBatch } from '../../lib/pricing/store'
 import { panelAccess } from '../access'
@@ -11,6 +14,8 @@ import { PanelPage } from '../ui/PanelPage'
 import { PanelShell } from '../ui/PanelShell'
 import { percentText, toFormValues, type FieldName } from './form'
 import { intakeStatus } from './intakeStatus'
+import { PushSettings, type PushDevice } from './PushSettings'
+import { whenLabel } from '../inquiries/format'
 import { MailSettingsForm } from './MailSettingsForm'
 import { toMailFormValues } from './mailForm'
 import { SettingsForm } from './SettingsForm'
@@ -39,13 +44,33 @@ export async function SettingsView({ initPageResult }: AdminViewServerProps) {
   }
 
   const { payload } = req
-  const [settings, hints, mail, intake] = await Promise.all([
+  const now = new Date()
+  const [settings, hints, mail, intake, devices] = await Promise.all([
     payload.findGlobal({ slug: 'pricing-settings', depth: 0, overrideAccess: true }),
     loadHints(payload),
     payload.findGlobal({ slug: 'mail-settings', depth: 0, overrideAccess: true }),
     payload.findGlobal({ slug: 'mail-intake-state', depth: 0, overrideAccess: true }),
+    // Own devices only (spec §13). Only a hash of the endpoint reaches the page („to urządzenie”).
+    payload.find({
+      collection: 'push-subscriptions',
+      where: { user: { equals: req.user?.id ?? 0 } },
+      sort: 'createdAt',
+      pagination: false,
+      depth: 0,
+      overrideAccess: true,
+    }),
   ])
-  const reading = intakeStatus(Boolean(imapConfig(getEnv())), intake, new Date())
+  const pushDevices: PushDevice[] = devices.docs.map((d) => ({
+    id: d.id,
+    label: d.label,
+    kinds: (d.kinds ?? []).filter((k): k is PushKind =>
+      (PUSH_KINDS as readonly string[]).includes(k),
+    ),
+    lastOk: d.lastOkAt ? whenLabel(d.lastOkAt, now) : null,
+    disabled: Boolean(d.disabledAt),
+    endpointHash: createHash('sha256').update(d.endpoint).digest('hex'),
+  }))
+  const reading = intakeStatus(Boolean(imapConfig(getEnv())), intake, now)
   const values = toFormValues({
     minMargin: settings.minMargin,
     warnMargin: settings.warnMargin,
@@ -110,6 +135,14 @@ export async function SettingsView({ initPageResult }: AdminViewServerProps) {
               replyAlarmMinutes: mail.replyAlarmMinutes,
               signature: mail.signature,
             })}
+          />
+        </Card>
+        {/* No board for this section (spec §13): laid out like the others. */}
+        <Card title="Powiadomienia na telefon" className="pn-card--section">
+          <PushSettings
+            publicKey={vapidConfig(getEnv())?.publicKey ?? null}
+            devices={pushDevices}
+            admin={payload.config.routes.admin}
           />
         </Card>
       </div>

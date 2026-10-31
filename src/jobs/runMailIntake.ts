@@ -4,10 +4,12 @@ import type { PayloadRequest } from 'payload'
 
 import { getEnv, imapConfig } from '../lib/env'
 import { errorFields } from '../lib/logger'
+import { inquiryTopic } from '../lib/inquiry/subject'
 import { mailErrorEmail } from '../lib/mail/alarm'
 import { imapMailbox } from '../lib/mail/imap.server'
 import { runIntake } from '../lib/mail/intake'
 import { storeIncoming } from '../lib/mail/store.server'
+import { notify } from '../lib/notify'
 import type { MailIntakeIO } from './mailIntake'
 
 /** One run of the mailbox reader. Logs UIDs and counts only — never addresses or subjects. */
@@ -24,6 +26,7 @@ export async function runMailIntake(req: PayloadRequest): Promise<MailIntakeIO['
     overrideAccess: true,
     req,
   })
+  const replied = new Set<number>()
   const result = await runIntake({
     client: imapMailbox(config),
     state: {
@@ -32,7 +35,11 @@ export async function runMailIntake(req: PayloadRequest): Promise<MailIntakeIO['
       errorCount: saved.errorCount ?? 0,
     },
     ownAddress: env.MAIL_FROM_ADDRESS,
-    store: (mail) => storeIncoming(payload, mail, now),
+    store: async (mail) => {
+      const stored = await storeIncoming(payload, mail, now)
+      if (stored.inquiryId !== undefined) replied.add(stored.inquiryId)
+      return stored.result
+    },
     now,
     onFailedParse: (uid, error) =>
       payload.logger.error({ uid, ...errorFields(error) }, 'Mail intake: message not parsed'),
@@ -63,17 +70,23 @@ export async function runMailIntake(req: PayloadRequest): Promise<MailIntakeIO['
     )
   }
   if (result.alarm) {
-    if (env.ALERT_EMAIL) {
-      await payload
-        .sendEmail(
-          mailErrorEmail({ to: env.ALERT_EMAIL, settingsUrl: `${env.SITE_URL}/admin/ustawienia` }),
-        )
-        .catch((error: unknown) =>
-          payload.logger.error({ ...errorFields(error) }, 'Mail intake alarm not sent'),
-        )
-    } else {
-      payload.logger.warn('Mail intake: ALERT_EMAIL not set, no alarm sent')
-    }
+    await notify(
+      payload,
+      {
+        kind: 'mail_error',
+        push: null,
+        email: mailErrorEmail({ settingsUrl: `${env.SITE_URL}/admin/ustawienia` }),
+      },
+      { req },
+    ).catch((error: unknown) =>
+      payload.logger.error({ ...errorFields(error) }, 'Mail intake alarm not queued'),
+    )
+  }
+  // One push per inquiry that got an answer in this run (panel spec §14 `inquiry_reply`).
+  for (const id of replied) {
+    await notifyReply(req, id).catch((error: unknown) =>
+      payload.logger.error({ inquiry: id, ...errorFields(error) }, 'Reply push not queued'),
+    )
   }
 
   const { counts } = result
@@ -85,4 +98,28 @@ export async function runMailIntake(req: PayloadRequest): Promise<MailIntakeIO['
     skipped: counts.skipped,
     error: result.error,
   }
+}
+
+async function notifyReply(req: PayloadRequest, id: number): Promise<void> {
+  const inquiry = await req.payload.findByID({
+    collection: 'inquiries',
+    id,
+    select: { number: true, type: true, budget: true, voucher: true, build: true },
+    populate: { builds: { name: true } },
+    depth: 1,
+    overrideAccess: true,
+    req,
+  })
+  const number = inquiry.number ?? `#${inquiry.id}`
+  const topic = inquiryTopic({
+    type: inquiry.type,
+    buildName: typeof inquiry.build === 'object' ? inquiry.build?.name : null,
+    budget: inquiry.budget,
+    voucherAmount: inquiry.voucher?.amount,
+  })
+  await notify(
+    req.payload,
+    { kind: 'inquiry_reply', push: { kind: 'inquiry_reply', number, topic }, email: null },
+    { req },
+  )
 }

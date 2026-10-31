@@ -2,8 +2,9 @@ import 'server-only'
 
 import type { Payload } from 'payload'
 
-import { getEnv } from '../lib/env'
+import { getEnv, vapidConfig } from '../lib/env'
 import { log } from '../lib/logger'
+import { notify } from '../lib/notify'
 import { marginAlarmMail } from '../lib/pricing/alarm'
 import { buildQueue, buildsOverview } from '../lib/pricing/publish'
 import { loadBatch, loadOffer } from '../lib/pricing/store'
@@ -31,12 +32,23 @@ export async function runMarginAlarm(
   const levels = queue.brokenLevels.map((p) => p.level)
   if (!mail) return { alarmed: false, levels }
 
-  const to = getEnv().ALERT_EMAIL
-  if (!to) {
-    log.warn({ levels, reason }, 'margin alarm: ALERT_EMAIL not set, mail not sent')
+  // E-mail to ALERT_EMAIL and push through `notify-send` (panel spec §14). Without ALERT_EMAIL
+  // and without push nothing would reach anyone — say so in the log.
+  const env = getEnv()
+  if (!env.ALERT_EMAIL && !vapidConfig(env)) {
+    log.warn({ levels, reason }, 'margin alarm: neither ALERT_EMAIL nor push set, nothing sent')
     return { alarmed: false, levels }
   }
-  await payload.sendEmail({ to, subject: mail.subject, text: mail.text })
-  log.warn({ levels, reason }, 'margin alarm sent')
+  // At once: after a CSV import the alarm must arrive right away (ADR-G002 §4.4).
+  await notify(
+    payload,
+    {
+      kind: 'margin_alarm',
+      push: { kind: 'margin_alarm' },
+      email: { subject: mail.subject, text: mail.text },
+    },
+    { runNow: true },
+  )
+  log.warn({ levels, reason }, 'margin alarm queued')
   return { alarmed: true, levels }
 }

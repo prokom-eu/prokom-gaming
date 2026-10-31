@@ -90,6 +90,7 @@ export interface Config {
     'reply-templates': ReplyTemplate;
     'inquiry-messages': InquiryMessage;
     'mail-intake-unmatched': MailIntakeUnmatched;
+    'push-subscriptions': PushSubscription;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
     'payload-locked-documents': PayloadLockedDocument;
@@ -120,6 +121,7 @@ export interface Config {
     'reply-templates': ReplyTemplatesSelect<false> | ReplyTemplatesSelect<true>;
     'inquiry-messages': InquiryMessagesSelect<false> | InquiryMessagesSelect<true>;
     'mail-intake-unmatched': MailIntakeUnmatchedSelect<false> | MailIntakeUnmatchedSelect<true>;
+    'push-subscriptions': PushSubscriptionsSelect<false> | PushSubscriptionsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -159,6 +161,7 @@ export interface Config {
       'inquiry-retention': TaskInquiryRetention;
       'inquiry-sla': TaskInquirySla;
       'mail-intake': TaskMailIntake;
+      'notify-send': TaskNotifySend;
       inline: {
         input: unknown;
         output: unknown;
@@ -991,6 +994,26 @@ export interface MailIntakeUnmatched {
   createdAt: string;
 }
 /**
+ * Włączasz i usuwasz w Ustawieniach → Powiadomienia na telefon.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "push-subscriptions".
+ */
+export interface PushSubscription {
+  id: number;
+  user: number | User;
+  label: string;
+  endpoint: string;
+  p256dh: string;
+  auth: string;
+  kinds?: ('inquiry_new' | 'inquiry_reply' | 'inquiry_sla' | 'margin_alarm')[] | null;
+  lastOkAt?: string | null;
+  failCount?: number | null;
+  disabledAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -1059,7 +1082,7 @@ export interface PayloadJob {
     | {
         executedAt: string;
         completedAt: string;
-        taskSlug: 'inline' | 'margin-alarm' | 'inquiry-retention' | 'inquiry-sla' | 'mail-intake';
+        taskSlug: 'inline' | 'margin-alarm' | 'inquiry-retention' | 'inquiry-sla' | 'mail-intake' | 'notify-send';
         taskID: string;
         input?:
           | {
@@ -1092,7 +1115,7 @@ export interface PayloadJob {
         id?: string | null;
       }[]
     | null;
-  taskSlug?: ('inline' | 'margin-alarm' | 'inquiry-retention' | 'inquiry-sla' | 'mail-intake') | null;
+  taskSlug?: ('inline' | 'margin-alarm' | 'inquiry-retention' | 'inquiry-sla' | 'mail-intake' | 'notify-send') | null;
   queue?: string | null;
   waitUntil?: string | null;
   processing?: boolean | null;
@@ -1202,6 +1225,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'mail-intake-unmatched';
         value: number | MailIntakeUnmatched;
+      } | null)
+    | ({
+        relationTo: 'push-subscriptions';
+        value: number | PushSubscription;
       } | null);
   globalSlug?: string | null;
   user:
@@ -1872,6 +1899,23 @@ export interface MailIntakeUnmatchedSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "push-subscriptions_select".
+ */
+export interface PushSubscriptionsSelect<T extends boolean = true> {
+  user?: T;
+  label?: T;
+  endpoint?: T;
+  p256dh?: T;
+  auth?: T;
+  kinds?: T;
+  lastOkAt?: T;
+  failCount?: T;
+  disabledAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv_select".
  */
 export interface PayloadKvSelect<T extends boolean = true> {
@@ -2393,6 +2437,30 @@ export interface TaskMailIntake {
     unmatched: number;
     skipped: number;
     error: boolean;
+  };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskNotify-send".
+ */
+export interface TaskNotifySend {
+  input: {
+    event:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    channel: string;
+  };
+  output: {
+    emailed: boolean;
+    pushed: number;
+    failed: number;
+    gone: number;
   };
 }
 /**

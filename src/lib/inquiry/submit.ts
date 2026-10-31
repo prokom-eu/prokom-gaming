@@ -4,6 +4,7 @@ import { randomUUID } from 'node:crypto'
 import type { Inquiry } from '../../payload-types'
 import type { CompatError } from '../compat'
 import { errorFields, type LogFields } from '../logger'
+import { notify } from '../notify'
 import type { PriceSnapshot } from '../pricing/snapshot'
 import type { Config } from '../pricing/types'
 import { isReserved, locationOf, RESERVATION_MS, SKIP_STOCK_GUARD, stockPrice } from '../stock'
@@ -17,7 +18,7 @@ import {
 } from './emails'
 import { priceComputer, type InquiryOffer, type PricedComputer } from './price'
 import { newMessageId } from './replyMail'
-import { inquiryPanelPath } from './subject'
+import { inquiryPanelPath, inquiryTopic } from './subject'
 import { inquiryFieldErrors, parseInquiryInput } from './schema'
 import {
   checkFormToken,
@@ -84,6 +85,8 @@ export type SubmitDeps = {
    * does not wait for SMTP), awaited in tests. The record is saved before either way.
    */
   defer: (task: () => Promise<void>) => void | Promise<void>
+  /** Push „Nowe zapytanie” to the panel's phones (P4, `notify()`), in the deferred task. */
+  notifyNew: (id: number, number: string) => Promise<void>
   /** Gaming inbox (`INQUIRY_NOTIFY_EMAIL`); `null` locally without it. */
   notifyTo: string | null
   /** „Odpowiedź na zapytanie” from `site-settings`; `null` when empty or unreadable. */
@@ -310,6 +313,11 @@ export async function submitInquiryWith(
     consent: { clauseVersion: input.consent.clauseVersion, acceptedAt },
   }
   await deps.defer(async () => {
+    // The push next to the e-mails (ADR-G010: a sign within seconds) — a slow push service never
+    // delays the customer's confirmation.
+    const pushed = deps.notifyNew(id, number).catch((error: unknown) => {
+      deps.log.error({ inquiry: id, ...errorFields(error) }, 'Inquiry push not sent')
+    })
     const emails: { kind: string; email: Email }[] = []
     if (deps.notifyTo) {
       emails.push({
@@ -349,6 +357,7 @@ export async function submitInquiryWith(
         deps.log.error({ inquiry: id, ...errorFields(error) }, 'Confirmation id not saved')
       })
     }
+    await pushed
   })
 
   return { ok: true, id, number }
@@ -480,6 +489,28 @@ export async function submitInquiry(
         })
       },
       defer: (task) => after(task),
+      // Run at once (we are already after the response): a sign within seconds, ADR-G010.
+      notifyNew: async (id, number) => {
+        const inquiry = await payload.findByID({
+          collection: 'inquiries',
+          id,
+          select: { type: true, budget: true, voucher: true, build: true },
+          populate: { builds: { name: true } },
+          depth: 1,
+          overrideAccess: true,
+        })
+        const topic = inquiryTopic({
+          type: inquiry.type,
+          buildName: typeof inquiry.build === 'object' ? inquiry.build?.name : null,
+          budget: inquiry.budget,
+          voucherAmount: inquiry.voucher?.amount,
+        })
+        await notify(
+          payload,
+          { kind: 'inquiry_new', push: { kind: 'inquiry_new', number, topic }, email: null },
+          { runNow: true },
+        )
+      },
       notifyTo: env.INQUIRY_NOTIFY_EMAIL ?? null,
       responseTime: async () => {
         const settings = await payload.findGlobal({

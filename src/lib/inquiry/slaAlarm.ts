@@ -21,16 +21,15 @@ export function dueAlarms<T extends WaitingInquiry>(
 }
 
 /**
- * The alarm e-mail to `ALERT_EMAIL`: number, topic and waiting time — never the customer's name,
- * e-mail or message (panel spec §14, §16). Push on the phone comes with `notify()` in P4.
+ * The alarm e-mail (to `ALERT_EMAIL`, sent by `notify-send` together with the push): number,
+ * topic and waiting time — never the customer's name, e-mail or message (panel spec §14, §16).
  */
 export function slaAlarmEmail(
   inquiry: WaitingInquiry & { waited: number },
-  { to, panelUrl }: { to: string; panelUrl: string },
+  { panelUrl }: { panelUrl: string },
 ) {
   const wait = waitLabel(inquiry.waited)
   return {
-    to,
     subject: `Bez odpowiedzi od ${wait}: ${inquiry.number}`,
     text: [
       `Zapytanie ${inquiry.number} (${inquiry.topic}) czeka na odpowiedź ${wait} w godzinach odpowiedzi.`,

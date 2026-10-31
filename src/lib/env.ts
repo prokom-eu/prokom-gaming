@@ -52,6 +52,16 @@ const envSchema = z
     // Folder for copies of replies sent from the panel; empty = the folder the server marks as
     // „Sent” (special-use \Sent), else „Sent”.
     IMAP_SENT_FOLDER: z.string().min(1).optional(),
+    // Push notifications on the panel's phones (ADR-G010 pt 4, P4). All three or none: without
+    // them push is off (the panel says so) and the e-mail alarms still go. The public key goes to
+    // the browser in the panel's HTML; the private one never leaves the server.
+    VAPID_PUBLIC_KEY: z.string().min(40).optional(),
+    VAPID_PRIVATE_KEY: z.string().min(20).optional(),
+    // Contact for the push services: `mailto:` of the Gaming mailbox.
+    VAPID_SUBJECT: z
+      .string()
+      .regex(/^(mailto:|https:\/\/)/, 'mailto: or https:// address')
+      .optional(),
   })
   // SMTP login is both or neither: a half-set pair would fail only at the first e-mail.
   .refine((env) => Boolean(env.SMTP_USER) === Boolean(env.SMTP_PASS), {
@@ -65,6 +75,18 @@ const envSchema = z
     {
       message: 'set all of IMAP_HOST, IMAP_USER and IMAP_PASSWORD, or none',
       path: ['IMAP_PASSWORD'],
+    },
+  )
+  .refine(
+    (env) =>
+      new Set(
+        [env.VAPID_PUBLIC_KEY, env.VAPID_PRIVATE_KEY, env.VAPID_SUBJECT].map((value) =>
+          Boolean(value),
+        ),
+      ).size === 1,
+    {
+      message: 'set all of VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY and VAPID_SUBJECT, or none',
+      path: ['VAPID_SUBJECT'],
     },
   )
   .refine((env) => env.NODE_ENV !== 'production' || Boolean(env.ALERT_EMAIL), {
@@ -117,6 +139,18 @@ export function imapConfig(env: Env): ImapConfig | null {
     user: env.IMAP_USER,
     password: env.IMAP_PASSWORD,
     sentFolder: env.IMAP_SENT_FOLDER ?? null,
+  }
+}
+
+export type VapidConfig = { publicKey: string; privateKey: string; subject: string }
+
+/** Keys for push, or `null` when push is switched off (no VAPID_* set). */
+export function vapidConfig(env: Env): VapidConfig | null {
+  if (!env.VAPID_PUBLIC_KEY || !env.VAPID_PRIVATE_KEY || !env.VAPID_SUBJECT) return null
+  return {
+    publicKey: env.VAPID_PUBLIC_KEY,
+    privateKey: env.VAPID_PRIVATE_KEY,
+    subject: env.VAPID_SUBJECT,
   }
 }
 
