@@ -48,7 +48,18 @@ export function BottomSheet({
   useEffect(() => {
     const dialog = ref.current
     if (!dialog) return
-    if (open && !dialog.open) dialog.showModal()
+    if (open && !dialog.open) {
+      dialog.showModal()
+      // showModal() focuses the first link while the sheet is still below the screen (start of
+      // the slide-in), and the browser scrolls the sheet's content to that focus — the grab bar
+      // and the top of the header end up hidden above the edge. Start every opening at the top;
+      // the focused element is in the header, so it stays in view. Again on the next frame:
+      // on a slow phone the focus scroll can land after this line.
+      dialog.scrollTop = 0
+      requestAnimationFrame(() => {
+        dialog.scrollTop = 0
+      })
+    }
     if (!open && dialog.open) dialog.close()
   }, [open])
 
