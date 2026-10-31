@@ -78,6 +78,11 @@ export default buildConfig({
     // `exact` on every view: `/ceny` must not catch `/ceny/zatwierdzanie` (P6).
     components: {
       views: {
+        // P2: the Pulpit „Dziś” replaces Payload's dashboard at /admin.
+        dashboard: {
+          Component: '/admin/dashboard/DashboardView#DashboardView',
+          meta: { title: 'Pulpit' },
+        },
         prices: {
           Component: '/admin/prices/PricesView#PricesView',
           path: '/ceny',

@@ -160,6 +160,18 @@ export function buildQueue(catalog: Catalog, snapshot: PriceSnapshot): QueueStat
   }
 }
 
+/**
+ * Prices on the site after approving the whole queue: the published ones with every queued item
+ * at its candidate price. Minor changes stay at their published price — exactly what
+ * `planPublication()` publishes when every queued key is selected (the Pulpit's „Po
+ * zatwierdzeniu”, P2).
+ */
+export function pricesAfterQueue(queue: QueueState): PriceList {
+  const prices = clonePrices(queue.effectivePublished)
+  for (const item of queue.items) withPrice(prices, item, item.candidate)
+  return prices
+}
+
 // --- Publication ---
 
 export type PublishProblem =

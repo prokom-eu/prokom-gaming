@@ -10,6 +10,7 @@ import React from 'react'
 
 import { PANEL_APP } from '../../admin/brand' // P1
 import { cinzel, manrope } from '../(site)/fonts' // P1
+import '../../styles/tokens.css' // P2: creature colours on the Pulpit (one source, spec §2)
 import '../../admin/styles/panel-tokens.css' // P1
 import '../../admin/styles/panel.css' // P1
 import { importMap } from './admin/importMap.js'
