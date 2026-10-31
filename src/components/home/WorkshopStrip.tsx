@@ -11,6 +11,8 @@ const STAGES = ['Części', 'Montaż', 'Test obciążeniowy', 'Pomiar klatek', '
  * orders (`loadWorkshop()`, the same data as `GET /api/warsztat`): sigil, build name and stage —
  * never who ordered (ADR-G005) — and the "live" dot. Without orders it shows the fixed process.
  * The board's „Tablica warsztatu” link is left out: `/warsztat` is outside 20.11 (spec. §14).
+ * The list scrolls sideways when it does not fit, so it takes focus — keyboard users scroll it
+ * with arrows (axe `scrollable-region-focusable`).
  */
 export function WorkshopStrip({ items = [] }: { items?: readonly WorkshopItem[] }) {
   const live = items.length > 0
@@ -21,7 +23,11 @@ export function WorkshopStrip({ items = [] }: { items?: readonly WorkshopItem[] 
         Teraz w warsztacie w Rabce
       </h2>
       {live ? (
-        <ul className="workshop__list workshop__list--live">
+        <ul
+          className="workshop__list workshop__list--live"
+          tabIndex={0}
+          aria-labelledby="workshop-title"
+        >
           {items.map((item, i) => (
             <li
               key={`${item.slug}-${i}`}
@@ -34,7 +40,7 @@ export function WorkshopStrip({ items = [] }: { items?: readonly WorkshopItem[] 
           ))}
         </ul>
       ) : (
-        <ol className="workshop__list">
+        <ol className="workshop__list" tabIndex={0} aria-labelledby="workshop-title">
           {STAGES.map((stage) => (
             <li key={stage}>{stage}</li>
           ))}
