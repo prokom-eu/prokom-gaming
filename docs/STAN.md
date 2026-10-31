@@ -1,12 +1,25 @@
 # STAN — prokom-gaming
 
-Ostatnia aktualizacja: 31.10.2026 (koniec sesji G14 — scalona do `develop`, #34).
+Ostatnia aktualizacja: 31.10.2026 (P1 PR 1 — powłoka panelu, gałąź `feat/p1-powloka-panelu`).
 
 ## W toku
-- **Gałąź:** brak — G14 scalona do `develop` (#34, squash 94f99d7); ten zapis na `docs/g14-koniec-sesji`.
-- **Zrobione w tej sesji:** G14 — role `admin`/`serwis`, kolekcje `customers`/`orders`/`units`/`tickets`, taśma warsztatu z `GET /api/warsztat`, metryka `/metryka/[kod]`, konto `/konto/*` (szczegóły w „Zrobione” i ADR-G005, uzupełnienie 31.10); `/przeglad` z poprawkami; CI zielone.
-- **Niedokończone:** Lighthouse `/metryka` i `/konto` (G15), test na prawdziwym telefonie (Android + iPhone), teksty `TODO(krystian)` z G14 (lista niżej).
-- **Następny krok:** `/zadanie P1` — powłoka panelu na komputerze i telefonie (`docs/zadania/prokomgaming-panel.md` §1–§2, spec. panelu §1–§2a, §13, §15; rola `serwis` z G14 → 403 na ustawieniach).
+- **Gałąź:** `feat/p1-powloka-panelu` (P1 PR 1 z 2).
+- **Zrobione:** tokeny `src/admin/styles/panel-tokens.css` + `panel.css` (klasy `pn-`, tryb telefonu ≤ 760 px), motyw Payload (ciemny, zmienne w `custom.scss`), kroje Manrope/Cinzel i `viewport-fit=cover` w `(payload)/layout.tsx`; jedna kontrola dostępu `panelAccess()` (`src/admin/access.ts`) + `panelActionSession()` dla akcji; `PanelShell` (pasek boczny i górny pasek / pasek aplikacji, dolne zakładki, arkusz „Więcej”), model nawigacji `src/admin/shell/navModel.ts` (grupy, zakładki admin/serwis, pozycje ukryte do swoich sesji), liczniki z `loadShell()`; komponenty `src/admin/ui/*` (PanelPage, Card, Kpi+Spark, Chip, Seg, FilterPill, DataTable z trybem kart, ActionBar, Sheet, MarginBar, Alert, Toggle, EmptyState); `marginStatus()` w `lib/pricing/format.ts`; ekran `/admin/ceny` w powłoce; `/admin/dane` (listy Payload), `/admin/podglad-panelu` (tylko dev); manifest PWA `/admin/manifest.webmanifest` + ikony „PK” (`scripts/admin-icons.mjs`); e2e `panel-shell`, `panel-access`.
+- **Niedokończone:** P1 PR 2; test na prawdziwym telefonie (Android: monit instalacji; iPhone: ikona i pełny ekran z ekranu głównego).
+- **Następny krok:** P1 PR 2 `feat/p1-ustawienia` — `/admin/ustawienia` z sekcją „Marża i narzuty” (`Ustawienia-1440`/`-414`), `warnMargin` (ułamek 0,12, migracja `p1_warn_margin`), usunięcie gałęzi `autoPublish` z `runMarginAlarm` (pole tylko do odczytu), `navModel.settings.ready = true`, e2e (zapis, granice, `serwis` → 403).
+
+## Uwagi na później (P1)
+- **Świadome odstępstwa i decyzje P1:**
+  - Nawigacja na listach Payload przez `beforeNavLinks` (nasze grupy z licznikami nad grupami Payload) zamiast własnego `admin.components.Nav` — `DefaultNavClient` jest w Payload `@internal`.
+  - Niezalogowany na własnym widoku → ekran z „Zaloguj się do panelu” (link z `redirect`), nie automatyczne przekierowanie: Payload wyłącza własne widoki z przekierowania, a `redirect()` w widoku daje pustą stronę (G4).
+  - „403” dla roli `serwis` to ekran w powłoce warsztatu; status HTTP zostaje 200 (komponent serwerowy go nie ustawi).
+  - Arkusz „Więcej” ma przycisk „Zamknij” (×), którego nie ma na `tel-04` — dostępność (wspólny `BottomSheet`).
+  - Ukryte do swoich sesji: wyszukiwarka (P8), „Sprawdź ceny” (P7), Klienci (P5), Centrum cen i Opcje (P6), Raporty cen (P7), Statystyki (P8), Ustawienia (PR 2). „Zatwierdź”/„Do zatwierdzenia” → `/admin/ceny` z G4, „Zestawy”/„Zapytania”/„Zamówienia” → listy Payload (spec. §2a pt 3).
+  - „Dane (listy)” to własny widok `/admin/dane` (lista kolekcji wg uprawnień) — po P2 dashboard Payload zniknie, więc listy muszą mieć własne wejście. Zdanie pod tytułem: `TODO(krystian)`.
+  - Licznik kolejki w powłoce: `buildQueue()` kosztuje ok. 0,5 s (dev) — wynik zapamiętany w procesie pod kluczem: partia + najnowsze `updatedAt` i liczba opcji/poziomów + `pricing-settings.updatedAt` (`src/admin/shell/load.ts`).
+  - Emulacja iPhone 13 (WebKit) nie w CI — tylko prawdziwy telefon; e2e na `mobile-414` (Chromium).
+- **`src/app/(payload)/layout.tsx` zmieniony ręcznie** (linie z „P1”): przy aktualizacji Payload sprawdzić, czy plik nie został wygenerowany od nowa.
+- **Ikony PWA** to monogram „PK” rysowany kreskami (bez kroju) — po decyzji o logo podmienić w `scripts/admin-icons.mjs` i wygenerować ponownie.
 
 ## Uwagi na później (G14)
 - **Treści do potwierdzenia (`TODO(krystian)`):** maile weryfikacji i resetu hasła, teksty stron logowania/rejestracji/hasła/weryfikacji i `/metryka` bez kodu, puste stany konta, zdania „Teraz: …” etapów poza testem (`CUSTOMER_STAGE_TEXT`), opisy etapów na taśmie `paid`/`shipped`, etykieta etapu `delivered` w panelu, klauzula zgody konta (`ACCOUNT_CONSENT_CLAUSE`, prawnik).

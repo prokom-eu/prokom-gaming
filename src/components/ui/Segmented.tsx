@@ -22,13 +22,21 @@ type Props<T extends string> = {
   options: readonly Option<T>[]
   value: T
   onChange: (value: T) => void
+  /** Class of the group; the panel uses its own look (`pn-seg`). */
+  className?: string
 }
 
 /**
  * Single choice as segments (FullHD / 2K / 4K). A radio group: one tab stop, arrows move and
  * select (WAI-ARIA radio pattern), so it reads the same as native radios.
  */
-export function Segmented<T extends string>({ label, options, value, onChange }: Props<T>) {
+export function Segmented<T extends string>({
+  label,
+  options,
+  value,
+  onChange,
+  className = 'seg',
+}: Props<T>) {
   const refs = useRef<(HTMLButtonElement | null)[]>([])
 
   /** Next enabled index from `index` in direction `step` (wrapping), or undefined. */
@@ -54,7 +62,7 @@ export function Segmented<T extends string>({ label, options, value, onChange }:
   }
 
   return (
-    <div role="radiogroup" aria-label={label} className="seg">
+    <div role="radiogroup" aria-label={label} className={className}>
       {options.map((option, index) => {
         const checked = option.value === value
         return (

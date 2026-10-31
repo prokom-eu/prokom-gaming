@@ -67,7 +67,10 @@ test('staff see the guard, the empty queue and 16 builds', async ({ page }) => {
   const builds = page.locator('section[aria-labelledby="builds"] tbody tr')
   await expect(builds).toHaveCount(16)
   await expect(builds.filter({ hasText: 'Wampir' })).toContainText('14 540 zł')
-  await expect(page.getByRole('link', { name: 'Ceny — publikacja i marże' })).toBeAttached()
+  // P1: the screen is "Do zatwierdzenia" (phone tab "Zatwierdź") in the panel navigation until P6.
+  await expect(
+    page.getByRole('link', { name: /^(Do zatwierdzenia|Zatwierdź)/ }).first(),
+  ).toHaveAttribute('href', '/admin/ceny')
 
   const { violations } = await new AxeBuilder({ page })
     .include('[data-prices-screen]')

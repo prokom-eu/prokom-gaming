@@ -1,0 +1,57 @@
+// Payload's own screens (lists, forms, login) in the panel colours (panel spec §2 "Motyw Payload").
+// Payload keeps its styles in `@layer payload-default`, so these unlayered rules win.
+// Values only from the panel tokens (src/admin/styles/panel-tokens.css).
+html[data-theme='dark'] {
+  --theme-elevation-0: var(--p-bg);
+  --theme-elevation-50: var(--p-s1);
+  --theme-elevation-100: var(--p-s2);
+  --theme-elevation-150: var(--p-s3);
+  --theme-border-color: var(--p-ln2);
+  --theme-bg: var(--p-bg);
+  --theme-input-bg: var(--p-field);
+  --theme-text: var(--p-tx);
+  --theme-elevation-800: var(--p-tx);
+  --theme-elevation-1000: var(--p-tx);
+  --font-body: var(--font-manrope), Manrope, system-ui, sans-serif;
+}
+
+// The panel nav group above Payload's own collection groups (beforeNavLinks).
+.pn-navlinks {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 18px;
+}
+.pn-navlinks h2 {
+  margin: 14px 0 4px;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--p-mu);
+}
+.pn-navlinks .nav__link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.pn-navlinks .pn-bd {
+  margin-left: auto;
+  min-width: 22px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  font-size: 11.5px;
+  font-weight: 800;
+  background: var(--p-s3);
+  color: var(--p-tx);
+}
+.pn-navlinks .pn-bd--gold {
+  background: var(--p-gold);
+  color: var(--p-on-gold);
+}
+.pn-navlinks .pn-bd--bad {
+  background: var(--p-bad);
+  color: var(--p-on-bad);
+}

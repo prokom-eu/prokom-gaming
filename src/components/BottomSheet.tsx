@@ -16,6 +16,8 @@ type Props = {
   /** From 761 px show as a panel from the right instead of a sheet (menu on a tablet). */
   side?: boolean
   id?: string
+  /** Extra class on the <dialog>, e.g. the panel look (`pn-sheet`). */
+  className?: string
   children: ReactNode
 }
 
@@ -38,6 +40,7 @@ export function BottomSheet({
   headerStart,
   side = false,
   id,
+  className,
   children,
 }: Props) {
   const ref = useRef<HTMLDialogElement>(null)
@@ -120,7 +123,7 @@ export function BottomSheet({
       ref={ref}
       id={id}
       aria-label={label}
-      className={side ? 'sheet sheet--side' : 'sheet'}
+      className={[side ? 'sheet sheet--side' : 'sheet', className].filter(Boolean).join(' ')}
       onClick={onClick}
       // Esc (cancel) and dialog.close() both end here: keep the parent state in sync.
       onClose={() => {

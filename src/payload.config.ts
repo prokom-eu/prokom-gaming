@@ -7,6 +7,7 @@ import sharp from 'sharp'
 import { fileURLToPath } from 'url'
 
 import { isAdmin } from './access/panel'
+import { PANEL_APP } from './admin/brand'
 import { Builds } from './collections/Builds'
 import { Customers } from './collections/Customers'
 import { Faq } from './collections/Faq'
@@ -44,13 +45,50 @@ export default buildConfig({
     importMap: {
       baseDir: path.resolve(dirname),
     },
-    // Referenced by path (import map), never imported here: the prices screen uses the
+    // The panel is dark only (panel spec §2): its tokens are written for a dark background.
+    theme: 'dark',
+    // Phone: the panel as an app on the home screen (ADR-G010 §2). Payload passes this through
+    // as Next metadata; the viewport is in `app/(payload)/layout.tsx`.
+    meta: {
+      titleSuffix: ' · PRO-KOM Panel',
+      // Fixed path: the route handler lives at app/(payload)/admin/manifest.webmanifest.
+      manifest: '/admin/manifest.webmanifest',
+      icons: {
+        icon: [{ url: PANEL_APP.icons.any192, sizes: '192x192', type: 'image/png' }],
+        apple: [{ url: PANEL_APP.icons.apple180, sizes: '180x180', type: 'image/png' }],
+      },
+      appleWebApp: {
+        capable: true,
+        title: PANEL_APP.shortName,
+        statusBarStyle: 'black-translucent',
+      },
+    },
+    // Referenced by path (import map), never imported here: the panel views use the
     // server-only cost layer, which must stay out of the config the Payload CLI loads.
+    // Every view checks access itself (`panelAccess`) — custom views are public by definition.
+    // `exact` on every view: `/ceny` must not catch `/ceny/zatwierdzanie` (P6).
     components: {
       views: {
-        prices: { Component: '/admin/prices/PricesView#PricesView', path: '/ceny', exact: true },
+        prices: {
+          Component: '/admin/prices/PricesView#PricesView',
+          path: '/ceny',
+          exact: true,
+          meta: { title: 'Ceny' },
+        },
+        data: {
+          Component: '/admin/shell/DataView#DataView',
+          path: '/dane',
+          exact: true,
+          meta: { title: 'Dane (listy)' },
+        },
+        panelPreview: {
+          Component: '/admin/preview/PanelPreviewView#PanelPreviewView',
+          path: '/podglad-panelu',
+          exact: true,
+          meta: { title: 'Podgląd komponentów', robots: { index: false, follow: false } },
+        },
       },
-      afterNavLinks: ['/admin/prices/PricesNavLink#PricesNavLink'],
+      beforeNavLinks: ['/admin/shell/PanelNavLinks#PanelNavLinks'],
     },
   },
   // New collections go at the end: Payload names compound indexes after their columns only,

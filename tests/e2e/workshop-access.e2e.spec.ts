@@ -3,6 +3,8 @@ import { randomBytes } from 'node:crypto'
 import { expect, test } from '@playwright/test'
 import type { APIRequestContext, PlaywrightWorkerArgs } from '@playwright/test'
 
+import { adminHeaders as sharedAdminHeaders } from './helpers/adminSession'
+
 type Playwright = PlaywrightWorkerArgs['playwright']
 
 /**
@@ -57,14 +59,10 @@ async function anyBuildId(): Promise<number> {
 }
 
 test.beforeAll(async ({ playwright, baseURL }) => {
-  const email = process.env.SEED_ADMIN_EMAIL
-  const pass = process.env.SEED_ADMIN_PASSWORD
-  if (!email || !pass) throw new Error('SEED_ADMIN_EMAIL / SEED_ADMIN_PASSWORD are not set.')
-  const session = await login(playwright, baseURL, 'users', email, pass)
-  expect(session.response.status()).toBe(200)
-  admin = session.context
-  const { token } = (await session.response.json()) as { token: string }
-  adminHeaders = { Authorization: `JWT ${token}` }
+  // The admin session of auth.setup.ts: a second login of the same account on a parallel worker
+  // can drop another worker's Payload session (see there).
+  admin = await playwright.request.newContext({ baseURL })
+  adminHeaders = sharedAdminHeaders()
 })
 
 test.afterAll(async () => {
