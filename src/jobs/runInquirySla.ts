@@ -74,15 +74,23 @@ export async function runInquirySla(req: PayloadRequest): Promise<{ alerted: num
       )
       continue
     }
-    await payload.update({
-      collection: 'inquiries',
-      id: inquiry.id,
-      data: { slaAlertedAt: now.toISOString() },
-      depth: 0,
-      overrideAccess: true,
-      req,
-    })
     alerted += 1
+    // The mail is out: a failed mark must not stop the other alarms (it repeats in 5 min — rare).
+    try {
+      await payload.update({
+        collection: 'inquiries',
+        id: inquiry.id,
+        data: { slaAlertedAt: now.toISOString() },
+        depth: 0,
+        overrideAccess: true,
+        req,
+      })
+    } catch (error) {
+      payload.logger.error(
+        { inquiry: inquiry.id, ...errorFields(error) },
+        'Inquiry SLA mark not saved',
+      )
+    }
   }
   if (alerted > 0) payload.logger.info({ alerted }, 'Inquiry SLA alarms sent')
   return { alerted }

@@ -23,6 +23,17 @@ import { CONFIG_TYPES } from './types'
  * ADR-G002 §8.7), so nothing here may run for anyone else.
  */
 
+/** Second lock behind the actions' check: internal models and the thread are for `admin` only. */
+export class NotAdminError extends Error {
+  constructor() {
+    super('Inquiry thread: admin role required')
+    this.name = 'NotAdminError'
+  }
+}
+const requireAdmin = (user: Pick<User, 'role'>) => {
+  if (user.role !== 'admin') throw new NotAdminError()
+}
+
 const PART_ORDER = ['cpu', 'gpu', 'mobo', 'psu'] as const
 const OPTION_KEYS = ['ram', 'ssd', 'case', 'cooler'] as const satisfies readonly (keyof Config)[]
 
@@ -84,7 +95,12 @@ export type ReplyContext = {
  * (decision 31.10.2026: an offer is valid 48 h from today); the panel warns when it differs from
  * the price at the inquiry. A unit „od ręki” keeps the price it was reserved at (own discount).
  */
-export async function loadReplyContext(payload: Payload, inquiry: Inquiry): Promise<ReplyContext> {
+export async function loadReplyContext(
+  payload: Payload,
+  inquiry: Inquiry,
+  user: Pick<User, 'role'>,
+): Promise<ReplyContext> {
+  requireAdmin(user)
   const [settings, site] = await Promise.all([
     payload.findGlobal({ slug: 'mail-settings', depth: 0, overrideAccess: true }),
     payload.findGlobal({
@@ -130,12 +146,15 @@ export async function loadReplyContext(payload: Payload, inquiry: Inquiry): Prom
 export type SendReplyResult =
   | { ok: true; status: Inquiry['status'] }
   | { ok: false; error: 'empty' | 'placeholders' | 'smtp'; missing?: string[] }
+  /** Sent, but not recorded: the panel must say „do not send again” (customer has the mail). */
+  | { ok: false; error: 'not_recorded'; messageId: string }
 
 /**
  * Sends one reply (ADR-G008 pt 1, 5): checks that no `{variable}` is left, sends from the Gaming
  * mailbox with `Re: [PKG-…]`, our `Message-ID` and the thread headers, then saves the message and
  * moves the status. Nothing is saved when SMTP fails — the panel shows the error and keeps the
- * text. Logs ids only.
+ * text. When the mail went out but saving fails, the result says so (`not_recorded`), so the
+ * reply is not sent twice. Logs ids only.
  */
 export async function sendInquiryReply(
   payload: Payload,
@@ -147,6 +166,7 @@ export async function sendInquiryReply(
     fromAddress: string
   },
 ): Promise<SendReplyResult> {
+  requireAdmin(input.user)
   const body = input.body.replace(/\r\n/g, '\n').trim()
   if (!body) return { ok: false, error: 'empty' }
   const missing = placeholdersIn(body)
@@ -194,30 +214,38 @@ export async function sendInquiryReply(
 
   const now = new Date().toISOString()
   const status = statusAfterReply(inquiry.status, template?.kind ?? null)
-  await payload.create({
-    collection: 'inquiry-messages',
-    data: {
-      inquiry: inquiry.id,
-      direction: 'out',
-      at: now,
-      subject: mail.subject,
-      body,
-      author: input.user.id,
-      messageId,
-      inReplyTo: mail.inReplyTo ?? null,
-      template: template?.id ?? null,
-    },
-    depth: 0,
-    overrideAccess: true,
-  })
-  await payload.update({
-    collection: 'inquiries',
-    id: inquiry.id,
-    data: { status, lastActivityAt: now },
-    depth: 0,
-    overrideAccess: true,
-    user: input.user,
-  })
+  try {
+    await payload.create({
+      collection: 'inquiry-messages',
+      data: {
+        inquiry: inquiry.id,
+        direction: 'out',
+        at: now,
+        subject: mail.subject,
+        body,
+        author: input.user.id,
+        messageId,
+        inReplyTo: mail.inReplyTo ?? null,
+        template: template?.id ?? null,
+      },
+      depth: 0,
+      overrideAccess: true,
+    })
+    await payload.update({
+      collection: 'inquiries',
+      id: inquiry.id,
+      data: { status, lastActivityAt: now },
+      depth: 0,
+      overrideAccess: true,
+      user: input.user,
+    })
+  } catch (error) {
+    payload.logger.error(
+      { inquiry: inquiry.id, messageId, ...errorFields(error) },
+      'Inquiry reply sent but not recorded',
+    )
+    return { ok: false, error: 'not_recorded', messageId }
+  }
   payload.logger.info({ inquiry: inquiry.id, status }, 'Inquiry reply sent')
   return { ok: true, status }
 }
@@ -227,6 +255,7 @@ export async function addInquiryNote(
   payload: Payload,
   input: { inquiryId: number; body: string; user: User },
 ): Promise<{ ok: true } | { ok: false; error: 'empty' }> {
+  requireAdmin(input.user)
   const body = input.body.replace(/\r\n/g, '\n').trim()
   if (!body) return { ok: false, error: 'empty' }
   await payload.create({

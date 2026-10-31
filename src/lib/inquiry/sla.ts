@@ -22,8 +22,8 @@ const parts = new Intl.DateTimeFormat('en-GB', {
 })
 
 function local(ms: number) {
-  const get = (type: Intl.DateTimeFormatPartTypes) =>
-    Number(parts.formatToParts(ms).find((p) => p.type === type)?.value)
+  const found = new Map(parts.formatToParts(ms).map((p) => [p.type, p.value]))
+  const get = (type: Intl.DateTimeFormatPartTypes) => Number(found.get(type))
   return {
     y: get('year'),
     m: get('month'),

@@ -28,7 +28,8 @@ export const InquiryMessages: CollectionConfig = {
     description: 'Wątek zapytania. Odpowiadasz i dodajesz notatki w Zapytaniach.',
   },
   defaultSort: '-at',
-  access: { read: adminOnly, create: nobody, update: nobody, delete: adminOnly },
+  // No single deletes either: the thread goes only with its inquiry (`deleteThread` hook).
+  access: { read: adminOnly, create: nobody, update: nobody, delete: nobody },
   indexes: [{ fields: ['inquiry', 'at'] }],
   fields: [
     {

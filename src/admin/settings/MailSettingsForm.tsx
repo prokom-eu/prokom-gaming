@@ -128,7 +128,12 @@ export function MailSettingsForm({ values }: { values: MailFormValues }) {
               ? state.message
               : ''}
       </p>
-      <button type="submit" className="pn-btn pn-btn--gold" disabled={pending}>
+      <button
+        type="submit"
+        className="pn-btn pn-btn--gold"
+        disabled={pending}
+        aria-label="Zapisz zmiany: Zapytania i poczta"
+      >
         Zapisz zmiany
       </button>
     </form>
