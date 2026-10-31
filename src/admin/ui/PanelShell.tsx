@@ -37,7 +37,7 @@ export async function PanelShell({ req, active, title, crumbs = [], back, childr
   const count = (item: NavItem) => (item.counter ? (counts[item.counter] ?? 0) : 0)
   const current = (item: NavItem) => (item.key === active ? ('page' as const) : undefined)
   const status = statusText(shell)
-  const bellHref = `${admin}/collections/inquiries` // TODO(P3): `/zapytania?filtr=nowe`
+  const bellHref = `${admin}/zapytania?filtr=nowe`
 
   const tiles: MoreTile[] = navMore(role).map((item) => ({
     key: item.key,

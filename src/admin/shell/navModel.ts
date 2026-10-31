@@ -57,12 +57,11 @@ const ITEMS: Record<NavKey, NavItem> = {
     roles: ADMIN,
     ready: true,
   },
-  // TODO(P3): `/zapytania` — until then the Payload list of inquiries.
   inquiries: {
     key: 'inquiries',
     label: 'Zapytania',
     icon: 'mail',
-    path: '/collections/inquiries',
+    path: '/zapytania',
     roles: ADMIN,
     counter: 'inquiriesNew',
     tone: 'bad',

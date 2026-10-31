@@ -117,6 +117,14 @@ const PATHS = {
       <path d="M13 7v10" />
     </>
   ),
+  // Zapytania board: „Wyślij” (paper plane) and „Notatka wewnętrzna” (sheet).
+  send: <path d="M21 3L10 14M21 3l-7 18-4-7-7-4z" />,
+  note: (
+    <>
+      <path d="M7 3h7l4 4v14H7z" />
+      <path d="M10 12h5M10 16h5" />
+    </>
+  ),
   inbox: (
     <>
       <path d="M3 13l3-8h12l3 8v6H3z" />

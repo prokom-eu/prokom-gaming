@@ -16,6 +16,7 @@ test.describe.configure({ mode: 'serial' })
 
 // The dev-only preview answers 404 in production builds (CI runs `next start`).
 const SCREENS = [
+  '/admin/zapytania',
   '/admin/ceny',
   '/admin/ustawienia',
   '/admin/dane',
@@ -72,7 +73,7 @@ test.describe('signed in with the serwis role', () => {
 
   test('admin screens answer "403" inside the workshop frame', async ({ page }) => {
     await logInAsSerwis(page)
-    for (const path of ['/admin/ceny', '/admin/ustawienia']) {
+    for (const path of ['/admin/zapytania', '/admin/ceny', '/admin/ustawienia']) {
       await page.goto(path)
       await expect(
         page.getByRole('heading', { level: 1, name: 'Brak dostępu (403)' }),
