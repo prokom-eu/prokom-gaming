@@ -23,3 +23,19 @@ export const signedZl = (value: number | null): string =>
 
 /** A share as typed into a panel field, e.g. markup 0.1812 → "0,1812". */
 export const share = (value: number): string => value.toFixed(4).replace('.', ',')
+
+export type MarginStatus = 'ok' | 'warn' | 'bad'
+
+/**
+ * Margin thresholds of the panel (panel spec §2 "Statusy"): below `minMargin` bad, below
+ * `warnMargin` warn, else ok. Shares (0.11), like `pricing-settings`. No margin = bad: a price
+ * without cost must not look safe.
+ */
+export function marginStatus(
+  margin: number | null,
+  minMargin: number,
+  warnMargin: number,
+): MarginStatus {
+  if (margin === null || !Number.isFinite(margin) || margin < minMargin) return 'bad'
+  return margin < warnMargin ? 'warn' : 'ok'
+}

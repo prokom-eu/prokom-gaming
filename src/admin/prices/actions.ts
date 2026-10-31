@@ -1,13 +1,8 @@
 'use server'
 
-import config from '@payload-config'
 import { revalidatePath } from 'next/cache'
-import { headers } from 'next/headers'
-import { getPayload } from 'payload'
-import type { Payload } from 'payload'
 import { z } from 'zod'
 
-import { isAdmin } from '../../access/panel'
 import { queueMarginAlarm } from '../../jobs/queue'
 import { errorFields, log } from '../../lib/logger'
 import { CatalogError } from '../../lib/pricing/catalog'
@@ -21,7 +16,7 @@ import {
   StalePublicationError,
   writeBatch,
 } from '../../lib/pricing/store'
-import type { User } from '../../payload-types'
+import { panelActionSession } from '../session'
 
 export type PublishResult =
   { ok: true; batch: number; changed: number } | { ok: false; messages: string[] }
@@ -173,10 +168,5 @@ const NO_ACCESS = 'Brak uprawnień — zaloguj się do panelu.'
 const rowMessage = (e: { line: number; message: string }) =>
   e.line > 0 ? `Wiersz ${e.line}: ${e.message}` : e.message
 
-/** The signed-in panel account (`users`), or `null`. */
-async function panelSession(): Promise<{ payload: Payload; user: User } | null> {
-  const payload = await getPayload({ config })
-  const { user } = await payload.auth({ headers: await headers() })
-  if (!user || !isAdmin({ user })) return null
-  return { payload, user: user as User }
-}
+/** The signed-in admin (`users`, role `admin`), or `null`. */
+const panelSession = () => panelActionSession('admin')

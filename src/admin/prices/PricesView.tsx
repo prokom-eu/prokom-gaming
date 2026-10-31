@@ -1,13 +1,15 @@
-import { DefaultTemplate } from '@payloadcms/next/templates'
-import { Banner, Gutter } from '@payloadcms/ui'
+import { Banner } from '@payloadcms/ui'
 import type { AdminViewServerProps, Payload } from 'payload'
 
-import { isAdmin, isPanelUser } from '../../access/panel'
 import { CatalogError } from '../../lib/pricing/catalog'
 import { buildQueue, buildsOverview, problemMessage } from '../../lib/pricing/publish'
 import { loadBatch, loadOffer, type BatchInfo } from '../../lib/pricing/store'
 import { percent, signedZl, zl } from '../../lib/pricing/format'
 import styles from './prices.module.css'
+import { panelAccess } from '../access'
+import { PanelDenied } from '../ui/PanelDenied'
+import { PanelPage } from '../ui/PanelPage'
+import { PanelShell } from '../ui/PanelShell'
 import { CostImport } from './CostImport'
 import { PricesQueue } from './PricesQueue'
 
@@ -20,50 +22,42 @@ const byPrice = (a: { price: number | null }, b: { price: number | null }) =>
 
 /**
  * Panel screen "Ceny" at /admin/ceny (ADR-G002 §4): newest batch, margin guard over the prices on
- * the site, the queue to approve and the builds with price, cost and margin. Panel staff only —
- * custom views are public by default, so the check is here.
+ * the site, the queue to approve and the builds with price, cost and margin. Admin only — custom
+ * views are public by default, so the check is here. Until P6 it is "Do zatwierdzenia" in the
+ * panel navigation.
  */
-export async function PricesView({ initPageResult, params, searchParams }: AdminViewServerProps) {
-  const { req, locale, permissions, visibleEntities } = initPageResult
+export async function PricesView({ initPageResult }: AdminViewServerProps) {
+  const { req } = initPageResult
   const { payload } = req
-  // A message, not `redirect()`: inside Payload's admin page the redirect only reaches the RSC
-  // stream and the browser stays on a blank page. Nothing about prices is loaded before this.
-  if (!isAdmin(req)) {
-    const login = `${payload.config.routes.admin}/login?redirect=${encodeURIComponent(`${payload.config.routes.admin}/ceny`)}`
+  const access = panelAccess(req, 'admin')
+  // Nothing about prices is loaded before this (custom views are public by definition).
+  if (!access.ok) {
     return (
-      <Gutter className={styles.page}>
-        <h1>Ceny — publikacja i marże</h1>
-        {isPanelUser(req) ? (
-          // Signed in with the `serwis` role: prices and margins are admin-only (panel spec §15).
-          <p>Ten ekran jest tylko dla administratora. Twoje konto ma rolę „Serwis”.</p>
-        ) : (
-          <p>
-            Ten ekran jest tylko dla pracowników PRO-KOM. <a href={login}>Zaloguj się do panelu</a>.
-          </p>
-        )}
-      </Gutter>
+      <PanelDenied
+        req={req}
+        reason={access.reason}
+        title="Ceny — publikacja i marże"
+        path="/ceny"
+        active="approve"
+      />
     )
   }
 
+  // TODO(P6): split into Centrum cen (/ceny) and Do zatwierdzenia (/ceny/zatwierdzanie).
   const template = (children: React.ReactNode) => (
-    <DefaultTemplate
-      i18n={req.i18n}
-      locale={locale}
-      params={params}
-      payload={payload}
-      permissions={permissions}
-      searchParams={searchParams}
-      user={req.user ?? undefined}
-      visibleEntities={visibleEntities}
+    <PanelShell
+      req={req}
+      title="Ceny — publikacja i marże"
+      active="approve"
+      crumbs={[{ label: 'Ceny' }]}
     >
-      <Gutter className={styles.page}>
+      <div className={styles.page}>
         {/* data-prices-screen: the e2e accessibility check scans this screen only. */}
         <div data-prices-screen>
-          <h1>Ceny — publikacja i marże</h1>
-          {children}
+          <PanelPage title="Ceny — publikacja i marże">{children}</PanelPage>
         </div>
-      </Gutter>
-    </DefaultTemplate>
+      </div>
+    </PanelShell>
   )
 
   const data = await loadScreen(payload)
