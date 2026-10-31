@@ -15,14 +15,22 @@ export const INBOX_FILTERS = [
   label: string
   statuses: readonly InquiryStatus[] | null
 }[]
-export type InboxFilter = (typeof INBOX_FILTERS)[number]['value']
+/**
+ * „Nieprzypisane” (ADR-G008 pt 3, P4): mail from the mailbox that matched no inquiry. Not a
+ * status filter — the list shows those messages instead of inquiries.
+ */
+export const UNMATCHED_FILTER = 'nieprzypisane'
+export type StatusFilter = (typeof INBOX_FILTERS)[number]['value']
+export type InboxFilter = StatusFilter | typeof UNMATCHED_FILTER
 
 /** Filter from the address; anything unknown = all. */
 export function parseFilter(value: unknown): InboxFilter {
+  if (value === UNMATCHED_FILTER) return UNMATCHED_FILTER
   return INBOX_FILTERS.find((f) => f.value === value)?.value ?? 'wszystkie'
 }
 
-export function statusesOf(filter: InboxFilter): readonly InquiryStatus[] | null {
+/** Statuses of a status filter; `null` = all inquiries. */
+export function statusesOf(filter: StatusFilter): readonly InquiryStatus[] | null {
   return INBOX_FILTERS.find((f) => f.value === filter)?.statuses ?? null
 }
 

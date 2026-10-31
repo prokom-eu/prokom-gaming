@@ -1907,6 +1907,37 @@
   margin: 0;
   min-height: 0;
 }
+/* „Nieprzypisane” (P4): number field, then „Odrzuć” and „Przypnij” in one row. */
+.pn-unm .pn-cmp__row > .pn-btn--quiet {
+  flex-basis: auto;
+}
+.pn-unm .pn-cmp__row > .pn-btn--gold {
+  margin-left: auto;
+}
+.pn-unm .pn-fld input {
+  max-width: 260px;
+  font: inherit;
+  text-transform: uppercase;
+}
+.pn-kv__note {
+  display: block;
+  margin-top: 2px;
+  color: var(--p-mu);
+  font-size: 12px;
+  font-weight: 400;
+}
+.pn-kv__note--ok {
+  color: var(--p-ok);
+}
+.pn-kv__note--bad {
+  color: var(--p-bad);
+}
+.pn-ibc__hint {
+  margin: 0;
+  color: var(--p-tx2);
+  font-size: 13px;
+  line-height: 1.5;
+}
 
 /* client and configuration */
 .pn-ibc {
@@ -2086,6 +2117,12 @@
   }
   .pn-cmp__row > .pn-btn--quiet {
     flex-basis: auto;
+  }
+  /* iOS zooms into fields under 16 px (spec §2a pt 8). */
+  .pn-unm .pn-fld input {
+    max-width: none;
+    height: 48px;
+    font-size: 16px;
   }
   /* The client and configuration come under the thread (spec §4). */
   .pn-ibc {

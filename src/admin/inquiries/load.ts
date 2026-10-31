@@ -14,6 +14,7 @@ import { loadReplyContext, topicOf } from '../../lib/inquiry/thread.server'
 import { CHOICES, INQUIRY_TYPE_CHOICES, labelOf, type InquiryStatus } from '../../lib/inquiry/types'
 import {
   INBOX_FILTERS,
+  UNMATCHED_FILTER,
   clock,
   initials,
   maskEmail,
@@ -22,6 +23,7 @@ import {
   statusesOf,
   whenLabel,
   type InboxFilter,
+  type StatusFilter,
 } from './format'
 
 /**
@@ -43,6 +45,8 @@ export type InboxRow = {
   status: InquiryStatus
   typeLabel: string
   meta: { text: string; tone: 'warn' | 'bad' | 'mu' }
+  /** Customer's answers from the mailbox not opened yet in the panel (P4). */
+  unread: number
 }
 
 export type ThreadMessage = {
@@ -88,9 +92,27 @@ export type InboxThread = {
   canConvert: boolean
 }
 
+/** A message in „Nieprzypisane” (P4): the address is only in the panel, never in a URL. */
+export type UnmatchedRow = {
+  id: number
+  from: string
+  subject: string
+  when: string
+  preview: string
+}
+
+export type UnmatchedView = UnmatchedRow & {
+  body: string
+  attachments: string | null
+}
+
 export type InboxData = {
   filter: InboxFilter
-  counts: Record<InboxFilter, number>
+  counts: Record<StatusFilter, number>
+  /** Unmatched mail waiting („Nieprzypisane”): the filter shows only when there is some. */
+  unmatchedCount: number
+  /** The „Nieprzypisane” list and the opened message; `null` in the status filters. */
+  unmatched: { rows: UnmatchedRow[]; open: UnmatchedView | null; missing: boolean } | null
   rows: InboxRow[]
   thread: InboxThread | null
   /** `?nr=` named an inquiry that does not exist (deleted, mistyped). */
@@ -145,36 +167,114 @@ const fullConfig = (config: Inquiry['config']): Config | null => {
     : null
 }
 
+/** Attachments line in the thread (ADR-G008 pt 4: never downloaded, only named). */
+export const attachmentsLine = (info: string) => `Załącznik w poczcie: ${info}`
+
+const UNMATCHED_WAITING = { status: { equals: 'new' } } as const
+
+type UnmatchedDoc = {
+  id: number
+  from?: string | null
+  subject?: string | null
+  receivedAt: string
+  body: string
+  attachmentsInfo?: string | null
+}
+
+// TODO(krystian): labels of a message without a sender or subject — not on the board.
+const unmatchedRow = (doc: UnmatchedDoc, now: Date): UnmatchedRow => ({
+  id: doc.id,
+  from: doc.from || 'nieznany nadawca',
+  subject: doc.subject || '(bez tematu)',
+  when: whenLabel(doc.receivedAt, now),
+  preview: preview(doc.body),
+})
+
+async function loadUnmatched(
+  payload: Payload,
+  openId: number | null,
+  now: Date,
+): Promise<NonNullable<InboxData['unmatched']>> {
+  const [list, opened] = await Promise.all([
+    payload.find({
+      collection: 'mail-intake-unmatched',
+      where: UNMATCHED_WAITING,
+      select: { from: true, subject: true, receivedAt: true, body: true, attachmentsInfo: true },
+      sort: '-receivedAt',
+      limit: LIST_LIMIT,
+      depth: 0,
+      overrideAccess: true,
+    }),
+    openId === null
+      ? null
+      : payload.findByID({
+          collection: 'mail-intake-unmatched',
+          id: openId,
+          depth: 0,
+          overrideAccess: true,
+          disableErrors: true,
+        }),
+  ])
+  // Only waiting ones open here; attached and rejected stay in „Dane”. Without `?wiad=` the
+  // computer shows the newest (like the first inquiry of a status filter).
+  const asked = opened && opened.status === 'new' ? opened : null
+  const shown = asked ?? (openId === null ? list.docs[0] : null)
+  const open: UnmatchedView | null = shown
+    ? { ...unmatchedRow(shown, now), body: shown.body, attachments: shown.attachmentsInfo ?? null }
+    : null
+  return {
+    rows: list.docs.map((doc) => unmatchedRow(doc, now)),
+    open,
+    missing: openId !== null && !asked,
+  }
+}
+
 export async function loadInbox(
   payload: Payload,
   user: User,
-  { filter, nr, fromAddress }: { filter: InboxFilter; nr: string | null; fromAddress: string },
+  {
+    filter,
+    nr,
+    unmatchedId = null,
+    fromAddress,
+  }: { filter: InboxFilter; nr: string | null; unmatchedId?: number | null; fromAddress: string },
 ): Promise<InboxData> {
   const now = new Date()
-  const statuses = statusesOf(filter)
-  const [settings, list, ...counts] = await Promise.all([
+  const inUnmatched = filter === UNMATCHED_FILTER
+  const statuses = inUnmatched ? null : statusesOf(filter)
+  const [settings, list, unmatchedCount, unmatched, ...counts] = await Promise.all([
     payload.findGlobal({ slug: 'mail-settings', depth: 0, overrideAccess: true }),
-    payload.find({
-      collection: 'inquiries',
-      where: statuses ? { status: { in: statuses } } : {},
-      select: {
-        number: true,
-        name: true,
-        type: true,
-        status: true,
-        budget: true,
-        voucher: true,
-        build: true,
-        message: true,
-        createdAt: true,
-        lastActivityAt: true,
-      },
-      populate: { builds: { name: true } },
-      sort: '-createdAt',
-      limit: LIST_LIMIT,
-      depth: 1,
+    // „Nieprzypisane” lists mail, not inquiries.
+    inUnmatched
+      ? { docs: [] }
+      : payload.find({
+          collection: 'inquiries',
+          where: statuses ? { status: { in: statuses } } : {},
+          select: {
+            number: true,
+            name: true,
+            type: true,
+            status: true,
+            budget: true,
+            voucher: true,
+            build: true,
+            message: true,
+            createdAt: true,
+            lastActivityAt: true,
+            unreadCount: true,
+          },
+          populate: { builds: { name: true } },
+          sort: '-createdAt',
+          limit: LIST_LIMIT,
+          depth: 1,
+          overrideAccess: true,
+        }),
+    payload.count({
+      collection: 'mail-intake-unmatched',
+      where: UNMATCHED_WAITING,
       overrideAccess: true,
     }),
+    inUnmatched ? loadUnmatched(payload, unmatchedId, now) : null,
     ...INBOX_FILTERS.map((f) =>
       payload.count({
         collection: 'inquiries',
@@ -195,11 +295,12 @@ export async function loadInbox(
     status: doc.status,
     typeLabel: labelOf(INQUIRY_TYPE_CHOICES, doc.type),
     meta: metaOf(doc, now, hours, settings.replySlaMinutes ?? 60),
+    unread: doc.unreadCount ?? 0,
   }))
 
   let thread: InboxThread | null = null
   let missing = false
-  const target = nr ?? rows[0]?.number ?? null
+  const target = inUnmatched ? null : (nr ?? rows[0]?.number ?? null)
   if (target) {
     const found = await payload.find({
       collection: 'inquiries',
@@ -212,13 +313,27 @@ export async function loadInbox(
     const inquiry = found.docs[0]
     if (inquiry) thread = await loadThread(payload, user, inquiry, now, fromAddress)
     else missing = nr !== null
+    // Opened on purpose (`?nr=`, not the computer's first-of-list): the answers count as read.
+    if (inquiry && nr !== null && (inquiry.unreadCount ?? 0) > 0) {
+      await payload.update({
+        collection: 'inquiries',
+        id: inquiry.id,
+        data: { unreadCount: 0 },
+        depth: 0,
+        overrideAccess: true,
+      })
+      const row = rows.find((r) => r.id === inquiry.id)
+      if (row) row.unread = 0
+    }
   }
 
   return {
     filter,
     counts: Object.fromEntries(
       INBOX_FILTERS.map((f, i) => [f.value, counts[i]?.totalDocs ?? 0]),
-    ) as Record<InboxFilter, number>,
+    ) as Record<StatusFilter, number>,
+    unmatchedCount: unmatchedCount.totalDocs,
+    unmatched,
     rows,
     thread,
     missing,
@@ -299,12 +414,15 @@ async function loadThread(
       kind: m.direction,
       who:
         m.direction === 'in'
-          ? inquiry.name
+          ? // TODO(krystian): label „inny nadawca” — not on the board (ADR-G008 pt 3).
+            m.otherSender
+            ? `${m.otherSender} · inny nadawca`
+            : inquiry.name
           : m.direction === 'system'
             ? null
             : nameOfUser(m.author),
       when: whenLabel(m.at, now),
-      body: m.attachmentsInfo ? `${m.body}\n\n${m.attachmentsInfo}` : m.body,
+      body: m.attachmentsInfo ? `${m.body}\n\n${attachmentsLine(m.attachmentsInfo)}` : m.body,
     })),
   ]
 
