@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test'
 
-// The seed admin (SEED_ADMIN_*, `pnpm seed`) logs in to the panel through the login form.
+// The seed admin (SEED_ADMIN_*, `pnpm seed`) logs in to the panel through the login form and
+// lands on the Pulpit „Dziś” (P2 — it replaced Payload's dashboard and its list of collections).
 test('the seed admin logs in to the panel', async ({ page }) => {
   const email = process.env.SEED_ADMIN_EMAIL
   const password = process.env.SEED_ADMIN_PASSWORD
@@ -12,5 +13,5 @@ test('the seed admin logs in to the panel', async ({ page }) => {
   await page.locator('button[type="submit"]').click()
 
   await expect(page).toHaveURL(/\/admin\/?$/)
-  await expect(page.locator('a[href="/admin/collections/users"]').first()).toBeVisible()
+  await expect(page.getByRole('heading', { level: 1, name: 'Dziś' })).toBeVisible()
 })

@@ -23,6 +23,7 @@ import { BoldFeatureClient as BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864
 import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { TableFeatureClient as TableFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { PanelNavLinks as PanelNavLinks_1dd5ad7d4298b584766e3b4523aa86a2 } from '../../../admin/shell/PanelNavLinks'
+import { DashboardView as DashboardView_a8bdfd6ec46ed48bd1e9402d58bf4c34 } from '../../../admin/dashboard/DashboardView'
 import { PricesView as PricesView_e5c8601078d4f9f1e1b644aae45338b4 } from '../../../admin/prices/PricesView'
 import { InquiriesView as InquiriesView_c9e6bcd9bd0ec4b17f2718f75737e298 } from '../../../admin/inquiries/InquiriesView'
 import { SettingsView as SettingsView_6e97004d35601209e35838a90c0fbc84 } from '../../../admin/settings/SettingsView'
@@ -57,6 +58,7 @@ export const importMap = {
   "@payloadcms/richtext-lexical/client#ItalicFeatureClient": ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#TableFeatureClient": TableFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "/admin/shell/PanelNavLinks#PanelNavLinks": PanelNavLinks_1dd5ad7d4298b584766e3b4523aa86a2,
+  "/admin/dashboard/DashboardView#DashboardView": DashboardView_a8bdfd6ec46ed48bd1e9402d58bf4c34,
   "/admin/prices/PricesView#PricesView": PricesView_e5c8601078d4f9f1e1b644aae45338b4,
   "/admin/inquiries/InquiriesView#InquiriesView": InquiriesView_c9e6bcd9bd0ec4b17f2718f75737e298,
   "/admin/settings/SettingsView#SettingsView": SettingsView_6e97004d35601209e35838a90c0fbc84,

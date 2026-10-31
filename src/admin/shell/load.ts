@@ -95,7 +95,8 @@ type PriceState = { queue: number; broken: number; batchDate: string | null }
 // a deploy restarts the process anyway. Saves the ~0.5 s of loading the offer on every screen.
 let remembered: { key: string; value: PriceState } | null = null
 
-async function priceKey(payload: Payload): Promise<string> {
+// Read once per request (`cache`): the shell and the Pulpit both need it.
+export const priceKey = cache(async (payload: Payload): Promise<string> => {
   const newest = (collection: 'options' | 'power-levels') =>
     payload
       .find({ collection, sort: '-updatedAt', limit: 1, depth: 0, overrideAccess: true })
@@ -117,7 +118,7 @@ async function priceKey(payload: Payload): Promise<string> {
       .then((g) => String(g.updatedAt ?? '')),
   ])
   return [batch, options, levels, settings].join('|')
-}
+})
 
 /**
  * Queue length and the guard over the prices on the site — `buildQueue()` from G4, the same

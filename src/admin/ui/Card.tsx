@@ -1,8 +1,11 @@
-import type { ReactNode } from 'react'
+import { useId, type ReactNode } from 'react'
 
 import { Spark } from './Spark'
 
-/** Surface of the panel: optional header with title, a muted note and actions on the right. */
+/**
+ * Surface of the panel: optional header with title, a muted note and actions on the right. With a
+ * title the section is a named region (screen-reader landmarks, e.g. „Ostatnie zapytania”).
+ */
 export function Card({
   title,
   note,
@@ -16,11 +19,15 @@ export function Card({
   className?: string
   children: ReactNode
 }) {
+  const id = useId()
   return (
-    <section className={className ? `pn-card ${className}` : 'pn-card'}>
+    <section
+      className={className ? `pn-card ${className}` : 'pn-card'}
+      aria-labelledby={title ? id : undefined}
+    >
       {title ? (
         <div className="pn-card__hd">
-          <h2>{title}</h2>
+          <h2 id={id}>{title}</h2>
           {note ? <p>{note}</p> : null}
           {actions ? <div className="pn-card__r">{actions}</div> : null}
         </div>

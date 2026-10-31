@@ -18,6 +18,19 @@ export const percent = (value: number | null, signed = false): string => {
   return signed && value > 0 ? `+${text}` : text
 }
 
+/**
+ * Short margin for tiles and lists (Pulpit: „12,8%”, „minimum 11%”). Rounded **down** to one
+ * decimal, so a margin under the minimum never shows as the minimum (10,96% → „10,9%”, not
+ * „11,0%”). Whole numbers without „,0”.
+ */
+export const percentShort = (value: number | null): string => {
+  if (value === null || !Number.isFinite(value)) return '—'
+  const tenths = Math.floor(value * 1000 + 1e-9)
+  const text = tenths % 10 === 0 ? String(tenths / 10) : (tenths / 10).toFixed(1).replace('.', ',')
+  // Typographic minus, like `signedZl`.
+  return `${text.replace('-', '−')}%`
+}
+
 export const signedZl = (value: number | null): string =>
   value === null ? '—' : value === 0 ? '0 zł' : `${value > 0 ? '+' : '−'}${zl(Math.abs(value))}`
 

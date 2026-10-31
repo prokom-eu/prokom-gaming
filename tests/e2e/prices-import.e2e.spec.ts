@@ -153,6 +153,48 @@ test('a cost that breaks the margin sends the alarm; prices on the site stay', a
   expect((await newestBatch(request))[0]!.batch).toBe(before[0]!.batch)
 })
 
+test('the Pulpit raises the broken margin: urgent to-do, alarm on top of the phone (P2)', async ({
+  page,
+}) => {
+  const gpu = p13.components.find((c) => c.role === 'gpu')!
+  // P13 (Wampir) GPU +500 zł — its published price now breaks the minimum (as above).
+  const res = await panel.patch(`/api/power-levels/${p13.id}`, {
+    headers,
+    data: {
+      components: p13.components.map((c) => (c === gpu ? { ...c, cost: c.cost + 500 } : c)),
+    },
+  })
+  expect(res.status()).toBe(200)
+  try {
+    await logIn(page)
+    await page.goto('/admin')
+    const todo = page.getByRole('region', { name: 'Czeka na Ciebie' })
+    await expect(
+      todo.locator('b').getByText(/do zatwierdzenia · marża w konfiguratorze \d+(,\d)?%/),
+    ).toBeVisible()
+    await expect(todo.getByText(/^\d+ (pilne|pilnych)$/)).toBeVisible()
+    // The tile of the lowest margin turns red.
+    await expect(
+      page.locator('.pn-kpi--bad').filter({ hasText: 'Najniższa marża w konfiguratorze' }),
+    ).toBeVisible()
+    // The alarm card is the phone's (spec §3, tel-01): hidden on a computer.
+    const alarm = page.getByRole('alert').filter({ hasText: 'Marża poniżej 11%' })
+    await expect(alarm).toBeHidden()
+
+    await page.setViewportSize({ width: 414, height: 896 })
+    await expect(alarm).toBeVisible()
+    await expect(alarm).toContainText(/Najsłabsza konfiguracja: \d+(,\d)?%\./)
+    await expect(
+      alarm.getByRole('link', { name: /^Zatwierdź \d+ (cenę|ceny|cen)$/ }),
+    ).toHaveAttribute('href', '/admin/ceny')
+  } finally {
+    await panel.patch(`/api/power-levels/${p13.id}`, {
+      headers,
+      data: { components: p13.components },
+    })
+  }
+})
+
 test('autoPublish cannot be switched on and an import never publishes by itself', async ({
   page,
   request,
