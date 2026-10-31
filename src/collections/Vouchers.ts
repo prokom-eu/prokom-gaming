@@ -2,7 +2,7 @@ import { randomInt } from 'node:crypto'
 
 import type { CollectionBeforeChangeHook, CollectionConfig } from 'payload'
 
-import { panelOnly } from '../access/panel'
+import { adminOnly } from '../access/panel'
 import { VOUCHER_AMOUNTS, VOUCHER_DESIGN_CHOICES } from '../lib/inquiry/types'
 import { GROUP_OFFER } from './shared'
 
@@ -34,7 +34,7 @@ export const Vouchers: CollectionConfig = {
     description:
       'Bon wystawiasz po wpłacie za zapytanie typu „Bon podarunkowy”. Kod nadaje się sam.',
   },
-  access: { read: panelOnly, create: panelOnly, update: panelOnly, delete: panelOnly },
+  access: { read: adminOnly, create: adminOnly, update: adminOnly, delete: adminOnly },
   hooks: { beforeChange: [assignCode] },
   fields: [
     {

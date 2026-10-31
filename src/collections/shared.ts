@@ -1,5 +1,6 @@
-import type { Validate } from 'payload'
+import type { FieldHook, Validate } from 'payload'
 
+import { normalizeEmail } from '../lib/email'
 import { KIND_PRIORITY, SOURCES } from '../lib/fps'
 
 // Panel groups (spec. §22).
@@ -8,6 +9,10 @@ export const GROUP_CONTENT = 'Treści'
 export const GROUP_ADMIN = 'Administracja'
 export const GROUP_GAMES = 'Gry i klatki'
 export const GROUP_SALES = 'Sprzedaż'
+export const GROUP_WORKSHOP = 'Warsztat'
+
+/** Field hook: e-mail trimmed and lower case on every write (panel spec §6, `lib/email.ts`). */
+export const normalizeEmailHook: FieldHook = ({ value }) => normalizeEmail(value)
 
 export const RESOLUTIONS = [
   { label: 'FullHD', value: 'fullhd' },

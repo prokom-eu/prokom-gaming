@@ -1,7 +1,7 @@
 import type { CollectionConfig } from 'payload'
 import { text } from 'payload/shared'
 
-import { anyone, panelOnly } from '../access/panel'
+import { anyone, adminOnly } from '../access/panel'
 import { blockDeleteWithFpsResults } from './FpsResults'
 import { GAME_KINDS, GROUP_GAMES } from './shared'
 
@@ -27,7 +27,7 @@ export const Games: CollectionConfig = {
     defaultColumns: ['name', 'kind', 'popularRank', 'seoPage'],
   },
   defaultSort: 'popularRank',
-  access: { read: anyone, create: panelOnly, update: panelOnly, delete: panelOnly },
+  access: { read: anyone, create: adminOnly, update: adminOnly, delete: adminOnly },
   hooks: { beforeDelete: [blockDeleteWithFpsResults('game')] },
   fields: [
     {

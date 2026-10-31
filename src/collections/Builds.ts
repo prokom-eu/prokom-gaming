@@ -1,7 +1,8 @@
 import type { CollectionConfig, Field } from 'payload'
 
-import { anyone, panelField, panelOnly } from '../access/panel'
+import { adminField, adminOnly, anyone } from '../access/panel'
 import { blockDeleteWithFpsResults } from './FpsResults'
+import { blockDeleteWhenReferenced } from './workshopGuards'
 import { GROUP_OFFER } from './shared'
 
 const optionOf = (name: string, label: string, type: string): Field => ({
@@ -30,8 +31,13 @@ export const Builds: CollectionConfig = {
     useAsTitle: 'name',
     defaultColumns: ['name', 'slug', 'level'],
   },
-  access: { read: anyone, create: panelOnly, update: panelOnly, delete: panelOnly },
-  hooks: { beforeDelete: [blockDeleteWithFpsResults('build')] },
+  access: { read: anyone, create: adminOnly, update: adminOnly, delete: adminOnly },
+  hooks: {
+    beforeDelete: [
+      blockDeleteWithFpsResults('build'),
+      blockDeleteWhenReferenced('units', 'build', 'egzemplarze tego zestawu'),
+    ],
+  },
   fields: [
     {
       type: 'row',
@@ -156,7 +162,7 @@ export const Builds: CollectionConfig = {
       name: 'internalRef',
       label: 'Odniesienie wewnętrzne (tylko panel)',
       type: 'text',
-      ...panelField,
+      ...adminField,
     },
   ],
 }

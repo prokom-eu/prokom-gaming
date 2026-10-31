@@ -2,7 +2,7 @@ import type { Access, CollectionConfig, Condition } from 'payload'
 
 import { number, select } from 'payload/shared'
 
-import { isPanelUser, panelField, panelOnly } from '../access/panel'
+import { adminField, adminOnly, isAdmin } from '../access/panel'
 import { GROUP_OFFER, RAM_TYPES, requiredFor, requiredWhen } from './shared'
 import type { Option } from '../payload-types'
 import { queueAlarmOnCostChange } from './marginAlarmHook'
@@ -24,7 +24,7 @@ const forCooler =
     isCooler(kind)(siblingData as { type?: string; kind?: string })
 
 // Visitors see only active options; the panel sees all of them.
-const readActive: Access = ({ req }) => isPanelUser(req) || { active: { equals: true } }
+const readActive: Access = ({ req }) => isAdmin(req) || { active: { equals: true } }
 
 /**
  * Options of the configurator: cases (24), coolers (22), RAM (7), SSDs (4) — ADR-G002 §2.
@@ -41,7 +41,7 @@ export const Options: CollectionConfig = {
     listSearchableFields: ['code', 'publicLabel'],
   },
   defaultSort: 'code',
-  access: { read: readActive, create: panelOnly, update: panelOnly, delete: panelOnly },
+  access: { read: readActive, create: adminOnly, update: adminOnly, delete: adminOnly },
   hooks: {
     afterChange: [queueAlarmOnCostChange<Option>((o) => String(o.cost))],
     beforeChange: [blockDeactivateWhenUsed],
@@ -87,16 +87,16 @@ export const Options: CollectionConfig = {
           label: 'Model wewnętrzny (tylko panel)',
           type: 'text',
           required: true,
-          ...panelField,
+          ...adminField,
         },
-        { name: 'ean', label: 'EAN (tylko panel)', type: 'text', ...panelField },
+        { name: 'ean', label: 'EAN (tylko panel)', type: 'text', ...adminField },
         {
           name: 'cost',
           label: 'Koszt zł (tylko panel)',
           type: 'number',
           required: true,
           min: 0,
-          ...panelField,
+          ...adminField,
         },
       ],
     },

@@ -38,6 +38,10 @@ const PAGES = [
   { path: '/poradniki/rodzice', status: 200 },
   { path: '/bon', status: Number(process.env.FEATURE_VOUCHER === '1' ? 200 : 404) },
   { path: '/gotowe', status: Number(process.env.FEATURE_READY === '1' ? 200 : 404) },
+  { path: '/metryka', status: 200 },
+  { path: '/metryka?kod=zly-kod', status: 200 },
+  // Seed unit (seed/prokomgaming/workshop.json).
+  { path: '/metryka/WMPR-7KQ2-M9XA-B3CD', status: 200 },
   { path: '/admin/login', status: 200 },
   { path: '/nie-ma-takiej-strony', status: 404 },
 ]

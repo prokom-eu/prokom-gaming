@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload'
 
-import { anyone, nobody, panelField } from '../access/panel'
+import { anyone, nobody, adminField } from '../access/panel'
 import { GROUP_OFFER, PRICE_ITEM_TYPES } from './shared'
 
 /**
@@ -37,7 +37,7 @@ export const PublishedPrices: CollectionConfig = {
       label: 'Koszt przy publikacji (tylko panel)',
       type: 'number',
       min: 0,
-      ...panelField,
+      ...adminField,
     },
     { name: 'publishedAt', label: 'Opublikowano', type: 'date', required: true },
     {
@@ -45,7 +45,7 @@ export const PublishedPrices: CollectionConfig = {
       label: 'Opublikował (tylko panel)',
       type: 'relationship',
       relationTo: 'users',
-      ...panelField,
+      ...adminField,
     },
   ],
 }

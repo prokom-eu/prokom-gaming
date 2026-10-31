@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload'
 
-import { anyone, panelField, panelOnly } from '../access/panel'
+import { anyone, adminField, adminOnly } from '../access/panel'
 import { GROUP_OFFER, MARKUP_CLASSES, RAM_TYPES, RESOLUTIONS } from './shared'
 import type { PowerLevel } from '../payload-types'
 import { queueAlarmOnCostChange } from './marginAlarmHook'
@@ -23,7 +23,7 @@ export const PowerLevels: CollectionConfig = {
     listSearchableFields: ['code', 'publicLabel', 'tierLabel'],
   },
   defaultSort: 'code',
-  access: { read: anyone, create: panelOnly, update: panelOnly, delete: panelOnly },
+  access: { read: anyone, create: adminOnly, update: adminOnly, delete: adminOnly },
   hooks: {
     afterChange: [
       queueAlarmOnCostChange<PowerLevel>((l) =>
@@ -124,7 +124,7 @@ export const PowerLevels: CollectionConfig = {
       name: 'components',
       label: 'Części (tylko panel)',
       type: 'array',
-      ...panelField,
+      ...adminField,
       fields: [
         {
           name: 'role',
@@ -144,16 +144,16 @@ export const PowerLevels: CollectionConfig = {
           label: 'Model wewnętrzny',
           type: 'text',
           required: true,
-          ...panelField,
+          ...adminField,
         },
-        { name: 'ean', label: 'EAN', type: 'text', ...panelField },
+        { name: 'ean', label: 'EAN', type: 'text', ...adminField },
         {
           name: 'cost',
           label: 'Koszt (zł)',
           type: 'number',
           required: true,
           min: 0,
-          ...panelField,
+          ...adminField,
         },
       ],
     },
@@ -187,7 +187,7 @@ export const PowerLevels: CollectionConfig = {
           type: 'select',
           required: true,
           options: MARKUP_CLASSES,
-          ...panelField,
+          ...adminField,
         },
         {
           name: 'markupOverride',
@@ -196,7 +196,7 @@ export const PowerLevels: CollectionConfig = {
           min: 0,
           max: 1,
           admin: { description: 'Jawny wyjątek od klasy, np. 0,168. Puste = narzut klasy.' },
-          ...panelField,
+          ...adminField,
         },
       ],
     },

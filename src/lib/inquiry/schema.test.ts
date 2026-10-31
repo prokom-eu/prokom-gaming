@@ -82,6 +82,9 @@ describe('parseInquiryInput', () => {
     expect(fields({ ...build, email: 'jan@foo-.pl' })).toContain('email')
     expect(fields({ ...build, email: 'jan..k@example.test' })).toContain('email')
     expect(fields({ ...build, email: 'jan.kowalski+gry@poczta.example.pl' })).toEqual([])
+    // One customer = one e-mail across inquiries, orders and accounts (panel spec §6, G14).
+    const parsed = parseInquiryInput({ ...build, email: ' Jan.Kowalski@Example.TEST ' })
+    expect(parsed.success && parsed.data.email).toBe('jan.kowalski@example.test')
     expect(
       fields({ ...build, consent: { accepted: false, clauseVersion: CONSENT_CLAUSE.version } }),
     ).toContain('consent.accepted')

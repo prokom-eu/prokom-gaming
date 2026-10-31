@@ -1,6 +1,6 @@
 import type { Field, GlobalConfig } from 'payload'
 
-import { anyone, panelOnly } from '../access/panel'
+import { anyone, adminOnly } from '../access/panel'
 import { GROUP_CONTENT } from '../collections/shared'
 
 const text = (name: string, label: string, description?: string): Field => ({
@@ -22,7 +22,7 @@ export const SiteSettings: GlobalConfig = {
   slug: 'site-settings',
   label: 'Ustawienia strony',
   admin: { group: GROUP_CONTENT },
-  access: { read: anyone, update: panelOnly },
+  access: { read: anyone, update: adminOnly },
   fields: [
     {
       name: 'company',

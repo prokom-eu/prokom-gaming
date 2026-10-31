@@ -26,3 +26,15 @@ export const CONTACT_CONSENT_CLAUSE = {
 
 /** Versions `POST /api/inquiry` accepts: the clauses shown on the site today. */
 export const CONSENT_VERSIONS = [CONSENT_CLAUSE.version, CONTACT_CONSENT_CLAUSE.version] as const
+
+/**
+ * Consent when a customer sets up an account (G14). Not on any board, own version: the account
+ * keeps which wording was accepted.
+ */
+export const ACCOUNT_CONSENT_CLAUSE = {
+  version: '2026-10-31-konto',
+  // TODO(krystian): wording with the lawyer together with the terms and the privacy policy (spec. §25).
+  text:
+    'Akceptuję regulamin konta. Administratorem danych jest PRO-KOM Tadeusz Wójciak, ' +
+    'szczegóły w polityce prywatności.',
+} as const

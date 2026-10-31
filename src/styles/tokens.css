@@ -132,6 +132,7 @@
   );
   --tick-bg: #050907; /* taśma „Teraz w warsztacie” */
   --tick-text: #bdb39b;
+  --live: #5bc23e; /* kropka „na żywo” (plansza Main, `.live`) */
 }
 
 /* Materiał imienia istoty (plansza Main, `--m1…--m4`): cztery przystanki gradientu od światła do
@@ -466,4 +467,28 @@
   --gt-badge-bg: #0f2a1c; /* „wysyłka w 1–2 dni robocze” */
   --gt-badge-text: #8ff0b5;
   --gt-badge-line: rgba(79, 210, 138, 0.5);
+
+  /* ---------- G14: metryka i konto (plansze Metryka, Konto) ---------- */
+  --mt-page: #050807; /* tło strony */
+  --mt-page-glow: rgba(242, 194, 48, 0.07);
+  --mt-tl-todo: #8a8576; /* oś etapów: jeszcze nie (plansza #7f7c70 — za słaby kontrast) */
+  --mt-tl-done: #cfc6b1;
+  --mt-tl-now: #ffffff;
+  --mt-tl-track: rgba(236, 228, 208, 0.12);
+  --mt-label: #9a9583; /* etykiety: Czas, Wynik, CPU maks. */
+  --mt-ok: #7fd56a; /* „bez błędów” */
+  --mt-bad: #ff8a7a; /* błędy w teście */
+  --mt-bar: #5bc23e; /* pasek klatek zmierzonych na egzemplarzu */
+  --mt-bar-track: rgba(236, 228, 208, 0.08);
+  --mt-dd: #cfc6b1; /* producent, model */
+  --mt-small: #8d8a7c; /* SN, gwarancja do */
+  --mt-gw-line: rgba(242, 194, 48, 0.3); /* ramka gwarancji PRO-KOM */
+  --mt-gw-bg: rgba(242, 194, 48, 0.06);
+  --mt-gw-text: #d8cfb8;
+  --kt-menu-on: rgba(242, 194, 48, 0.1); /* konto: wybrana pozycja menu */
+  --kt-sub: #a9a18c; /* konto: „Egzemplarz nr …”, zgoda na pomoc zdalną */
+  --kt-input-bg: rgba(0, 0, 0, 0.25);
+  --print-ink: #000000; /* metryka do druku (wkładka do pudełka) */
+  --print-line: #999999;
+  --print-line-soft: #cccccc;
 }

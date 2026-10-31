@@ -22,6 +22,8 @@ import { legalFeatures } from '../globals/Legal'
 import { mapBuildFaq, mapFaq } from './faq'
 import { guideSeeds } from './guides'
 import stockSeed from '../../seed/prokomgaming/stock.json'
+import workshopSeed from '../../seed/prokomgaming/workshop.json'
+import type { OrderStage } from '../lib/orders'
 import { SKIP_STOCK_GUARD } from '../lib/stock'
 import { fpsSeed, mapFpsResult, mapGame, planFpsResults, type ExistingFpsResult } from './fps'
 import { legalSeeds, splitLineBreaks } from './legal'
@@ -88,12 +90,14 @@ async function upsert<S extends 'options' | 'power-levels' | 'builds' | 'games'>
 async function seedAdmin(payload: Payload): Promise<number> {
   const existing = await findIdBy(payload, 'users', 'email', adminEmail)
   if (existing !== undefined) {
+    // Role only: an older local database (before G14) may have the admin without one.
+    await payload.update({ collection: 'users', id: existing, data: { role: 'admin' }, ...asSeed })
     payload.logger.info('Seed: local admin already exists, skipped.')
     return existing
   }
   const created = await payload.create({
     collection: 'users',
-    data: { email: adminEmail, password: adminPassword },
+    data: { email: adminEmail, password: adminPassword, role: 'admin' },
     ...asSeed,
   })
   payload.logger.info('Seed: local admin created.')
@@ -406,6 +410,88 @@ async function seedStock(payload: Payload): Promise<void> {
   payload.logger.info(`Seed: ${stockSeed.items.length} sample stock units.`)
 }
 
+/**
+ * Sample units and orders (G14): the workshop strip, `/metryka/<code>` and the account have data
+ * locally and in CI. Units are matched by their fixed code, orders by e-mail + build. Stages are
+ * reset to the seed values on every run.
+ */
+async function seedWorkshop(payload: Payload): Promise<void> {
+  const ids = async (collection: 'builds' | 'games') => {
+    const { docs } = await payload.find({
+      collection,
+      select: { slug: true },
+      pagination: false,
+      ...asSeed,
+    })
+    return new Map(docs.map((d) => [d.slug as string, d.id]))
+  }
+  const [buildId, gameId] = await Promise.all([ids('builds'), ids('games')])
+  const need = <T>(map: Map<string, T>, slug: string, what: string): T => {
+    const id = map.get(slug)
+    if (id === undefined) throw new Error(`Seed: workshop ${what} „${slug}” not found.`)
+    return id
+  }
+
+  const unitId = new Map<string, number>()
+  for (const unit of workshopSeed.units) {
+    const data = {
+      code: unit.code,
+      build: need(buildId, unit.build, 'build'),
+      published: unit.published,
+      email: unit.email,
+      serial: unit.serial,
+      testedAt: unit.testedAt,
+      warrantyUntil: unit.warrantyUntil,
+      assembledBy: unit.assembledBy || null,
+      stressTest: unit.stressTest,
+      temps: unit.temps,
+      fpsSetup: {
+        ...unit.fpsSetup,
+        resolution: unit.fpsSetup.resolution as 'fullhd' | 'qhd' | 'uhd',
+      },
+      fps: unit.fps.map((f) => ({ game: need(gameId, f.game, 'game'), fps: f.fps })),
+      parts: unit.parts.map((part) => ({
+        ...part,
+        role: part.role as
+          'gpu' | 'cpu' | 'motherboard' | 'ram' | 'ssd' | 'psu' | 'case' | 'cooler',
+      })),
+    }
+    const existing = await findIdBy(payload, 'units', 'code', unit.code)
+    if (existing !== undefined) {
+      await payload.update({ collection: 'units', id: existing, data, ...asSeed })
+      unitId.set(unit.code, existing)
+    } else {
+      const created = await payload.create({ collection: 'units', data, ...asSeed })
+      unitId.set(unit.code, created.id)
+    }
+  }
+
+  for (const order of workshopSeed.orders) {
+    const build = need(buildId, order.build, 'build')
+    const data = {
+      build,
+      stage: order.stage as OrderStage,
+      name: order.name,
+      email: order.email,
+      price: order.price,
+      unit: order.unit ? need(unitId, order.unit, 'unit') : null,
+      dueDate: order.dueDate,
+    }
+    const found = await payload.find({
+      collection: 'orders',
+      where: { and: [{ email: { equals: order.email } }, { build: { equals: build } }] },
+      limit: 1,
+      ...asSeed,
+    })
+    const id = found.docs[0]?.id
+    if (id !== undefined) await payload.update({ collection: 'orders', id, data, ...asSeed })
+    else await payload.create({ collection: 'orders', data, ...asSeed })
+  }
+  payload.logger.info(
+    `Seed: ${workshopSeed.units.length} sample units, ${workshopSeed.orders.length} sample orders.`,
+  )
+}
+
 const payload = await getPayload({ config })
 
 try {
@@ -418,6 +504,7 @@ try {
   await seedLegal(payload)
   await seedGuides(payload)
   await seedStock(payload)
+  await seedWorkshop(payload)
 } finally {
   await payload.destroy()
 }

@@ -64,7 +64,9 @@ export function SentSummaryCard({
       </p>
       <div className="iq-card__a">
         <ButtonLink href={routes.home}>Wróć na stronę główną</ButtonLink>
-        {/* TODO(G14): „Załóż konto i śledź zamówienie” (board) once the customer account exists. */}
+        <ButtonLink variant="ghost" href={routes.accountRegister}>
+          Załóż konto i śledź zamówienie
+        </ButtonLink>
       </div>
     </div>
   )

@@ -5,12 +5,12 @@ import type {
   Field,
 } from 'payload'
 
-import { isPanelUser, nobody, panelOnly } from '../access/panel'
+import { adminOnly, isPanelUser, nobody } from '../access/panel'
 import { formatInquiryNumber, nextInquirySeq, yearInPoland } from '../lib/inquiry/number'
 import { RETENTION_CONTEXT } from '../lib/inquiry/retention'
 import { nextStatusChangedAt } from '../lib/inquiry/status'
 import { CHOICES, INQUIRY_STATUS_CHOICES, INQUIRY_TYPE_CHOICES } from '../lib/inquiry/types'
-import { GROUP_SALES } from './shared'
+import { GROUP_SALES, normalizeEmailHook } from './shared'
 
 // Everything but `status` is what the customer sent (or the server computed): nobody edits it,
 // not even in the panel. Field access drops such values from API updates; `readOnly` only greys
@@ -93,7 +93,7 @@ export const Inquiries: CollectionConfig = {
     description: 'Zapytania ze strony. Zmieniasz tylko status.',
   },
   defaultSort: '-createdAt',
-  access: { read: panelOnly, create: nobody, update: panelOnly, delete: panelOnly },
+  access: { read: adminOnly, create: nobody, update: adminOnly, delete: adminOnly },
   hooks: {
     beforeChange: [assignNumber, trackStatusChange],
     afterDelete: [recordDeletion],
@@ -262,7 +262,14 @@ export const Inquiries: CollectionConfig = {
           type: 'row',
           fields: [
             { name: 'name', label: 'Imię', type: 'text', required: true, ...locked },
-            { name: 'email', label: 'E-mail', type: 'email', required: true, ...locked },
+            {
+              name: 'email',
+              label: 'E-mail',
+              type: 'email',
+              required: true,
+              ...locked,
+              hooks: { beforeValidate: [normalizeEmailHook] },
+            },
             text('phone', 'Telefon'),
             select('preferredContact', 'Odpowiedź'),
           ],

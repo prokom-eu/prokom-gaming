@@ -1,6 +1,6 @@
 import type { Access, CollectionConfig } from 'payload'
 
-import { isPanelUser, panelOnly } from '../access/panel'
+import { adminOnly, isPanelUser } from '../access/panel'
 import { GUIDE_CATEGORIES } from '../lib/guides'
 import { menuCreatures } from '../lib/site'
 import { GROUP_CONTENT } from './shared'
@@ -31,10 +31,10 @@ export const Guides: CollectionConfig = {
   // customers (G14) would read the drafts through `/api/guides/versions`.
   access: {
     read: publishedOrPanel,
-    readVersions: panelOnly,
-    create: panelOnly,
-    update: panelOnly,
-    delete: panelOnly,
+    readVersions: adminOnly,
+    create: adminOnly,
+    update: adminOnly,
+    delete: adminOnly,
   },
   fields: [
     { name: 'title', label: 'Tytuł', type: 'text', required: true },

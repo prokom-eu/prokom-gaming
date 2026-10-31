@@ -817,6 +817,18 @@
   gap: 10px;
   margin-top: 22px;
 }
+.cf-save {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.cf-save small {
+  font-size: 13.5px;
+  color: var(--note);
+}
+.cf-save a {
+  color: var(--grom);
+}
 .cf-sms {
   margin: 10px 0 0;
   font-size: 13.5px;

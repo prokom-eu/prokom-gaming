@@ -5,7 +5,7 @@ import {
 } from '@payloadcms/richtext-lexical'
 import type { GlobalConfig } from 'payload'
 
-import { anyone, panelOnly } from '../access/panel'
+import { anyone, adminOnly } from '../access/panel'
 import { GROUP_CONTENT } from '../collections/shared'
 
 /**
@@ -28,7 +28,7 @@ function legalGlobal(slug: 'legal-terms' | 'legal-privacy', label: string): Glob
     slug,
     label,
     admin: { group: GROUP_CONTENT },
-    access: { read: anyone, update: panelOnly },
+    access: { read: anyone, update: adminOnly },
     fields: [
       {
         name: 'draft',

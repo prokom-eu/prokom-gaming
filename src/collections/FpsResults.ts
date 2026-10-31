@@ -7,7 +7,7 @@ import type {
 } from 'payload'
 import { date, text } from 'payload/shared'
 
-import { anyone, panelField, panelOnly } from '../access/panel'
+import { anyone, adminField, adminOnly } from '../access/panel'
 import { FPS_KINDS, GROUP_GAMES, RESOLUTIONS, requiredWhen } from './shared'
 
 const TEST_KINDS = ['m', 'r', 'e'] as const
@@ -113,7 +113,8 @@ export function blockDeleteWithFpsResults(field: 'build' | 'game'): CollectionBe
  * `seed/prokomgaming/fps-sources.json`. The site only reads these numbers, always with the source
  * label (`lib/fps.ts`). `cpu`/`gpu` name the level's parts — panel only, like internal models
  * (ADR-G002 §8.7).
- * TODO(G14): `unit` — relation to the measured unit (`units`) for `p` records.
+ * `unit` links a `p` record to the measured unit — only a unit built exactly to the build's recipe
+ * (ADR-G004 §5); measurements of a changed unit stay on its certificate only.
  */
 export const FpsResults: CollectionConfig = {
   slug: 'fps-results',
@@ -124,7 +125,7 @@ export const FpsResults: CollectionConfig = {
     description:
       'Liczby z testów (ADR-G004). Nowa karta albo procesor w ofercie = nowy seed z czatu. Ręcznie dodajemy tylko pomiary PRO-KOM.',
   },
-  access: { read: anyone, create: panelOnly, update: panelOnly, delete: panelOnly },
+  access: { read: anyone, create: adminOnly, update: adminOnly, delete: adminOnly },
   indexes: [{ fields: ['build', 'game', 'resolution'] }],
   hooks: { beforeChange: [oneTestResultPerSlot] },
   fields: [
@@ -175,10 +176,22 @@ export const FpsResults: CollectionConfig = {
       validate: requiredWhen((s) => s.kind === 'p', date, 'Pomiar PRO-KOM musi mieć datę.'),
     },
     {
+      name: 'unit',
+      label: 'Egzemplarz (pomiar PRO-KOM)',
+      type: 'relationship',
+      relationTo: 'units',
+      // Which unit is internal: the public offer API shows the number, not where it came from.
+      ...adminField,
+      admin: {
+        condition: (_, s) => s?.kind === 'p',
+        description: 'Tylko egzemplarz złożony dokładnie według przepisu zestawu (ADR-G004 §5).',
+      },
+    },
+    {
       type: 'row',
       fields: [
-        { name: 'cpu', label: 'Procesor (tylko panel)', type: 'text', ...panelField },
-        { name: 'gpu', label: 'Karta (tylko panel)', type: 'text', ...panelField },
+        { name: 'cpu', label: 'Procesor (tylko panel)', type: 'text', ...adminField },
+        { name: 'gpu', label: 'Karta (tylko panel)', type: 'text', ...adminField },
       ],
     },
   ],

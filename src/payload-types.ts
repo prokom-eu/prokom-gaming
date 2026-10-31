@@ -64,6 +64,7 @@ export type SupportedTimezones =
 export interface Config {
   auth: {
     users: UserAuthOperations;
+    customers: CustomerAuthOperations;
   };
   blocks: {};
   collections: {
@@ -82,6 +83,10 @@ export interface Config {
     guides: Guide;
     stock: Stock;
     vouchers: Voucher;
+    customers: Customer;
+    orders: Order;
+    units: Unit;
+    tickets: Ticket;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
     'payload-locked-documents': PayloadLockedDocument;
@@ -105,6 +110,10 @@ export interface Config {
     guides: GuidesSelect<false> | GuidesSelect<true>;
     stock: StockSelect<false> | StockSelect<true>;
     vouchers: VouchersSelect<false> | VouchersSelect<true>;
+    customers: CustomersSelect<false> | CustomersSelect<true>;
+    orders: OrdersSelect<false> | OrdersSelect<true>;
+    units: UnitsSelect<false> | UnitsSelect<true>;
+    tickets: TicketsSelect<false> | TicketsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -133,7 +142,7 @@ export interface Config {
   widgets: {
     collections: CollectionsWidget;
   };
-  user: User;
+  user: User | Customer;
   jobs: {
     tasks: {
       'margin-alarm': TaskMarginAlarm;
@@ -164,12 +173,31 @@ export interface UserAuthOperations {
     password: string;
   };
 }
+export interface CustomerAuthOperations {
+  forgotPassword: {
+    email: string;
+    password: string;
+  };
+  login: {
+    email: string;
+    password: string;
+  };
+  registerFirstUser: {
+    email: string;
+    password: string;
+  };
+  unlock: {
+    email: string;
+    password: string;
+  };
+}
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users".
  */
 export interface User {
   id: number;
+  role: 'admin' | 'serwis';
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -453,10 +481,122 @@ export interface FpsResult {
    * Dla pomiarów PRO-KOM — najnowszy wygrywa.
    */
   measuredAt?: string | null;
+  /**
+   * Tylko egzemplarz złożony dokładnie według przepisu zestawu (ADR-G004 §5).
+   */
+  unit?: (number | null) | Unit;
   cpu?: string | null;
   gpu?: string | null;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * Egzemplarze z metryką. Kod nadaje się sam przy zapisie — drukujesz go na naklejce.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "units".
+ */
+export interface Unit {
+  id: number;
+  code?: string | null;
+  build: number | Build;
+  number?: number | null;
+  /**
+   * Dopiero wtedy działa adres /metryka/<kod>.
+   */
+  published?: boolean | null;
+  serial?: string | null;
+  testedAt?: string | null;
+  warrantyUntil?: string | null;
+  /**
+   * Tylko za zgodą osoby. Puste = na metryce bez imienia.
+   */
+  assembledBy?: string | null;
+  email?: string | null;
+  customer?: (number | null) | Customer;
+  stressTest?: {
+    minutes?: number | null;
+    errors?: number | null;
+  };
+  temps?: {
+    cpuMax?: number | null;
+    gpuMax?: number | null;
+  };
+  fpsSetup?: {
+    resolution?: ('fullhd' | 'qhd' | 'uhd') | null;
+    settings?: string | null;
+    driver?: string | null;
+  };
+  fps?:
+    | {
+        game: number | Game;
+        fps: number;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Na metryce widać producenta, model i numer seryjny tego egzemplarza (spec. §13) — to jedyne miejsce na stronie z modelem części.
+   */
+  parts?:
+    | {
+        role: 'gpu' | 'cpu' | 'motherboard' | 'ram' | 'ssd' | 'psu' | 'case' | 'cooler';
+        label: string;
+        manufacturer?: string | null;
+        model?: string | null;
+        serial?: string | null;
+        warrantyUntil?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Konta klientów strony. Klient zakłada je sam na /konto/rejestracja.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "customers".
+ */
+export interface Customer {
+  id: number;
+  name: string;
+  phone?: string | null;
+  consent?: {
+    clauseVersion?: string | null;
+    acceptedAt?: string | null;
+  };
+  savedConfigs?:
+    | {
+        label: string;
+        k: string;
+        light?: string | null;
+        savedAt: string;
+        id?: string | null;
+      }[]
+    | null;
+  favorites?: (number | Build)[] | null;
+  notes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  email: string;
+  resetPasswordToken?: string | null;
+  resetPasswordExpiration?: string | null;
+  salt?: string | null;
+  hash?: string | null;
+  resetPasswordRequestedAt?: string | null;
+  _verified?: boolean | null;
+  _verificationToken?: string | null;
+  loginAttempts?: number | null;
+  lockUntil?: string | null;
+  sessions?:
+    | {
+        id: string;
+        createdAt?: string | null;
+        expiresAt: string;
+      }[]
+    | null;
+  password?: string | null;
+  collection: 'customers';
 }
 /**
  * Zapytania ze strony. Zmieniasz tylko status.
@@ -699,6 +839,76 @@ export interface Voucher {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders".
+ */
+export interface Order {
+  id: number;
+  number?: string | null;
+  stage: 'offer' | 'paid' | 'parts' | 'assembly' | 'test' | 'metric_ready' | 'shipped' | 'delivered';
+  dueDate?: string | null;
+  name: string;
+  email: string;
+  customer?: (number | null) | Customer;
+  inquiry?: (number | null) | Inquiry;
+  build?: (number | null) | Build;
+  price?: number | null;
+  unit?: (number | null) | Unit;
+  trackingNumber?: string | null;
+  config?: {
+    level?: string | null;
+    case?: string | null;
+    cooler?: string | null;
+    ram?: string | null;
+    ssd?: string | null;
+  };
+  checklist?:
+    | {
+        key: 'parts' | 'bios' | 'stress' | 'temps' | 'fps' | 'photos' | 'certificate' | 'packed';
+        done?: boolean | null;
+        doneAt?: string | null;
+        doneBy?: (number | null) | User;
+        id?: string | null;
+      }[]
+    | null;
+  workshopNote?: string | null;
+  stageChangedAt?: string | null;
+  stageHistory?:
+    | {
+        stage: 'offer' | 'paid' | 'parts' | 'assembly' | 'test' | 'metric_ready' | 'shipped' | 'delivered';
+        at: string;
+        by?: (number | null) | User;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tickets".
+ */
+export interface Ticket {
+  id: number;
+  unit: number | Unit;
+  category: 'stutter' | 'no_power' | 'noise_heat' | 'other';
+  status: 'new' | 'in_progress' | 'resolved' | 'closed';
+  description: string;
+  remoteHelpConsent?: boolean | null;
+  email: string;
+  customer?: (number | null) | Customer;
+  history?:
+    | {
+        at: string;
+        status: 'new' | 'in_progress' | 'resolved' | 'closed';
+        by?: (number | null) | User;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -881,12 +1091,33 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'vouchers';
         value: number | Voucher;
+      } | null)
+    | ({
+        relationTo: 'customers';
+        value: number | Customer;
+      } | null)
+    | ({
+        relationTo: 'orders';
+        value: number | Order;
+      } | null)
+    | ({
+        relationTo: 'units';
+        value: number | Unit;
+      } | null)
+    | ({
+        relationTo: 'tickets';
+        value: number | Ticket;
       } | null);
   globalSlug?: string | null;
-  user: {
-    relationTo: 'users';
-    value: number | User;
-  };
+  user:
+    | {
+        relationTo: 'users';
+        value: number | User;
+      }
+    | {
+        relationTo: 'customers';
+        value: number | Customer;
+      };
   updatedAt: string;
   createdAt: string;
 }
@@ -896,10 +1127,15 @@ export interface PayloadLockedDocument {
  */
 export interface PayloadPreference {
   id: number;
-  user: {
-    relationTo: 'users';
-    value: number | User;
-  };
+  user:
+    | {
+        relationTo: 'users';
+        value: number | User;
+      }
+    | {
+        relationTo: 'customers';
+        value: number | Customer;
+      };
   key?: string | null;
   value?:
     | {
@@ -929,6 +1165,7 @@ export interface PayloadMigration {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
+  role?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -1152,6 +1389,7 @@ export interface FpsResultsSelect<T extends boolean = true> {
   sourceUrl?: T;
   setting?: T;
   measuredAt?: T;
+  unit?: T;
   cpu?: T;
   gpu?: T;
   updatedAt?: T;
@@ -1312,6 +1550,175 @@ export interface VouchersSelect<T extends boolean = true> {
   dedication?: T;
   validUntil?: T;
   inquiry?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "customers_select".
+ */
+export interface CustomersSelect<T extends boolean = true> {
+  name?: T;
+  phone?: T;
+  consent?:
+    | T
+    | {
+        clauseVersion?: T;
+        acceptedAt?: T;
+      };
+  savedConfigs?:
+    | T
+    | {
+        label?: T;
+        k?: T;
+        light?: T;
+        savedAt?: T;
+        id?: T;
+      };
+  favorites?: T;
+  notes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  email?: T;
+  resetPasswordToken?: T;
+  resetPasswordExpiration?: T;
+  salt?: T;
+  hash?: T;
+  resetPasswordRequestedAt?: T;
+  _verified?: T;
+  _verificationToken?: T;
+  loginAttempts?: T;
+  lockUntil?: T;
+  sessions?:
+    | T
+    | {
+        id?: T;
+        createdAt?: T;
+        expiresAt?: T;
+      };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders_select".
+ */
+export interface OrdersSelect<T extends boolean = true> {
+  number?: T;
+  stage?: T;
+  dueDate?: T;
+  name?: T;
+  email?: T;
+  customer?: T;
+  inquiry?: T;
+  build?: T;
+  price?: T;
+  unit?: T;
+  trackingNumber?: T;
+  config?:
+    | T
+    | {
+        level?: T;
+        case?: T;
+        cooler?: T;
+        ram?: T;
+        ssd?: T;
+      };
+  checklist?:
+    | T
+    | {
+        key?: T;
+        done?: T;
+        doneAt?: T;
+        doneBy?: T;
+        id?: T;
+      };
+  workshopNote?: T;
+  stageChangedAt?: T;
+  stageHistory?:
+    | T
+    | {
+        stage?: T;
+        at?: T;
+        by?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "units_select".
+ */
+export interface UnitsSelect<T extends boolean = true> {
+  code?: T;
+  build?: T;
+  number?: T;
+  published?: T;
+  serial?: T;
+  testedAt?: T;
+  warrantyUntil?: T;
+  assembledBy?: T;
+  email?: T;
+  customer?: T;
+  stressTest?:
+    | T
+    | {
+        minutes?: T;
+        errors?: T;
+      };
+  temps?:
+    | T
+    | {
+        cpuMax?: T;
+        gpuMax?: T;
+      };
+  fpsSetup?:
+    | T
+    | {
+        resolution?: T;
+        settings?: T;
+        driver?: T;
+      };
+  fps?:
+    | T
+    | {
+        game?: T;
+        fps?: T;
+        id?: T;
+      };
+  parts?:
+    | T
+    | {
+        role?: T;
+        label?: T;
+        manufacturer?: T;
+        model?: T;
+        serial?: T;
+        warrantyUntil?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tickets_select".
+ */
+export interface TicketsSelect<T extends boolean = true> {
+  unit?: T;
+  category?: T;
+  status?: T;
+  description?: T;
+  remoteHelpConsent?: T;
+  email?: T;
+  customer?: T;
+  history?:
+    | T
+    | {
+        at?: T;
+        status?: T;
+        by?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }
