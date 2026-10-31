@@ -3,6 +3,8 @@ import { randomBytes } from 'node:crypto'
 import { expect, test } from '@playwright/test'
 import type { APIRequestContext, Page } from '@playwright/test'
 
+import { adminHeaders } from './helpers/adminSession'
+
 /**
  * Access to the custom panel views (panel spec §15, ADR-G006 §3): custom Payload views are public
  * by definition, so every one checks access itself (`panelAccess`). Not signed in → a way to the
@@ -43,12 +45,9 @@ test.describe('signed in with the serwis role', () => {
   let userId: number
 
   test.beforeAll(async ({ playwright, baseURL }) => {
+    // The admin session of auth.setup.ts — no second login of the same account (see there).
     admin = await playwright.request.newContext({ baseURL })
-    const login = await admin.post('/api/users/login', {
-      data: { email: process.env.SEED_ADMIN_EMAIL, password: process.env.SEED_ADMIN_PASSWORD },
-    })
-    expect(login.status()).toBe(200)
-    headers = { Authorization: `JWT ${((await login.json()) as { token: string }).token}` }
+    headers = adminHeaders()
     const created = await admin.post('/api/users', {
       headers,
       data: { email, password, role: 'serwis' },

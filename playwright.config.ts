@@ -35,8 +35,16 @@ export default defineConfig({
   // The two reference widths of the design (docs/design/prokomgaming/screens/*-1440, *-414).
   projects: [
     {
+      // One login of the seed admin before everything (tests/e2e/auth.setup.ts): parallel logins
+      // of the same account drop each other's Payload session.
+      name: 'auth',
+      testMatch: /auth\.setup\.ts$/,
+      use: { ...devices['Desktop Chrome'] },
+    },
+    {
       name: 'db-writers',
       testMatch: DB_WRITERS,
+      dependencies: ['auth'],
       workers: 1,
       use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } },
     },

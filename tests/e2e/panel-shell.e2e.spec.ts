@@ -2,29 +2,19 @@ import AxeBuilder from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
 
+import { ADMIN_STATE } from './helpers/adminSession'
+
 /**
  * Panel shell (P1, panel spec §2, §2a): sidebar on a computer; app bar, bottom tabs and the
  * "Więcej" sheet on a phone; the table as cards; no sideways scrolling; axe; the PWA manifest
- * only for /admin. Read-only — runs at 1440 and 414 with the seed admin.
+ * only for /admin. Read-only — runs at 1440 and 414 with the seed admin session of
+ * `auth.setup.ts` (no own logins: parallel logins drop each other's Payload session).
  */
-
-async function logIn(page: Page): Promise<void> {
-  const email = process.env.SEED_ADMIN_EMAIL
-  const password = process.env.SEED_ADMIN_PASSWORD
-  if (!email || !password) throw new Error('SEED_ADMIN_EMAIL / SEED_ADMIN_PASSWORD are not set.')
-  await page.goto('/admin/login')
-  await page.locator('#field-email').fill(email)
-  await page.locator('#field-password').fill(password)
-  await page.locator('button[type="submit"]').click()
-  await expect(page).toHaveURL(/\/admin\/?$/)
-}
 
 const tabbar = (page: Page) => page.getByRole('navigation', { name: 'Panel, nawigacja dolna' })
 
 test.describe('signed in as admin', () => {
-  test.beforeEach(async ({ page }) => {
-    await logIn(page)
-  })
+  test.use({ storageState: ADMIN_STATE })
 
   test('the shell of the mode on a real screen', async ({ page, isMobile }) => {
     await page.goto('/admin/dane')
@@ -88,9 +78,7 @@ test.describe('signed in as admin', () => {
 test.describe('phone (414)', () => {
   test.skip(({ isMobile }) => !isMobile, 'phone mode only')
 
-  test.beforeEach(async ({ page }) => {
-    await logIn(page)
-  })
+  test.use({ storageState: ADMIN_STATE })
 
   test('bottom tabs of the boards: Pulpit · Zapytania · Zatwierdź · Zestawy · Więcej', async ({
     page,
@@ -151,9 +139,7 @@ test.describe('phone (414)', () => {
 test.describe('component preview (dev only)', () => {
   test.skip(process.env.E2E_SERVER === 'start', '/admin/podglad-panelu is 404 in production builds')
 
-  test.beforeEach(async ({ page }) => {
-    await logIn(page)
-  })
+  test.use({ storageState: ADMIN_STATE })
 
   test('all components pass axe in both modes', async ({ page }) => {
     await page.goto('/admin/podglad-panelu')

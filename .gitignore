@@ -13,6 +13,7 @@ test-results/
 *.log
 blob-report/
 playwright/.cache/
+playwright/.auth/
 .claude/worktrees/
 # Next.js (generated)
 next-env.d.ts
