@@ -28,6 +28,11 @@ export function retentionCutoff(now: Date, months: number): Date {
   return cutoff
 }
 
+/** `now` minus whole days (unmatched mail: 90 days from arrival, ADR-G008 pt 7). */
+export function daysBefore(now: Date, days: number): Date {
+  return new Date(now.getTime() - days * 86_400_000)
+}
+
 const expiring = new Set<InquiryStatus>(RETAINED_UNTIL_EXPIRY)
 
 /**

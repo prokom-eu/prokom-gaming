@@ -41,12 +41,32 @@ const envSchema = z
     // Closed inquiries (`lost`, `closed`) are deleted this many months after the last status
     // change (ADR-G005; to be confirmed with the privacy policy).
     INQUIRY_RETENTION_MONTHS: z.coerce.number().int().min(1).max(120).default(24),
+    // Customers' answers read from the Gaming mailbox (ADR-G008 pt 2, P4) — the same mailbox as
+    // MAIL_FROM_ADDRESS. All three of host, user and password, or none: without them reading is off
+    // (the panel says so) and sending still works. Port 993 = TLS from the first byte; any other
+    // port upgrades with STARTTLS.
+    IMAP_HOST: z.string().min(1).optional(),
+    IMAP_PORT: z.coerce.number().int().min(1).max(65535).default(993),
+    IMAP_USER: z.string().min(1).optional(),
+    IMAP_PASSWORD: z.string().min(1).optional(),
+    // Folder for copies of replies sent from the panel; empty = the folder the server marks as
+    // „Sent” (special-use \Sent), else „Sent”.
+    IMAP_SENT_FOLDER: z.string().min(1).optional(),
   })
   // SMTP login is both or neither: a half-set pair would fail only at the first e-mail.
   .refine((env) => Boolean(env.SMTP_USER) === Boolean(env.SMTP_PASS), {
     message: 'set both SMTP_USER and SMTP_PASS, or neither',
     path: ['SMTP_PASS'],
   })
+  .refine(
+    (env) =>
+      new Set([env.IMAP_HOST, env.IMAP_USER, env.IMAP_PASSWORD].map((value) => Boolean(value)))
+        .size === 1,
+    {
+      message: 'set all of IMAP_HOST, IMAP_USER and IMAP_PASSWORD, or none',
+      path: ['IMAP_PASSWORD'],
+    },
+  )
   .refine((env) => env.NODE_ENV !== 'production' || Boolean(env.ALERT_EMAIL), {
     message: 'required in production (margin alarm)',
     path: ['ALERT_EMAIL'],
@@ -78,6 +98,26 @@ export function parseEnv(source: Record<string, string | undefined>): Env {
     throw new Error(`Invalid environment variables (see .env.example):\n${problems}`)
   }
   return result.data
+}
+
+export type ImapConfig = {
+  host: string
+  port: number
+  user: string
+  password: string
+  sentFolder: string | null
+}
+
+/** The mailbox to read, or `null` when reading is switched off (no IMAP_* set). */
+export function imapConfig(env: Env): ImapConfig | null {
+  if (!env.IMAP_HOST || !env.IMAP_USER || !env.IMAP_PASSWORD) return null
+  return {
+    host: env.IMAP_HOST,
+    port: env.IMAP_PORT,
+    user: env.IMAP_USER,
+    password: env.IMAP_PASSWORD,
+    sentFolder: env.IMAP_SENT_FOLDER ?? null,
+  }
 }
 
 let cached: Env | undefined

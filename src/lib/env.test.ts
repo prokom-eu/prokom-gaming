@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { parseEnv } from './env'
+import { imapConfig, parseEnv } from './env'
 
 const valid = {
   NODE_ENV: 'test',
@@ -18,6 +18,7 @@ const defaults = {
   SMTP_SECURE: false,
   MAIL_FROM_NAME: 'PRO-KOM Gaming',
   SITE_URL: 'http://localhost:3100',
+  IMAP_PORT: 993,
   INQUIRY_RETENTION_MONTHS: 24,
 }
 
@@ -105,6 +106,24 @@ describe('parseEnv', () => {
   it('requires SMTP_USER and SMTP_PASS together', () => {
     expect(() => parseEnv({ ...valid, SMTP_USER: 'formularz' })).toThrow(/SMTP_PASS/)
     expect(() => parseEnv({ ...valid, SMTP_PASS: 'x'.repeat(16) })).toThrow(/SMTP_PASS/)
+  })
+
+  it('reading mail is off without IMAP_*, on with all three (ADR-G008)', () => {
+    expect(imapConfig(parseEnv(valid))).toBeNull()
+    const imap = {
+      IMAP_HOST: 'imap.example.test',
+      IMAP_USER: 'gaming',
+      IMAP_PASSWORD: 'p'.repeat(16),
+    }
+    expect(imapConfig(parseEnv({ ...valid, ...imap, IMAP_PORT: '143' }))).toEqual({
+      host: 'imap.example.test',
+      port: 143,
+      user: 'gaming',
+      password: 'p'.repeat(16),
+      sentFolder: null,
+    })
+    expect(() => parseEnv({ ...valid, IMAP_HOST: 'imap.example.test' })).toThrow(/IMAP_PASSWORD/)
+    expect(() => parseEnv({ ...valid, ...imap, IMAP_USER: undefined })).toThrow(/IMAP_PASSWORD/)
   })
 
   it('rejects an invalid SMTP_PORT or SMTP_SECURE', () => {

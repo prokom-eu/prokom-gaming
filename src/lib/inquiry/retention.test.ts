@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 
-import { deleteExpiredInquiries, isExpired, retentionCutoff } from './retention'
+import { daysBefore, deleteExpiredInquiries, isExpired, retentionCutoff } from './retention'
 import { nextStatusChangedAt } from './status'
 
 describe('retentionCutoff', () => {
@@ -97,5 +97,13 @@ describe('nextStatusChangedAt', () => {
     expect(
       nextStatusChangedAt({ operation: 'update', status: 'new', previousStatus: 'new', now }),
     ).toBe(now.toISOString())
+  })
+})
+
+describe('daysBefore', () => {
+  it('goes back whole days (unmatched mail: 90)', () => {
+    expect(daysBefore(new Date('2026-11-02T03:00:00Z'), 90).toISOString()).toBe(
+      '2026-08-04T03:00:00.000Z',
+    )
   })
 })

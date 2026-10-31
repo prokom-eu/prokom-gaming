@@ -14,6 +14,7 @@ import * as migration_20261030_212115_stock_vouchers from './20261030_212115_sto
 import * as migration_20261030_231049_g14_orders_units_customers from './20261030_231049_g14_orders_units_customers'
 import * as migration_20261031_180205_p1_warn_margin from './20261031_180205_p1_warn_margin'
 import * as migration_20261031_193026_p3_inquiry_thread from './20261031_193026_p3_inquiry_thread'
+import * as migration_20261031_212944_p4_mail_intake from './20261031_212944_p4_mail_intake'
 
 export const migrations = [
   {
@@ -95,5 +96,10 @@ export const migrations = [
     up: migration_20261031_193026_p3_inquiry_thread.up,
     down: migration_20261031_193026_p3_inquiry_thread.down,
     name: '20261031_193026_p3_inquiry_thread',
+  },
+  {
+    up: migration_20261031_212944_p4_mail_intake.up,
+    down: migration_20261031_212944_p4_mail_intake.down,
+    name: '20261031_212944_p4_mail_intake',
   },
 ]

@@ -1,12 +1,21 @@
 # STAN — prokom-gaming
 
-Ostatnia aktualizacja: 31.10.2026 (koniec sesji P3 — #40, #41 scalone).
+Ostatnia aktualizacja: 31.10.2026 (P4 PR 1 — odbiór poczty IMAP, PR do `develop`).
 
 ## W toku
-- **Gałąź:** brak (P3 zamknięta: #40 i #41 scalone do `develop`; ta aktualizacja STAN — `docs/p3-stan`).
-- **Zrobione w tej sesji:** P3 — wątek zapytań w bazie, wysyłka odpowiedzi z panelu (`Re: [PKG-…]`, własny `Message-ID`, nagłówki wątku), szablony ze zmiennymi, alarm SLA, ekran `/admin/zapytania` (komputer 3 kolumny, telefon lista → wątek), „Zamień w zamówienie”; poprawka dostępności taśmy warsztatu na głównej.
-- **Niedokończone:** test na prawdziwym telefonie (Android + iPhone) ekranu zapytań i powłoki P1 (dodanie do ekranu głównego); Lighthouse mobile `/admin/zapytania` po zalogowaniu (spec. panelu §2a pkt 10).
-- **Następny krok:** `/zadanie P4` — odbiór odpowiedzi klientów przez IMAP (`imapflow` + `mailparser`, testy na `tests/fixtures/mail/*.eml`, atrapa IMAP, filtr „Nieprzypisane”) i push (`web-push`, `lib/notify` — przepiąć tam alarm SLA z `runInquirySla`); opis w `docs/zadania/prokomgaming-panel.md` (P4).
+- **Gałąź:** `feat/p4-odbior-poczty` (P4 PR 1 — odbiór odpowiedzi klientów przez IMAP). PR 2 (`feat/p4-push`) po scaleniu.
+- **Zrobione w PR 1:** `imapflow` 2.5.2 + `mailparser` 3.9.40 (+ `nodemailer` 10.1.2 wprost, pod `MailComposer` kopii w „Wysłane”); `src/lib/mail/` — parsowanie (tylko tekst, cytat obcięty, załączniki: nazwa i rozmiar, pomijane własne i autorespondery), dopasowanie (numer → In-Reply-To/References → „Nieprzypisane”, „inny nadawca”), przebieg na interfejsie skrzynki (UID + UIDVALIDITY, INBOX tylko do odczytu, alarm e-mail przy 3 błędach z rzędu), kopia odpowiedzi w „Wysłane” (APPEND, `after()`); zadanie `mail-intake` co 2 min; kolekcja `mail-intake-unmatched` (retencja 90 dni w `inquiry-retention`), global `mail-intake-state`, `inquiry-messages.otherSender`, migracja `p4_mail_intake`; env `IMAP_*` (brak = odbiór wyłączony); panel: filtr „Nieprzypisane” (przypnij po numerze / odrzuć), znacznik „nowa wiadomość”, zerowanie przy otwarciu wątku, wiersz „Odpowiedzi klientów” w Ustawieniach. Testy: 7 plików `.eml`, atrapa skrzynki, e2e 1440 + 414.
+- **Niedokończone:** prawdziwy test odbioru na skrzynce testowej (Mailpit nie ma IMAP — przed G16, ADR-G008 pkt 8); prawdziwy telefon i Lighthouse (z P3).
+- **Następny krok:** po scaleniu PR 1 — `/zadanie P4` PR 2: `web-push` 3.6.7, VAPID w env, `push-subscriptions`, service worker `/admin/sw.js`, `lib/notify` + zadanie `notify-send`, przepięcie alarmów SLA, marży i `mail_error` (dziś e-mail wprost w `runMailIntake`) na `notify()`, `inquiry_new` i `inquiry_reply`, Ustawienia → Powiadomienia.
+
+## Uwagi na później (P4 PR 1)
+- **Blokada nakładania przebiegów** = domyślne `defaultBeforeSchedule` Payload 3.91 (nie kolejkuje, gdy poprzedni czeka albo trwa) — bez `enableConcurrencyControl` i migracji tabeli zadań. Restart kontenera w trakcie przebiegu zostawia zadanie `processing` na zawsze i odbiór staje bez błędu (dotyczy też `inquiry-sla`): Ustawienia pokazują wtedy na czerwono „brak odczytu od ponad 10 min”. Do G16: sprzątanie zablokowanych zadań przy starcie (przegląd P4).
+- **Pierwszy przebieg i zmiana UIDVALIDITY** startują od końca skrzynki („teraz”) — stara poczta nie jest importowana; wiadomość z okna zmiany zostaje tylko w poczcie (log `warn`).
+- **Świadome uproszczenia (przegląd P4, „do rozważenia”):** zapis do wątku i licznik `unreadCount` bez transakcji (błąd między nimi = wiadomość bez znacznika „nowa”; mail bez Message-ID może się zdublować); wiadomość, której zapis zawsze się wywraca, wstrzymuje kolejkę (alarm raz, przy 3. błędzie) — ewentualnie po N próbach do „Nieprzypisanych” jako nieczytelna; mail z `From` = adres skrzynki jest pomijany (podszycie zostaje tylko w poczcie). Przypięcie z „Nieprzypisanych” oznacza rekord przed zapisem w wątku (dwa kliknięcia nie przypną dwa razy; błąd cofa status).
+- **`mail-intake-unmatched.create` = admin** — celowo, żeby e2e mógł dodać wiadomość (Mailpit nie ma IMAP); admin i tak może pisać w wątku.
+- **Teksty spoza planszy (`TODO(krystian)`):** alarm odbioru, „(bez treści)”, wiadomość nieczytelna, „inny nadawca”, „nowa wiadomość”, akcje i komunikaty „Nieprzypisanych”, stany odbioru w Ustawieniach.
+- **G16:** `IMAP_HOST/USER/PASSWORD` skrzynki Gaming w `compose.*.yml`; folder „Wysłane” z serwera (`\Sent`) albo `IMAP_SENT_FOLDER`; prawdziwy test odbioru i kopii w „Wysłane”.
+- **Lokalnie:** e2e na `next dev` cudzej sesji dawały losowe błędy testów P3 (timing); na `next start` (`PORT=3105 E2E_SERVER=start SITE_URL=http://localhost:3105 pnpm test:e2e`) wszystko zielone.
 
 ## Uwagi na później (P3)
 - **Decyzje Krystiana 31.10:** jedna skrzynka Gaming jako `MAIL_FROM_ADDRESS` dla wszystkich maili (konto SMTP tej skrzynki — G16); `{cena}` i zamówienie = cena dziś z najnowszej partii.

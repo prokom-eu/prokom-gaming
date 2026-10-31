@@ -1,6 +1,6 @@
 import type { AdminViewServerProps, Payload } from 'payload'
 
-import { getEnv } from '../../lib/env'
+import { getEnv, imapConfig } from '../../lib/env'
 import { zl } from '../../lib/pricing/format'
 import { loadBatch } from '../../lib/pricing/store'
 import { panelAccess } from '../access'
@@ -10,6 +10,7 @@ import { PanelDenied } from '../ui/PanelDenied'
 import { PanelPage } from '../ui/PanelPage'
 import { PanelShell } from '../ui/PanelShell'
 import { percentText, toFormValues, type FieldName } from './form'
+import { intakeStatus } from './intakeStatus'
 import { MailSettingsForm } from './MailSettingsForm'
 import { toMailFormValues } from './mailForm'
 import { SettingsForm } from './SettingsForm'
@@ -38,11 +39,13 @@ export async function SettingsView({ initPageResult }: AdminViewServerProps) {
   }
 
   const { payload } = req
-  const [settings, hints, mail] = await Promise.all([
+  const [settings, hints, mail, intake] = await Promise.all([
     payload.findGlobal({ slug: 'pricing-settings', depth: 0, overrideAccess: true }),
     loadHints(payload),
     payload.findGlobal({ slug: 'mail-settings', depth: 0, overrideAccess: true }),
+    payload.findGlobal({ slug: 'mail-intake-state', depth: 0, overrideAccess: true }),
   ])
+  const reading = intakeStatus(Boolean(imapConfig(getEnv())), intake, new Date())
   const values = toFormValues({
     minMargin: settings.minMargin,
     warnMargin: settings.warnMargin,
@@ -79,12 +82,19 @@ export async function SettingsView({ initPageResult }: AdminViewServerProps) {
         </Card>
         <Card title="Zapytania i poczta" className="pn-card--section">
           {/* The mailbox is the sender from env (decision 31.10: one Gaming mailbox for all
-              mail). Customers' answers by IMAP come in P4 — that row of the board waits. */}
+              mail); customers' answers are read from the same one (IMAP, P4). */}
           <dl className="pn-kv">
             <dt>Skrzynka</dt>
             <dd>{getEnv().MAIL_FROM_ADDRESS}</dd>
             <dt>Wysyłka</dt>
             <dd>SMTP skrzynki (Seohost)</dd>
+            <dt>Odpowiedzi klientów</dt>
+            <dd>
+              {reading.value}
+              {reading.note ? (
+                <small className={`pn-kv__note pn-kv__note--${reading.tone}`}>{reading.note}</small>
+              ) : null}
+            </dd>
           </dl>
           <div className="pn-manual">
             <Icon name="check" size={20} />

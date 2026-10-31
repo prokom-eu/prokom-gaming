@@ -13,6 +13,7 @@ import {
 describe('filters', () => {
   it('reads the filter from the address, unknown = all', () => {
     expect(parseFilter('nowe')).toBe('nowe')
+    expect(parseFilter('nieprzypisane')).toBe('nieprzypisane')
     expect(parseFilter('x')).toBe('wszystkie')
     expect(parseFilter(undefined)).toBe('wszystkie')
   })

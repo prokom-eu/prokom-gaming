@@ -20,7 +20,10 @@ test.use({ storageState: ADMIN_STATE })
 
 const MAILPIT =
   process.env.MAILPIT_URL ?? `http://127.0.0.1:${Number(process.env.SMTP_PORT ?? 1026) + 7000}`
-const ip = `10.${randomInt(0, 256)}.${randomInt(0, 256)}.${randomInt(1, 255)}`
+const randomIp = () => `10.${randomInt(0, 256)}.${randomInt(0, 256)}.${randomInt(1, 255)}`
+const ip = randomIp()
+// The form's limit counts per address: the „Nieprzypisane” tests send from their own.
+const ipUnmatched = randomIp()
 const run = `${Date.now().toString(36)}${randomInt(0, 1000)}`
 
 function formToken(): string {
@@ -49,11 +52,14 @@ test.afterAll(async () => {
 })
 
 /** A build inquiry from the site, with its own name and address. */
-async function newInquiry(tag: string): Promise<{ number: string; email: string; name: string }> {
+async function newInquiry(
+  tag: string,
+  from = ip,
+): Promise<{ number: string; email: string; name: string }> {
   const email = `p3-${tag}-${run}@example.test`
   const name = `Klient ${tag} ${run}`
   const res = await api.post('/api/inquiry', {
-    headers: { 'x-real-ip': ip },
+    headers: { 'x-real-ip': from },
     data: {
       type: 'build',
       build: 'bies',
@@ -268,5 +274,128 @@ test.describe('phone', () => {
     await send(page)
     expect(await stored(number)).toMatchObject({ status: 'in_progress' })
     await replyMail(email, number)
+  })
+})
+
+/**
+ * „Nieprzypisane” (P4, ADR-G008 pt 3): a mail from the mailbox that matched no inquiry is attached
+ * by number (it lands in the thread as the customer's answer, marked „inny nadawca” when the
+ * address differs) or rejected. The intake job itself is tested on a fake mailbox (Vitest) —
+ * Mailpit has no IMAP — so the test adds the unmatched record through the admin REST API.
+ */
+async function newUnmatched(tag: string): Promise<{ id: number; subject: string; body: string }> {
+  const subject = `Pytanie bez numeru ${tag} ${run}`
+  const body = `Treść z poczty ${tag} ${run}.`
+  const res = await api.post('/api/mail-intake-unmatched', {
+    headers,
+    data: {
+      from: `inny-${tag}-${run}@example.test`,
+      subject,
+      receivedAt: new Date().toISOString(),
+      body,
+      attachmentsInfo: 'zdjecie.jpg (120 KB)',
+      status: 'new',
+    },
+  })
+  expect(res.status(), await res.text()).toBe(201)
+  return { id: ((await res.json()) as { doc: { id: number } }).doc.id, subject, body }
+}
+
+async function attachByNumber(page: Page, number: string) {
+  await page.getByLabel('Numer zapytania').fill(number.toLowerCase())
+  await page.getByRole('button', { name: 'Przypnij do zapytania' }).click()
+  await expect(page).toHaveURL(new RegExp(`nr=${number}`), { timeout: 20_000 })
+}
+
+async function threadInMessages(number: string) {
+  const { id } = await stored(number)
+  const res = await api.get(
+    `/api/inquiry-messages?where[inquiry][equals]=${id}&where[direction][equals]=in&depth=0`,
+    { headers },
+  )
+  return (await res.json()) as { docs: { body: string; otherSender: string | null }[] }
+}
+
+test.describe('unmatched mail — computer', () => {
+  test.skip(({ isMobile }) => isMobile, 'the phone variant is below')
+
+  test('attach by number: into the thread as „inny nadawca”, unread cleared on opening', async ({
+    page,
+  }) => {
+    const { number } = await newInquiry('unm', ipUnmatched)
+    const mail = await newUnmatched('pc')
+    await page.goto(`/admin/zapytania?filtr=nieprzypisane&wiad=${mail.id}`)
+    await expect(page.getByRole('link', { name: /Nieprzypisane/ })).toHaveAttribute(
+      'aria-current',
+      'true',
+    )
+    await expect(page.getByRole('heading', { level: 2, name: mail.subject })).toBeVisible()
+    await expect(page.locator('.pn-msg--in')).toContainText('Załącznik w poczcie: zdjecie.jpg')
+    // The address is in the panel only — never in the URL.
+    expect(page.url()).not.toContain('example.test')
+    const axe = await new AxeBuilder({ page })
+      .include('[data-panel]')
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+      .analyze()
+    expect(
+      axe.violations.map((v) => ({ rule: v.id, targets: v.nodes.map((n) => n.target) })),
+    ).toEqual([])
+
+    await attachByNumber(page, number)
+    await expect(page.locator('.pn-msg--in').last()).toContainText(mail.body)
+    await expect(page.locator('.pn-msg--in').last()).toContainText('inny nadawca')
+    const { docs } = await threadInMessages(number)
+    expect(docs).toHaveLength(1)
+    expect(docs[0]?.otherSender).toBe(`inny-pc-${run}@example.test`)
+    // Opening the thread with ?nr= marked the answer as read.
+    const res = await api.get(
+      `/api/inquiries?where[number][equals]=${encodeURIComponent(number)}&depth=0`,
+      { headers },
+    )
+    expect(((await res.json()) as { docs: { unreadCount: number }[] }).docs[0]?.unreadCount).toBe(0)
+  })
+
+  test('a wrong number is refused; „Odrzuć” takes the message off the list', async ({ page }) => {
+    const mail = await newUnmatched('odrz')
+    await page.goto(`/admin/zapytania?filtr=nieprzypisane&wiad=${mail.id}`)
+    await page.getByLabel('Numer zapytania').fill('PKG-1999-9999')
+    await page.getByRole('button', { name: 'Przypnij do zapytania' }).click()
+    await expect(
+      page.getByRole('status').filter({ hasText: 'Nie ma zapytania PKG-1999-9999.' }),
+    ).toBeVisible()
+    await page.getByRole('button', { name: 'Odrzuć' }).click()
+    await expect(page).toHaveURL(/filtr=nieprzypisane$/, { timeout: 20_000 })
+    await expect(page.locator('.pn-ibl').getByText(mail.subject)).toHaveCount(0)
+    // Its old address now says it was handled.
+    await page.goto(`/admin/zapytania?filtr=nieprzypisane&wiad=${mail.id}`)
+    await expect(page.getByText('Tej wiadomości już nie ma albo została obsłużona.')).toBeVisible()
+  })
+
+  test('Settings say whether customers’ answers are read (IMAP off here)', async ({ page }) => {
+    await page.goto('/admin/ustawienia')
+    const row = page.locator('.pn-kv').filter({ hasText: 'Odpowiedzi klientów' })
+    await expect(row).toContainText(
+      process.env.IMAP_HOST ? 'pobierane co 2 min (IMAP)' : 'odbiór wyłączony — brak ustawień IMAP',
+    )
+  })
+})
+
+test.describe('unmatched mail — phone', () => {
+  test.skip(({ isMobile }) => !isMobile, 'phone only')
+
+  test('list → message full screen → attach from the bottom box', async ({ page }) => {
+    const { number } = await newInquiry('unmtel', ipUnmatched)
+    const mail = await newUnmatched('tel')
+    await page.goto('/admin/zapytania?filtr=nieprzypisane')
+    await expect(page.locator('.pn-ibm')).toBeHidden()
+    await page.getByRole('link', { name: new RegExp(mail.subject) }).click()
+    await expect(page.getByRole('heading', { level: 2, name: mail.subject })).toBeVisible()
+    await expect(page.getByRole('navigation', { name: 'Panel, nawigacja dolna' })).toBeHidden()
+    const field = page.getByLabel('Numer zapytania')
+    expect(await field.evaluate((el) => getComputedStyle(el).fontSize)).toBe('16px')
+    const scroll = await page.evaluate(() => document.documentElement.scrollWidth)
+    expect(scroll).toBeLessThanOrEqual(414)
+    await attachByNumber(page, number)
+    await expect(page.locator('.pn-msg--in').last()).toContainText(mail.body)
   })
 })

@@ -10,9 +10,17 @@ import { Icon } from '../ui/icons'
 import { PanelDenied } from '../ui/PanelDenied'
 import { PanelPage } from '../ui/PanelPage'
 import { PanelShell } from '../ui/PanelShell'
-import { INBOX_FILTERS, STATUS_CHIP, parseFilter, type InboxFilter } from './format'
+import { numberIn } from '../../lib/mail/match'
+import {
+  INBOX_FILTERS,
+  STATUS_CHIP,
+  UNMATCHED_FILTER,
+  parseFilter,
+  type InboxFilter,
+} from './format'
 import { AsideActions, InboxSearch, ReplyBox, StatusSwitch } from './InboxClient'
-import { loadInbox, type InboxRow, type InboxThread } from './load'
+import { attachmentsLine, loadInbox, type InboxData, type InboxRow, type InboxThread } from './load'
+import { UnmatchedActions } from './UnmatchedClient'
 
 const TITLE = 'Zapytania'
 
@@ -42,10 +50,28 @@ export async function InquiriesView({ initPageResult, searchParams }: AdminViewS
 
   const filter = parseFilter(one(searchParams?.filtr))
   const asked = one(searchParams?.nr)?.trim() || null
+  // „Nieprzypisane”: the message by its record id only — never an address in the URL.
+  const wiad = Number(one(searchParams?.wiad))
+  const unmatchedId = Number.isInteger(wiad) && wiad > 0 ? wiad : null
   const fromAddress = getEnv().MAIL_FROM_ADDRESS
-  const data = await loadInbox(req.payload, req.user as User, { filter, nr: asked, fromAddress })
-  const { thread } = data
-  const mode = !thread ? 'none' : data.auto ? 'auto' : 'open'
+  const data = await loadInbox(req.payload, req.user as User, {
+    filter,
+    nr: asked,
+    unmatchedId,
+    fromAddress,
+  })
+  const { thread, unmatched } = data
+  const mode = unmatched
+    ? !unmatched.open
+      ? 'none'
+      : unmatchedId === null
+        ? 'auto'
+        : 'open'
+    : !thread
+      ? 'none'
+      : data.auto
+        ? 'auto'
+        : 'open'
 
   const admin = req.payload.config.routes.admin
   const listHref = (f: InboxFilter) => `${admin}/zapytania${f === 'wszystkie' ? '' : `?filtr=${f}`}`
@@ -54,6 +80,7 @@ export async function InquiriesView({ initPageResult, searchParams }: AdminViewS
     q.set('nr', row.number)
     return `${admin}/zapytania?${q.toString()}`
   }
+  const unmatchedHref = (id: number) => `${admin}/zapytania?filtr=${UNMATCHED_FILTER}&wiad=${id}`
   const { from, to } = data.replyHours
 
   return (
@@ -68,10 +95,12 @@ export async function InquiriesView({ initPageResult, searchParams }: AdminViewS
           </span>
         }
       />
-      {data.missing ? (
+      {data.missing || unmatched?.missing ? (
         // TODO(krystian): text — not on the board.
         <p className="pn-formstatus" role="status">
-          Nie ma zapytania o tym numerze — mogło zostać usunięte.
+          {unmatched
+            ? 'Tej wiadomości już nie ma albo została obsłużona.'
+            : 'Nie ma zapytania o tym numerze — mogło zostać usunięte.'}
         </p>
       ) : null}
 
@@ -89,9 +118,23 @@ export async function InquiriesView({ initPageResult, searchParams }: AdminViewS
                   href={listHref(f.value)}
                 />
               ))}
+              {data.unmatchedCount > 0 || unmatched ? (
+                <FilterPill
+                  label="Nieprzypisane"
+                  count={data.unmatchedCount}
+                  active={Boolean(unmatched)}
+                  href={listHref(UNMATCHED_FILTER)}
+                />
+              ) : null}
             </nav>
           </div>
-          {data.rows.length === 0 ? (
+          {unmatched ? (
+            <UnmatchedList
+              data={unmatched}
+              openId={unmatched.open?.id ?? null}
+              href={unmatchedHref}
+            />
+          ) : data.rows.length === 0 ? (
             // TODO(krystian): text — not on the board.
             <EmptyState title="Brak zapytań w tym filtrze." />
           ) : (
@@ -109,9 +152,11 @@ export async function InquiriesView({ initPageResult, searchParams }: AdminViewS
                     <span className="pn-it__b">
                       <span className="pn-it__top">
                         <b>{row.name}</b>
-                        {row.status === 'new' ? (
+                        {row.status === 'new' || row.unread > 0 ? (
                           <span className="pn-it__new">
-                            <span className="pn-sr">, nowe</span>
+                            <span className="pn-sr">
+                              {row.unread > 0 ? ', nowa wiadomość' : ', nowe'}
+                            </span>
                           </span>
                         ) : null}
                         <time>{row.when}</time>
@@ -125,9 +170,16 @@ export async function InquiriesView({ initPageResult, searchParams }: AdminViewS
                           {STATUS_CHIP[row.status].label}
                         </Chip>
                         <span className="pn-it__type">{row.typeLabel}</span>
-                        <span className={`pn-it__wait pn-it__wait--${row.meta.tone}`}>
-                          {row.meta.text}
-                        </span>
+                        {row.unread > 0 ? (
+                          // TODO(krystian): label „nowa wiadomość” — ADR-G008 pt 5, not on the board.
+                          <span className="pn-it__wait pn-it__wait--warn">
+                            {row.unread === 1 ? 'nowa wiadomość' : `nowe wiadomości: ${row.unread}`}
+                          </span>
+                        ) : (
+                          <span className={`pn-it__wait pn-it__wait--${row.meta.tone}`}>
+                            {row.meta.text}
+                          </span>
+                        )}
                       </span>
                     </span>
                   </a>
@@ -137,7 +189,20 @@ export async function InquiriesView({ initPageResult, searchParams }: AdminViewS
           )}
         </section>
 
-        {thread ? (
+        {unmatched ? (
+          unmatched.open ? (
+            <UnmatchedMessage
+              message={unmatched.open}
+              backHref={listHref(UNMATCHED_FILTER)}
+              threadHref={`${admin}/zapytania?nr=`}
+            />
+          ) : (
+            <section className="pn-ibm" aria-label="Wiadomość">
+              {/* TODO(krystian): text — not on the board. */}
+              <EmptyState title="Nic do przypisania." />
+            </section>
+          )
+        ) : thread ? (
           <Thread thread={thread} backHref={listHref(filter)} />
         ) : (
           <section className="pn-ibm" aria-label="Wątek">
@@ -252,6 +317,107 @@ function Thread({ thread, backHref }: { thread: InboxThread; backHref: string })
           </p>
         ) : null}
         <AsideActions inquiryId={thread.id} canConvert={thread.canConvert} canClose={canClose} />
+      </aside>
+    </>
+  )
+}
+
+function UnmatchedList({
+  data,
+  openId,
+  href,
+}: {
+  data: NonNullable<InboxData['unmatched']>
+  openId: number | null
+  href: (id: number) => string
+}) {
+  if (data.rows.length === 0) {
+    // TODO(krystian): text — not on the board.
+    return <EmptyState title="Nic do przypisania." />
+  }
+  return (
+    <ul className="pn-ibl__list">
+      {data.rows.map((row) => (
+        <li key={row.id}>
+          <a
+            className="pn-it"
+            href={href(row.id)}
+            aria-current={openId === row.id ? 'true' : undefined}
+          >
+            <span className="pn-av" aria-hidden="true">
+              <Icon name="mail" size={17} />
+            </span>
+            <span className="pn-it__b">
+              <span className="pn-it__top">
+                <b>{row.from}</b>
+                <time>{row.when}</time>
+              </span>
+              <span className="pn-it__msg">
+                <b>{row.subject}</b>
+                {row.preview ? ` · ${row.preview}` : null}
+              </span>
+            </span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+function UnmatchedMessage({
+  message,
+  backHref,
+  threadHref,
+}: {
+  message: NonNullable<NonNullable<InboxData['unmatched']>['open']>
+  backHref: string
+  threadHref: string
+}) {
+  return (
+    <>
+      <section className="pn-ibm" aria-labelledby="pn-thread-title">
+        <header className="pn-ibm__hd">
+          <a className="pn-icb pn-ibm__back" href={backHref} aria-label="Wróć do listy wiadomości">
+            <Icon name="back" size={20} />
+          </a>
+          <div className="pn-ibm__tt">
+            <h2 id="pn-thread-title">{message.subject}</h2>
+            <p>
+              {message.from} · {message.when}
+            </p>
+          </div>
+        </header>
+        <ol className="pn-msgs" aria-label="Wiadomość">
+          <li className="pn-msg pn-msg--in">
+            <span className="pn-msg__h">
+              <b>{message.from}</b>
+              {message.when}
+            </span>
+            <p>
+              {message.attachments
+                ? `${message.body}\n\n${attachmentsLine(message.attachments)}`
+                : message.body}
+            </p>
+          </li>
+        </ol>
+        <UnmatchedActions
+          key={message.id}
+          id={message.id}
+          suggested={numberIn(message.subject)}
+          threadHref={threadHref}
+          listHref={backHref}
+        />
+      </section>
+      <aside className="pn-ibc" aria-label="Jak przypisać">
+        {/* TODO(krystian): text — not on the board (ADR-G008 pt 3, 7). */}
+        <div className="pn-ibc__sec">
+          <h3>Nieprzypisana wiadomość</h3>
+          <p className="pn-ibc__hint">
+            Przyszła na skrzynkę Gaming, ale nie ma numeru zapytania w temacie ani nie odpowiada na
+            naszą wiadomość. Przypnij ją do zapytania po numerze — trafi do wątku jako odpowiedź
+            klienta. Odrzucona nie wraca; wiadomości stąd znikają po 90 dniach (w poczcie zostają).
+          </p>
+        </div>
       </aside>
     </>
   )

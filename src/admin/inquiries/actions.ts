@@ -1,9 +1,10 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
+import { after } from 'next/server'
 import { z } from 'zod'
 
-import { getEnv } from '../../lib/env'
+import { getEnv, imapConfig } from '../../lib/env'
 import { errorFields, log } from '../../lib/logger'
 import {
   addInquiryNote,
@@ -82,15 +83,32 @@ export async function sendReply(raw: {
   const found = await open(input.data.inquiryId)
   if (isResult(found)) return found
   try {
+    const env = getEnv()
     const result = await sendInquiryReply(found.payload, {
       inquiry: found.inquiry,
       body: input.data.body,
       templateId: input.data.templateId,
       user: found.user,
-      fromAddress: getEnv().MAIL_FROM_ADDRESS,
+      fromAddress: env.MAIL_FROM_ADDRESS,
     })
     revalidatePath(PATH)
-    if (result.ok) return { ok: true, message: 'Wysłano.' }
+    if (result.ok) {
+      // A copy in the mailbox's „Sent” (ADR-G008 pt 1) after the answer: IMAP takes a second or
+      // two and a failure there must not look like a failed reply.
+      const imap = imapConfig(env)
+      if (imap) {
+        const { mail, at } = result
+        after(async () => {
+          const { copyToSent } = await import('../../lib/mail/imap.server')
+          await copyToSent(imap, {
+            ...mail,
+            from: { name: env.MAIL_FROM_NAME, address: env.MAIL_FROM_ADDRESS },
+            date: new Date(at),
+          })
+        })
+      }
+      return { ok: true, message: 'Wysłano.' }
+    }
     switch (result.error) {
       case 'empty':
         return { ok: false, message: 'Napisz odpowiedź.' }
