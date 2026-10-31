@@ -1,15 +1,19 @@
 # STAN — prokom-gaming
 
-Ostatnia aktualizacja: 31.10.2026 (P3 PR 2 — ekran zapytań, gałąź `feat/p3-zapytania-widok`; PR 1 = #40).
+Ostatnia aktualizacja: 31.10.2026 (koniec sesji P3 — #40, #41 scalone).
 
 ## W toku
-- **Gałąź:** `feat/p3-zapytania-widok` (P3 PR 2 z 2: ekran `/admin/zapytania`). PR 1 = #40 (model, wysyłka, SLA) scalony.
-- **Zrobione w PR 2:** widok `/admin/zapytania` (`src/admin/inquiries/`): jeden loader (`load.ts`: lista do 200 z licznikami filtrów, wybrany wątek, szablony wypełnione dla zapytania, prawa kolumna z ceną przy zapytaniu, ceną dziś i marżą z `lib/pricing`), akcje serwera z rolą admina (`actions.ts`: wyślij, notatka, status, „Zamień w zamówienie” — cena dziś, raz na zapytanie; wyszukiwanie POST po numerze, imieniu, zestawie), komponenty klienckie (`InboxClient.tsx`); komputer w 3 kolumnach (≤ 1180 px prawa kolumna pod spodem), telefon: lista → wątek pod `?nr=` na pełny ekran (bez zakładek i paska), pole odpowiedzi przyklejone na dole, szablony w rzędzie przewijanym palcem; bez `?nr=` komputer otwiera pierwsze zapytanie, telefon zostaje na liście. Wpis „Wysłano automatyczne potwierdzenie…” wyliczany z `createdAt` (także dla zapytań sprzed P3). Komunikaty: brak `{cena}`, zmiana ceny od zapytania (przy szablonie oferty), `not_recorded`. Nawigacja „Zapytania”, dzwonek (`?filtr=nowe`) i link w powiadomieniu G6 (`/admin/zapytania?nr=`) prowadzą do ekranu. Czyste funkcje z testami (`format.ts`); e2e `panel-inquiries` (1440 + 414, w `db-writers`), zapytania w `panel-access`.
+- **Gałąź:** brak (P3 zamknięta: #40 i #41 scalone do `develop`; ta aktualizacja STAN — `docs/p3-stan`).
+- **Zrobione w tej sesji:** P3 — wątek zapytań w bazie, wysyłka odpowiedzi z panelu (`Re: [PKG-…]`, własny `Message-ID`, nagłówki wątku), szablony ze zmiennymi, alarm SLA, ekran `/admin/zapytania` (komputer 3 kolumny, telefon lista → wątek), „Zamień w zamówienie”; poprawka dostępności taśmy warsztatu na głównej.
+- **Niedokończone:** test na prawdziwym telefonie (Android + iPhone) ekranu zapytań i powłoki P1 (dodanie do ekranu głównego); Lighthouse mobile `/admin/zapytania` po zalogowaniu (spec. panelu §2a pkt 10).
+- **Następny krok:** `/zadanie P4` — odbiór odpowiedzi klientów przez IMAP (`imapflow` + `mailparser`, testy na `tests/fixtures/mail/*.eml`, atrapa IMAP, filtr „Nieprzypisane”) i push (`web-push`, `lib/notify` — przepiąć tam alarm SLA z `runInquirySla`); opis w `docs/zadania/prokomgaming-panel.md` (P4).
+
+## Uwagi na później (P3)
 - **Decyzje Krystiana 31.10:** jedna skrzynka Gaming jako `MAIL_FROM_ADDRESS` dla wszystkich maili (konto SMTP tej skrzynki — G16); `{cena}` i zamówienie = cena dziś z najnowszej partii.
-- **Niedokończone:** test na prawdziwym telefonie (Android + iPhone): lista → wątek → odpowiedź, klawiatura nad polem odpowiedzi; Lighthouse mobile ekranu po zalogowaniu (spec. §2a pkt 10).
-- **Następny krok:** scalić PR 2, potem `/zadanie P4` (odbiór odpowiedzi IMAP + push).
 - **Do potwierdzenia (`TODO(krystian)`):** `{termin}` = `site-settings.fulfilment` („5–10 dni roboczych od wpłaty”), a szablon „Potwierdzenie i termin” ma „w {termin} od wpłaty” → w mailu „od wpłaty” dwa razy: poprawić szablon w panelu albo treść „Realizacja”. Podpis: plansza Ustawienia („Krystian · PRO-KOM Gaming / Rabka-Zdrój, ul. Orkana 16B · telefon”), plansza Zapytania wypełnia „Pozdrawiam, Krystian · PRO-KOM Gaming” — wzięty z Ustawień. Teksty spoza planszy: etykiety pól godzin/SLA, komunikaty zapisu i wysyłki („Wysyłam…”, „Wysłano.”, błędy), pusta lista, „Wybierz zapytanie z listy.”, zapytanie bez wiadomości, potwierdzenie „Zamień w zamówienie”. Szablon „Raty: na start nie” (plansza, spec. §4) to druga wzmianka o ratach poza FAQ — zgodny z decyzją „bez rat”.
 - **Odstępstwa:** alarm SLA wysyła mail wprost (`payload.sendEmail` w `runInquirySla`), nie przez `notify()` jak w ADR-G008 pkt 6 — `lib/notify` powstaje w P4 i wtedy przepiąć (push + e-mail). `INQUIRY_NOTIFY_EMAIL` musi być tą samą skrzynką co `MAIL_FROM_ADDRESS` (Reply-To potwierdzenia, `.env.example`). W Ustawieniach bez wiersza „Odpowiedzi klientów: pobierane co 2 min (IMAP)” (P4) i bez przełączników (potwierdzenie zawsze włączone — informacja; alarm jako liczba minut, spec. §13). Na ekranie zapytań: bez znacznika „dane przykładowe” (plansza), lista do 200 ostatnich w filtrze (starsze przez wyszukiwarkę), etykieta „Konfiguracja” z `publicLabel` (plansza pokazuje modele — spec. §4 mówi „tak jak widział klient”), menu statusu bez „Zamknięte” (zostaje w „Dane”); filtr „Nieprzypisane” w P4; bez linku „Karta klienta” w prawej kolumnie (karta = P5, spec. §6); pole odpowiedzi bez `enterkeyhint="send"` (spec. §2a pkt 8) — w wielowierszowym polu Enter robi nową linię, więc „Wyślij” na klawiaturze myliłby; „Zamień w zamówienie” odmawia, gdy konfiguracja nie ma dzisiejszej ceny (nigdy cicho stara cena), bez transakcji (jedna osoba w panelu).
+- **Kod:** `lib/inquiry/thread.server.ts` (wysyłka, wartości zmiennych — tylko admin), `src/admin/inquiries/` (ekran); seed szablonów pilnuje test zgodności z planszą (`src/seed/mail.test.ts`). Migracja `p3_inquiry_thread` — `down` kasuje wątki, szablony i ustawienia poczty (przed `migrate:down` na serwerze kopia tabel).
+- **G16:** `MAIL_FROM_ADDRESS` = skrzynka Gaming z jej kontem SMTP, `INQUIRY_NOTIFY_EMAIL` = ta sama skrzynka; SPF/DKIM/DMARC przed włączeniem odpowiedzi.
 
 ## Uwagi na później (P1)
 - **Świadome odstępstwa i decyzje P1:**
@@ -17,7 +21,7 @@ Ostatnia aktualizacja: 31.10.2026 (P3 PR 2 — ekran zapytań, gałąź `feat/p3
   - Niezalogowany na własnym widoku → ekran z „Zaloguj się do panelu” (link z `redirect`), nie automatyczne przekierowanie: Payload wyłącza własne widoki z przekierowania, a `redirect()` w widoku daje pustą stronę (G4).
   - „403” dla roli `serwis` to ekran w powłoce warsztatu; status HTTP zostaje 200 (komponent serwerowy go nie ustawi).
   - Arkusz „Więcej” ma przycisk „Zamknij” (×), którego nie ma na `tel-04` — dostępność (wspólny `BottomSheet`).
-  - Ukryte do swoich sesji: wyszukiwarka (P8), „Sprawdź ceny” (P7), Klienci (P5), Centrum cen i Opcje (P6), Raporty cen (P7), Statystyki (P8), Ustawienia (PR 2). „Zatwierdź”/„Do zatwierdzenia” → `/admin/ceny` z G4, „Zestawy”/„Zapytania”/„Zamówienia” → listy Payload (spec. §2a pt 3).
+  - Ukryte do swoich sesji: wyszukiwarka (P8), „Sprawdź ceny” (P7), Klienci (P5), Centrum cen i Opcje (P6), Raporty cen (P7), Statystyki (P8), Ustawienia (PR 2). „Zatwierdź”/„Do zatwierdzenia” → `/admin/ceny` z G4, „Zestawy”/„Zamówienia” → listy Payload (spec. §2a pt 3); „Zapytania” od P3 → `/admin/zapytania`.
   - „Dane (listy)” to własny widok `/admin/dane` (lista kolekcji wg uprawnień) — po P2 dashboard Payload zniknie, więc listy muszą mieć własne wejście. Zdanie pod tytułem: `TODO(krystian)`.
   - Licznik kolejki w powłoce: `buildQueue()` kosztuje ok. 0,5 s (dev) — wynik zapamiętany w procesie pod kluczem: partia + najnowsze `updatedAt` i liczba opcji/poziomów + `pricing-settings.updatedAt` (`src/admin/shell/load.ts`).
   - Ustawienia: jedno pole „Narzut RAM i dysków” zapisuje `categoryMarkup.ram` i `.ssd` (w cenniku równe); gdy ktoś rozdzieli je w listach Payload, ekran pokazuje ostrzeżenie (`TODO(krystian)` treść), a zapis bez zmiany tego pola zostawia obie wartości. Pola niezmienione zapisują dokładnie wartość z bazy (`keepUnchanged`) — zapis nie zaokrągla precyzji wpisanej w listach Payload. Ostatni zapis wygrywa (dwie karty naraz — przy jednej osobie świadomie).
@@ -130,7 +134,7 @@ Ostatnia aktualizacja: 31.10.2026 (P3 PR 2 — ekran zapytań, gałąź `feat/p3
 - **Pozycja usunięta z oferty zostawia otwarty wpis `price-history`** (jest w partii N, nie ma jej w N+1, `writeBatch` jej nie zamyka). Dziś nieszkodliwe — części z zestawu nie da się usunąć — ale przed liczeniem „najniższej ceny z 30 dni” zamykać wpisy pozycji, których nie ma w nowej partii.
 
 ## Zrobione
-- 31.10.2026 — **P3 PR 1 (wątek zapytań: model, wysyłka, SLA)** scalony do `develop` (#40).
+- 31.10.2026 — **P3 (zapytania: wątek i wysyłka)** scalona do `develop`: #40 (model, wysyłka, alarm SLA, szablony, Ustawienia → „Zapytania i poczta”) i #41 (ekran `/admin/zapytania`, komputer + telefon, e2e z Mailpit). Prawdziwy telefon i Lighthouse nadal do zrobienia.
 - 31.10.2026 — **G14 (metryka, warsztat, konto, zgłoszenia + role panelu)** scalona do `develop` (#34): role `admin`/`serwis` (dotychczasowe „tylko panel” = admin), `customers` z weryfikacją e-maila i resetem (REST create/update tylko admin — `_verified`), `orders` `Z-RRRR-NNNN` z etapami i polami P5, `units` z kodem metryki, `tickets`, e-mail małymi literami (+ migracja danych), taśma i licznik warsztatu, `/metryka` i `/metryka/[kod]` (druk = PDF), `/konto` z logowaniem, rejestracją, resetem, zgłoszeniami i zapisanymi konfiguracjami; Vitest 584, e2e dostępu/metryki/konta 1440 i 414. Lighthouse i prawdziwy telefon nadal do zrobienia.
 - 30.10.2026 — **P0 (dokumenty panelu, gałąź `docs/panel-p0`)**: spec. panelu v1.1 sprawdzona z kodem G3–G13. Kolejka „Do zatwierdzenia” = `buildQueue()` (wyliczana, bez tabeli). Decyzje Krystiana: zmiana przepisu zestawu zapisywana od razu po potwierdzeniu ceny (bez kolejki); `autoPublish` — P1 usuwa auto-publikację; godziny SLA w `mail-settings.replyHours`, `{termin}` = `site-settings.fulfilment`; `stock`/`vouchers` jako listy Payload w grupie „Oferta”. Dopisek G14: `inquiries.email` małymi literami.
 - 30.10.2026 — **G12 (formularz zapytania i „wysłane”)** scalona do `develop` (#27); test na prawdziwym telefonie nadal do zrobienia.
@@ -161,7 +165,7 @@ Ostatnia aktualizacja: 31.10.2026 (P3 PR 2 — ekran zapytań, gałąź `feat/p3
 - 25.10.2026 — pakiet startowy (pierwszy commit, podpisany): CLAUDE.md, specyfikacja `docs/strony/prokomgaming.md`, ADR-G001…G005, plan G0–G16, wzorzec wyglądu v36 (`docs/design/prokomgaming/`), seed (`seed/prokomgaming/`), oczekiwane wyniki testów cen (`tests/fixtures/pricing-expected.json`).
 
 ## Następne kroki
-G1 → G2 → G3 → G4 → G5 → G6 → G7 → G8 → G9 → (kontrola 8.11) → G10 → G11 → G12 → (kontrola 13.11) → G13 → ~~G14~~ (zrobione 31.10) → **P1 → P3 → P4 → P2** → G15 (+ Umami) → G16 (produkcja 20.11) → **P6 → P7 → P5 → P8**. Panel: `docs/zadania/prokomgaming-panel.md` (P0 zrobione 30.10 — spec. v1.1).
+G1 → G2 → G3 → G4 → G5 → G6 → G7 → G8 → G9 → (kontrola 8.11) → G10 → G11 → G12 → (kontrola 13.11) → G13 → ~~G14~~ (zrobione 31.10) → ~~P1~~ → ~~P3~~ (zrobione 31.10) → **P4 → P2** → G15 (+ Umami) → G16 (produkcja 20.11) → **P6 → P7 → P5 → P8**. Panel: `docs/zadania/prokomgaming-panel.md` (P0 zrobione 30.10 — spec. v1.1).
 
 ## Decyzje (skrót)
 - Osobne repo, ten sam stos i wersje co `prokom-web` (ADR-G001), porty 3100 / 54321 / 1026 / 8026.
@@ -207,7 +211,7 @@ G1 → G2 → G3 → G4 → G5 → G6 → G7 → G8 → G9 → (kontrola 8.11) �
 - [czat] 6 poradników w szkicu (na start wystarczy 1 gotowy — plan cięcia §4).
 
 ## Otwarte pytania — panel (30.10)
-- [SZEF, przed P3/P4] skrzynka Gaming (`gaming@pro-kom.eu`?) z dostępem IMAP dla panelu.
+- [SZEF, przed P4 — odbiór na prawdziwej skrzynce] skrzynka Gaming (`gaming@pro-kom.eu`?) z dostępem IMAP i kontem SMTP dla panelu (od P3 wszystkie maile wychodzą z niej).
 - [SZEF, przed P7] klucz API Anthropic na firmę i limit wydatków (propozycja 20 USD/mies., ADR-G007 §4).
 - [prawnik] polityka prywatności: statystyki bez ciasteczek (Umami), odpowiedzi z panelu.
 - [Krystian, przed G16] SPF/DKIM/DMARC domeny nadawcy w Seohost.
@@ -219,6 +223,7 @@ G1 → G2 → G3 → G4 → G5 → G6 → G7 → G8 → G9 → (kontrola 8.11) �
 - Alarm marży (mail) wymieniający egzemplarze ukryte przez strażnika — dziś tylko wpis w logu.
 - Newsletter „Nowy poradnik co dwa tygodnie” (plansza Poradniki) — wymaga narzędzia mailingowego i zgody marketingowej (ADR).
 - Panel: własne widoki „Gotowe od ręki” (`stock`) i „Bony” (`vouchers`) — w v1 listy Payload (P0).
+- Zapytania: status „Zamknięte” w menu wątku (dziś tylko w „Dane”); paginacja listy ponad 200 ostatnich (dziś wyszukiwarka); transakcja przy „Zamień w zamówienie”, gdyby panel obsługiwało kilka osób.
 - „Ulubione zestawy” w koncie (plansza Konto): serce na kartach zestawów + lista w koncie (pole `customers.favorites` już jest).
 - Wykres temperatur na metryce (przebieg z testu obciążeniowego) — wymaga zapisu krzywej z narzędzia testowego.
 - Prawdziwy kod QR na papierze metryki (dziś ikona) — biblioteka QR albo SVG generowany na serwerze.
