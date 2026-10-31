@@ -31,7 +31,7 @@ describe('slaAlarmEmail', () => {
   it('number, topic and time only', () => {
     const mail = slaAlarmEmail(
       { id: 1, number: 'PKG-2026-0001', topic: 'Wampir', createdAt: '', waited: 50 },
-      { to: 'alarm@example.test', panelUrl: 'http://x/admin/zapytania?nr=PKG-2026-0001' },
+      { panelUrl: 'http://x/admin/zapytania?nr=PKG-2026-0001' },
     )
     expect(mail.subject).toBe('Bez odpowiedzi od 50 min: PKG-2026-0001')
     expect(mail.text).toContain('PKG-2026-0001 (Wampir)')

@@ -78,6 +78,7 @@ function setup(overrides: Partial<SubmitDeps> = {}) {
     newMessageId: () => '<confirm-41@example.test>',
     saveConfirmationId: vi.fn(async () => {}),
     defer: (task) => task(),
+    notifyNew: vi.fn(async () => {}),
     notifyTo: 'gaming@example.test',
     responseTime: async () => 'zwykle w godzinę, codziennie 8–22',
     panelUrl: (_id, number) => `http://localhost:3100/admin/zapytania?nr=${number}`,
@@ -93,6 +94,27 @@ const noPersonalData = (logs: unknown[]) => {
 }
 
 describe('submitInquiryWith', () => {
+  it('pushes „Nowe zapytanie” by id and number only, in the deferred task (P4)', async () => {
+    const tasks: (() => Promise<void>)[] = []
+    const { deps } = setup({ defer: (task) => void tasks.push(task) })
+    await submitInquiryWith(deps, { ip: '203.0.113.5', body: body() })
+    expect(deps.notifyNew).not.toHaveBeenCalled()
+    await Promise.all(tasks.map((task) => task()))
+    expect(deps.notifyNew).toHaveBeenCalledWith(41, 'PKG-2026-0041')
+  })
+
+  it('a failed push is only logged: the e-mails still go', async () => {
+    const { deps, sent, logs } = setup({
+      notifyNew: vi.fn(async () => {
+        throw new Error('queue down')
+      }),
+    })
+    await submitInquiryWith(deps, { ip: '203.0.113.5', body: body() })
+    expect(sent).toHaveLength(2)
+    expect(JSON.stringify(logs)).toContain('Inquiry push not sent')
+    noPersonalData(logs)
+  })
+
   it('answers before the e-mails: they run in the deferred task (after the response)', async () => {
     const tasks: (() => Promise<void>)[] = []
     const { deps, sent } = setup({ defer: (task) => void tasks.push(task) })

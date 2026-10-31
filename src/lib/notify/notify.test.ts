@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 
 import { deliverPush, type PushTarget } from './deliver'
+import { channelsOf } from './index'
 import { CHANNELS, PUSH_KINDS } from './kinds'
 import { pushContent } from './content'
 import { pushTargets, type Subscription } from './recipients'
@@ -134,5 +135,29 @@ describe('deliverPush (fake web-push)', () => {
       { endpoint: 'https://push.example.test/1', keys: { p256dh: 'p', auth: 'a' } },
       JSON.stringify(content),
     )
+  })
+})
+
+describe('channelsOf (one job per channel)', () => {
+  const email = { subject: 's', text: 't' }
+  it('only channels the table allows and the event carries', () => {
+    expect(
+      channelsOf({
+        kind: 'inquiry_sla',
+        push: { kind: 'inquiry_sla', number: 'PKG-2026-0001', topic: 'Bies', waited: 50 },
+        email,
+      }),
+    ).toEqual(['email', 'push'])
+    expect(channelsOf({ kind: 'mail_error', push: null, email })).toEqual(['email'])
+    expect(
+      channelsOf({
+        kind: 'inquiry_new',
+        push: { kind: 'inquiry_new', number: 'PKG-2026-0001', topic: 'Bies' },
+        email,
+      }),
+    ).toEqual(['push'])
+    expect(
+      channelsOf({ kind: 'test', push: { kind: 'test' }, email: null, subscription: 1 }),
+    ).toEqual(['push'])
   })
 })

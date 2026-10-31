@@ -74,8 +74,8 @@ export async function storeIncoming(
   payload: Payload,
   mail: IncomingMail,
   now: Date,
-): Promise<StoreResult> {
-  if (await alreadySaved(payload, mail.messageId)) return 'duplicate'
+): Promise<{ result: StoreResult; inquiryId?: number }> {
+  if (await alreadySaved(payload, mail.messageId)) return { result: 'duplicate' }
 
   const [number, reference] = await Promise.all([
     byNumber(payload, mail.subject),
@@ -104,7 +104,7 @@ export async function storeIncoming(
       depth: 0,
       overrideAccess: true,
     })
-    return 'unmatched'
+    return { result: 'unmatched' }
   }
 
   await attachToThread(payload, match.inquiryId, {
@@ -116,7 +116,7 @@ export async function storeIncoming(
     attachmentsInfo: mail.attachmentsInfo,
     otherSender: match.otherSender,
   })
-  return 'thread'
+  return { result: 'thread', inquiryId: match.inquiryId }
 }
 
 /**
