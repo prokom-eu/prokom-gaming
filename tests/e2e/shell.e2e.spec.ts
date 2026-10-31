@@ -152,6 +152,38 @@ test.describe('phone', () => {
     await expect(menu).toBeHidden()
   })
 
+  test('on a slow phone the sheet still opens at the top, grab bar in view', async ({ page }) => {
+    // Regression (flaky drag test in CI): showModal() focused the logo while the sheet was still
+    // below the screen and the browser scrolled the sheet's content, hiding the grab bar. A
+    // slowed-down CPU (Chromium) makes that timing reliable.
+    await page.goto(MISSING)
+    const cdp = await page.context().newCDPSession(page)
+    await cdp.send('Emulation.setCPUThrottlingRate', { rate: 6 })
+    const menu = page.getByRole('dialog', { name: 'Menu' })
+    const opener = page
+      .getByRole('navigation', { name: 'Nawigacja główna' })
+      .getByRole('button', { name: 'Menu' })
+    // The same steps as the drag test: in CI the content was scrolled from the third opening.
+    await opener.click()
+    await menu.getByRole('button', { name: 'Zamknij menu' }).click()
+    await expect(menu).toBeHidden()
+    await opener.click()
+    await expect(menu).toBeVisible()
+    await page.mouse.click(200, 20)
+    await expect(menu).toBeHidden()
+    await opener.click()
+    await expect(menu).toBeVisible()
+    await page.waitForFunction(() => {
+      const sheet = document.getElementById('menu')
+      return sheet !== null && sheet.getAnimations().length === 0
+    })
+    expect(await menu.evaluate((sheet) => sheet.scrollTop)).toBe(0)
+    const grab = (await menu.locator('.sheet__grab').boundingBox())!
+    const sheet = (await menu.boundingBox())!
+    expect(grab.y).toBeGreaterThanOrEqual(sheet.y)
+    await cdp.send('Emulation.setCPUThrottlingRate', { rate: 1 })
+  })
+
   test('a link in the menu navigates and closes the sheet', async ({ page }) => {
     await page.goto(MISSING)
     await page
