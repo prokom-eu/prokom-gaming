@@ -16,7 +16,8 @@ process.env.PORT = String(port)
 // Tests that change costs, publish price batches or try to break the offer (and put it back):
 // they run first, one at a time, and every other test starts after them — so a test reading
 // prices never sees a half-changed price list.
-const DB_WRITERS = /(prices-panel|prices-import|offer-integrity|panel-settings)\.e2e\.spec\.ts$/
+const DB_WRITERS =
+  /(prices-panel|prices-import|offer-integrity|panel-settings|panel-inquiries)\.e2e\.spec\.ts$/
 
 export default defineConfig({
   testDir: './tests/e2e',
@@ -49,9 +50,9 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } },
     },
     {
-      // The read-only checks of the prices screen at 414 (the publishing test skips on a phone).
+      // Phone (414): the prices screen read-only (publishing skips) and the inquiry reply path.
       name: 'db-writers-414',
-      testMatch: /prices-panel\.e2e\.spec\.ts$/,
+      testMatch: /(prices-panel|panel-inquiries)\.e2e\.spec\.ts$/,
       workers: 1,
       dependencies: ['db-writers'],
       use: {
