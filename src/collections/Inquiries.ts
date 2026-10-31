@@ -1,6 +1,7 @@
 import type {
   CollectionAfterDeleteHook,
   CollectionBeforeChangeHook,
+  CollectionBeforeDeleteHook,
   CollectionConfig,
   Field,
 } from 'payload'
@@ -78,6 +79,34 @@ export const recordDeletion: CollectionAfterDeleteHook = async ({ context, doc, 
 }
 
 /**
+ * The thread goes with the inquiry (panel spec §16): retention and erasure on request remove the
+ * messages too, in the same transaction — before the row, as `inquiry` is a required relation.
+ */
+const deleteThread: CollectionBeforeDeleteHook = async ({ id, req }) => {
+  await req.payload.delete({
+    collection: 'inquiry-messages',
+    where: { inquiry: { equals: id } },
+    depth: 0,
+    overrideAccess: true,
+    req,
+  })
+}
+
+/** Panel bookkeeping of the thread (P3, spec §17): set by the panel's actions and jobs only. */
+const sidebarDate = (name: string, label: string, description?: string): Field => ({
+  name,
+  label,
+  type: 'date',
+  admin: {
+    readOnly: true,
+    position: 'sidebar',
+    date: { pickerAppearance: 'dayAndTime' },
+    ...(description ? { description } : {}),
+  },
+  access: { update: () => false },
+})
+
+/**
  * Inquiries from the site (ADR-G005). Written only by `submitInquiry()` (`lib/inquiry`) through
  * the Local API — the REST API cannot create, and nothing public can read. In the panel only the
  * status changes. Fields 1:1 with the future Django model (migration in 2027).
@@ -96,6 +125,7 @@ export const Inquiries: CollectionConfig = {
   access: { read: adminOnly, create: nobody, update: adminOnly, delete: adminOnly },
   hooks: {
     beforeChange: [assignNumber, trackStatusChange],
+    beforeDelete: [deleteThread],
     afterDelete: [recordDeletion],
   },
   fields: [
@@ -132,6 +162,25 @@ export const Inquiries: CollectionConfig = {
         date: { pickerAppearance: 'dayAndTime' },
         description: 'Od tej daty liczy się okres przechowywania zamkniętych zapytań.',
       },
+      access: { update: () => false },
+    },
+    sidebarDate('lastActivityAt', 'Ostatnia aktywność w wątku'),
+    sidebarDate('slaAlertedAt', 'Alarm bez odpowiedzi wysłany'),
+    {
+      name: 'unreadCount',
+      label: 'Nieprzeczytane odpowiedzi klienta',
+      type: 'number',
+      defaultValue: 0,
+      min: 0,
+      admin: { readOnly: true, position: 'sidebar' },
+      access: { update: () => false },
+    },
+    {
+      name: 'confirmationMessageId',
+      label: 'Message-ID potwierdzenia',
+      type: 'text',
+      index: true,
+      admin: { readOnly: true, position: 'sidebar' },
       access: { update: () => false },
     },
     {

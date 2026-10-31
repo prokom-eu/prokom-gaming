@@ -75,7 +75,14 @@ export type InquiryForEmail = {
   stock?: StockForEmail | null
 }
 
-export type Email = { to: string; replyTo?: string; subject: string; text: string }
+export type Email = {
+  to: string
+  replyTo?: string
+  subject: string
+  text: string
+  /** Our own id (thread of the inquiry, ADR-G008); the adapter passes it to nodemailer. */
+  messageId?: string
+}
 
 const PART_LABELS: Record<keyof Config, string> = {
   level: 'Poziom mocy',

@@ -75,6 +75,8 @@ function setup(overrides: Partial<SubmitDeps> = {}) {
     sendEmail: vi.fn(async (email: Email) => {
       sent.push(email)
     }),
+    newMessageId: () => '<confirm-41@example.test>',
+    saveConfirmationId: vi.fn(async () => {}),
     defer: (task) => task(),
     notifyTo: 'gaming@example.test',
     responseTime: async () => 'zwykle w godzinę, codziennie 8–22',
@@ -250,6 +252,21 @@ describe('submitInquiryWith', () => {
     expect(result).toMatchObject({ ok: true, number: 'PKG-2026-0041' })
     expect(JSON.stringify(logs)).toContain('EENVELOPE')
     noPersonalData(logs)
+  })
+
+  it('the confirmation carries our Message-ID, saved once it went out (thread, P3)', async () => {
+    const { deps, sent } = setup()
+    await submitInquiryWith(deps, { ip: null, body: body() })
+    const confirmation = sent.find((e) => e.to === personal.email)
+    expect(confirmation?.messageId).toBe('<confirm-41@example.test>')
+    expect(sent.find((e) => e.to === 'gaming@example.test')?.messageId).toBeUndefined()
+    expect(deps.saveConfirmationId).toHaveBeenCalledWith(41, '<confirm-41@example.test>')
+  })
+
+  it('a confirmation that failed leaves no Message-ID on the inquiry', async () => {
+    const { deps } = setup({ sendEmail: async () => Promise.reject(new Error('smtp down')) })
+    await submitInquiryWith(deps, { ip: null, body: body() })
+    expect(deps.saveConfirmationId).not.toHaveBeenCalled()
   })
 
   it('without a notification inbox only the confirmation goes out', async () => {

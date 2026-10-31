@@ -1,4 +1,5 @@
 import { sql, type PostgresAdapter } from '@payloadcms/db-postgres'
+import { randomUUID } from 'node:crypto'
 
 import type { Inquiry } from '../../payload-types'
 import type { CompatError } from '../compat'
@@ -15,6 +16,7 @@ import {
   type StockForEmail,
 } from './emails'
 import { priceComputer, type InquiryOffer, type PricedComputer } from './price'
+import { newMessageId } from './replyMail'
 import { inquiryFieldErrors, parseInquiryInput } from './schema'
 import {
   checkFormToken,
@@ -72,6 +74,10 @@ export type SubmitDeps = {
   /** Returns the record after the hooks, so with its number. */
   save: (data: NewInquiry) => Promise<{ id: number; number?: string | null }>
   sendEmail: (email: Email) => Promise<unknown>
+  /** A fresh `Message-ID` for the confirmation (`<uuid@sender-domain>`). */
+  newMessageId: () => string
+  /** Keeps the confirmation's id, so the customer's answer to it lands in the thread (P3/P4). */
+  saveConfirmationId: (id: number, messageId: string) => Promise<void>
   /**
    * Runs the e-mails: after the response in the app (`after()` from `next/server` — the customer
    * does not wait for SMTP), awaited in tests. The record is saved before either way.
@@ -312,20 +318,32 @@ export async function submitInquiryWith(
       deps.log.warn({ inquiry: id }, 'INQUIRY_NOTIFY_EMAIL not set: no notification sent')
     }
     const responseTime = await deps.responseTime().catch(() => null)
+    const confirmationId = deps.newMessageId()
     emails.push({
       kind: 'confirmation',
-      email: confirmationEmail(forEmail, { responseTime, replyTo: deps.notifyTo }),
+      email: {
+        ...confirmationEmail(forEmail, { responseTime, replyTo: deps.notifyTo }),
+        messageId: confirmationId,
+      },
     })
 
     const results = await Promise.allSettled(emails.map(({ email }) => deps.sendEmail(email)))
+    let confirmed = false
     results.forEach((result, i) => {
       if (result.status === 'rejected') {
         deps.log.error(
           { inquiry: id, email: emails[i]?.kind, ...errorFields(result.reason) },
           'Inquiry e-mail not sent',
         )
+      } else if (emails[i]?.kind === 'confirmation') {
+        confirmed = true
       }
     })
+    if (confirmed) {
+      await deps.saveConfirmationId(id, confirmationId).catch((error: unknown) => {
+        deps.log.error({ inquiry: id, ...errorFields(error) }, 'Confirmation id not saved')
+      })
+    }
   })
 
   return { ok: true, id, number }
@@ -446,6 +464,16 @@ export async function submitInquiry(
       save: (data) =>
         payload.create({ collection: 'inquiries', data, depth: 0, overrideAccess: true }),
       sendEmail: (email) => payload.sendEmail(email),
+      newMessageId: () => newMessageId(env.MAIL_FROM_ADDRESS, randomUUID()),
+      saveConfirmationId: async (id, messageId) => {
+        await payload.update({
+          collection: 'inquiries',
+          id,
+          data: { confirmationMessageId: messageId },
+          depth: 0,
+          overrideAccess: true,
+        })
+      },
       defer: (task) => after(task),
       notifyTo: env.INQUIRY_NOTIFY_EMAIL ?? null,
       responseTime: async () => {

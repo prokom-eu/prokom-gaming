@@ -87,6 +87,8 @@ export interface Config {
     orders: Order;
     units: Unit;
     tickets: Ticket;
+    'reply-templates': ReplyTemplate;
+    'inquiry-messages': InquiryMessage;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
     'payload-locked-documents': PayloadLockedDocument;
@@ -114,6 +116,8 @@ export interface Config {
     orders: OrdersSelect<false> | OrdersSelect<true>;
     units: UnitsSelect<false> | UnitsSelect<true>;
     tickets: TicketsSelect<false> | TicketsSelect<true>;
+    'reply-templates': ReplyTemplatesSelect<false> | ReplyTemplatesSelect<true>;
+    'inquiry-messages': InquiryMessagesSelect<false> | InquiryMessagesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -129,6 +133,7 @@ export interface Config {
     'site-settings': SiteSetting;
     'legal-terms': LegalTerm;
     'legal-privacy': LegalPrivacy;
+    'mail-settings': MailSetting;
     'payload-jobs-stats': PayloadJobsStat;
   };
   globalsSelect: {
@@ -136,6 +141,7 @@ export interface Config {
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
     'legal-terms': LegalTermsSelect<false> | LegalTermsSelect<true>;
     'legal-privacy': LegalPrivacySelect<false> | LegalPrivacySelect<true>;
+    'mail-settings': MailSettingsSelect<false> | MailSettingsSelect<true>;
     'payload-jobs-stats': PayloadJobsStatsSelect<false> | PayloadJobsStatsSelect<true>;
   };
   locale: null;
@@ -147,6 +153,7 @@ export interface Config {
     tasks: {
       'margin-alarm': TaskMarginAlarm;
       'inquiry-retention': TaskInquiryRetention;
+      'inquiry-sla': TaskInquirySla;
       inline: {
         input: unknown;
         output: unknown;
@@ -613,6 +620,10 @@ export interface Inquiry {
    * Od tej daty liczy się okres przechowywania zamkniętych zapytań.
    */
   statusChangedAt?: string | null;
+  lastActivityAt?: string | null;
+  slaAlertedAt?: string | null;
+  unreadCount?: number | null;
+  confirmationMessageId?: string | null;
   build?: (number | null) | Build;
   config?: {
     level?: string | null;
@@ -908,6 +919,46 @@ export interface Ticket {
   createdAt: string;
 }
 /**
+ * Zmienne: {nr}, {zestaw}, {cena}, {czesci}, {termin}, {podpis}. Podpis wstawia tylko {podpis}.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "reply-templates".
+ */
+export interface ReplyTemplate {
+  id: number;
+  name: string;
+  kind: 'reply' | 'offer' | 'stage';
+  order: number;
+  active?: boolean | null;
+  body: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Wątek zapytania. Odpowiadasz i dodajesz notatki w Zapytaniach.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "inquiry-messages".
+ */
+export interface InquiryMessage {
+  id: number;
+  inquiry: number | Inquiry;
+  direction: 'in' | 'out' | 'note' | 'system';
+  at: string;
+  subject?: string | null;
+  body: string;
+  /**
+   * Puste = klient.
+   */
+  author?: (number | null) | User;
+  messageId?: string | null;
+  inReplyTo?: string | null;
+  attachmentsInfo?: string | null;
+  template?: (number | null) | ReplyTemplate;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -976,7 +1027,7 @@ export interface PayloadJob {
     | {
         executedAt: string;
         completedAt: string;
-        taskSlug: 'inline' | 'margin-alarm' | 'inquiry-retention';
+        taskSlug: 'inline' | 'margin-alarm' | 'inquiry-retention' | 'inquiry-sla';
         taskID: string;
         input?:
           | {
@@ -1009,7 +1060,7 @@ export interface PayloadJob {
         id?: string | null;
       }[]
     | null;
-  taskSlug?: ('inline' | 'margin-alarm' | 'inquiry-retention') | null;
+  taskSlug?: ('inline' | 'margin-alarm' | 'inquiry-retention' | 'inquiry-sla') | null;
   queue?: string | null;
   waitUntil?: string | null;
   processing?: boolean | null;
@@ -1107,6 +1158,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'tickets';
         value: number | Ticket;
+      } | null)
+    | ({
+        relationTo: 'reply-templates';
+        value: number | ReplyTemplate;
+      } | null)
+    | ({
+        relationTo: 'inquiry-messages';
+        value: number | InquiryMessage;
       } | null);
   globalSlug?: string | null;
   user:
@@ -1404,6 +1463,10 @@ export interface InquiriesSelect<T extends boolean = true> {
   type?: T;
   status?: T;
   statusChangedAt?: T;
+  lastActivityAt?: T;
+  slaAlertedAt?: T;
+  unreadCount?: T;
+  confirmationMessageId?: T;
   build?: T;
   config?:
     | T
@@ -1724,6 +1787,37 @@ export interface TicketsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "reply-templates_select".
+ */
+export interface ReplyTemplatesSelect<T extends boolean = true> {
+  name?: T;
+  kind?: T;
+  order?: T;
+  active?: T;
+  body?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "inquiry-messages_select".
+ */
+export interface InquiryMessagesSelect<T extends boolean = true> {
+  inquiry?: T;
+  direction?: T;
+  at?: T;
+  subject?: T;
+  body?: T;
+  author?: T;
+  messageId?: T;
+  inReplyTo?: T;
+  attachmentsInfo?: T;
+  template?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv_select".
  */
 export interface PayloadKvSelect<T extends boolean = true> {
@@ -1982,6 +2076,22 @@ export interface LegalPrivacy {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "mail-settings".
+ */
+export interface MailSetting {
+  id: number;
+  replyHours: {
+    from: number;
+    to: number;
+  };
+  replySlaMinutes: number;
+  replyAlarmMinutes: number;
+  signature: string;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-jobs-stats".
  */
 export interface PayloadJobsStat {
@@ -2112,6 +2222,24 @@ export interface LegalPrivacySelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "mail-settings_select".
+ */
+export interface MailSettingsSelect<T extends boolean = true> {
+  replyHours?:
+    | T
+    | {
+        from?: T;
+        to?: T;
+      };
+  replySlaMinutes?: T;
+  replyAlarmMinutes?: T;
+  signature?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-jobs-stats_select".
  */
 export interface PayloadJobsStatsSelect<T extends boolean = true> {
@@ -2159,6 +2287,16 @@ export interface TaskInquiryRetention {
   input?: unknown;
   output: {
     deleted: number;
+  };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskInquiry-sla".
+ */
+export interface TaskInquirySla {
+  input?: unknown;
+  output: {
+    alerted: number;
   };
 }
 /**
