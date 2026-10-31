@@ -3,27 +3,26 @@
 Spec: `docs/strony/prokomgaming-panel.md` · ADR-G006 (widoki), ADR-G007 (sprawdzanie cen), ADR-G008 (poczta), ADR-G009 (Umami), ADR-G010 (telefon: PWA i push) · wzorzec: `docs/design/prokomgaming/panel/`.
 Prefiks zadań: **P**. Zasady jak w `docs/zadania/prokomgaming.md` (jedna sesja naraz, PR do `develop`, squash, STAN na koniec).
 
-## 1. Kolejność (stan 30.10.2026: G0–G12 scalone do `develop`, PR #27)
-**Produkcja strony 20.11 ma pierwszeństwo — żadna sesja P jej nie blokuje.** Jeśli G13–G16 się przesuwają, sesje P idą po starcie.
+## 1. Kolejność (stan 01.11.2026: G0–G14 i P0–P4 scalone, P2 w PR #48)
+**Decyzja Krystiana 01.11.2026: panel jest budowany w całości (P0–P8) i idzie na produkcję razem ze stroną, skończony — jednym wdrożeniem (G16).** Nie ma już podziału na „przed startem” i „po starcie”. Zastępuje zasadę z 30.10 („produkcja strony ma pierwszeństwo, sesje P po starcie”).
 
-| Kolejność | Sesja | Wieczory | Uwagi |
+| Kolejność | Sesja | Wieczory | Stan / uwagi |
 |---|---|---|---|
-| 1 | G12 — test na prawdziwym telefonie | — | jedyne niedokończone z G12 (STAN) |
-| 2 | **P0** — dokumenty panelu | 0,5 | bez kodu |
-| 3 | G13 | 2 | bez zmian |
-| 4 | G14 **+ dopisek panelu** | 2 | role `admin`/`serwis`; w `orders` od razu `dueDate`, `checklist[]`, `workshopNote` (§17 spec.) — bez osobnej migracji w P5 |
-| 5 | **P1** — powłoka panelu (komputer + telefon) | 1,5 | dolne zakładki, „Więcej”, tryb kart tabel, manifest PWA |
-| 6 | **P3** — zapytania: wątek i wysyłka | 2 | najważniejsze na start: odpowiedzi z panelu od pierwszego dnia |
-| 7 | **P4** — odbiór odpowiedzi (IMAP) + push na telefon | 1,5 | push o nowym zapytaniu od pierwszego dnia sprzedaży |
-| 8 | **P2** — Pulpit „Dziś” | 1 | |
-| 9 | G15 **+ Umami** | 1,5 + 0,5 | zbieranie ruchu od startu (ADR-G009 pkt 1–3) |
-| 10 | G16 | 1 | staging → szef → produkcja 20.11 |
-| 11 | **P6** — ceny i oferta | 2 | po starcie; nie wciskać przed G15/G16, nawet gdy zostanie czas |
-| 12 | **P7** — sprawdzanie cen (Claude) | 2 | |
-| 13 | **P5** — klient i warsztat | 1,5 | |
-| 14 | **P8** — statystyki, wyszukiwarka, przegląd całości | 1,5 | |
+| — | P0, P1, P3, P4 | 5,5 | scalone (30–31.10) |
+| — | **P2** — Pulpit „Dziś” | 1 | PR #48 (01.11) |
+| 1 | **P6** — ceny i oferta | 2 | przed P7: `price-sources` i `partKey` z P6 są wejściem sprawdzania cen |
+| 2 | **P7** — sprawdzanie cen (Claude) | 2 | klucz `ANTHROPIC_API_KEY` poda Krystian na starcie P7 (tylko `.env`, nigdy repo); limit wydatków — [SZEF] |
+| 3 | **P5** — klient i warsztat | 1,5 | niezależna od P6/P7 |
+| 4 | G15 **+ Umami** | 1,5 + 0,5 | po całym UI panelu: SEO, Lighthouse, axe i e2e obejmują też panel; Umami potrzebne do P8 |
+| 5 | **P8** — statystyki, wyszukiwarka, przegląd całości | 1,5 | po Umami; przegląd całego panelu = ostatnia sesja kodu |
+| 6 | G16 — wdrożenie strony **i panelu** | 1 | staging → szef → produkcja; zmienne panelu w `compose.*.yml` (niżej) |
 
-Razem panel: ok. 13,5 wieczoru (P0–P8), z czego przed startem ok. 6,5 (P0 0,5 + P1 1,5 + P3 2 + P4 1,5 + P2 1). Razem z G13–G16 to ok. 13,5 wieczoru do 19.11 — **ciasno**. Kolejność cięcia przed startem: najpierw **P2 po starcie** (do tego czasu zostaje dashboard Payload + dzwonek), potem push z P4 po starcie (zostaje alarm e-mail). P1 i P3 bez cięć — odpowiedzi z panelu od pierwszego dnia. Zapas trzymaj na poprawki G15/G16, nie na P6/P7.
+**Kalendarz:** zostaje ok. 10 wieczorów (P6 2 + P7 2 + P5 1,5 + G15 2 + P8 1,5 + G16 1) w oknie 2.11–19.11, a staging dla szefa najpóźniej 18.11 — razem z pracą w `prokom-web`. To **bardzo ciasno**, bez bufora na poprawki z prawdziwego telefonu i Lighthouse.
+- **Kontrola 3 — 9.11:** P6 scalone, P7 w toku.
+- **Kontrola 4 — 14.11:** P5 i P7 scalone, G15 w toku.
+- **Gdy kontrola pokaże poślizg:** `TODO(krystian)`: co wtedy — przesunięcie daty produkcji całości (rozmowa z szefem) czy jednak część panelu po starcie. Do rozstrzygnięcia najpóźniej przy kontroli 3.
+
+**Dopisek do G16 (panel w całości):** w `compose.prod.yml`/`compose.staging.yml` oprócz zmiennych strony: `IMAP_HOST/USER/PASSWORD` (P4), `VAPID_PUBLIC_KEY/PRIVATE_KEY/SUBJECT` (P4, osobna para na staging i produkcję), `ANTHROPIC_API_KEY` (P7), `UMAMI_*` i dane logowania API Umami (P8); prawdziwy push na Androidzie i iPhonie, prawdziwy odbiór IMAP i jeden ręczny przebieg sprawdzania cen na stagingu przed akceptacją szefa.
 
 ## 2. Sesje
 | # | Zakres | Gotowe, gdy | Spec. / wzór |

@@ -6,7 +6,7 @@ Ostatnia aktualizacja: 01.11.2026 (P2 — Pulpit „Dziś”, PR do `develop`; P
 - **Gałąź:** `feat/p2-pulpit` (P2 — Pulpit „Dziś”, jeden PR — decyzja Krystiana 01.11).
 - **Zrobione:** `/admin` = Pulpit zamiast dashboardu Payload (`admin.components.views.dashboard`): tytuł, data, akcja „Zapytania”; kafle Zapytania dziś (+ wykres 30 dni), Średnia marża gotowców („było X% przy cenach z <data>”), Najniższa marża w konfiguratorze (czerwona < minimum, „po zatwierdzeniu Y%”); „Czeka na Ciebie” (`src/admin/dashboard/rules.ts`: zapytania `new` z SLA w godzinach odpowiedzi, kolejka, zamówienia z terminem ≤ 2 dni robocze); marża 16 zestawów z przełącznikiem „Ceny <dd.mm> / Dzisiejsze koszty / Po zatwierdzeniu” (`margins.ts`, wszystko z `lib/pricing`, do klienta tylko ceny i marże); Ostatnie zapytania, Warsztat (7 etapów), Ostatnie zdarzenia; „Ceny na rynku” i „Ruch na stronie” jako stany puste; telefon: alarm marży na górze z „Zatwierdź N cen”, kafle 2 w rzędzie, zestawy jako karty. `serwis` widzi na Pulpicie tylko Warsztat (decyzja Krystiana 01.11). Testy: Vitest (reguły, serie, zdarzenia, marże = `buildsOverview`/`reviewAll` dla partii 1 i zmiany kosztu P13), e2e `panel-dashboard` 1440 + 414 (sekcje, przełącznik, axe, bez przewijania w bok, serwis, anonim) + alarm w `prices-import`.
 - **Niedokończone:** prawdziwy telefon (Android + iPhone) i Lighthouse mobile Pulpitu po zalogowaniu (spec. §2a pkt 10); ręczny push na telefonie (P4).
-- **Następny krok:** po scaleniu PR — G15 (+ Umami) wg `docs/zadania/prokomgaming.md`.
+- **Następny krok:** po scaleniu PR #48 — `/zadanie P6` (ceny i oferta). Kolejność do produkcji (decyzja 01.11): P6 → P7 → P5 → G15 (+ Umami) → P8 → G16, panel w całości razem ze stroną.
 
 ## Uwagi na później (P2)
 - **Świadome odstępstwa od planszy Main:** kafel „Odwiedzający dziś” znika bez Umami (spec. §3 pkt 2) — 3 kafle, na telefonie trzeci sam w rzędzie; kafle marż bez wykresiku 30 dni (nie mamy historii kosztów — wykres byłby zmyślony); bez akcji „Statystyki”, wyszukiwarki i „Sprawdź ceny” (P7/P8); bez stopki „dane przykładowe”; zdarzenie „Alarm marży wysłany e-mailem” pominięte (zadanie `margin-alarm`/`notify-send` kasuje się po wykonaniu — brak śladu w bazie); reguły raportu cen (część niedostępna, nowy raport) w P7.
@@ -200,9 +200,10 @@ Ostatnia aktualizacja: 01.11.2026 (P2 — Pulpit „Dziś”, PR do `develop`; P
 - 25.10.2026 — pakiet startowy (pierwszy commit, podpisany): CLAUDE.md, specyfikacja `docs/strony/prokomgaming.md`, ADR-G001…G005, plan G0–G16, wzorzec wyglądu v36 (`docs/design/prokomgaming/`), seed (`seed/prokomgaming/`), oczekiwane wyniki testów cen (`tests/fixtures/pricing-expected.json`).
 
 ## Następne kroki
-G1 → G2 → G3 → G4 → G5 → G6 → G7 → G8 → G9 → (kontrola 8.11) → G10 → G11 → G12 → (kontrola 13.11) → G13 → ~~G14~~ (zrobione 31.10) → ~~P1~~ → ~~P3~~ → ~~P4~~ (31.10; push w PR 2) → ~~P2~~ (01.11) → **G15** (+ Umami) → G16 (produkcja 20.11) → **P6 → P7 → P5 → P8**. Panel: `docs/zadania/prokomgaming-panel.md` (P0 zrobione 30.10 — spec. v1.1).
+G1 → G2 → G3 → G4 → G5 → G6 → G7 → G8 → G9 → (kontrola 8.11) → G10 → G11 → G12 → (kontrola 13.11) → G13 → ~~G14~~ (zrobione 31.10) → ~~P1~~ → ~~P3~~ → ~~P4~~ (31.10; push w PR 2) → ~~P2~~ (01.11, PR #48) → **P6 → P7 → P5** → G15 (+ Umami) → **P8** → G16 (produkcja 20.11 — strona **i cały panel** jednym wdrożeniem, decyzja Krystiana 01.11). Kontrole: 9.11 (P6 scalone), 14.11 (P5, P7 scalone). Panel: `docs/zadania/prokomgaming-panel.md` §1.
 
 ## Decyzje (skrót)
+- **Panel w całości na produkcję razem ze stroną (Krystian 01.11.2026):** P5–P8 przed G16, jedno wdrożenie; zastępuje zasadę z 30.10 „sesje P po starcie”.
 - Osobne repo, ten sam stos i wersje co `prokom-web` (ADR-G001), porty 3100 / 54321 / 1026 / 8026.
 - **Repo publiczne (decyzja Krystiana 31.10.2026):** `prokom-eu/prokom-gaming` jest publiczne (jak `prokom-web`), bo GitHub Actions w repo prywatnym zablokowało się na flagę płatności, a płacić nie planujemy. Świadomie jawne: koszty zakupu, modele części (`internalModel`) i narzuty w `seed/prokomgaming/` i `tests/fixtures/`, wzór ceny (ADR-G002), dokumenty w `docs/` — także w całej historii gita. Zasada „koszty, modele i marże nigdy na stronie ani w API” (ADR-G002 §8.7) dotyczy dalej strony i API, nie repo. Sekrety wyłącznie w `.env*` (gitleaks w haku i w CI); nowe dane wrażliwe (np. ceny od dostawców, dane klientów) nigdy do repo.
 - Pełny zakres na 20.11 z ustaloną kolejnością cięcia (`docs/zadania/prokomgaming.md` §4).
@@ -248,7 +249,8 @@ G1 → G2 → G3 → G4 → G5 → G6 → G7 → G8 → G9 → (kontrola 8.11) �
 
 ## Otwarte pytania — panel (30.10)
 - [SZEF, przed P4 — odbiór na prawdziwej skrzynce] skrzynka Gaming (`gaming@pro-kom.eu`?) z dostępem IMAP i kontem SMTP dla panelu (od P3 wszystkie maile wychodzą z niej).
-- [SZEF, przed P7] klucz API Anthropic na firmę i limit wydatków (propozycja 20 USD/mies., ADR-G007 §4).
+- [Krystian, na starcie P7] klucz `ANTHROPIC_API_KEY` — Krystian poda go, gdy zacznie się P7 (wpis tylko do `.env`, nigdy do repo ani czatu z logami). [SZEF] limit wydatków (propozycja 20 USD/mies., ADR-G007 §4).
+- [Krystian, do kontroli 9.11] co przy poślizgu: przesunięcie produkcji całości czy część panelu po starcie (`docs/zadania/prokomgaming-panel.md` §1).
 - [prawnik] polityka prywatności: statystyki bez ciasteczek (Umami), odpowiedzi z panelu.
 - [Krystian, przed G16] SPF/DKIM/DMARC domeny nadawcy w Seohost.
 
