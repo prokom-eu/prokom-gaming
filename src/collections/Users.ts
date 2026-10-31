@@ -1,8 +1,26 @@
-import type { Access, CollectionBeforeChangeHook, CollectionConfig } from 'payload'
+import type {
+  Access,
+  CollectionBeforeChangeHook,
+  CollectionBeforeDeleteHook,
+  CollectionConfig,
+} from 'payload'
 
 import { isAdmin, isPanelUser, USER_ROLES } from '../access/panel'
 import { enforcePasswordPolicy } from './passwordPolicy'
 import { GROUP_ADMIN } from './shared'
+
+/**
+ * A deleted panel account takes its push devices with it (P4): `push-subscriptions.user` is
+ * required, so the database's `set null` would refuse the delete.
+ */
+const deleteDevices: CollectionBeforeDeleteHook = async ({ id, req }) => {
+  await req.payload.delete({
+    collection: 'push-subscriptions',
+    where: { user: { equals: id } },
+    overrideAccess: true,
+    req,
+  })
+}
 
 /**
  * The very first account (`/admin/create-first-user`, nobody signed in) must be an admin, or no one
@@ -51,6 +69,7 @@ export const Users: CollectionConfig = {
   hooks: {
     beforeOperation: [enforcePasswordPolicy('users')],
     beforeChange: [firstUserIsAdmin],
+    beforeDelete: [deleteDevices],
   },
   // Email and password are added by `auth`.
   fields: [

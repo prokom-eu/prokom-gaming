@@ -188,6 +188,9 @@ jobs:
         run: |
           echo "PAYLOAD_SECRET=$(openssl rand -hex 32)" >> "$GITHUB_ENV"
           echo "SEED_ADMIN_PASSWORD=$(openssl rand -hex 16)" >> "$GITHUB_ENV"
+          # Push (P4, ADR-G010): a throwaway VAPID pair per run for the Settings e2e.
+          node -e "const k=require('web-push').generateVAPIDKeys();console.log('VAPID_PUBLIC_KEY='+k.publicKey);console.log('VAPID_PRIVATE_KEY='+k.privateKey)" >> "$GITHUB_ENV"
+          echo "VAPID_SUBJECT=mailto:alarm@example.test" >> "$GITHUB_ENV"
 
       # ADR-009: push is disabled, so the empty CI database gets its schema from migrations only.
       - name: Migrate database
