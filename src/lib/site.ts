@@ -16,6 +16,8 @@ export const company = {
   email: 'gaming@pro-kom.eu',
   phone: '+48 18 267 65 11',
   phoneHref: 'tel:+48182676511',
+  // Gaming is a product brand of PRO-KOM (docs/zadania/gaming-marka-prokom.md).
+  parentSite: { label: 'pro-kom.eu', href: 'https://pro-kom.eu' },
 } as const
 
 // Public registers where a customer checks the company (spec. §16, boards Rodzice, OFirmie).
