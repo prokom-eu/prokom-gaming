@@ -1,3 +1,5 @@
+import { latestReport } from '../price-reports/load'
+import { marketChanges, type MarketRow } from '../price-reports/market'
 import 'server-only'
 
 import type { Payload } from 'payload'
@@ -57,6 +59,8 @@ export type DashboardData = {
   workshop: WorkshopData
   prices: PricesData
   events: DashEvent[]
+  /** P7: the newest price report — „Ceny na rynku”. */
+  market: { id: number; date: string; rows: MarketRow[] } | null
 }
 
 const DAY_MS = 86_400_000
@@ -96,54 +100,56 @@ export async function loadDashboard(payload: Payload, now: Date): Promise<Dashbo
   const days = lastDays(now)
   const since = new Date(`${days[0]}T00:00:00Z`).getTime() - DAY_MS // a margin for the time zone
 
-  const [mail, monthly, waiting, recent, dueOrders, workshop, prices, events] = await Promise.all([
-    payload.findGlobal({ slug: 'mail-settings', depth: 0, overrideAccess: true }),
-    payload.find({
-      collection: 'inquiries',
-      where: { createdAt: { greater_than_equal: new Date(since).toISOString() } },
-      select: { createdAt: true },
-      ...trusted,
-    }),
-    payload.find({
-      collection: 'inquiries',
-      where: { status: { equals: 'new' } },
-      select: { name: true, createdAt: true },
-      sort: 'createdAt',
-      ...trusted,
-    }),
-    payload.find({
-      collection: 'inquiries',
-      sort: '-createdAt',
-      limit: 4,
-      depth: 1,
-      populate: { builds: { name: true } },
-      select: {
-        number: true,
-        name: true,
-        status: true,
-        createdAt: true,
-        type: true,
-        build: true,
-        budget: true,
-        voucher: true,
-      },
-      overrideAccess: true,
-    }),
-    payload.find({
-      collection: 'orders',
-      where: {
-        and: [{ stage: { not_in: ['shipped', 'delivered'] } }, { dueDate: { exists: true } }],
-      },
-      select: { number: true, stage: true, dueDate: true, checklist: true, build: true },
-      populate: { builds: { name: true } },
-      overrideAccess: true,
-      depth: 1,
-      pagination: false,
-    }),
-    loadWorkshop(payload),
-    loadPrices(payload),
-    loadEvents(payload),
-  ])
+  const [mail, monthly, waiting, recent, dueOrders, workshop, prices, events, report] =
+    await Promise.all([
+      payload.findGlobal({ slug: 'mail-settings', depth: 0, overrideAccess: true }),
+      payload.find({
+        collection: 'inquiries',
+        where: { createdAt: { greater_than_equal: new Date(since).toISOString() } },
+        select: { createdAt: true },
+        ...trusted,
+      }),
+      payload.find({
+        collection: 'inquiries',
+        where: { status: { equals: 'new' } },
+        select: { name: true, createdAt: true },
+        sort: 'createdAt',
+        ...trusted,
+      }),
+      payload.find({
+        collection: 'inquiries',
+        sort: '-createdAt',
+        limit: 4,
+        depth: 1,
+        populate: { builds: { name: true } },
+        select: {
+          number: true,
+          name: true,
+          status: true,
+          createdAt: true,
+          type: true,
+          build: true,
+          budget: true,
+          voucher: true,
+        },
+        overrideAccess: true,
+      }),
+      payload.find({
+        collection: 'orders',
+        where: {
+          and: [{ stage: { not_in: ['shipped', 'delivered'] } }, { dueDate: { exists: true } }],
+        },
+        select: { number: true, stage: true, dueDate: true, checklist: true, build: true },
+        populate: { builds: { name: true } },
+        overrideAccess: true,
+        depth: 1,
+        pagination: false,
+      }),
+      loadWorkshop(payload),
+      loadPrices(payload),
+      loadEvents(payload),
+      latestReport(payload),
+    ])
 
   const replyHours: ReplyHours = mail.replyHours ?? DEFAULT_REPLY_HOURS
   const slaMinutes = mail.replySlaMinutes ?? 60
@@ -170,6 +176,13 @@ export async function loadDashboard(payload: Payload, now: Date): Promise<Dashbo
   )
 
   return {
+    market: report
+      ? {
+          id: report.id,
+          date: dateLong.format(new Date(report.startedAt)),
+          rows: marketChanges(report.diff),
+        }
+      : null,
     inquiries: {
       today: series.at(-1) ?? 0,
       yesterday: series.at(-2) ?? 0,
@@ -198,6 +211,15 @@ export async function loadDashboard(payload: Payload, now: Date): Promise<Dashbo
             }
           : null,
         orders,
+        report: report
+          ? {
+              id: report.id,
+              unread: !report.readAt,
+              unavailable: report.diff.items
+                .filter((i) => i.decision.kind === 'unavailable' && i.builds.length > 0)
+                .map((i) => ({ title: i.title, builds: i.builds })),
+            }
+          : null,
       },
       now,
     ),

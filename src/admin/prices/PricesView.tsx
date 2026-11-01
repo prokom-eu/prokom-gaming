@@ -1,3 +1,5 @@
+import { dateTime } from '../price-reports/format'
+import { latestReport } from '../price-reports/load'
 import type { AdminViewServerProps } from 'payload'
 
 import { percentShort } from '../../lib/pricing/format'
@@ -47,7 +49,7 @@ export async function PricesView({ initPageResult }: AdminViewServerProps) {
     )
   }
   const admin = req.payload.config.routes.admin
-  const data = await loadPrices(req.payload)
+  const [data, report] = await Promise.all([loadPrices(req.payload), latestReport(req.payload)])
   const queueCount = 'error' in data ? 0 : data.queue.items.length
 
   return (
@@ -67,18 +69,36 @@ export async function PricesView({ initPageResult }: AdminViewServerProps) {
         {'error' in data ? (
           <Alert title="Nie można policzyć cen">{data.error}</Alert>
         ) : (
-          <Centre data={data} admin={admin} />
+          <Centre data={data} admin={admin} report={report} />
         )}
       </div>
     </PanelShell>
   )
 }
 
-function Centre({ data, admin }: { data: PricesData; admin: string }) {
+function Centre({
+  data,
+  admin,
+  report,
+}: {
+  data: PricesData
+  admin: string
+  report: Awaited<ReturnType<typeof latestReport>>
+}) {
+  // The last price check (P7): items without a usable offer; a part marks its levels.
+  const missing = new Set<string>()
+  for (const item of report?.diff.items ?? []) {
+    if (item.decision.kind !== 'unavailable') continue
+    if (item.itemType === 'option') missing.add(`option:${item.code}`)
+    else for (const level of item.levels) missing.add(`level:${level}`)
+  }
+  const missingUsed = (report?.diff.items ?? []).filter(
+    (i) => i.decision.kind === 'unavailable' && i.builds.length > 0,
+  )
   const { offer, current, queue, items, levelParts, warnMargin } = data
   const { minMargin, publishThreshold } = offer.catalog.settings
   const batchShort = dateShort.format(new Date(current.snapshot.publishedAt))
-  const rows = items.map((item) => toRow(item, queue))
+  const rows = items.map((item) => toRow(item, queue, missing))
   const queued = rows.filter((r) => r.status !== 'same' && r.status !== 'minor').length
   const minor = rows.filter((r) => r.status === 'minor').length
   const levels = items.filter((i) => i.category === 'level').length
@@ -115,9 +135,39 @@ function Centre({ data, admin }: { data: PricesData; admin: string }) {
           tone={queued > 0 ? 'gold' : undefined}
           note={`${queued} powyżej progu ${percentShort(publishThreshold)}, ${minor} poniżej`}
         />
-        {/* TODO(P7): unavailable parts and the last check come from the price check report. */}
-        <Kpi label="Niedostępne" value="—" note="po pierwszym sprawdzeniu cen" />
-        <Kpi label="Ostatnie sprawdzenie" value="—" note="sprawdzanie cen jeszcze nie działa" />
+        {report ? (
+          <>
+            <Kpi
+              label="Niedostępne"
+              value={String(missingUsed.length)}
+              tone={missingUsed.length > 0 ? 'bad' : undefined}
+              note={
+                missingUsed.length > 0
+                  ? missingUsed
+                      .slice(0, 2)
+                      .map((i) => `${i.title} · ${i.builds.join(', ')}`)
+                      .join('; ')
+                  : 'wszystkie części z zestawów mają ofertę'
+              }
+            />
+            <Kpi
+              label="Ostatnie sprawdzenie"
+              value={dateTime(report.startedAt)}
+              note={
+                <a className="pn-link" href={`${admin}/raporty-cen/${report.id}`}>
+                  Claude · {report.diff.totals.found} z {report.diff.totals.items} pozycji
+                  znalezionych
+                </a>
+              }
+            />
+          </>
+        ) : (
+          <>
+            {/* TODO(krystian): sentences before the first check. */}
+            <Kpi label="Niedostępne" value="—" note="po pierwszym sprawdzeniu cen" />
+            <Kpi label="Ostatnie sprawdzenie" value="—" note="jeszcze nie sprawdzano cen" />
+          </>
+        )}
       </div>
 
       <WhatIfCard
@@ -140,7 +190,7 @@ function Centre({ data, admin }: { data: PricesData; admin: string }) {
   )
 }
 
-function toRow(item: PriceItem, queue: PricesData['queue']): PriceRowView {
+function toRow(item: PriceItem, queue: PricesData['queue'], missing: Set<string>): PriceRowView {
   const queued = queue.items.find((q) => q.key === item.key)
   const status: PriceRowView['status'] = queued
     ? queued.reasons.includes('urgent')
@@ -163,6 +213,7 @@ function toRow(item: PriceItem, queue: PricesData['queue']): PriceRowView {
     margin: item.margin,
     costSource: item.costSource,
     status,
+    unavailable: missing.has(item.key),
     editPath: item.editPath,
   }
 }

@@ -181,3 +181,33 @@ describe('todoList — unknown margin after approval', () => {
     expect(item!.note).not.toContain('—%')
   })
 })
+
+describe('todoList — price report (P7)', () => {
+  const now = new Date('2026-11-02T09:00:00+01:00')
+
+  it('an unavailable part of a build is urgent, an unread report is a plain item', () => {
+    const items = todoList(
+      {
+        ...base,
+        report: {
+          id: 7,
+          unread: true,
+          unavailable: [{ title: 'NZXT H9 Flow', builds: ['Żmij', 'Perun'] }],
+        },
+      },
+      now,
+    )
+    expect(items.map((i) => [i.kind, i.urgent])).toEqual([
+      ['unavailable', true],
+      ['report', false],
+    ])
+    expect(items[0]!.note).toContain('Żmij, Perun')
+    expect(items[1]!.action.path).toBe('/raporty-cen/7')
+  })
+
+  it('a read report without missing parts adds nothing', () => {
+    expect(todoList({ ...base, report: { id: 7, unread: false, unavailable: [] } }, now)).toEqual(
+      [],
+    )
+  })
+})

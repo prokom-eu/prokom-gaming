@@ -7,10 +7,10 @@ import type { IconName } from '../ui/icons'
 /**
  * „Czeka na Ciebie” on the Pulpit (panel spec §3.3): what to do now, the most urgent first, each
  * with a button to the place where it gets done. Pure — the loader passes counts and dates.
- * Rules of the price report (unavailable parts, unread report) come with P7.
+ * The price report rules (unavailable parts, unread report) since P7.
  */
 
-export type TodoKind = 'inquiries' | 'queue' | 'order'
+export type TodoKind = 'inquiries' | 'queue' | 'order' | 'unavailable' | 'report'
 
 export type TodoItem = {
   kind: TodoKind
@@ -51,6 +51,13 @@ export type TodoInput = {
   } | null
   /** Active orders with a due date (the rule picks the ones due soon). */
   orders: readonly DueOrder[]
+  /** P7: the newest price report — `null` before the first one. */
+  report?: {
+    id: number
+    unread: boolean
+    /** Items of builds without a usable offer: name and builds. */
+    unavailable: readonly { title: string; builds: readonly string[] }[]
+  } | null
 }
 
 /** Orders due within this many working days count (spec §3.3). */
@@ -207,11 +214,48 @@ function orderItems(input: TodoInput, now: Date): TodoItem[] {
 const stageLabel = (stage: OrderStage) =>
   ORDER_STAGE_CHOICES.find((c) => c.value === stage)?.label ?? stage
 
-/** The whole list: urgent first, then inquiries, the queue and orders by due date. */
+// TODO(krystian): wording of the report rules (not on the board).
+function reportItems(input: TodoInput): TodoItem[] {
+  const r = input.report
+  if (!r) return []
+  const out: TodoItem[] = []
+  if (r.unavailable.length > 0) {
+    const first = r.unavailable[0]!
+    out.push({
+      kind: 'unavailable',
+      key: 'unavailable',
+      urgent: true,
+      icon: 'box',
+      title:
+        r.unavailable.length === 1
+          ? `${first.title} niedostępna w sklepach`
+          : `${r.unavailable.length} części z zestawów niedostępne w sklepach`,
+      note: `Używa: ${[...new Set(r.unavailable.flatMap((u) => u.builds))].join(', ')}. Potwierdź u dostawcy albo zmień przepis.`,
+      action: { label: 'Raport', path: `/raporty-cen/${r.id}` },
+    })
+  }
+  if (r.unread) {
+    out.push({
+      kind: 'report',
+      key: 'report',
+      urgent: false,
+      icon: 'report',
+      title: 'Nowy raport cen',
+      note: 'Sprawdzanie cen skończone — zobacz propozycje.',
+      action: { label: 'Otwórz', path: `/raporty-cen/${r.id}` },
+    })
+  }
+  return out
+}
+
+/** The whole list: urgent first, then inquiries, the queue, the report and orders by due date. */
 export function todoList(input: TodoInput, now: Date): TodoItem[] {
-  const items = [inquiriesItem(input, now), queueItem(input), ...orderItems(input, now)].filter(
-    (i): i is TodoItem => i !== null,
-  )
+  const items = [
+    inquiriesItem(input, now),
+    queueItem(input),
+    ...reportItems(input),
+    ...orderItems(input, now),
+  ].filter((i): i is TodoItem => i !== null)
   // Stable sort: the order above stays within the urgent and the rest.
   return items.sort((a, b) => Number(b.urgent) - Number(a.urgent))
 }

@@ -7,6 +7,7 @@ import { errorFields, log } from '../../lib/logger'
 import { panelActionSession } from '../session'
 import { fieldOfPath, keepUnchanged, parseSettingsForm, type FieldErrors } from './form'
 import { mailFieldOfPath, parseMailForm, type MailFieldErrors } from './mailForm'
+import { parsePriceCheckForm, type PriceCheckFieldErrors } from './priceCheckForm'
 
 export type SaveState =
   | { status: 'idle' }
@@ -109,6 +110,48 @@ export async function saveMailSettings(
     return { status: 'error', message: 'Nie udało się zapisać. Spróbuj ponownie.', errors: {} }
   }
   log.info({ userId: user.id }, 'mail settings saved')
+  revalidatePath('/admin/ustawienia')
+  return { status: 'saved', at: new Date().toISOString() }
+}
+
+// --- Section „Sprawdzanie cen” (P7) ---
+
+export type PriceCheckSaveState =
+  | { status: 'idle' }
+  | { status: 'saved'; at: string }
+  | { status: 'error'; message: string; errors: PriceCheckFieldErrors }
+
+/** Saves `price-check-settings` (schedule, alarms, cost method, monthly limit). Admin only. */
+export async function savePriceCheckSettings(
+  _prev: PriceCheckSaveState,
+  form: FormData,
+): Promise<PriceCheckSaveState> {
+  const session = await panelActionSession('admin')
+  if (!session) {
+    return { status: 'error', message: 'Brak uprawnień — zaloguj się do panelu.', errors: {} }
+  }
+  const entries: Record<string, FormDataEntryValue | FormDataEntryValue[]> = {}
+  for (const key of new Set(form.keys())) {
+    const all = form.getAll(key)
+    entries[key] = key === 'days' ? all : (all[0] ?? '')
+  }
+  const parsed = parsePriceCheckForm(entries)
+  if (!parsed.ok)
+    return { status: 'error', message: 'Popraw zaznaczone pola.', errors: parsed.errors }
+  const { payload, user } = session
+  try {
+    await payload.updateGlobal({
+      slug: 'price-check-settings',
+      data: parsed.data,
+      user,
+      overrideAccess: false,
+      depth: 0,
+    })
+  } catch (error) {
+    log.error({ ...errorFields(error) }, 'settings: price check save failed')
+    return { status: 'error', message: 'Nie udało się zapisać. Spróbuj ponownie.', errors: {} }
+  }
+  log.info({ userId: user.id }, 'price check settings saved')
   revalidatePath('/admin/ustawienia')
   return { status: 'saved', at: new Date().toISOString() }
 }

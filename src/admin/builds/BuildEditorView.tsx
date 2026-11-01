@@ -7,7 +7,14 @@ import { PanelDenied } from '../ui/PanelDenied'
 import { PanelShell } from '../ui/PanelShell'
 import { loadEditor } from './editor'
 import { EditorBoard } from './EditorBoard'
+import { competitorsBySlug } from '../price-reports/load'
 import { loadBuildsContext } from './load'
+
+const dateShort = new Intl.DateTimeFormat('pl-PL', {
+  timeZone: 'Europe/Warsaw',
+  day: '2-digit',
+  month: '2-digit',
+})
 
 const TITLE = 'Edytor zestawu'
 const SLUG = /^[a-z0-9-]{1,80}$/
@@ -56,7 +63,10 @@ export async function BuildEditorView({ initPageResult, params }: AdminViewServe
   const ctx = await loadBuildsContext(req.payload)
   if ('error' in ctx)
     return shell(TITLE, <Alert title="Nie można policzyć zestawu">{ctx.error}</Alert>)
-  const data = slug ? await loadEditor(req.payload, ctx, slug) : null
+  const [data, rivals] = await Promise.all([
+    slug ? loadEditor(req.payload, ctx, slug) : null,
+    competitorsBySlug(req.payload),
+  ])
   if (!data) {
     return shell(
       TITLE,
@@ -68,5 +78,20 @@ export async function BuildEditorView({ initPageResult, params }: AdminViewServe
       </EmptyState>,
     )
   }
-  return shell(data.build.name, <EditorBoard data={data} />)
+  const rival = rivals.get(data.build.slug)
+  return shell(
+    data.build.name,
+    <EditorBoard
+      data={data}
+      competitor={
+        rival
+          ? {
+              name: rival.name,
+              price: rival.price,
+              date: dateShort.format(new Date(rival.checkedAt)),
+            }
+          : null
+      }
+    />,
+  )
 }
