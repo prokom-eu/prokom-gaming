@@ -1,6 +1,6 @@
-import type { CollectionConfig, Field } from 'payload'
+import type { Access, CollectionConfig, Field } from 'payload'
 
-import { adminField, adminOnly, anyone } from '../access/panel'
+import { adminField, adminOnly, isPanelUser } from '../access/panel'
 import { blockDeleteWithFpsResults } from './FpsResults'
 import { blockDeleteWhenReferenced } from './workshopGuards'
 import { GROUP_OFFER } from './shared'
@@ -17,6 +17,17 @@ const optionOf = (name: string, label: string, type: string): Field => ({
   filterOptions: { type: { equals: type }, active: { equals: true } },
 })
 
+export const OFFER_STATUSES = [
+  { label: 'Na stronie', value: 'published' },
+  { label: 'Szkic', value: 'draft' },
+  { label: 'Ukryty', value: 'hidden' },
+] as const
+
+// Drafts and hidden builds do not exist for the site (panel spec §9): visitors, customers and
+// every site read (`overrideAccess: false`) get published builds only; the panel sees all.
+const readPublished: Access = ({ req }) =>
+  isPanelUser(req) || { offerStatus: { equals: 'published' } }
+
 /**
  * Ready builds = saved configurator recipes (ADR-G002 §2). **No price field**: the price is always
  * computed from the published prices of its level and four options. Creature texts come 1:1 from
@@ -29,9 +40,9 @@ export const Builds: CollectionConfig = {
   admin: {
     group: GROUP_OFFER,
     useAsTitle: 'name',
-    defaultColumns: ['name', 'slug', 'level'],
+    defaultColumns: ['name', 'slug', 'level', 'offerStatus'],
   },
-  access: { read: anyone, create: adminOnly, update: adminOnly, delete: adminOnly },
+  access: { read: readPublished, create: adminOnly, update: adminOnly, delete: adminOnly },
   hooks: {
     beforeDelete: [
       blockDeleteWithFpsResults('build'),
@@ -50,6 +61,16 @@ export const Builds: CollectionConfig = {
           required: true,
           unique: true,
           admin: { description: '/zestawy/<slug>' },
+        },
+        {
+          // Not `status`: builds have no versions (`_status`) today, the name stays free (P0).
+          name: 'offerStatus',
+          label: 'Status',
+          type: 'select',
+          required: true,
+          defaultValue: 'published',
+          index: true,
+          options: [...OFFER_STATUSES],
         },
       ],
     },

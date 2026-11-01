@@ -368,6 +368,7 @@ export interface Build {
    * /zestawy/<slug>
    */
   slug: string;
+  offerStatus: 'published' | 'draft' | 'hidden';
   level: number | PowerLevel;
   case: number | Option;
   cooler: number | Option;
@@ -1447,6 +1448,7 @@ export interface PowerLevelsSelect<T extends boolean = true> {
 export interface BuildsSelect<T extends boolean = true> {
   name?: T;
   slug?: T;
+  offerStatus?: T;
   level?: T;
   case?: T;
   cooler?: T;

@@ -81,7 +81,11 @@ export async function loadInquiryOffer(payload: Payload): Promise<Omit<Pricing, 
     offer: {
       levels: offer.catalog.levels.map(compatLevel),
       options: offer.catalog.options.map(compatOption),
-      builds: offer.builds,
+      // Drafts and hidden builds cannot be asked for (panel spec §9): `loadOffer` reads all of
+      // them for the panel, bypassing the collection's read filter.
+      builds: offer.builds
+        .filter((b) => b.offerStatus === 'published')
+        .map(({ id, slug, name, config }) => ({ id, slug, name, config })),
     },
     labels: { level, option },
   }
