@@ -196,6 +196,15 @@ describe('summary numbers (ADR-G007 §2 pt 6)', () => {
     expect(unknownNumbers('Koszt 2500zł.', [], names)).toEqual([2500])
   })
 
+  it('a shortened name keeps its bare numbers out, never a price or a percent (run 1.11.2026)', () => {
+    const names = ['Pamięć DDR5 32 GB 6000 MHz', 'Chłodzenie wodne 360 mm', 'Dysk SSD 1000 GB']
+    const text = 'Podrożał RAM DDR5 32 GB 6000, chłodzenie 360 i SSD 1000 GB.'
+    expect(unknownNumbers(text, [], names)).toEqual([])
+    expect(unknownNumbers('RAM 32 GB kosztuje 6000 zł, czyli 32% więcej.', [], names)).toEqual([
+      6000, 32,
+    ])
+  })
+
   it('a hard space as the thousands separator', () => {
     expect(numbersIn('14 750 zł i 2 397 zł')).toEqual([14750, 2397])
   })
