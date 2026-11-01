@@ -159,6 +159,8 @@ jobs:
       # Gotowe od ręki and the voucher (G13): off in production until the owner decides, on for e2e.
       FEATURE_READY: '1'
       FEATURE_VOUCHER: '1'
+      # Price check (P7): a fake Claude answering from fixed data — no API key in CI.
+      PRICE_CHECK_FAKE: '1'
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1

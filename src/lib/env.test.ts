@@ -20,6 +20,7 @@ const defaults = {
   SITE_URL: 'http://localhost:3100',
   IMAP_PORT: 993,
   INQUIRY_RETENTION_MONTHS: 24,
+  PRICE_CHECK_FAKE: '0',
 }
 
 describe('parseEnv', () => {
@@ -179,5 +180,38 @@ describe('parseEnv', () => {
     const secret = 'too-short-secret'
     expect(() => parseEnv({ ...valid, PAYLOAD_SECRET: secret })).toThrow(/PAYLOAD_SECRET/)
     expect(() => parseEnv({ ...valid, PAYLOAD_SECRET: secret })).not.toThrow(secret)
+  })
+})
+
+describe('price check (P7, ADR-G007)', async () => {
+  const { priceCheckConfig } = await import('./env')
+  const base = {
+    NODE_ENV: 'test',
+    DATABASE_URL: 'postgresql://u:p@localhost:5432/db',
+    PAYLOAD_SECRET: 'a'.repeat(32),
+    SMTP_HOST: '127.0.0.1',
+    SMTP_PORT: '1026',
+    MAIL_FROM_ADDRESS: 'formularz@example.test',
+  }
+  it('is off without a key, live with one, fake for tests', () => {
+    expect(priceCheckConfig(parseEnv(base))).toBeNull()
+    expect(priceCheckConfig(parseEnv({ ...base, ANTHROPIC_API_KEY: 'x' }))).toEqual({
+      mode: 'live',
+      apiKey: 'x',
+    })
+    expect(priceCheckConfig(parseEnv({ ...base, PRICE_CHECK_FAKE: '1' }))).toEqual({ mode: 'fake' })
+  })
+  it('the fake is refused in production outside CI', () => {
+    const prod = {
+      ...base,
+      NODE_ENV: 'production',
+      ALERT_EMAIL: 'a@example.test',
+      INQUIRY_NOTIFY_EMAIL: 'b@example.test',
+      SITE_URL: 'https://x.test',
+    }
+    expect(() => parseEnv({ ...prod, PRICE_CHECK_FAKE: '1' })).toThrow(/PRICE_CHECK_FAKE/)
+    expect(priceCheckConfig(parseEnv({ ...prod, PRICE_CHECK_FAKE: '1', CI: 'true' }))).toEqual({
+      mode: 'fake',
+    })
   })
 })

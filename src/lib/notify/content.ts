@@ -8,6 +8,8 @@ export type PushData =
   | { kind: 'inquiry_new' | 'inquiry_reply'; number: string; topic: string }
   | { kind: 'inquiry_sla'; number: string; topic: string; waited: number }
   | { kind: 'margin_alarm' }
+  /** P7: a report id only — the reasons are in the report and in the e-mail. */
+  | { kind: 'price_report'; check: number }
   /** „Wyślij próbne” in Settings — to one device. */
   | { kind: 'test' }
 
@@ -41,6 +43,13 @@ export function pushContent(data: PushData, admin: string): PushContent {
         body: 'Cena na stronie łamie minimum przy dzisiejszych kosztach. Sprawdź ceny.',
         url: `${admin}/ceny/zatwierdzanie`,
         tag: 'margin-alarm',
+      }
+    case 'price_report':
+      return {
+        title: 'Raport cen z alarmem',
+        body: 'Sprawdzanie cen znalazło zmiany wymagające uwagi. Otwórz raport.',
+        url: `${admin}/raporty-cen/${data.check}`,
+        tag: 'price-report',
       }
     case 'test':
       return {

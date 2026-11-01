@@ -14,8 +14,16 @@ describe('channels (panel spec §14)', () => {
       inquiry_sla: { email: true, push: true },
       margin_alarm: { email: true, push: true },
       mail_error: { email: true, push: false },
+      price_report: { email: true, push: true },
+      budget: { email: true, push: false },
     })
-    expect(PUSH_KINDS).toEqual(['inquiry_new', 'inquiry_reply', 'inquiry_sla', 'margin_alarm'])
+    expect(PUSH_KINDS).toEqual([
+      'inquiry_new',
+      'inquiry_reply',
+      'inquiry_sla',
+      'margin_alarm',
+      'price_report',
+    ])
   })
 })
 

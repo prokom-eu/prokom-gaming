@@ -1,15 +1,18 @@
-import type { CollectionBeforeChangeHook, CollectionConfig } from 'payload'
+import type { CollectionBeforeChangeHook, CollectionConfig, PayloadRequest } from 'payload'
 
 import { adminOnly } from '../access/panel'
-import { DEFAULT_SHOPS, shopOf } from '../lib/pricing/sources'
+import { allowedShops } from '../lib/price-check/shops'
+import { shopOf } from '../lib/pricing/sources'
 import { GROUP_OFFER } from './shared'
 
-const NOT_A_SHOP = `Adres musi być stroną oferty w jednym ze sklepów: ${DEFAULT_SHOPS.join(', ')}.`
+const notAShop = (shops: string[]) =>
+  `Adres musi być stroną oferty w jednym ze sklepów: ${shops.join(', ')}.`
 
 // The shop is always derived from the address, never typed.
-const setShop: CollectionBeforeChangeHook = ({ data, originalDoc }) => {
+const setShop: CollectionBeforeChangeHook = async ({ data, originalDoc, req }) => {
   const url = data.url ?? (originalDoc as { url?: string } | undefined)?.url
-  data.shop = typeof url === 'string' ? (shopOf(url.trim()) ?? '') : ''
+  const shops = await allowedShops(req.payload)
+  data.shop = typeof url === 'string' ? (shopOf(url.trim(), shops) ?? '') : ''
   return data
 }
 
@@ -72,8 +75,13 @@ export const PriceSources: CollectionConfig = {
       type: 'text',
       required: true,
       maxLength: 1000,
-      validate: (value: string | null | undefined) =>
-        (typeof value === 'string' && shopOf(value.trim()) !== null) || NOT_A_SHOP,
+      // The shops of „Sprawdzanie cen” (P7); the start list until they are set.
+      validate: async (value: string | null | undefined, { req }: { req: PayloadRequest }) => {
+        const shops = await allowedShops(req.payload)
+        return (
+          (typeof value === 'string' && shopOf(value.trim(), shops) !== null) || notAShop(shops)
+        )
+      },
     },
     {
       type: 'row',

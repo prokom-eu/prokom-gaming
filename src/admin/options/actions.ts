@@ -13,7 +13,8 @@ import { z } from 'zod'
 import { errorFields, log } from '../../lib/logger'
 import { toCostOption, type PricingSettingsInput } from '../../lib/pricing/catalog'
 import { partKey } from '../../lib/pricing/partKey'
-import { shopOf, DEFAULT_SHOPS } from '../../lib/pricing/sources'
+import { allowedShops } from '../../lib/price-check/shops'
+import { shopOf } from '../../lib/pricing/sources'
 import { loadBatch } from '../../lib/pricing/store'
 import type { User } from '../../payload-types'
 import { panelActionSession } from '../session'
@@ -325,13 +326,12 @@ export async function addOption(form: FormData): Promise<AddResult> {
     .filter(Boolean)
     .filter((url, i, all) => all.indexOf(url) === i)
   if (links.length > 4) return { ok: false, messages: ['Najwyżej 4 linki do ofert.'] }
-  const bad = links.find((l) => !shopOf(l))
+  const shops = await allowedShops(payload)
+  const bad = links.find((l) => !shopOf(l, shops))
   if (bad) {
     return {
       ok: false,
-      messages: [
-        `Link spoza dozwolonych sklepów (${DEFAULT_SHOPS.join(', ')}): ${bad.slice(0, 80)}`,
-      ],
+      messages: [`Link spoza dozwolonych sklepów (${shops.join(', ')}): ${bad.slice(0, 80)}`],
     }
   }
 
