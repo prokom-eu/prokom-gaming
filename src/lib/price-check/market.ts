@@ -49,6 +49,20 @@ export function staleCost(offers: readonly Offer[], method: CostMethod, now: Dat
   })
 }
 
+/**
+ * A link found by the search switches itself on only when its reading is the same product with a
+ * price within `outlierPct` of the current cost — a deterministic check, not the model's word
+ * alone (a shop page could talk the model into „matches”). Otherwise it waits for Krystian.
+ */
+export function autoEnable(
+  offer: { matched: boolean; price: number | null },
+  cost: number,
+  outlierPct: number,
+): boolean {
+  if (!offer.matched || offer.price === null || !(cost > 0)) return false
+  return Math.abs(offer.price / cost - 1) <= outlierPct
+}
+
 export type Decision =
   /** A new cost to accept (only `market` items). */
   | { kind: 'propose'; newCost: number; change: number }

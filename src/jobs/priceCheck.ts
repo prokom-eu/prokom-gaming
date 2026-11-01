@@ -11,7 +11,7 @@ export type PriceCheckIO = {
 
 /**
  * One price check (ADR-G007 §2): reads offers through Claude, searches for missing ones,
- * recomputes in lib/pricing and writes the report. In its own queue (`long`), so a 15-minute run
+ * recomputes in lib/pricing and writes the report. In its own queue (`long`), so a run of up to 30 min
  * never holds back mail intake and alarms. Never retried: a run costs money; a failed one ends
  * as `failed` with its progress saved.
  */

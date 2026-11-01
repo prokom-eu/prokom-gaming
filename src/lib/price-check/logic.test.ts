@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { decide, marketCost, staleCost } from './market'
+import { autoEnable, decide, marketCost, staleCost } from './market'
 import { parseAnswer, readingSchema } from './schema'
 import { numbersIn, numbersOf, summaryInput, unknownNumbers } from './summary'
 import { callCostUsd, monthStart, overBudget, READ_MODEL, SEARCH_MODEL } from './usage'
@@ -118,6 +118,21 @@ describe('old page copies (the cheap fetch serves cached pages)', () => {
     // The same cost is still „bez zmian”, an invoice cost still „z faktury”.
     expect(decide({ cost: 2397, costSource: 'market' }, 2397, 0.25, 1, true).kind).toBe('same')
     expect(decide({ cost: 2000, costSource: 'invoice' }, 2397, 0.25, 1, true).kind).toBe('invoice')
+  })
+})
+
+describe('autoEnable (a found link switches itself on)', () => {
+  it('the same product with a price close to the cost', () => {
+    expect(autoEnable({ matched: true, price: 2397 }, 2219, 0.25)).toBe(true)
+  })
+
+  it('never on the model word alone: a price far from the cost, another product, no price', () => {
+    // A shop page that talked the model into „matches” with a fake low price stays off.
+    expect(autoEnable({ matched: true, price: 99 }, 2219, 0.25)).toBe(false)
+    expect(autoEnable({ matched: true, price: 3000 }, 2219, 0.25)).toBe(false)
+    expect(autoEnable({ matched: false, price: 2397 }, 2219, 0.25)).toBe(false)
+    expect(autoEnable({ matched: true, price: null }, 2219, 0.25)).toBe(false)
+    expect(autoEnable({ matched: true, price: 2397 }, 0, 0.25)).toBe(false)
   })
 })
 

@@ -7,7 +7,7 @@ import { getEnv, priceCheckConfig } from '../env'
 import { errorFields, log } from '../logger'
 import { notify } from '../notify'
 import { percent, zl } from '../pricing/format'
-import { shopOf } from '../pricing/sources'
+import { onePerShop, shopOf } from '../pricing/sources'
 import { loadBatch, loadOffer } from '../pricing/store'
 import { shopsOf } from '../../globals/PriceCheckSettings'
 import { ClaudePriceReader, FakePriceReader, type CheckedItem, type PriceReader } from './claude'
@@ -18,7 +18,7 @@ import {
   type ItemCategory,
   type OfferRow,
 } from './diff'
-import { decide, marketCost, staleCost, type CostMethod } from './market'
+import { autoEnable, decide, marketCost, staleCost, type CostMethod } from './market'
 import { numbersOf, summaryInput, unknownNumbers } from './summary'
 import { callCostUsd, estimateUsd, monthStart, overBudget, type CallUsage } from './usage'
 
@@ -30,10 +30,12 @@ import { callCostUsd, estimateUsd, monthStart, overBudget, type CallUsage } from
  * Progress, tokens and cost are written to `price-checks` as it goes.
  */
 
-const MAX_MINUTES = 15
+const MAX_MINUTES = 30
+/** No new search starts after this — the report is still written, the rest waits for the next run. */
+const SEARCH_MINUTES = 20
 const CONCURRENCY = 4
-/** At most this many searches per run (each costs money). */
-const MAX_SEARCHES = 20
+/** At most this many items searched per run (each costs money; the monthly limit still applies). */
+const MAX_SEARCHES = 100
 
 type Item = CheckItem & {
   checked: CheckedItem
@@ -126,7 +128,7 @@ export async function runPriceCheck(payload: Payload, checkId: number): Promise<
       sourceId: number | null,
       url: string,
       method: 'fetch' | 'search',
-    ) => {
+    ): Promise<OfferRow | null> => {
       guard('read')
       const result = await reader.read(item.checked, url, shops)
       spend(result.usage)
@@ -175,6 +177,7 @@ export async function runPriceCheck(payload: Payload, checkId: number): Promise<
           overrideAccess: true,
         })
       }
+      return result.note === 'ok' ? row : null
     }
 
     // (2) Read every offer page, 4 at a time.
@@ -200,13 +203,50 @@ export async function runPriceCheck(payload: Payload, checkId: number): Promise<
         !linked.pending.has(`${i.itemType}:${i.code}`),
     )
     let linksProposed = 0
-    for (const item of rotate(missing, checkId * MAX_SEARCHES).slice(0, MAX_SEARCHES)) {
-      guard('search')
+    let linksEnabled = 0
+    let searchNote: string | null = null
+    let budgetHit = false
+    let searched = 0
+    const outlierPct = settings.outlierPct ?? 0.25
+    const stopSearch = (error: unknown) => {
+      if (!(error instanceof Stop)) throw error
+      if (error.status === 'budget') budgetHit = true
+      searchNote ??= error.message
+    }
+    const queue = rotate(missing, checkId * MAX_SEARCHES).slice(0, MAX_SEARCHES)
+    await pool(queue, CONCURRENCY, async (item) => {
+      if (searchNote !== null) return
+      if (Date.now() - started > SEARCH_MINUTES * 60_000) {
+        // TODO(krystian): wording (no board).
+        searchNote = 'Część pozycji poczeka na wyszukanie do następnego sprawdzenia (limit czasu).'
+        return
+      }
+      try {
+        guard('search')
+      } catch (error) {
+        // The limit: stop searching, keep what is read — the report is still written.
+        stopSearch(error)
+        return
+      }
       const found = await reader.search(item.checked, shops)
       spend(found.usage)
-      for (const url of found.urls.filter((u) => !linked.urls.has(u)).slice(0, 2)) {
+      for (const url of onePerShop(found.urls, linked.urls, shops)) {
+        // Another worker may have saved the same page meanwhile (an option and a part).
+        if (linked.urls.has(url)) continue
         linked.urls.add(url)
-        // Proposed link: switched off until Krystian accepts it (ADR-G007 §2 pt 3).
+        let row: OfferRow | null
+        try {
+          row = await record(item, null, url, 'search')
+        } catch (error) {
+          // The limit or the time: save nothing unread — the item is searched again next run.
+          stopSearch(error)
+          linked.urls.delete(url)
+          break
+        }
+        // A link switches itself on when its reading confirmed the same product and a price close
+        // to the cost (ADR-G007, 1.11.2026 addition) — not on the model's word alone; others wait
+        // for Krystian. Prices still go through „Do zatwierdzenia”: nothing reaches the site.
+        const confirmed = row !== null && autoEnable(row, item.cost, outlierPct)
         await payload
           .create({
             collection: 'price-sources',
@@ -214,17 +254,24 @@ export async function runPriceCheck(payload: Payload, checkId: number): Promise<
               itemType: item.itemType,
               itemCode: item.code,
               url,
-              active: false,
+              active: confirmed,
               proposedByClaude: true,
+              ...(confirmed ? { lastOk: new Date().toISOString() } : {}),
             },
             depth: 0,
             overrideAccess: true,
           })
-          .then(() => linksProposed++)
+          .then(() => {
+            linksProposed++
+            if (confirmed) linksEnabled++
+          })
           .catch((error: unknown) => log.warn({ ...errorFields(error) }, 'proposed link refused'))
-        await record(item, null, url, 'search')
       }
-    }
+      searched++
+      if (searched % 3 === 0) {
+        await progress('Sklepy: wyszukiwanie', 70 + (searched / Math.max(queue.length, 1)) * 15)
+      }
+    })
 
     // (4)–(5) Market cost, decisions, recomputation in lib/pricing.
     await progress('Przeliczenie', 85)
@@ -244,7 +291,11 @@ export async function runPriceCheck(payload: Payload, checkId: number): Promise<
         offers: offerOf(item),
       }
     })
-    const diff: CheckDiff = { ...(await diffOf(payload, decided)), linksProposed }
+    const diff: CheckDiff = {
+      ...(await diffOf(payload, decided)),
+      linksProposed,
+      linksEnabled,
+    }
 
     // (6) Summary from the numbers only, checked; one retry, else none.
     await progress('Raport i alarm', 92)
@@ -278,12 +329,13 @@ export async function runPriceCheck(payload: Payload, checkId: number): Promise<
       itemsFound: diff.totals.found,
       summary,
       diff,
-      error: stopNote,
+      error: [...new Set([searchNote, stopNote].filter(Boolean))].join(' ') || null,
       ...rounded(totals),
     })
 
     // (7) Alarms.
     await alarm(payload, checkId, diff, settings)
+    if (budgetHit) await budgetAlarm(payload, checkId, searchNote ?? '')
     log.info(
       {
         checkId,
@@ -300,19 +352,22 @@ export async function runPriceCheck(payload: Payload, checkId: number): Promise<
     if (!(error instanceof Stop))
       log.error({ ...errorFields(error), checkId }, 'price check failed')
     await save({ status, finishedAt: new Date().toISOString(), error: message, ...rounded(totals) })
-    if (status === 'budget') {
-      await notify(payload, {
-        kind: 'budget',
-        push: null,
-        email: {
-          // TODO(krystian): wording of the alarm (no board).
-          subject: 'Sprawdzanie cen: przekroczony limit wydatków Claude',
-          text: `${message}\nRaport: ${getEnv().SITE_URL}/admin/raporty-cen/${checkId}`,
-        },
-      }).catch(() => undefined)
-    }
+    if (status === 'budget') await budgetAlarm(payload, checkId, message)
     return status
   }
+}
+
+/** The monthly limit stopped the run (whole or only its search): e-mail Krystian. */
+async function budgetAlarm(payload: Payload, checkId: number, message: string) {
+  await notify(payload, {
+    kind: 'budget',
+    push: null,
+    email: {
+      // TODO(krystian): wording of the alarm (no board).
+      subject: 'Sprawdzanie cen: przekroczony limit wydatków Claude',
+      text: `${message}\nRaport: ${getEnv().SITE_URL}/admin/raporty-cen/${checkId}`,
+    },
+  }).catch(() => undefined)
 }
 
 const rounded = (t: {
@@ -341,12 +396,22 @@ async function spentThisMonth(payload: Payload, exceptId: number): Promise<numbe
   return checks.docs.reduce((sum, c) => sum + (c.costUsd ?? 0), 0)
 }
 
+/**
+ * `work` on the list, `size` at a time. After the first error no worker takes another item — a
+ * failed run must not go on paying for calls in the background (review of the full search).
+ */
 async function pool<T>(list: readonly T[], size: number, work: (item: T) => Promise<void>) {
   let next = 0
+  let aborted = false
   const workers = Array.from({ length: Math.min(size, list.length) }, async () => {
-    while (next < list.length) {
+    while (!aborted && next < list.length) {
       const item = list[next++]!
-      await work(item)
+      try {
+        await work(item)
+      } catch (error) {
+        aborted = true
+        throw error
+      }
     }
   })
   await Promise.all(workers)

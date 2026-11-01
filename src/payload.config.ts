@@ -214,7 +214,7 @@ export default buildConfig({
     ],
     autoRun: [
       { cron: '* * * * *', queue: 'default', limit: 5 },
-      // P7: the price check runs up to 15 minutes — its own queue, one at a time.
+      // P7: the price check runs up to 30 minutes — its own queue, one at a time.
       { cron: '* * * * *', queue: 'long', limit: 1 },
     ],
     deleteJobOnComplete: true,

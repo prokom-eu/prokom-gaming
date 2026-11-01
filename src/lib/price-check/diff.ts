@@ -65,8 +65,10 @@ export type BuildRow = {
 export type CheckDiff = {
   items: ItemRow[]
   builds: BuildRow[]
-  /** Offer links Claude found in this run, saved switched off (missing in older reports). */
+  /** Offer links Claude found in this run (missing in older reports). */
   linksProposed?: number
+  /** Of those: switched on by themselves (the reading confirmed the product and a price). */
+  linksEnabled?: number
   totals: {
     items: number
     found: number
