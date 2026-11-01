@@ -20,7 +20,14 @@ const trusted = { overrideAccess: true, depth: 0, pagination: false } as const
 
 export type OfferData = {
   catalog: Catalog
-  builds: { id: number; slug: string; name: string; config: Config }[]
+  /** Every build, also drafts and hidden ones (panel); the site filters `offerStatus`. */
+  builds: {
+    id: number
+    slug: string
+    name: string
+    offerStatus: 'published' | 'draft' | 'hidden'
+    config: Config
+  }[]
 }
 
 /** Levels, options (active or not), pricing settings and the builds as code recipes. */
@@ -47,6 +54,7 @@ export async function loadOffer(payload: Payload): Promise<OfferData> {
       id: b.id,
       slug: b.slug,
       name: b.name,
+      offerStatus: b.offerStatus ?? 'published',
       config: {
         level: code(levelCode, b.level, 'poziom'),
         case: code(optionCode, b.case, 'obudowę'),

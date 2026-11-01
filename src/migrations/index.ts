@@ -17,6 +17,7 @@ import * as migration_20261031_193026_p3_inquiry_thread from './20261031_193026_
 import * as migration_20261031_212944_p4_mail_intake from './20261031_212944_p4_mail_intake'
 import * as migration_20261031_222946_p4_push from './20261031_222946_p4_push'
 import * as migration_20261031_235857_p6_cost_source from './20261031_235857_p6_cost_source'
+import * as migration_20261101_004700_p6_offer_status from './20261101_004700_p6_offer_status'
 
 export const migrations = [
   {
@@ -113,5 +114,10 @@ export const migrations = [
     up: migration_20261031_235857_p6_cost_source.up,
     down: migration_20261031_235857_p6_cost_source.down,
     name: '20261031_235857_p6_cost_source',
+  },
+  {
+    up: migration_20261101_004700_p6_offer_status.up,
+    down: migration_20261101_004700_p6_offer_status.down,
+    name: '20261101_004700_p6_offer_status',
   },
 ]

@@ -114,13 +114,12 @@ const ITEMS: Record<NavKey, NavItem> = {
     tone: 'gold',
     ready: true,
   },
-  // TODO(P6): `/zestawy` — until then the Payload list of builds.
   builds: {
     key: 'builds',
     label: 'Gotowe zestawy',
     short: 'Zestawy',
     icon: 'tower',
-    path: '/collections/builds',
+    path: '/zestawy',
     roles: ADMIN,
     ready: true,
   },

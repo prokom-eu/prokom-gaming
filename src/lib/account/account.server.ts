@@ -135,7 +135,10 @@ export async function loadAccount({ payload, customer }: CustomerSession): Promi
             media: { url: true, filename: true, alt: true },
           },
           depth: 2,
-          overrideAccess: false,
+          // Ids come only from the customer's own orders and units (read as the customer above),
+          // so a build hidden later still shows its name in the account (P6). Narrow `select` and
+          // `populate`: no cost or internal field.
+          overrideAccess: true,
           pagination: false,
         })
       : null,

@@ -216,6 +216,7 @@ export function mapBuild(b: SeedBuild, c: SeedCreature, refs: BuildRefs): BuildD
   return {
     slug: b.slug,
     name: b.name,
+    offerStatus: 'published',
     ...refs,
     creature: {
       key: c.id,

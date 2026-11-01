@@ -23,7 +23,7 @@ const publicLabels = async (
 
 // The cost layer reads parts with costs; an inquiry keeps only what the rules and prices need,
 // picked field by field — a cost field added later cannot slip through (ADR-G002 §8.7, review G6).
-const compatLevel = (l: CostLevel): CompatLevel => ({
+export const compatLevel = (l: CostLevel): CompatLevel => ({
   code: l.code,
   ramType: l.ramType,
   gpuLengthMm: l.gpuLengthMm,
@@ -34,9 +34,9 @@ const compatLevel = (l: CostLevel): CompatLevel => ({
   minCaseClass: l.minCaseClass,
 })
 
-type InquiryOption = CompatOption & { active: boolean }
+export type InquiryOption = CompatOption & { active: boolean }
 
-function compatOption(o: CostOption): InquiryOption {
+export function compatOption(o: CostOption): InquiryOption {
   const { code, active } = o
   switch (o.type) {
     case 'case':
@@ -81,7 +81,11 @@ export async function loadInquiryOffer(payload: Payload): Promise<Omit<Pricing, 
     offer: {
       levels: offer.catalog.levels.map(compatLevel),
       options: offer.catalog.options.map(compatOption),
-      builds: offer.builds,
+      // Drafts and hidden builds cannot be asked for (panel spec §9): `loadOffer` reads all of
+      // them for the panel, bypassing the collection's read filter.
+      builds: offer.builds
+        .filter((b) => b.offerStatus === 'published')
+        .map(({ id, slug, name, config }) => ({ id, slug, name, config })),
     },
     labels: { level, option },
   }
