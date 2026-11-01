@@ -5,6 +5,7 @@
  * the panel description of `upgrade`), `aio360Raw` and `serviceCostBreakdown` (informational).
  */
 import type { PriceRow } from '../lib/pricing/catalog'
+import { partKey } from '../lib/pricing/partKey'
 import { SERVICE_CODE } from '../lib/pricing/types'
 import type { Build, Option, PowerLevel, PricingSetting, SiteSetting } from '../payload-types'
 import pricingExpected from '../../tests/fixtures/pricing-expected.json'
@@ -146,6 +147,8 @@ export function mapOption(o: SeedOption, imageId: number | null): OptionData {
     internalModel: o.internalModel,
     ean: o.ean ?? null,
     cost: o.cost,
+    // Seed costs are the lowest shop prices of 24–25.10.2026 (ADR-G007 §1).
+    costSource: 'market',
     image: imageId,
     description: o.description ?? null,
     gpuMaxMm: o.gpuMaxMm ?? null,
@@ -187,6 +190,8 @@ export function mapPowerLevel(p: SeedPowerLevel): PowerLevelData {
       internalModel: c.internalModel,
       ean: c.ean ?? null,
       cost: c.cost,
+      costSource: 'market' as const,
+      partKey: partKey(c.role, c.internalModel),
     })),
     upgrade: {
       freeRamSlots: p.upgrade.freeRamSlots,

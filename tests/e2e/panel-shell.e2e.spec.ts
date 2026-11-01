@@ -35,14 +35,12 @@ test.describe('signed in as admin', () => {
     }
   })
 
-  test('the prices screen sits in the panel frame, "Do zatwierdzenia" highlighted', async ({
+  test('the approval screen sits in the panel frame, "Do zatwierdzenia" highlighted', async ({
     page,
     isMobile,
   }) => {
-    await page.goto('/admin/ceny')
-    await expect(
-      page.getByRole('heading', { level: 1, name: 'Ceny — publikacja i marże' }),
-    ).toBeVisible()
+    await page.goto('/admin/ceny/zatwierdzanie')
+    await expect(page.getByRole('heading', { level: 1, name: 'Do zatwierdzenia' })).toBeVisible()
     const current = isMobile
       ? tabbar(page).getByRole('link', { name: /Zatwierdź/ })
       : page
@@ -69,6 +67,10 @@ test.describe('signed in as admin', () => {
     await page.goto('/admin/collections/builds')
     const prices = page.getByRole('navigation', { name: 'Panel: Ceny' })
     await expect(prices.getByRole('link', { name: /Do zatwierdzenia/ })).toHaveAttribute(
+      'href',
+      '/admin/ceny/zatwierdzanie',
+    )
+    await expect(prices.getByRole('link', { name: /Centrum cen/ })).toHaveAttribute(
       'href',
       '/admin/ceny',
     )
@@ -124,7 +126,12 @@ test.describe('phone (414)', () => {
   for (const width of [360, 414]) {
     test(`no sideways scrolling at ${width} px`, async ({ page }) => {
       await page.setViewportSize({ width, height: 800 })
-      for (const path of ['/admin/ceny', '/admin/dane', '/admin/ustawienia']) {
+      for (const path of [
+        '/admin/ceny',
+        '/admin/ceny/zatwierdzanie',
+        '/admin/dane',
+        '/admin/ustawienia',
+      ]) {
         await page.goto(path)
         await expect(page.locator('[data-panel]')).toBeVisible()
         const overflow = await page.evaluate(

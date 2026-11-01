@@ -11,7 +11,14 @@ import { describe, expect, it } from 'vitest'
 const here = path.dirname(fileURLToPath(import.meta.url))
 const src = path.resolve(here, '../..')
 
-const SERVER_ONLY_MODULES = ['catalog.ts', 'cost.ts', 'csv.ts', 'publish.ts', 'store.ts']
+const SERVER_ONLY_MODULES = [
+  'catalog.ts',
+  'cost.ts',
+  'csv.ts',
+  'preview.ts',
+  'publish.ts',
+  'store.ts',
+]
 
 function sourceFiles(dir: string): string[] {
   return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
@@ -29,7 +36,7 @@ describe('cost layer stays on the server', () => {
 
   it('no "use client" module imports the cost layer (types only are fine — they vanish)', () => {
     const valueImport =
-      /^import (?!type\b)[^\n]*from ['"][^'"]*pricing\/(cost|catalog|csv|publish|store)['"]/m
+      /^import (?!type\b)[^\n]*from ['"][^'"]*pricing\/(cost|catalog|csv|preview|publish|store)['"]/m
     const offenders = sourceFiles(src).filter((file) => {
       const code = readFileSync(file, 'utf8')
       const isClient = /^\s*['"]use client['"]/.test(code)

@@ -91,6 +91,7 @@ export interface Config {
     'inquiry-messages': InquiryMessage;
     'mail-intake-unmatched': MailIntakeUnmatched;
     'push-subscriptions': PushSubscription;
+    'price-sources': PriceSource;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
     'payload-locked-documents': PayloadLockedDocument;
@@ -122,6 +123,7 @@ export interface Config {
     'inquiry-messages': InquiryMessagesSelect<false> | InquiryMessagesSelect<true>;
     'mail-intake-unmatched': MailIntakeUnmatchedSelect<false> | MailIntakeUnmatchedSelect<true>;
     'push-subscriptions': PushSubscriptionsSelect<false> | PushSubscriptionsSelect<true>;
+    'price-sources': PriceSourcesSelect<false> | PriceSourcesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -268,6 +270,9 @@ export interface Option {
   internalModel: string;
   ean?: string | null;
   cost: number;
+  costSource: 'market' | 'invoice';
+  costNote?: string | null;
+  costUpdatedAt?: string | null;
   image?: (number | null) | Media;
   description?: string | null;
   gpuMaxMm?: number | null;
@@ -310,6 +315,13 @@ export interface PowerLevel {
         internalModel: string;
         ean?: string | null;
         cost: number;
+        costSource: 'market' | 'invoice';
+        costNote?: string | null;
+        costUpdatedAt?: string | null;
+        /**
+         * Ten sam model w kilku poziomach = ten sam klucz (uzupełnia się sam).
+         */
+        partKey?: string | null;
         id?: string | null;
       }[]
     | null;
@@ -401,7 +413,7 @@ export interface Build {
   createdAt: string;
 }
 /**
- * Ceny publikuje ekran „Ceny — publikacja i marże” (/admin/ceny, na końcu menu) po sprawdzeniu marży. Ręcznej edycji nie ma.
+ * Ceny publikuje ekran „Do zatwierdzenia” (/admin/ceny/zatwierdzanie) po sprawdzeniu marży. Ręcznej edycji nie ma.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "published-prices".
@@ -1015,6 +1027,24 @@ export interface PushSubscription {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "price-sources".
+ */
+export interface PriceSource {
+  id: number;
+  itemType: 'option' | 'component';
+  itemCode: string;
+  componentRole?: ('cpu' | 'gpu' | 'mobo' | 'psu') | null;
+  url: string;
+  shop?: string | null;
+  active?: boolean | null;
+  proposedByClaude?: boolean | null;
+  lastOk?: string | null;
+  lastError?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -1229,6 +1259,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'push-subscriptions';
         value: number | PushSubscription;
+      } | null)
+    | ({
+        relationTo: 'price-sources';
+        value: number | PriceSource;
       } | null);
   globalSlug?: string | null;
   user:
@@ -1336,6 +1370,9 @@ export interface OptionsSelect<T extends boolean = true> {
   internalModel?: T;
   ean?: T;
   cost?: T;
+  costSource?: T;
+  costNote?: T;
+  costUpdatedAt?: T;
   image?: T;
   description?: T;
   gpuMaxMm?: T;
@@ -1378,6 +1415,10 @@ export interface PowerLevelsSelect<T extends boolean = true> {
         internalModel?: T;
         ean?: T;
         cost?: T;
+        costSource?: T;
+        costNote?: T;
+        costUpdatedAt?: T;
+        partKey?: T;
         id?: T;
       };
   upgrade?:
@@ -1911,6 +1952,23 @@ export interface PushSubscriptionsSelect<T extends boolean = true> {
   lastOkAt?: T;
   failCount?: T;
   disabledAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "price-sources_select".
+ */
+export interface PriceSourcesSelect<T extends boolean = true> {
+  itemType?: T;
+  itemCode?: T;
+  componentRole?: T;
+  url?: T;
+  shop?: T;
+  active?: T;
+  proposedByClaude?: T;
+  lastOk?: T;
+  lastError?: T;
   updatedAt?: T;
   createdAt?: T;
 }

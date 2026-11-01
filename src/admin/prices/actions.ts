@@ -7,6 +7,7 @@ import { queueMarginAlarm } from '../../jobs/queue'
 import { errorFields, log } from '../../lib/logger'
 import { CatalogError } from '../../lib/pricing/catalog'
 import { previewCostImport, type ImportPreview } from '../../lib/pricing/csv'
+import { configLabel, previewPublication, type ClientView } from '../../lib/pricing/preview'
 import { planPublication, problemMessage } from '../../lib/pricing/publish'
 import {
   applyCostImport,
@@ -72,6 +73,57 @@ export async function publishPrices(raw: unknown): Promise<PublishResult> {
       ok: false,
       messages: ['Publikacja nie powiodła się — nic nie zmieniono. Szczegóły w logach.'],
     }
+  }
+}
+
+export type SelectionPreview =
+  | {
+      ok: true
+      canPublish: boolean
+      messages: string[]
+      count: number
+      compatible: number | null
+      lowest: { margin: number; config: string } | null
+      client: ClientView
+    }
+  | { ok: false; messages: string[] }
+
+/**
+ * The live guard of „Do zatwierdzenia” (panel spec §8): the same check as publishing, for the
+ * items ticked right now. Nothing is written.
+ */
+export async function previewSelection(raw: unknown): Promise<SelectionPreview> {
+  const session = await panelSession()
+  if (!session) return { ok: false, messages: [NO_ACCESS] }
+  const parsed = input.safeParse(raw)
+  if (!parsed.success) return { ok: false, messages: ['Nieprawidłowe dane z formularza.'] }
+  try {
+    const [offer, current] = await Promise.all([
+      loadOffer(session.payload),
+      loadBatch(session.payload),
+    ])
+    if (!current) return { ok: false, messages: ['Brak opublikowanych cen — uruchom seed.'] }
+    const preview = previewPublication(
+      offer.catalog,
+      current.snapshot,
+      offer.builds,
+      parsed.data.keys,
+    )
+    return {
+      ok: true,
+      canPublish: preview.ok,
+      messages: preview.messages,
+      count: preview.count,
+      compatible: preview.compatible,
+      lowest: preview.lowest
+        ? { margin: preview.lowest.margin, config: configLabel(preview.lowest.config) }
+        : null,
+      client: preview.client,
+    }
+  } catch (error) {
+    if (error instanceof CatalogError) return { ok: false, messages: [error.message] }
+    log.error({ ...errorFields(error) }, 'publication preview failed')
+    return { ok: false, messages: ['Nie udało się sprawdzić marży. Szczegóły w logach.'] }
   }
 }
 

@@ -16,6 +16,7 @@ import * as migration_20261031_180205_p1_warn_margin from './20261031_180205_p1_
 import * as migration_20261031_193026_p3_inquiry_thread from './20261031_193026_p3_inquiry_thread'
 import * as migration_20261031_212944_p4_mail_intake from './20261031_212944_p4_mail_intake'
 import * as migration_20261031_222946_p4_push from './20261031_222946_p4_push'
+import * as migration_20261031_235857_p6_cost_source from './20261031_235857_p6_cost_source'
 
 export const migrations = [
   {
@@ -107,5 +108,10 @@ export const migrations = [
     up: migration_20261031_222946_p4_push.up,
     down: migration_20261031_222946_p4_push.down,
     name: '20261031_222946_p4_push',
+  },
+  {
+    up: migration_20261031_235857_p6_cost_source.up,
+    down: migration_20261031_235857_p6_cost_source.down,
+    name: '20261031_235857_p6_cost_source',
   },
 ]

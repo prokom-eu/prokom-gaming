@@ -13,7 +13,7 @@ const snapshot = snapshotFromRows(
   firstBatch().map((row) => ({ ...row, batch: 1, publishedAt: firstBatchPublishedAt() })),
 )
 const builds = expected.builds.map((b) => ({ slug: b.slug, name: b.name, config: b.config }))
-const SCREEN = '/admin/ceny'
+const SCREEN = '/admin/ceny/zatwierdzanie'
 
 function mailFor(c: Catalog) {
   const queue = buildQueue(c, snapshot)
@@ -41,6 +41,6 @@ describe('margin alarm mail (ADR-G002 §4.4)', () => {
     expect(mail.text).toMatch(/Zatwierdź nową cenę poziomu P13 \([\d\s ]+ zł\)/)
     expect(mail.text).toMatch(/- Wampir: 14\s540 zł \/ [\d\s ]+ zł \/ \d+,\d{2}%/)
     expect(mail.text).not.toContain('Skrzat')
-    expect(mail.text).toContain('„Ceny — publikacja i marże” (/admin/ceny)')
+    expect(mail.text).toContain('„Do zatwierdzenia” (/admin/ceny/zatwierdzanie)')
   })
 })

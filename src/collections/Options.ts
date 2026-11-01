@@ -7,6 +7,7 @@ import { GROUP_OFFER, RAM_TYPES, requiredFor, requiredWhen } from './shared'
 import type { Option } from '../payload-types'
 import { queueAlarmOnCostChange } from './marginAlarmHook'
 import { blockDeactivateWhenUsed, blockDeleteWhenUsed } from './usage'
+import { COST_LABEL, COST_SOURCES, stampOptionCost } from './costStamp'
 
 const forTypes =
   (...types: string[]): Condition =>
@@ -44,7 +45,7 @@ export const Options: CollectionConfig = {
   access: { read: readActive, create: adminOnly, update: adminOnly, delete: adminOnly },
   hooks: {
     afterChange: [queueAlarmOnCostChange<Option>((o) => String(o.cost))],
-    beforeChange: [blockDeactivateWhenUsed],
+    beforeChange: [blockDeactivateWhenUsed, stampOptionCost],
     beforeDelete: [
       blockDeleteWhenUsed(
         ['case', 'cooler', 'ram', 'ssd'],
@@ -92,10 +93,32 @@ export const Options: CollectionConfig = {
         { name: 'ean', label: 'EAN (tylko panel)', type: 'text', ...adminField },
         {
           name: 'cost',
-          label: 'Koszt zł (tylko panel)',
+          label: COST_LABEL,
           type: 'number',
           required: true,
           min: 0,
+          ...adminField,
+        },
+      ],
+    },
+    {
+      type: 'row',
+      fields: [
+        {
+          name: 'costSource',
+          label: 'Źródło kosztu',
+          type: 'select',
+          required: true,
+          defaultValue: 'market',
+          options: [...COST_SOURCES],
+          ...adminField,
+        },
+        { name: 'costNote', label: 'Uwaga (np. nr faktury)', type: 'text', ...adminField },
+        {
+          name: 'costUpdatedAt',
+          label: 'Koszt zmieniony',
+          type: 'date',
+          admin: { readOnly: true },
           ...adminField,
         },
       ],

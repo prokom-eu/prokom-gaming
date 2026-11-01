@@ -25,7 +25,7 @@ describe('panel navigation', () => {
 
   it('hides screens whose session has not been built yet instead of linking to nothing', () => {
     const shown = [...navGroups('admin').flatMap((g) => g.items), ...navMore('admin')]
-    for (const hidden of ['clients', 'pricesCentre', 'reports', 'options', 'stats']) {
+    for (const hidden of ['clients', 'reports', 'options', 'stats']) {
       expect(keys(shown)).not.toContain(hidden)
     }
   })
@@ -44,7 +44,9 @@ describe('panel navigation', () => {
     expect(navMore('serwis').map((i) => i.key)).not.toContain('settings')
   })
 
-  it('points "Zatwierdź" at the G4 prices screen until P6', () => {
-    expect(navTabs('admin').find((i) => i.key === 'approve')?.path).toBe('/ceny')
+  it('points "Zatwierdź" at its own screen and shows the prices centre (P6)', () => {
+    expect(navTabs('admin').find((i) => i.key === 'approve')?.path).toBe('/ceny/zatwierdzanie')
+    const shown = [...navGroups('admin').flatMap((g) => g.items), ...navMore('admin')]
+    expect(shown.find((i) => i.key === 'pricesCentre')?.path).toBe('/ceny')
   })
 })

@@ -38,7 +38,18 @@ export async function panelInternalModels(playwright: Playwright, baseURL: strin
 /** The page HTML (with its RSC data) has no internal model and no panel-only key. */
 export function expectNoHiddenOffer(html: string, internalModels: readonly string[]) {
   for (const model of internalModels) expect(html, model).not.toContain(model)
-  for (const key of ['cost', 'costAtPublish', 'internalModel', 'markupClass', 'internalRef']) {
+  for (const key of [
+    'cost',
+    'costAtPublish',
+    'internalModel',
+    'markupClass',
+    'internalRef',
+    // P6: cost source and part key (a slug of the internal model).
+    'costSource',
+    'costNote',
+    'costUpdatedAt',
+    'partKey',
+  ]) {
     expect(html, key).not.toContain(`"${key}"`)
   }
 }

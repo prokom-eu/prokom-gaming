@@ -98,7 +98,9 @@ test.afterAll(async () => {
 test('a bad row blocks saving; the preview shows what would change', async ({ page }) => {
   await logIn(page)
   await importCsv(page, `kod;koszt\n${r16.code};${r16.cost + 1}\nNIE-MA-TAKIEGO;100\n${r16.code};5`)
-  const live = page.locator('section[aria-labelledby="import"] [aria-live="polite"]')
+  const live = page
+    .getByRole('region', { name: 'Import kosztów (CSV)' })
+    .locator('[aria-live="polite"]')
   await expect(live).toContainText('1 zmian, 0 bez zmian, 2 błędnych wierszy.')
   await expect(live).toContainText(
     'Wiersz 3 („NIE-MA-TAKIEGO”): Nie znam tego kodu, EAN ani modelu części.',
@@ -127,7 +129,8 @@ test('a cost that breaks the margin sends the alarm; prices on the site stay', a
   await expect(
     page.getByText('Pilne: opublikowane ceny przy dzisiejszych kosztach łamią marżę.'),
   ).toBeVisible()
-  await expect(page.getByRole('checkbox', { name: /Poziom mocy P13/ })).toBeChecked()
+  await page.goto('/admin/ceny/zatwierdzanie')
+  await expect(page.getByRole('checkbox', { name: /Publikuj: P13 ·/ })).toBeChecked()
 
   // The alarm mail in Mailpit, sent right after the import.
   await expect
@@ -186,7 +189,7 @@ test('the Pulpit raises the broken margin: urgent to-do, alarm on top of the pho
     await expect(alarm).toContainText(/Najsłabsza konfiguracja: \d+(,\d)?%\./)
     await expect(
       alarm.getByRole('link', { name: /^Zatwierdź \d+ (cenę|ceny|cen)$/ }),
-    ).toHaveAttribute('href', '/admin/ceny')
+    ).toHaveAttribute('href', '/admin/ceny/zatwierdzanie')
   } finally {
     await panel.patch(`/api/power-levels/${p13.id}`, {
       headers,
@@ -221,7 +224,9 @@ test('autoPublish cannot be switched on and an import never publishes by itself'
   await save(page, /Zapisano koszty: 1 opcji, 0 poziomów mocy/)
   expect((await newestBatch(request))[0]!.batch).toBe(before[0]!.batch)
   // The new price waits in the queue for approval instead.
-  await expect(page.locator('section[aria-labelledby="queue"]')).toContainText('R16')
+  await page.goto('/admin/ceny/zatwierdzanie')
+  await expect(page.getByRole('checkbox', { name: /Publikuj: 16 GB DDR5 6000/ })).toBeVisible()
+  await page.goto('/admin/ceny')
 
   await importCsv(page, `R16;${r16.cost}`)
   await save(page, /Zapisano koszty: 1 opcji/)

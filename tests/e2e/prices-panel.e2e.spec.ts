@@ -2,11 +2,13 @@ import AxeBuilder from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
 import type { APIRequestContext, Page } from '@playwright/test'
 
+import { ADMIN_STATE, adminHeaders } from './helpers/adminSession'
+
 /**
- * Prices screen in the panel (/admin/ceny, ADR-G002 §4): only staff see it, the queue shows what
- * changed, the margin guard blocks a publication under 11% and an approved one becomes the newest
- * batch. The publishing test changes costs and publishes twice — there and back — so the local
- * database ends with the seed prices again.
+ * Prices in the panel (P6, panel spec §8, boards Ceny and Publikacja, stany/tel-05): Centrum cen
+ * at /admin/ceny and „Do zatwierdzenia” at /admin/ceny/zatwierdzanie. Admin only; the live guard
+ * blocks a selection under 11% and an approved one becomes the newest batch. The publishing test
+ * changes costs and publishes twice — there and back — so the database ends with the seed prices.
  */
 
 type Doc = Record<string, unknown> & { id: number }
@@ -14,27 +16,7 @@ type List<T = Doc> = { docs: T[] }
 type Level = Doc & { code: string; components: { role: string; cost: number }[] }
 type Price = { itemType: string; itemCode: string; sellPrice: number; batch: number }
 
-function credentials() {
-  const email = process.env.SEED_ADMIN_EMAIL
-  const password = process.env.SEED_ADMIN_PASSWORD
-  if (!email || !password) throw new Error('SEED_ADMIN_EMAIL / SEED_ADMIN_PASSWORD are not set.')
-  return { email, password }
-}
-
-async function logIn(page: Page): Promise<void> {
-  const { email, password } = credentials()
-  await page.goto('/admin/login')
-  await page.locator('#field-email').fill(email)
-  await page.locator('#field-password').fill(password)
-  await page.locator('button[type="submit"]').click()
-  await expect(page).toHaveURL(/\/admin\/?$/)
-}
-
-async function adminHeaders(request: APIRequestContext) {
-  const response = await request.post('/api/users/login', { data: credentials() })
-  expect(response.status()).toBe(200)
-  return { Authorization: `JWT ${((await response.json()) as { token: string }).token}` }
-}
+const AXE_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']
 
 /** Newest batch from the public API, as the site sees it. */
 async function newestBatch(request: APIRequestContext): Promise<Price[]> {
@@ -51,42 +33,88 @@ async function newestBatch(request: APIRequestContext): Promise<Price[]> {
 const price = (rows: Price[], type: string, code: string) =>
   rows.find((r) => r.itemType === type && r.itemCode === code)?.sellPrice
 
+async function noSidewaysScroll(page: Page) {
+  const overflow = await page.evaluate(
+    () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+  )
+  expect(overflow).toBeLessThanOrEqual(0)
+}
+
 test('anonymous visitor sees no prices, only a way to log in', async ({ page }) => {
-  await page.goto('/admin/ceny')
-  await expect(page.getByText('Ten ekran jest tylko dla pracowników PRO-KOM.')).toBeVisible()
-  await expect(page.getByRole('link', { name: 'Zaloguj się do panelu' })).toBeVisible()
-  await expect(page.locator('body')).not.toContainText('zł')
+  for (const path of ['/admin/ceny', '/admin/ceny/zatwierdzanie']) {
+    await page.goto(path)
+    await expect(page.getByText('Ten ekran jest tylko dla pracowników PRO-KOM.')).toBeVisible()
+    await expect(page.getByRole('link', { name: 'Zaloguj się do panelu' })).toBeVisible()
+    await expect(page.locator('body')).not.toContainText('zł')
+  }
 })
 
-test('staff see the guard, the empty queue and 16 builds', async ({ page }) => {
-  await logIn(page)
-  await page.goto('/admin/ceny')
-  await expect(page.getByRole('heading', { name: 'Ceny — publikacja i marże' })).toBeVisible()
-  await expect(page.getByText(/Wszystkie [\d\s ]+ zgodnych konfiguracji ma marżę/)).toBeVisible()
-  await expect(page.getByText('Brak pozycji do zatwierdzenia.')).toBeVisible()
-  const builds = page.locator('section[aria-labelledby="builds"] tbody tr')
-  await expect(builds).toHaveCount(16)
-  await expect(builds.filter({ hasText: 'Wampir' })).toContainText('14 540 zł')
-  // P1: the screen is "Do zatwierdzenia" (phone tab "Zatwierdź") in the panel navigation until P6.
-  await expect(
-    page.getByRole('link', { name: /^(Do zatwierdzenia|Zatwierdź)/ }).first(),
-  ).toHaveAttribute('href', '/admin/ceny')
+test.describe('signed in as admin', () => {
+  test.use({ storageState: ADMIN_STATE })
 
-  const { violations } = await new AxeBuilder({ page })
-    .include('[data-prices-screen]')
-    .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
-    .analyze()
-  expect(violations).toEqual([])
+  test('Centrum cen: tiles, „Co jeśli?”, positions with filters', async ({ page, isMobile }) => {
+    await page.goto('/admin/ceny')
+    await expect(page.getByRole('heading', { level: 1, name: 'Centrum cen' })).toBeVisible()
+    for (const label of ['Pozycje w cenniku', 'Niedostępne', 'Ostatnie sprawdzenie']) {
+      await expect(page.getByText(label, { exact: true })).toBeVisible()
+    }
+    await expect(page.getByText(/^Zmienione od \d\d\.\d\d$/)).toBeVisible()
+    await expect(page.getByText('16 poziomów (64 części), 57 opcji, usługa')).toBeVisible()
+
+    // „Co jeśli?”: RAM +25% lowers the average margin of the builds; „Wyzeruj” brings it back.
+    const whatIf = page.getByRole('region', { name: 'Co jeśli?' })
+    const average = whatIf.locator('dd').first()
+    const before = await average.textContent()
+    await whatIf.getByLabel('RAM').fill('0.25')
+    await expect(average).not.toHaveText(before!)
+    await whatIf.getByRole('button', { name: 'Wyzeruj' }).click()
+    await expect(average).toHaveText(before!)
+
+    // Positions: every sold item, by category.
+    const positions = page.getByRole('region', { name: 'Pozycje' })
+    await positions.getByRole('button', { name: /^Wszystkie/ }).click()
+    const rows = positions.locator('tbody tr')
+    await expect(rows).toHaveCount(74)
+    await positions.getByRole('radio', { name: /^RAM/ }).click()
+    await expect(rows).toHaveCount(7)
+    await expect(rows.first()).toContainText(/\d zł/)
+
+    await expect(page.getByRole('link', { name: /Do zatwierdzenia · \d+/ })).toHaveAttribute(
+      'href',
+      '/admin/ceny/zatwierdzanie',
+    )
+    if (isMobile) await noSidewaysScroll(page)
+
+    const { violations } = await new AxeBuilder({ page })
+      .include('[data-prices-screen]')
+      .withTags(AXE_TAGS)
+      .analyze()
+    expect(violations).toEqual([])
+  })
+
+  test('Do zatwierdzenia with nothing queued: the empty state, axe', async ({ page, isMobile }) => {
+    await page.goto('/admin/ceny/zatwierdzanie')
+    await expect(page.getByRole('heading', { level: 1, name: 'Do zatwierdzenia' })).toBeVisible()
+    await expect(page.getByText('Nic nie czeka na zatwierdzenie')).toBeVisible()
+    if (isMobile) await noSidewaysScroll(page)
+    const { violations } = await new AxeBuilder({ page })
+      .include('[data-prices-screen]')
+      .withTags(AXE_TAGS)
+      .analyze()
+    expect(violations).toEqual([])
+  })
 })
 
 test.describe('publication', () => {
-  // Writes to the database: once, in the desktop project.
-  test.skip(({ isMobile }) => isMobile, 'publishes in the desktop project only')
+  // Writes to the database: once per project, run serially (db-writers). The phone project
+  // checks the cards and the action under the thumb on the same flow.
+  test.use({ storageState: ADMIN_STATE })
 
-  // Panel account in its own context: its login cookie must never reach the `request` fixture,
-  // which checks the public API anonymously.
+  // `storageState` signs in the `request` fixture too, so the public API is checked from an
+  // anonymous context of its own; the panel token lives in another one.
   let panel: APIRequestContext
-  let headers: { Authorization: string }
+  let anon: APIRequestContext
+  let headers: Record<string, string>
   let original: { p01: Level; r32: Doc & { cost: number } }
 
   async function setCosts(p01Delta: number, r32Delta: number) {
@@ -106,20 +134,17 @@ test.describe('publication', () => {
     expect(option.status()).toBe(200)
   }
 
-  async function publishAll(page: Page) {
-    await page.goto('/admin/ceny')
-    for (const box of await page.locator('table input[type="checkbox"]:not([disabled])').all()) {
-      await box.check()
-    }
-    await page.getByRole('button', { name: 'Sprawdź marżę i opublikuj' }).click()
-    await expect(page.getByText(/Opublikowano partię \d+/)).toBeVisible()
-    // Wait for the refreshed screen: everything published, and no stream cut by closing the page.
-    await expect(page.getByText('Brak pozycji do zatwierdzenia.')).toBeVisible()
-  }
+  const guard = (page: Page) => page.getByRole('region', { name: 'Strażnik marży' })
+  const publishButton = (page: Page, isMobile: boolean) =>
+    (isMobile ? page.getByRole('region', { name: 'Akcja ekranu' }) : guard(page)).getByRole(
+      'button',
+      { name: /^Opublikuj \d+/ },
+    )
 
   test.beforeAll(async ({ playwright, baseURL }) => {
     panel = await playwright.request.newContext({ baseURL })
-    headers = await adminHeaders(panel)
+    anon = await playwright.request.newContext({ baseURL, storageState: undefined })
+    headers = adminHeaders()
     const levels = (await (
       await panel.get('/api/power-levels?where[code][equals]=P01&depth=0', { headers })
     ).json()) as List<Level>
@@ -133,49 +158,58 @@ test.describe('publication', () => {
     // Back to the seed costs and prices, whatever happened above.
     await setCosts(0, 0)
     await panel.dispose()
-    const page = await browser.newPage()
-    await logIn(page)
-    await page.goto('/admin/ceny')
-    if (await page.getByText('Brak pozycji do zatwierdzenia.').isHidden()) await publishAll(page)
+    await anon.dispose()
+    const page = await browser.newPage({
+      storageState: ADMIN_STATE,
+      viewport: { width: 1440, height: 900 },
+    })
+    await page.goto('/admin/ceny/zatwierdzanie')
+    if (await page.getByText('Nic nie czeka na zatwierdzenie').isHidden()) {
+      await expect(guard(page).getByText('można publikować', { exact: true })).toBeVisible()
+      await publishButton(page, false).click()
+      await expect(page.getByText('Nic nie czeka na zatwierdzenie')).toBeVisible()
+    }
     await page.close()
   })
 
-  test('the guard blocks a publication under the minimum margin, approval passes', async ({
+  test('the live guard blocks a selection under the minimum margin, approval passes', async ({
     page,
-    request,
+    isMobile,
   }) => {
-    const before = await newestBatch(request)
+    const before = await newestBatch(anon)
     const p01Cost = original.p01.components.reduce((sum, c) => sum + c.cost, 0)
     // P01 parts +12% (the old price now breaks 11%) and RAM 32 GB +300 zł (above the 3% threshold).
     await setCosts(Math.round(p01Cost * 0.12), 300)
 
-    await logIn(page)
     await page.goto('/admin/ceny')
     await expect(
       page.getByText('Pilne: opublikowane ceny przy dzisiejszych kosztach łamią marżę.'),
     ).toBeVisible()
-    const p01 = page.getByRole('checkbox', { name: /Poziom mocy P01/ })
-    const r32 = page.getByRole('checkbox', { name: /Opcja R32/ })
-    // Both urgent, so both start ticked: RAM's 15% markup is so close to the floor that a cost
-    // rise worth more than the 3% threshold always breaks its own margin at the old price.
+
+    await page.goto('/admin/ceny/zatwierdzanie')
+    const p01 = page.getByRole('checkbox', { name: /Publikuj: P01 ·/ })
+    const r32 = page.getByRole('checkbox', { name: /Publikuj: 32 GB DDR5 6000 CL30/ })
     await expect(p01).toBeChecked()
     await expect(r32).toBeChecked()
+    await expect(guard(page).getByText('można publikować', { exact: true })).toBeVisible()
 
-    // Only the RAM: P01 keeps its old price and stays under the floor → blocked.
+    // Only the RAM: P01 keeps its old price and stays under the floor → blocked, nothing written.
     await p01.uncheck()
-    await page.getByRole('button', { name: 'Sprawdź marżę i opublikuj' }).click()
-    const blocked = page.locator('section[aria-labelledby="queue"] [aria-live="polite"]')
-    await expect(blocked).toContainText('Publikacja zablokowana — na stronie nic się nie zmieniło.')
-    await expect(blocked).toContainText('Poziom P01')
-    await expect(blocked).toContainText(/Zatwierdź nową cenę poziomu P01 \([\d\s ]+ zł\)/)
-    expect((await newestBatch(request))[0]!.batch).toBe(before[0]!.batch)
+    await expect(guard(page).getByText('publikacja zablokowana', { exact: true })).toBeVisible()
+    await expect(guard(page)).toContainText(/Zatwierdź nową cenę poziomu P01 \([\d\s ]+ zł\)/)
+    await expect(publishButton(page, isMobile)).toBeDisabled()
+    // The action under the thumb shows the guard's number (spec §2a pt 6).
+    const lowest = await guard(page).locator('dd').first().textContent()
+    await expect(page.locator('.pn-mact__v b')).toHaveText(lowest!)
+    expect((await newestBatch(anon))[0]!.batch).toBe(before[0]!.batch)
 
-    // With the level approved too, the guard passes and the site gets a new batch.
+    // With the level ticked again the guard passes and the site gets a new batch.
     await p01.check()
-    await page.getByRole('button', { name: 'Sprawdź marżę i opublikuj' }).click()
+    await expect(guard(page).getByText('można publikować', { exact: true })).toBeVisible()
+    await publishButton(page, isMobile).click()
     await expect(page.getByText(`Opublikowano partię ${before[0]!.batch + 1}`)).toBeVisible()
 
-    const after = await newestBatch(request)
+    const after = await newestBatch(anon)
     expect(after).toHaveLength(90)
     expect(after[0]!.batch).toBe(before[0]!.batch + 1)
     expect(price(after, 'level', 'P01')).toBeGreaterThan(price(before, 'level', 'P01')!)

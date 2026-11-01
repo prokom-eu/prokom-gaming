@@ -22,11 +22,10 @@ const MATCHED_BY: Record<ImportPreview['changes'][number]['matchedBy'], string> 
 }
 
 const CHECK_MESSAGE: Record<MarginCheck, string> = {
-  done: 'Marża sprawdzona — jeśli ceny na stronie ją łamią, poszedł alarm mailem. Sprawdź kolejkę niżej.',
+  done: 'Marża sprawdzona — jeśli ceny na stronie ją łamią, poszedł alarm mailem. Sprawdź „Do zatwierdzenia”.',
   pending:
     'Sprawdzenie marży jest w toku (alarm wyśle się sam, jeśli trzeba) — za chwilę odśwież stronę.',
-  failed:
-    'Sprawdzenie marży nie powiodło się (szczegóły w logach) — sprawdź strażnika i kolejkę niżej.',
+  failed: 'Sprawdzenie marży nie powiodło się (szczegóły w logach) — sprawdź „Do zatwierdzenia”.',
 }
 
 const ROLE: Record<string, string> = {
@@ -105,7 +104,7 @@ export function CostImport() {
           {pending ? 'Zapisuję…' : 'Zapisz koszty'}
         </Button>
         <span className={styles.hint}>
-          Zapis zmienia koszty, nie ceny — nowe ceny trafią do kolejki niżej.
+          Zapis zmienia koszty, nie ceny — nowe ceny trafią do „Do zatwierdzenia”.
         </span>
       </div>
 
