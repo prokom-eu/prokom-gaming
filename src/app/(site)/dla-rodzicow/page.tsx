@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 
+import { BreadcrumbJsonLd } from '@/components/BreadcrumbJsonLd'
 import { IconPhone } from '@/components/icons'
 import { ButtonLink } from '@/components/ui/Button'
 import { routes } from '@/lib/nav'
@@ -11,6 +12,7 @@ export const metadata: Metadata = {
   title: 'Komputer dla dziecka',
   description:
     'Komputer do gier dla dziecka bez stresu i bez żargonu: wystarczy powiedzieć, w co dziecko gra. Płacisz po ofercie, przelewem albo BLIK-iem.',
+  alternates: { canonical: routes.parents },
 }
 
 const STEPS = [
@@ -85,6 +87,7 @@ const QUESTIONS = [
 export default function ParentsPage() {
   return (
     <>
+      <BreadcrumbJsonLd crumbs={[{ name: 'Dla rodziców', path: routes.parents }]} />
       {/* Light top section: the header floats over it with dark text (globals.css). */}
       <header className="ct-par-hero" data-scene-top data-nav-light>
         <div className="wrap ct-par-hero__grid">
@@ -126,8 +129,7 @@ export default function ParentsPage() {
               <li>
                 <Check />
                 <span>
-                  <b>Sklepy stacjonarne.</b> Rabka-Zdrój, ul. Orkana 16B, i Zakopane, ul. Staszica
-                  8.
+                  <b>Sklep stacjonarny.</b> Rabka-Zdrój, ul. Orkana 16B.
                 </span>
               </li>
               <li>

@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 
 import { IconArrow, IconClose } from '@/components/icons'
 import { Button, ButtonLink } from '@/components/ui/Button'
+import { track } from '@/lib/analytics'
 import {
   buildMatch,
   configInquiryHref,
@@ -62,7 +63,11 @@ export function Configurator({ data, initial, initialChanges, fromAddress, siteU
   const headingRef = useRef<HTMLHeadingElement>(null)
   const stepChanged = useRef(false)
   const restoring = useRef(false)
+  const doneTracked = useRef(false)
   const ctx = useMemo(() => ({ offer: data, builds: data.builds, prices: data.prices }), [data])
+
+  // Statistics (ADR-G009): one start per visit of the page.
+  useEffect(() => track('configurator_start'), [])
 
   // No configuration in the address: open the last one from this browser. Through the address, so
   // the server renders it like any shared link (and checks it the same way).
@@ -102,6 +107,12 @@ export function Configurator({ data, initial, initialChanges, fromAddress, siteU
     stepChanged.current = true
     setNotice(null)
     setState((s) => ({ ...s, step }))
+    track('configurator_step', { step })
+    // Once per visit: going back and returning to the summary is not a second finished run.
+    if (step === 'podsumowanie' && !doneTracked.current) {
+      doneTracked.current = true
+      track('configurator_done')
+    }
   }
   const stepIndex = STEPS.findIndex((s) => s.key === state.step)
   const next = STEPS[stepIndex + 1]

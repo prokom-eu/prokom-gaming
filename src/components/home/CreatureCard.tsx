@@ -67,8 +67,10 @@ export function CreatureCardView({
             <Image
               src={card.photo.src}
               alt=""
-              width={240}
-              height={273}
+              // Drawn ~175 px wide (60% of the 330 px view, `height: 100%`): 180 gives a 384 px
+              // 2x variant instead of 640 px (Lighthouse G15). Same aspect as before (240×273).
+              width={180}
+              height={205}
               loading={eager ? 'eager' : 'lazy'}
             />
           </span>

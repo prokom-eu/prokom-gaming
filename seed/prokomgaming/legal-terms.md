@@ -1,6 +1,6 @@
 ## Kto sprzedaje
 
-Sprzedawcą jest PRO-KOM Tadeusz Wójciak, ul. Orkana 16B, 34-700 Rabka-Zdrój, NIP 735-251-14-47, wpisany do Centralnej Ewidencji i Informacji o Działalności Gospodarczej. Kontakt: e-mail gaming@pro-kom.eu, telefon +48 18 267 65 11, sklepy w Rabce-Zdroju (ul. Orkana 16B) i w Zakopanem (ul. Staszica 8).
+Sprzedawcą jest PRO-KOM Tadeusz Wójciak, ul. Orkana 16B, 34-700 Rabka-Zdrój, NIP 735-251-14-47, wpisany do Centralnej Ewidencji i Informacji o Działalności Gospodarczej. Kontakt: e-mail kontakt@prokomgaming.pl, telefon +48 883 200 151, sklep w Rabce-Zdroju (ul. Orkana 16B).
 
 Regulamin dotyczy sprzedaży komputerów i usług przez stronę PRO-KOM Gaming. Zapoznasz się z nim przed wysłaniem zapytania; akceptujesz go, akceptując ofertę.
 
@@ -21,7 +21,7 @@ Płacisz przelewem albo BLIK-iem na podstawie faktury pro forma. Nie wysyłamy z
 
 Komputer składamy, testujemy i wysyłamy w 5–10 dni roboczych od zaksięgowania wpłaty. Dokładny termin podajemy w ofercie. Status widzisz w koncie klienta.
 
-Wysyłamy kurierem z ubezpieczeniem i numerem śledzenia na terenie Polski, w cenie komputera. Możesz też odebrać komputer w sklepie w Rabce-Zdroju albo, po umówieniu, w Zakopanem.
+Wysyłamy kurierem z ubezpieczeniem i numerem śledzenia na terenie Polski, w cenie komputera. Możesz też odebrać komputer w sklepie w Rabce-Zdroju.
 
 > Przy odbiorze od kuriera obejrzyj paczkę. Jeśli karton jest uszkodzony, poproś kuriera o protokół szkody i daj nam znać tego samego dnia. To nie warunek reklamacji, ale bardzo ją przyspiesza.
 
@@ -73,7 +73,7 @@ Przyjmujemy nieodpłatnie zużyty sprzęt tego samego rodzaju co kupowany, w ilo
 
 Możesz, ale nie musisz go użyć.
 
-> Adresat: PRO-KOM Tadeusz Wójciak, ul. Orkana 16B, 34-700 Rabka-Zdrój, NIP 735-251-14-47, gaming@pro-kom.eu <br> Ja, niżej podpisany, informuję o odstąpieniu od umowy sprzedaży komputera: …………………… <br> Data odbioru: ……………… Numer zapytania lub faktury: ……………… <br> Imię i nazwisko: ……………………………… Adres: ……………………………… <br> Data: ……………… Podpis (tylko w wersji papierowej): ………………
+> Adresat: PRO-KOM Tadeusz Wójciak, ul. Orkana 16B, 34-700 Rabka-Zdrój, NIP 735-251-14-47, kontakt@prokomgaming.pl <br> Ja, niżej podpisany, informuję o odstąpieniu od umowy sprzedaży komputera: …………………… <br> Data odbioru: ……………… Numer zapytania lub faktury: ……………… <br> Imię i nazwisko: ……………………………… Adres: ……………………………… <br> Data: ……………… Podpis (tylko w wersji papierowej): ………………
 
 ## Zmiany regulaminu
 

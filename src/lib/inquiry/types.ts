@@ -125,7 +125,6 @@ export const EXTRA_CHOICES = [
 export const PICKUP_CHOICES = [
   { value: 'courier', label: 'Kurier' },
   { value: 'rabka', label: 'Sklep w Rabce-Zdroju' },
-  { value: 'zakopane', label: 'Salon w Zakopanem' },
 ] as const satisfies readonly Choice<string>[]
 
 export const INVOICE_CHOICES = [

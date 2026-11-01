@@ -74,7 +74,8 @@ test('one build from a build page gets the next dearer one; the header counts th
   await page.goto('/zestawy/wampir')
   // The button in the price block (the header has a „Porównaj” link too).
   await page.locator('a[href="/porownaj?z=wampir"]').first().click()
-  await expect(page).toHaveURL(/\/porownaj\?z=wampir,/)
+  // A soft navigation that renders the offer and the FPS table: ~4 s under `next dev`.
+  await expect(page).toHaveURL(/\/porownaj\?z=wampir,/, { timeout: 20_000 })
   await expect(page.locator('.cmp-slot')).toHaveCount(2)
   await expect(page.locator('.cmp-slot .nm').first()).toHaveText('Wampir')
   await expect(page.getByRole('link', { name: /Porównanie, 2/ }).first()).toBeVisible()

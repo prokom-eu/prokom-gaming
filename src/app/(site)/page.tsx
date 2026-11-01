@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import { connection } from 'next/server'
 
 import { BeforeShipping } from '@/components/home/BeforeShipping'
@@ -12,14 +13,23 @@ import { HowToBuy } from '@/components/home/HowToBuy'
 import { Included } from '@/components/home/Included'
 import { StartPaths } from '@/components/home/StartPaths'
 import { WorkshopStrip } from '@/components/home/WorkshopStrip'
+import { JsonLd } from '@/components/JsonLd'
+import { getEnv } from '@/lib/env'
 import { EMPTY_HOME, type HomeData } from '@/lib/home'
 import { loadHome } from '@/lib/home.server'
 import { errorFields, log } from '@/lib/logger'
+import { DESCRIPTIONS, HOME_TITLE, organizationJsonLd } from '@/lib/seo'
 import { EMPTY_WORKSHOP, loadWorkshop, type Workshop } from '@/lib/workshop.server'
 
 import '@/components/home/home.css'
 import '@/components/home/sections.css'
 import '@/components/paper.css'
+
+export const metadata: Metadata = {
+  title: { absolute: HOME_TITLE },
+  description: DESCRIPTIONS.home,
+  alternates: { canonical: '/' },
+}
 
 // Home page, sections in the order of spec. §4.
 export default async function HomePage() {
@@ -41,6 +51,8 @@ export default async function HomePage() {
   ])
   return (
     <>
+      {/* The brand and the shop (spec. §23): Organization + LocalBusiness. */}
+      <JsonLd data={organizationJsonLd(getEnv().SITE_URL)} />
       <Hero data={home.hero} />
       <WorkshopStrip items={workshop.items} />
       <StartPaths />

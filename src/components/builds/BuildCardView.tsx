@@ -22,11 +22,15 @@ export function BuildCardView({ card, eager = false }: { card: BuildCard; eager?
           alt=""
           width={580}
           height={331}
+          // One column up to 1000 px, three of ~420 px above. Without `sizes` a phone took the
+          // 1200 px variant for a ~400 px card — the biggest item before LCP (Lighthouse G15).
+          sizes="(max-width: 1000px) 100vw, 420px"
           loading={eager ? 'eager' : 'lazy'}
         />
         {card.photo && (
           <span className="bl-card__photo">
-            <Image src={card.photo.src} alt="" width={160} height={182} />
+            {/* Drawn at most ~125 px wide (75 px on a phone): a 256 px 2x variant, not 384. */}
+            <Image src={card.photo.src} alt="" width={125} height={142} />
           </span>
         )}
       </span>

@@ -487,7 +487,7 @@ const SPEC: (SpecDef | { group: string })[] = [
     hint: 'od zaksięgowania płatności',
     value: () => '5–10 dni roboczych',
   },
-  { label: 'Odbiór', hint: 'Rabka-Zdrój lub Zakopane', value: () => 'kurier albo sklep' },
+  { label: 'Odbiór', hint: 'Rabka-Zdrój', value: () => 'kurier albo sklep' },
 ]
 
 /**

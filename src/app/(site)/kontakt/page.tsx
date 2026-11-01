@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { connection } from 'next/server'
 
+import { BreadcrumbJsonLd } from '@/components/BreadcrumbJsonLd'
 import { ContactForm } from '@/components/content/ContactForm'
 import { PageHeader } from '@/components/content/PageHeader'
 import { StoreMap } from '@/components/content/StoreMap'
@@ -18,7 +19,8 @@ import '@/components/inquiry/inquiry.css'
 export const metadata: Metadata = {
   title: 'Kontakt',
   description:
-    'Zapytanie o komputer, telefon i e-mail PRO-KOM Gaming. Sklep w Rabce-Zdroju i salon w Zakopanem. Odpisujemy codziennie od 8 do 22.',
+    'Zapytanie o komputer, telefon i e-mail PRO-KOM Gaming. Sklep w Rabce-Zdroju, ul. Orkana 16B. Odpisujemy codziennie od 8 do 22.',
+  alternates: { canonical: routes.contact },
 }
 
 const mapsHref = (query: string) =>
@@ -32,14 +34,6 @@ const STORES = [
     pin: 'PRO-KOM, Orkana 16B',
     text: 'Tu składamy i testujemy komputery. Zobaczysz egzemplarz na żywo i odbierzesz zamówienie.',
     maps: mapsHref('PRO-KOM Orkana 16B Rabka-Zdrój'),
-  },
-  {
-    key: 'zakopane',
-    title: 'Salon w Zakopanem',
-    address: 'ul. Staszica 8, 34-500 Zakopane',
-    pin: 'PRO-KOM, Staszica 8',
-    text: 'Odbiór zamówienia po umówieniu. Napisz wcześniej, przywieziemy komputer z Rabki.',
-    maps: mapsHref('Staszica 8 Zakopane'),
   },
 ] as const
 
@@ -72,6 +66,7 @@ export default async function ContactPage() {
 
   return (
     <>
+      <BreadcrumbJsonLd crumbs={[{ name: 'Kontakt', path: routes.contact }]} />
       <PageHeader
         scene="licho"
         size="tall"
@@ -120,11 +115,9 @@ export default async function ContactPage() {
         <div className="wrap">
           <div className="ct-row">
             <h2 id="ct-stores" className="h ct-h2">
-              Nasze sklepy
+              Nasz sklep
             </h2>
-            <p className="ct-p">
-              Dwa miejsca na Podhalu. Komputery składamy i testujemy w Rabce-Zdroju.
-            </p>
+            <p className="ct-p">Komputery składamy i testujemy w Rabce-Zdroju.</p>
           </div>
           <div className="ct-stores">
             {STORES.map((store) => (
@@ -143,7 +136,7 @@ export default async function ContactPage() {
                   <h3 className="h">{store.title}</h3>
                   <p className="ct-store__address">{store.address}</p>
                   <p>{store.text}</p>
-                  {/* TODO(krystian): opening hours of both shops [SZEF] — the line with the
+                  {/* TODO(krystian): opening hours of the shop [SZEF] — the line with the
                       clock comes back when they are known (no placeholders, spec. §27.7). */}
                   <a
                     className="lnk ct-gold ct-store__go"

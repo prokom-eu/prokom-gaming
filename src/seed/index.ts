@@ -391,7 +391,7 @@ async function seedStock(payload: Payload): Promise<void> {
     if (build === undefined) throw new Error(`Seed: stock for unknown build „${item.build}”.`)
     const data = {
       build,
-      location: item.location as 'rabka' | 'zakopane',
+      location: item.location as 'rabka',
       condition: item.condition as 'new' | 'demo' | 'returned',
       conditionNote: item.conditionNote,
       discount: item.discount,

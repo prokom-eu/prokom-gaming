@@ -14,7 +14,7 @@ export function ForParents() {
     },
     {
       title: 'Przyjedź i zobacz',
-      text: 'Sklepy w Rabce-Zdroju i w Zakopanem. Przy odbiorze włączymy komputer i odpalimy grę przy Tobie.',
+      text: 'Sklep w Rabce-Zdroju. Przy odbiorze włączymy komputer i odpalimy grę przy Tobie.',
     },
     {
       title: 'Odpisuje człowiek, nie bot',

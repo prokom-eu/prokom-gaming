@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 
 import { HScroll } from '@/components/HScroll'
 import { Segmented } from '@/components/ui/Segmented'
+import { track } from '@/lib/analytics'
 import { fpsText, RESOLUTIONS, RESOLUTION_LABELS, type Resolution } from '@/lib/fps'
 import { pickerQuery, type PickerState } from '@/lib/games'
 import type { PickerData } from '@/lib/games.server'
@@ -59,7 +60,10 @@ export function GamePicker({ data, initial }: { data: PickerData; initial: Picke
                 type="button"
                 className="chip"
                 aria-pressed={i === game}
-                onClick={() => setGame(i)}
+                onClick={() => {
+                  setGame(i)
+                  track('game_pick', { game: g.slug })
+                }}
               >
                 {g.name}
               </button>

@@ -9,7 +9,6 @@ import type { PriceSnapshot } from './pricing/snapshot'
 
 export const STOCK_LOCATIONS = [
   { value: 'rabka', label: 'Rabka-Zdrój', badge: 'wysyłka w 1–2 dni robocze' },
-  { value: 'zakopane', label: 'Zakopane', badge: 'odbiór od ręki' },
 ] as const
 export type StockLocation = (typeof STOCK_LOCATIONS)[number]['value']
 

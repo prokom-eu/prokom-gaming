@@ -367,7 +367,8 @@
 }
 .ct-stores {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  /* One shop (01.11.2026): the card keeps the width it had beside a second one. */
+  grid-template-columns: minmax(0, calc((100% - 20px) / 2));
   gap: 20px;
   margin-top: 40px;
 }
@@ -783,7 +784,8 @@
 }
 .ct-numbers ul {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  /* Three numbers since 01.11.2026 (the „2 sklepy” tile left with the Zakopane salon). */
+  grid-template-columns: repeat(3, 1fr);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -1003,6 +1005,7 @@
     grid-template-columns: 1fr 1fr;
   }
   .ct-numbers li:nth-child(3) {
+    grid-column: 1 / -1;
     border-left: 0;
   }
   .ct-numbers li:nth-child(n + 3) {

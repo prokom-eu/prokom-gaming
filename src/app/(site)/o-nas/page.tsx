@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 
+import { BreadcrumbJsonLd } from '@/components/BreadcrumbJsonLd'
 import { PageHeader } from '@/components/content/PageHeader'
 import { Sigil } from '@/components/Sigil'
 import { ButtonLink } from '@/components/ui/Button'
@@ -11,28 +12,23 @@ import '@/components/content/content.css'
 export const metadata: Metadata = {
   title: 'O nas',
   description:
-    'PRO-KOM z Rabki-Zdroju: od 2004 roku składamy komputery, naprawiamy sprzęt i opiekujemy się IT firm. Dwa sklepy na Podhalu, dane firmy i rejestry.',
+    'PRO-KOM z Rabki-Zdroju: od 2004 roku składamy komputery, naprawiamy sprzęt i opiekujemy się IT firm. Sklep w Rabce-Zdroju, dane firmy i rejestry.',
+  alternates: { canonical: routes.about },
 }
 
 const NUMBERS = [
   { value: '2004', text: 'od tego roku składamy komputery w Rabce-Zdroju' },
   { value: '100+', text: 'firm z Małopolski pod naszą opieką IT' },
-  { value: '2', text: 'sklepy: w Rabce-Zdroju i w Zakopanem' },
   { value: '2 lata', text: 'gwarancji na cały komputer, z odbiorem od Ciebie' },
 ] as const
 
-// TODO(krystian): years of the Zakopane salon and of the till service [SZEF] — the board has
+// TODO(krystian): year of the till service [SZEF] — the board has
 // „[rok]”; until then the entries show without a year (no placeholders, spec. §27.7).
 const HISTORY = [
   {
     year: '2004',
     title: 'Sklep w Rabce-Zdroju',
     text: 'Tadeusz Wójciak otwiera PRO-KOM przy ulicy Orkana. Od początku składamy komputery na zamówienie i naprawiamy sprzęt.',
-  },
-  {
-    year: '',
-    title: 'Salon w Zakopanem',
-    text: 'Drugi sklep, przy ulicy Staszica. Klienci z całego Podhala mają nas bliżej.',
   },
   {
     year: '',
@@ -100,6 +96,7 @@ const LINES = [
 export default function AboutPage() {
   return (
     <>
+      <BreadcrumbJsonLd crumbs={[{ name: 'O nas', path: routes.about }]} />
       <PageHeader
         scene="perun"
         size="hero"
@@ -223,10 +220,6 @@ export default function AboutPage() {
             <div>
               <dt>NIP</dt>
               <dd>{company.nip}</dd>
-            </div>
-            <div>
-              <dt>Salon</dt>
-              <dd>{company.salon}</dd>
             </div>
             <div>
               <dt>Rejestry</dt>

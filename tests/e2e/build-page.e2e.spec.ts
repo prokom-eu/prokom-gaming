@@ -53,6 +53,8 @@ test.describe('all 16 builds', () => {
 
   // Money: every page shows the published price (= fixtures) in the price box, the bar and the offer.
   test('show the fixture price', async ({ page }) => {
+    // 16 pages that read the offer and the FPS table: ~4 s each under `next dev` (G15).
+    test.slow()
     for (const build of pricingExpected.builds) {
       // `next dev` may reload a page while it compiles the next one: retry the navigation.
       await expect(async () => {

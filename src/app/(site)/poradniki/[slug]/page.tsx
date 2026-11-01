@@ -26,6 +26,7 @@ import { dateText } from '@/lib/home'
 import { legalHeadings, nodeText, type LegalContent } from '@/lib/legal'
 import { buildHref, routes } from '@/lib/nav'
 import { menuCreatures } from '@/lib/site'
+import { OPEN_GRAPH } from '@/lib/seo'
 
 import '@/components/content/content.css'
 
@@ -37,7 +38,12 @@ const guideOf = cache(loadGuide)
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const guide = await guideOf((await params).slug)
   if (!guide) return {}
-  return { title: guide.title, description: guide.lead }
+  return {
+    title: guide.title,
+    description: guide.lead,
+    alternates: { canonical: guidePath(guide.slug) },
+    openGraph: { ...OPEN_GRAPH, type: 'article' },
+  }
 }
 
 const creatureName = (slug: string) => menuCreatures.find((c) => c.slug === slug)?.name ?? slug
@@ -95,6 +101,7 @@ export default async function GuidePage({ params }: Props) {
           title: guide.title,
           lead: guide.lead,
           author: guide.author,
+          image: `/scenes/${creatureKey(guide.creature)}-hero.webp`,
           publishedAt: guide.publishedAt ?? null,
           updatedAt: guide.updatedAt ?? null,
         })}

@@ -1,8 +1,9 @@
 import { Sigil } from '@/components/Sigil'
-import { ButtonLink } from '@/components/ui/Button'
 import { inquiryHref } from '@/lib/buildPage'
 import type { BuildPageData } from '@/lib/buildPage.server'
 import { zl } from '@/lib/pricing/format'
+
+import { AskLink } from './AskLink'
 
 /**
  * Sticky bar (spec. §6, ADR-G003 §4): sigil, name, price, „Zapytaj o {istotę}”. Desktop: under the
@@ -26,9 +27,9 @@ export function StickyBar({ data }: { data: BuildPageData }) {
             <small>z montażem i wysyłką</small>
           </span>
         )}
-        <ButtonLink href={inquiryHref(build.slug, data.config)}>
+        <AskLink build={build.slug} href={inquiryHref(build.slug, data.config)}>
           Zapytaj o {build.accusative}
-        </ButtonLink>
+        </AskLink>
       </div>
     </div>
   )

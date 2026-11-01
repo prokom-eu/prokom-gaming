@@ -21,7 +21,9 @@ setup('log in the seed admin once', async ({ page }) => {
   await page.locator('#field-email').fill(email)
   await page.locator('#field-password').fill(password)
   await page.locator('button[type="submit"]').click()
-  await expect(page).toHaveURL(/\/admin\/?$/)
+  // The Pulpit renders after the login: up to ~12 s under `next dev` (G15), well under 1 s on
+  // `next start`.
+  await expect(page).toHaveURL(/\/admin\/?$/, { timeout: 30_000 })
 
   await mkdir(path.dirname(ADMIN_STATE), { recursive: true })
   await page.context().storageState({ path: ADMIN_STATE })

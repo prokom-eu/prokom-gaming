@@ -709,7 +709,7 @@ export interface Inquiry {
   email: string;
   phone?: string | null;
   preferredContact?: ('email' | 'phone') | null;
-  pickup?: ('courier' | 'rabka' | 'zakopane') | null;
+  pickup?: ('courier' | 'rabka') | null;
   invoice?: ('private' | 'company') | null;
   nip?: string | null;
   message?: string | null;
@@ -737,7 +737,7 @@ export interface Inquiry {
 export interface Stock {
   id: number;
   build: number | Build;
-  location: 'rabka' | 'zakopane';
+  location: 'rabka';
   condition: 'new' | 'demo' | 'returned';
   changes?: {
     level?: string | null;

@@ -67,16 +67,24 @@ describe('guideJsonLd', () => {
       title: 'Jak kupić',
       lead: 'Pięć pytań',
       author: 'Zespół PRO-KOM Gaming',
+      image: '/scenes/skrzat-hero.webp',
       publishedAt: null,
       updatedAt: '2026-10-30T10:00:00.000Z',
     }) as [Record<string, unknown>, Record<string, unknown>]
     expect(article).toMatchObject({
       '@type': 'Article',
       headline: 'Jak kupić',
+      image: 'https://prokomgaming.pl/scenes/skrzat-hero.webp',
       mainEntityOfPage: 'https://prokomgaming.pl/poradniki/rodzice',
     })
     expect(article).not.toHaveProperty('datePublished')
     expect(crumbs['@type']).toBe('BreadcrumbList')
+    // From the home page down: home → Poradniki → the guide.
+    expect((crumbs.itemListElement as { name: string }[]).map((c) => c.name)).toEqual([
+      'Strona główna',
+      'Poradniki',
+      'Jak kupić',
+    ])
   })
 })
 

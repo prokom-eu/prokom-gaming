@@ -16,14 +16,13 @@
 | Pole | Wartość startowa | Status |
 |---|---|---|
 | Firma | PRO-KOM Tadeusz Wójciak, ul. Orkana 16B, 34-700 Rabka-Zdrój, NIP 735-251-14-47 | z planszy |
-| Salon | ul. Staszica 8, Zakopane | z planszy |
-| Telefon | +48 18 267 65 11 | [SZEF] potwierdzić numer dla Gaming |
-| E-mail | `gaming@pro-kom.eu` | [SZEF] skrzynka do założenia |
+| Telefon | +48 883 200 151 | Krystian, 01.11.2026 |
+| E-mail | `kontakt@prokomgaming.pl` | Krystian, 01.11.2026 |
 | Odpowiedź na zapytanie | „zwykle w godzinę, codziennie 8–22” | [SZEF] kto zastępuje Krystiana |
 | Oferta | ważna 48 h, imienna lista części, cena brutto, termin | z planszy |
 | Realizacja | 5–10 dni roboczych od wpłaty; pole „najbliższy wolny termin montażu” | z planszy |
 | Płatność | przelew albo BLIK na podstawie faktury pro forma; bez pobrania; **bez rat** (decyzja 25.10) | BLIK: [SZEF] sposób |
-| Dostawa | kurier z ubezpieczeniem w cenie albo odbiór: Rabka-Zdrój / Zakopane | [SZEF] firma kurierska |
+| Dostawa | kurier z ubezpieczeniem w cenie albo odbiór w Rabce-Zdroju | [SZEF] firma kurierska |
 | Gwarancja PRO-KOM | 24 mies. na cały komputer, kurier odbiera od klienta na koszt PRO-KOM, najpierw pomoc zdalna (za zgodą), rozbudowa RAM/dysku bez utraty gwarancji | z planszy |
 | Zwrot | 14 dni dla wszystkich komputerów (także konfiguracji), koszt odesłania po stronie klienta — **opisany neutralnie, nie jako atut** (art. 7 pkt 10 UPNPR) | z planszy |
 | Test egzemplarza | 60 min obciążenia, 3 gry zmierzone, test pamięci, aktualny BIOS i sterowniki | [SZEF/serwis] potwierdzić długość testu |
@@ -125,14 +124,14 @@ Logika i zachowanie: **ADR-G002 §5–§6** (kroki, wyszarzenia z powodem, zmian
 Plansza Porownywarka (telefon: `stany/tel-13-porownywarka.jpg`; reguły werdyktu, kolorów macierzy i „+X% za Y zł” — dokładnie jak w JS `boards/Porownywarka.dc.html`): do 3 istot (sloty z wyborem dowolnej z 16), gra (33), rozdzielczość, odświeżanie monitora (60/144/240 Hz) → **werdykt** („Baba Jaga wystarczy” / „Za mało mocy na ten monitor” + podpowiedź), wykres klatek z liniami 60 kl./s i odświeżania, „Z {A} na {B}: +X% klatek za dopłatę Y zł”, macierz wszystkich gier (kolor: poniżej 60 / płynnie / wykorzystuje monitor), tabela podzespołów i „w cenie” z trybem „Tylko różnice”, „Wyślij to porównanie” (link ze stanem, mail, kopiuj). Stan w adresie. Telefon: plansza Porownywarka-telefon.
 
 ## 10. Zapytanie `/zapytanie` i `/zapytanie/wyslane` (G12)
-- 4 kroki (plansza Formularz): **1. Komputer** — Od czego zaczynasz? (Wiem, który zestaw → 16 pieczęci · Pomóżcie mi dobrać → dla kogo i budżet · Mam własną listę → tekst/link); **2. Gry i monitor** — gry (kilka), inne gry, monitor, odświeżanie, obudowa, podświetlenie, „Potrzebujesz też” (monitor, peryferia, słuchawki, Office, dodatkowy dysk — wycenimy osobno); **3. Kontakt** — imię, e-mail (wymagany — oferta idzie mailem; decyzja Krystiana 27.10.2026, ADR-G005), telefon (wymagany przy odpowiedzi telefonicznej), preferowany kontakt, odbiór (kurier / Rabka / Zakopane), faktura na firmę + NIP (suma kontrolna), uwagi, zgoda RODO (link do polityki), osobno zgoda marketingowa (domyślnie odznaczona); **4. Sprawdzenie** — podsumowanie z „Zmień” przy każdej sekcji. Z boku na żywo „Twoje zapytanie” (istota/konfiguracja, cena).
+- 4 kroki (plansza Formularz): **1. Komputer** — Od czego zaczynasz? (Wiem, który zestaw → 16 pieczęci · Pomóżcie mi dobrać → dla kogo i budżet · Mam własną listę → tekst/link); **2. Gry i monitor** — gry (kilka), inne gry, monitor, odświeżanie, obudowa, podświetlenie, „Potrzebujesz też” (monitor, peryferia, słuchawki, Office, dodatkowy dysk — wycenimy osobno); **3. Kontakt** — imię, e-mail (wymagany — oferta idzie mailem; decyzja Krystiana 27.10.2026, ADR-G005), telefon (wymagany przy odpowiedzi telefonicznej), preferowany kontakt, odbiór (kurier / Rabka-Zdrój), faktura na firmę + NIP (suma kontrolna), uwagi, zgoda RODO (link do polityki), osobno zgoda marketingowa (domyślnie odznaczona); **4. Sprawdzenie** — podsumowanie z „Zmień” przy każdej sekcji. Z boku na żywo „Twoje zapytanie” (istota/konfiguracja, cena).
 - Wejścia: `?zestaw=wampir`, `?k=<konfiguracja z konfiguratora>`, porównanie, bon, „Gotowe od ręki” (rezerwacja).
 - Walidacja z konkretnymi komunikatami (plansza). Typ zapytania: Wiem, który zestaw → `build` (albo `config` z konfiguratora), Pomóżcie mi dobrać → `advice`, Mam własną listę → `custom_list`. Wysyłka → `POST /api/inquiry` (ADR-G005) → `/zapytanie/wyslane?nr=PKG-…`.
 - **Wysłane:** scena istoty, pieczęć budzi się (jedyna animacja), „Zapytanie wysłane”, numer, „Co będzie dalej” (Teraz · W ciągu godziny · Gdy zaakceptujesz [pro forma, przelew albo BLIK] · 5–10 dni roboczych), „Twoja konfiguracja”. Licznik zapytania zeruje się.
 - Maile: powiadomienie do skrzynki Gaming i potwierdzenie dla klienta — treści w G12 (szablon z planszy „Co będzie dalej”).
 
 ## 11. Gotowe od ręki `/gotowe` (G13)
-Plansza Gotowe: egzemplarze z kolekcji `stock` (miejsce Rabka/Zakopane, stan, cena za egzemplarz, części), „Zarezerwuj” (zapytanie `type: ready`, rezerwacja 24 h), pusty stan „Nie ma tego, czego szukasz?” + „Powiadom mnie” (zapytanie). [SZEF] ile egzemplarzy i gdzie.
+Plansza Gotowe: egzemplarze z kolekcji `stock` (miejsce: Rabka-Zdrój, stan, cena za egzemplarz, części), „Zarezerwuj” (zapytanie `type: ready`, rezerwacja 24 h), pusty stan „Nie ma tego, czego szukasz?” + „Powiadom mnie” (zapytanie). [SZEF] ile egzemplarzy i gdzie.
 
 ## 12. Bon podarunkowy `/bon` (G13)
 Plansza Bon: podgląd bonu na żywo (kwota, wygląd jednej z 4 istot, dla kogo, dedykacja), „Zamów bon” (zapytanie `type: voucher`), „Jak to działa” (3 kroki), pytania. Kwoty startowe 500 / 1000 / 2000 / 3000 zł, ważność 12 mies. — **[SZEF] decyzja przed publikacją** (inaczej strona ukryta).
@@ -171,7 +170,7 @@ Grupy w panelu: **Sprzedaż** (Zapytania, Zamówienia, Egzemplarze, Zgłoszenia,
 
 ## 23. SEO (G15)
 - Meta `title`/`description` unikalne (szablony: zestaw — „{Istota} — komputer do gier {rozdzielczość}, {cena} zł | PRO-KOM Gaming”; gra — „Komputer do {gry}: ile klatek w FullHD, 2K i 4K | PRO-KOM Gaming”).
-- JSON-LD: `Organization` + `LocalBusiness` ×2 (Rabka, Zakopane), `Product`/`Offer` (zestawy), `FAQPage`, `BreadcrumbList`, `Article` (poradniki).
+- JSON-LD: `Organization` + `LocalBusiness` (sklep w Rabce-Zdroju; salonu w Zakopanem nie ma — Krystian, 01.11.2026), `Product`/`Offer` (zestawy), `FAQPage`, `BreadcrumbList`, `Article` (poradniki).
 - `sitemap.xml` (strony, 16 zestawów, 33 gry, opublikowane poradniki), `robots.txt`; staging `noindex`. Metryka, konto, zapytanie: `noindex`.
 - Frazy: komputer do gier, komputer do Fortnite / CS2 / Minecrafta, komputer gamingowy do 5000 / 8000 zł, biały komputer gamingowy, komputer do gier dla dziecka.
 - Obrazy WebP/AVIF, LCP < 2,5 s na telefonie (hero nie blokuje renderu).
@@ -192,7 +191,7 @@ Zwrot 14 dni neutralnie (nie atut) · gwarancja PRO-KOM odróżniona od rękojmi
 4. Zapytanie z każdej ścieżki (zestaw, konfiguracja, porównanie, kontakt, bon, gotowe) zapisuje rekord, wysyła 2 maile i pokazuje numer.
 5. Wszystkie strony zgodne ze zrzutami 1440 i 414; dolny pasek, menu i arkusze działają na Androidzie i iPhonie; klawiatura i axe bez błędów.
 6. Lighthouse mobile ≥ 90 (4 kategorie) na: `/`, `/zestawy`, `/zestawy/wampir`, `/konfigurator`, `/komputer-do/cyberpunk-2077`.
-7. Zero nawiasów kwadratowych w HTML produkcji; zero słowa „Santander”, kalkulatora i oferty rat (jedyne dozwolone „raty” jako całe słowo: pytanie FAQ „Czy mogę kupić na raty?” z odpowiedzią „Na razie nie…”; test na całe słowa, nie fragmenty jak „utraty”).
+7. Zero nawiasów kwadratowych w HTML produkcji; zero słowa „Santander”, kalkulatora i oferty rat (jedyne dozwolone „raty” jako całe słowo: pytanie FAQ „Czy mogę kupić na raty?” na `/pytania` albo „Czy da się kupić na raty?” na `/dla-rodzicow` (plansza Rodzice, §16), zawsze z odpowiedzią „Na razie nie…” — ujednolicone w G15; test na całe słowa, nie fragmenty jak „utraty”).
 8. `sitemap.xml`, `robots.txt`, JSON-LD bez błędów w Rich Results Test.
 
 ## 28. Poza zakresem 20.11

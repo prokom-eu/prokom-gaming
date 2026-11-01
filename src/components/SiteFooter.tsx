@@ -87,8 +87,6 @@ export function SiteFooter({ features }: { features: Features }) {
               <br />
               {company.address}
               <br />
-              Salon: {company.salon}
-              <br />
               NIP {company.nip}
             </p>
             <ul className="foot__links">
@@ -125,6 +123,11 @@ export function SiteFooter({ features }: { features: Features }) {
             <Link href={`${routes.privacy}#cookies`}>Ustawienia cookies</Link>
           </li>
         </ul>
+        {/* Seller and the parent company, required in an online shop's footer anyway. */}
+        <p className="foot__brand">
+          PRO-KOM Gaming to marka {company.name} · NIP {company.nip} · {company.address} ·{' '}
+          <a href={company.parentSite.href}>{company.parentSite.label}</a>
+        </p>
       </Container>
     </footer>
   )

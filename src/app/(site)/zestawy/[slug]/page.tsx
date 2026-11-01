@@ -14,6 +14,9 @@ import { TuneBuild } from '@/components/build/TuneBuild'
 import { buildJsonLd, ownLight } from '@/lib/buildPage'
 import { loadBuildPage } from '@/lib/buildPage.server'
 import { getEnv } from '@/lib/env'
+import { RESOLUTION_LABELS } from '@/lib/fps'
+import { buildHref } from '@/lib/nav'
+import { buildTitle, OPEN_GRAPH } from '@/lib/seo'
 
 import '@/components/build/build.css'
 
@@ -26,7 +29,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   await connection()
   const data = await load((await params).slug)
   if (!data) return {}
-  return { title: `${data.build.name} — komputer do gier`, description: data.build.why }
+  const { build } = data
+  return {
+    title: { absolute: buildTitle(build.name, RESOLUTION_LABELS[build.resolution], build.price) },
+    description: build.why,
+    alternates: { canonical: buildHref(build.slug) },
+    openGraph: {
+      ...OPEN_GRAPH,
+      ...(build.photo ? { images: [{ url: build.photo.src, alt: build.photo.alt }] } : {}),
+    },
+  }
 }
 
 /**

@@ -4,18 +4,20 @@ import creaturesSeed from '../../seed/prokomgaming/creatures.json'
 // = these), but reading them in the layout changes how pages render (`docker build` has no
 // database), so it waits for the first page with data.
 // TODO(krystian): G7 — read company, contact and the cookie flag from `site-settings`
-// (spec. §1), creatures from `builds`. Phone and e-mail are spec. §1 start values still marked
-// [SZEF]; they are shown until the boss confirms or changes them in the panel.
+// (spec. §1), creatures from `builds`. One shop, in Rabka-Zdrój; phone and e-mail confirmed by
+// Krystian on 01.11.2026 (no salon in Zakopane).
 
 export const company = {
   name: 'PRO-KOM Tadeusz Wójciak',
   address: 'ul. Orkana 16B, 34-700 Rabka-Zdrój',
-  salon: 'ul. Staszica 8, Zakopane',
+  // The same address in parts, for structured data (PostalAddress).
+  postal: { street: 'ul. Orkana 16B', code: '34-700', city: 'Rabka-Zdrój' },
   nip: '735-251-14-47',
-  // [SZEF] mailbox to be created and phone to be confirmed for Gaming (spec. §1).
-  email: 'gaming@pro-kom.eu',
-  phone: '+48 18 267 65 11',
-  phoneHref: 'tel:+48182676511',
+  email: 'kontakt@prokomgaming.pl',
+  phone: '+48 883 200 151',
+  phoneHref: 'tel:+48883200151',
+  // Gaming is a product brand of PRO-KOM (docs/zadania/gaming-marka-prokom.md).
+  parentSite: { label: 'pro-kom.eu', href: 'https://pro-kom.eu' },
 } as const
 
 // Public registers where a customer checks the company (spec. §16, boards Rodzice, OFirmie).

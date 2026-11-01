@@ -5,6 +5,7 @@ import { useRef, useState, type FormEvent, type ReactNode } from 'react'
 
 import { BottomSheet } from '@/components/BottomSheet'
 import { Button } from '@/components/ui/Button'
+import { track } from '@/lib/analytics'
 import { CONSENT_CLAUSE } from '@/lib/inquiry/consent'
 import { HONEYPOT_FIELD } from '@/lib/inquiry/honeypot'
 import {
@@ -80,12 +81,11 @@ export function QuickInquirySheet({
     setSending(true)
     setSendError(null)
     try {
+      const payload = quickPayload(order, state, { url: window.location.href, token, honeypot })
       const response = await fetch('/api/inquiry', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify(
-          quickPayload(order, state, { url: window.location.href, token, honeypot }),
-        ),
+        body: JSON.stringify(payload),
       })
       const body = (await response.json().catch(() => ({}))) as {
         number?: string
@@ -93,6 +93,8 @@ export function QuickInquirySheet({
         fields?: string[]
       }
       if (response.status === 201 && body.number) {
+        // Statistics: the type only, never the number (ADR-G009 pt 3).
+        track('inquiry_sent', { type: payload.type })
         setSent(body.number)
         return
       }

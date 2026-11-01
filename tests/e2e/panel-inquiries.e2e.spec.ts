@@ -174,7 +174,10 @@ test.describe('computer', () => {
 
     await page.getByLabel('Odpowiedź', { exact: true }).fill('Notatka: zadzwonić jutro.')
     await page.getByRole('button', { name: 'Notatka wewnętrzna' }).click()
-    await expect(page.locator('.pn-msg--note')).toContainText('Notatka: zadzwonić jutro.')
+    // The action saves and the thread renders again: several seconds under `next dev` (G15).
+    await expect(page.locator('.pn-msg--note')).toContainText('Notatka: zadzwonić jutro.', {
+      timeout: 20_000,
+    })
     expect(await stored(number)).toMatchObject({ status: 'new' })
 
     await page.getByRole('button', { name: 'Oferta z listą części' }).click()
