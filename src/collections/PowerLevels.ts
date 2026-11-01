@@ -5,6 +5,7 @@ import { GROUP_OFFER, MARKUP_CLASSES, RAM_TYPES, RESOLUTIONS } from './shared'
 import type { PowerLevel } from '../payload-types'
 import { queueAlarmOnCostChange } from './marginAlarmHook'
 import { blockDeleteWhenUsed } from './usage'
+import { COST_LABEL, COST_SOURCES, stampPartCosts } from './costStamp'
 
 const CLASS_1_3 = { type: 'number', required: true, min: 1, max: 3 } as const
 
@@ -30,6 +31,7 @@ export const PowerLevels: CollectionConfig = {
         (l.components ?? []).map((c) => `${c.internalModel}:${c.cost}`).join('|'),
       ),
     ],
+    beforeChange: [stampPartCosts],
     beforeDelete: [blockDeleteWhenUsed(['level'], 'Zmień najpierw poziom w tym zestawie.')],
   },
   fields: [
@@ -149,10 +151,37 @@ export const PowerLevels: CollectionConfig = {
         { name: 'ean', label: 'EAN', type: 'text', ...adminField },
         {
           name: 'cost',
-          label: 'Koszt (zł)',
+          label: COST_LABEL,
           type: 'number',
           required: true,
           min: 0,
+          ...adminField,
+        },
+        {
+          name: 'costSource',
+          label: 'Źródło kosztu',
+          type: 'select',
+          required: true,
+          defaultValue: 'market',
+          options: [...COST_SOURCES],
+          ...adminField,
+        },
+        { name: 'costNote', label: 'Uwaga (np. nr faktury)', type: 'text', ...adminField },
+        {
+          name: 'costUpdatedAt',
+          label: 'Koszt zmieniony',
+          type: 'date',
+          admin: { readOnly: true },
+          ...adminField,
+        },
+        {
+          name: 'partKey',
+          label: 'Klucz części',
+          type: 'text',
+          index: true,
+          admin: {
+            description: 'Ten sam model w kilku poziomach = ten sam klucz (uzupełnia się sam).',
+          },
           ...adminField,
         },
       ],

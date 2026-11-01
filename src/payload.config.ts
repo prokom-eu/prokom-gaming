@@ -21,6 +21,7 @@ import { InquiryDeletions } from './collections/InquiryDeletions'
 import { InquiryMessages } from './collections/InquiryMessages'
 import { MailIntakeUnmatched } from './collections/MailIntakeUnmatched'
 import { PushSubscriptions } from './collections/PushSubscriptions'
+import { PriceSources } from './collections/PriceSources'
 import { Media } from './collections/Media'
 import { Options } from './collections/Options'
 import { Orders } from './collections/Orders'
@@ -143,6 +144,7 @@ export default buildConfig({
     InquiryMessages,
     MailIntakeUnmatched,
     PushSubscriptions,
+    PriceSources,
   ],
   globals: [PricingSettings, SiteSettings, LegalTerms, LegalPrivacy, MailSettings, MailIntakeState],
   // Background jobs (ADR-G002 §4.4: margin alarm; ADR-G005: daily inquiry retention). Run inside the Next process
