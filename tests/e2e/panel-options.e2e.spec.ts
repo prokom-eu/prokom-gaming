@@ -120,7 +120,7 @@ test.describe('changes', () => {
     // A marketplace link is refused, nothing is created.
     await panelForm.getByLabel(/Linki do ofert/).fill('https://allegro.pl/oferta/1')
     await panelForm.getByRole('button', { name: 'Dodaj do zatwierdzenia' }).click()
-    await expect(panelForm.getByText(/Link spoza dozwolonych sklepów/)).toBeVisible()
+    await expect(panelForm.getByText(/Link spoza Ceneo i dozwolonych sklepów/)).toBeVisible()
     // The form keeps what was typed after a refused save.
     await expect(panelForm.getByLabel(/Linki do ofert/)).toHaveValue('https://allegro.pl/oferta/1')
 

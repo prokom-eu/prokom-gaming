@@ -2,7 +2,7 @@ import type { GlobalConfig } from 'payload'
 
 import { adminOnly } from '../access/panel'
 import { GROUP_OFFER } from '../collections/shared'
-import { DEFAULT_SHOPS } from '../lib/pricing/sources'
+import { DEFAULT_SHOPS, NOT_SHOPS } from '../lib/pricing/sources'
 
 export const CHECK_DAYS = [
   { label: 'poniedziałek', value: 'mon' },
@@ -105,9 +105,13 @@ export const PriceCheckSettings: GlobalConfig = {
     },
     {
       name: 'shops',
-      label: 'Dozwolone sklepy',
+      label: 'Zaufane sklepy',
       type: 'array',
-      admin: { description: 'Bez Ceneo i Allegro — pokazują oferty marketplace (ADR-G007 §1).' },
+      // TODO(krystian): wording (no board).
+      admin: {
+        description:
+          'Liczą się tylko ich oferty — na stronach Ceneo i z linków do sklepów. Bez marketplace (Allegro, Amazon) — ADR-G011.',
+      },
       defaultValue: DEFAULT_SHOPS.map((domain) => ({ domain })),
       fields: [
         {
@@ -115,9 +119,15 @@ export const PriceCheckSettings: GlobalConfig = {
           label: 'Domena',
           type: 'text',
           required: true,
-          validate: (value: string | null | undefined) =>
-            (typeof value === 'string' && /^[a-z0-9-]+(\.[a-z0-9-]+)+$/.test(value.trim())) ||
-            'Sama domena, np. x-kom.pl.',
+          validate: (value: string | null | undefined) => {
+            const domain = typeof value === 'string' ? value.trim().toLowerCase() : ''
+            if (!/^[a-z0-9-]+(\.[a-z0-9-]+)+$/.test(domain)) return 'Sama domena, np. x-kom.pl.'
+            // Ceneo is read on its own; marketplaces mix in third-party sellers (ADR-G011 §3).
+            // TODO(krystian): wording (no board).
+            return NOT_SHOPS.some((d) => domain === d || domain.endsWith(`.${d}`))
+              ? 'Ceneo i marketplace (Allegro, Amazon) nie są zaufanym sklepem.'
+              : true
+          },
         },
       ],
     },
@@ -165,5 +175,7 @@ export function shopsOf(
   const list = (settings?.shops ?? [])
     .map((s) => s.domain?.trim().toLowerCase())
     .filter((d): d is string => Boolean(d))
+    // Saved before the rule: never treated as a shop (a Ceneo search page would count as one).
+    .filter((d) => !NOT_SHOPS.some((n) => d === n || d.endsWith(`.${n}`)))
   return list.length > 0 ? list : [...DEFAULT_SHOPS]
 }

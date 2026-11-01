@@ -2442,7 +2442,7 @@ export interface PriceCheckSetting {
   outlierPct: number;
   monthlyBudgetUsd: number;
   /**
-   * Bez Ceneo i Allegro — pokazują oferty marketplace (ADR-G007 §1).
+   * Liczą się tylko ich oferty — na stronach Ceneo i z linków do sklepów. Bez marketplace (Allegro, Amazon) — ADR-G011.
    */
   shops?:
     | {

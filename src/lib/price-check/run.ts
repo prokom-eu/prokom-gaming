@@ -7,9 +7,10 @@ import { getEnv, priceCheckConfig } from '../env'
 import { errorFields, log } from '../logger'
 import { notify } from '../notify'
 import { percent, zl } from '../pricing/format'
-import { onePerShop, shopOf } from '../pricing/sources'
+import { CENEO, ceneoProductId, ceneoUrl, onePerShop, shopOf } from '../pricing/sources'
 import { loadBatch, loadOffer } from '../pricing/store'
 import { shopsOf } from '../../globals/PriceCheckSettings'
+import { parseCeneo, titleMatches, trustedOffers, type CeneoPage } from './ceneo'
 import { ClaudePriceReader, FakePriceReader, type CheckedItem, type PriceReader } from './claude'
 import {
   computeDiff,
@@ -23,9 +24,10 @@ import { numbersOf, summaryInput, unknownNumbers } from './summary'
 import { callCostUsd, estimateUsd, monthStart, overBudget, type CallUsage } from './usage'
 
 /**
- * One price check (ADR-G007 §2, panel spec §11): (1) items with their offer links, (2) Claude
- * reads each offer page, (3) items without a valid offer are searched for (new links saved as
- * proposals), (4) market cost per item, (5) lib/pricing recomputes, (6) Claude describes the
+ * One price check (ADR-G007 §2, panel spec §11): (1) items with their offer links, (2) the
+ * server reads each Ceneo product page (trusted shops' offers, no Claude — ADR-G011) and Claude
+ * reads each shop's offer page, (3) items without a Ceneo page are searched on Ceneo, then items
+ * still without a valid offer in the shops (new links saved as proposals), (4) market cost per item, (5) lib/pricing recomputes, (6) Claude describes the
  * numbers, (7) alarms. Nothing is published — „Przyjmij propozycje” in the report saves costs.
  * Progress, tokens and cost are written to `price-checks` as it goes.
  */
@@ -37,10 +39,23 @@ const CONCURRENCY = 4
 /** At most this many items searched per run (each costs money; the monthly limit still applies). */
 const MAX_SEARCHES = 100
 /**
+ * Of those, at most this many on Ceneo, so items Ceneo does not have are still searched in the
+ * shops in the same run (the first run looks up every item on Ceneo).
+ */
+const MAX_CENEO_SEARCHES = 70
+/** Reading the saved Ceneo pages stops after this — the shops' pages are read either way. */
+const CENEO_MINUTES = 10
+/** This many Ceneo pages in a row not there = Ceneo blocks or is down: skipped for this run. */
+const CENEO_FAILS = 5
+/**
  * A running check is saved this often even while a long call waits, so a run whose process died
  * is told apart within minutes (`SILENT_MINUTES` in scheduler.ts — keep it well above this).
  */
 const HEARTBEAT_SECONDS = 30
+/** The note of a Ceneo search that found nothing: that item is not searched again for a while. */
+// TODO(krystian): wording (no board).
+export const CENEO_NOT_FOUND = 'Ceneo: nie znaleziono strony produktu'
+const NOT_FOUND_DAYS = 14
 
 type Item = CheckItem & {
   checked: CheckedItem
@@ -59,7 +74,9 @@ class Stop extends Error {
 export function readerFor(): PriceReader | null {
   const config = priceCheckConfig(getEnv())
   if (!config) return null
-  return config.mode === 'fake' ? new FakePriceReader() : new ClaudePriceReader(config.apiKey)
+  return config.mode === 'fake'
+    ? new FakePriceReader()
+    : new ClaudePriceReader(config.apiKey, getEnv().SITE_URL)
 }
 
 export async function runPriceCheck(payload: Payload, checkId: number): Promise<string> {
@@ -190,13 +207,142 @@ export async function runPriceCheck(payload: Payload, checkId: number): Promise<
       return result.note === 'ok' ? row : null
     }
 
-    // (2) Read every offer page, 4 at a time.
-    const jobs = items.flatMap((item) => item.urls.map((u) => ({ item, ...u })))
+    // Ceneo pages one after another, `pageDelayMs` apart, whichever worker asks (ADR-G011).
+    let gate: Promise<unknown> = Promise.resolve()
+    let ceneoFails = 0
+    let ceneoNote: string | null = null
+    const ceneoDown = () => ceneoFails >= CENEO_FAILS
+    const loadCeneo = (url: string): Promise<CeneoPage | null> => {
+      const turn = gate.then(async () => {
+        if (Date.now() - started > MAX_MINUTES * 60_000) {
+          throw new Stop('failed', `Przekroczono ${MAX_MINUTES} min — zapisano postęp.`)
+        }
+        if (ceneoDown()) return null
+        const html = await reader.page(url)
+        totals.pagesRead++
+        await new Promise((resolve) => setTimeout(resolve, reader.pageDelayMs))
+        ceneoFails = html === null ? ceneoFails + 1 : 0
+        if (ceneoDown()) {
+          // TODO(krystian): wording (no board).
+          ceneoNote ??= 'Ceneo nie odpowiada — pominięte do następnego sprawdzenia.'
+          log.warn({ checkId }, 'ceneo skipped: pages not there')
+        }
+        return html === null ? null : parseCeneo(html)
+      })
+      gate = turn.catch(() => undefined)
+      return turn
+    }
+    /**
+     * The trusted shops' offers of a Ceneo page as offers of the item (only when `use`: a page
+     * not yet confirmed as the product is shown in the observations, never priced).
+     */
+    const recordCeneo = async (
+      item: Item,
+      sourceId: number | null,
+      url: string,
+      page: CeneoPage | null,
+      matched: boolean,
+      use: boolean,
+      method: 'fetch' | 'search',
+    ): Promise<OfferRow[]> => {
+      const now = new Date()
+      const rows: OfferRow[] = (page ? trustedOffers(page, shops, now) : []).map((o) => ({
+        url,
+        shop: o.shop,
+        price: o.price,
+        available: o.available,
+        matched,
+        fetchedAt: now.toISOString(),
+        via: 'ceneo',
+      }))
+      if (use && rows.length > 0) {
+        offers.set(`${item.itemType}:${item.code}`, [...offerOf(item), ...rows])
+      }
+      // TODO(krystian): wording of the notes (no board).
+      const note =
+        page === null
+          ? 'Ceneo: strona niedostępna'
+          : rows.length === 0
+            ? 'Ceneo: brak ofert zaufanych sklepów'
+            : matched
+              ? 'Ceneo'
+              : 'Ceneo: tytuł strony nie zgadza się z modelem'
+      const observed = rows.length > 0 ? rows : [null]
+      for (const row of observed) {
+        await payload.create({
+          collection: 'price-observations',
+          data: {
+            check: checkId,
+            itemType: item.itemType,
+            itemCode: item.code,
+            componentRole: item.itemType === 'component' ? item.category : null,
+            url,
+            shop: row?.shop ?? CENEO,
+            title: page?.title?.slice(0, 500) ?? null,
+            pricePln: row?.price ?? null,
+            available: row?.available ?? false,
+            matched,
+            method,
+            note,
+            observedAt: now.toISOString(),
+          },
+          depth: 0,
+          overrideAccess: true,
+        })
+      }
+      if (sourceId !== null) {
+        await payload.update({
+          collection: 'price-sources',
+          id: sourceId,
+          data:
+            rows.length > 0
+              ? { lastOk: now.toISOString(), lastError: null }
+              : { lastError: note.replace(/^Ceneo: /, '') },
+          depth: 0,
+          overrideAccess: true,
+        })
+      }
+      return rows
+    }
+
+    // (2a) Ceneo pages of the items — the main source, free (ADR-G011).
+    const isCeneo = (u: { url: string }) => ceneoProductId(u.url) !== null
+    const ceneoJobs = items.flatMap((item) =>
+      item.urls.filter(isCeneo).map((u) => ({ item, ...u })),
+    )
     let done = 0
+    const total = Math.max(items.flatMap((i) => i.urls).length, 1)
+    for (const job of ceneoJobs) {
+      if (ceneoDown()) break
+      if (Date.now() - started > CENEO_MINUTES * 60_000) {
+        // TODO(krystian): wording (no board).
+        ceneoNote ??= 'Część stron Ceneo poczeka do następnego sprawdzenia (limit czasu).'
+        break
+      }
+      const page = await loadCeneo(job.url)
+      // A page not there leaves the link alone (`recordCeneo` notes the error) unless Ceneo is
+      // down as a whole — then nothing is written for the rest.
+      if (page === null && ceneoDown()) break
+      await recordCeneo(job.item, job.id, job.url, page, true, true, 'fetch')
+      done++
+      if (done % 5 === 0) await progress('Ceneo', 10 + (done / total) * 60)
+    }
+
+    // (2b) Every shop's offer page, read by Claude, 4 at a time — except a shop whose usable offer
+    // (available, with a price) the item's Ceneo page gave already: the same price, paid twice.
+    // An offer Ceneo shows as not available is checked in the shop itself.
+    const fromCeneo = (item: Item, url: string) =>
+      offerOf(item).some(
+        (o) =>
+          o.via === 'ceneo' && o.available && o.price !== null && o.shop === shopOf(url, shops),
+      )
+    const jobs = items.flatMap((item) =>
+      item.urls.filter((u) => !isCeneo(u) && !fromCeneo(item, u.url)).map((u) => ({ item, ...u })),
+    )
     await pool(jobs, CONCURRENCY, async (job) => {
       await record(job.item, job.id, job.url, 'fetch')
       done++
-      if (done % 5 === 0) await progress('Sklepy', 10 + (done / Math.max(jobs.length, 1)) * 60)
+      if (done % 5 === 0) await progress('Sklepy', 10 + (done / total) * 60)
     })
 
     // (3) Search for items without a usable offer (market items only — invoice costs stay).
@@ -206,12 +352,6 @@ export async function runPriceCheck(payload: Payload, checkId: number): Promise<
     // saved again — before, every run searched (and paid for) the same items and duplicated links.
     // An item whose active links failed (product gone, another variant) is still searched.
     const linked = await linkedItems(payload)
-    const missing = items.filter(
-      (i) =>
-        i.costSource === 'market' &&
-        marketCost(offerOf(i), method) === null &&
-        !linked.pending.has(`${i.itemType}:${i.code}`),
-    )
     let linksProposed = 0
     let linksEnabled = 0
     let searchNote: string | null = null
@@ -223,14 +363,131 @@ export async function runPriceCheck(payload: Payload, checkId: number): Promise<
       if (error.status === 'budget') budgetHit = true
       searchNote ??= error.message
     }
-    const queue = rotate(missing, checkId * MAX_SEARCHES).slice(0, MAX_SEARCHES)
-    await pool(queue, CONCURRENCY, async (item) => {
-      if (searchNote !== null) return
-      if (Date.now() - started > SEARCH_MINUTES * 60_000) {
-        // TODO(krystian): wording (no board).
-        searchNote = 'Część pozycji poczeka na wyszukanie do następnego sprawdzenia (limit czasu).'
+    const timeUp = () => {
+      if (Date.now() - started <= SEARCH_MINUTES * 60_000) return false
+      // TODO(krystian): wording (no board).
+      searchNote ??= 'Część pozycji poczeka na wyszukanie do następnego sprawdzenia (limit czasu).'
+      return true
+    }
+    const propose = async (item: Item, url: string, active: boolean) => {
+      await payload
+        .create({
+          collection: 'price-sources',
+          data: {
+            itemType: item.itemType,
+            itemCode: item.code,
+            url,
+            active,
+            proposedByClaude: true,
+            ...(active ? { lastOk: new Date().toISOString() } : {}),
+          },
+          depth: 0,
+          overrideAccess: true,
+        })
+        .then(() => {
+          linksProposed++
+          if (active) linksEnabled++
+        })
+        .catch((error: unknown) => log.warn({ ...errorFields(error) }, 'proposed link refused'))
+    }
+
+    // (3a) Every market item without a Ceneo page (none saved, not „not found” lately) is looked
+    // up on Ceneo. A page switches itself on when its title is the model (`titleMatches`) and its
+    // cheapest trusted offer is close to the cost (`autoEnable`); otherwise it waits for Krystian.
+    const ceneoQueue = rotate(
+      items.filter(
+        (i) =>
+          i.costSource === 'market' &&
+          !linked.ceneo.has(`${i.itemType}:${i.code}`) &&
+          !linked.notFound.has(`${i.itemType}:${i.code}`),
+      ),
+      checkId * MAX_SEARCHES,
+    ).slice(0, MAX_CENEO_SEARCHES)
+    await pool(ceneoQueue, CONCURRENCY, async (item) => {
+      if (searchNote !== null || timeUp() || ceneoDown()) return
+      try {
+        guard('search')
+      } catch (error) {
+        stopSearch(error)
         return
       }
+      const found = await reader.searchCeneo(item.checked)
+      spend(found.usage)
+      searched++
+      // A failed search (API error, broken answer) says nothing about Ceneo: tried again next run.
+      if (!found.ok) return
+      const candidates = found.urls.filter((u) => !linked.urls.has(u))
+      let chosen: { url: string; page: CeneoPage; matched: boolean } | null = null
+      try {
+        for (const url of candidates) {
+          const page = await loadCeneo(url)
+          // A page not there, or with no offers and another title (a block page, a moved
+          // product), is never proposed — the item is searched again next run.
+          if (page === null) continue
+          const matched = titleMatches(item.model, page.title)
+          if (!matched && page.offers.length === 0) continue
+          if (matched) {
+            chosen = { url, page, matched }
+            break
+          }
+          chosen ??= { url, page, matched }
+        }
+      } catch (error) {
+        stopSearch(error)
+        return
+      }
+      if (chosen === null && (found.urls.length > 0 || ceneoDown())) return
+      if (chosen === null) {
+        // Nothing on Ceneo: remembered, so the next runs do not pay for the same search.
+        await payload.create({
+          collection: 'price-observations',
+          data: {
+            check: checkId,
+            itemType: item.itemType,
+            itemCode: item.code,
+            componentRole: item.itemType === 'component' ? item.category : null,
+            url: `https://www.${CENEO}/`,
+            shop: CENEO,
+            method: 'search',
+            note: CENEO_NOT_FOUND,
+            observedAt: new Date().toISOString(),
+          },
+          depth: 0,
+          overrideAccess: true,
+        })
+        return
+      }
+      // Another worker may have saved the same page meanwhile (an option and a part).
+      if (linked.urls.has(chosen.url)) return
+      linked.urls.add(chosen.url)
+      linked.ceneo.add(`${item.itemType}:${item.code}`)
+      const best = trustedOffers(chosen.page, shops, new Date()).find((o) => o.available)
+      const confirmed =
+        chosen.matched &&
+        best !== undefined &&
+        autoEnable({ matched: true, price: best.price }, item.cost, outlierPct)
+      await recordCeneo(item, null, chosen.url, chosen.page, chosen.matched, confirmed, 'search')
+      await propose(item, chosen.url, confirmed)
+      if (searched % 3 === 0) {
+        await progress('Ceneo: wyszukiwanie', 70 + (searched / Math.max(ceneoQueue.length, 1)) * 8)
+      }
+    })
+
+    // (3b) Items still without a usable offer are searched in the shops themselves.
+    const missing = items.filter(
+      (i) =>
+        i.costSource === 'market' &&
+        marketCost(offerOf(i), method) === null &&
+        !linked.pending.has(`${i.itemType}:${i.code}`),
+    )
+    // At most MAX_SEARCHES paid searches per run, Ceneo (up to MAX_CENEO_SEARCHES) and shops.
+    const queue = rotate(missing, checkId * MAX_SEARCHES).slice(
+      0,
+      Math.max(MAX_SEARCHES - searched, 0),
+    )
+    let shopSearched = 0
+    await pool(queue, CONCURRENCY, async (item) => {
+      if (searchNote !== null || timeUp()) return
       try {
         guard('search')
       } catch (error) {
@@ -257,29 +514,11 @@ export async function runPriceCheck(payload: Payload, checkId: number): Promise<
         // to the cost (ADR-G007, 1.11.2026 addition) — not on the model's word alone; others wait
         // for Krystian. Prices still go through „Do zatwierdzenia”: nothing reaches the site.
         const confirmed = row !== null && autoEnable(row, item.cost, outlierPct)
-        await payload
-          .create({
-            collection: 'price-sources',
-            data: {
-              itemType: item.itemType,
-              itemCode: item.code,
-              url,
-              active: confirmed,
-              proposedByClaude: true,
-              ...(confirmed ? { lastOk: new Date().toISOString() } : {}),
-            },
-            depth: 0,
-            overrideAccess: true,
-          })
-          .then(() => {
-            linksProposed++
-            if (confirmed) linksEnabled++
-          })
-          .catch((error: unknown) => log.warn({ ...errorFields(error) }, 'proposed link refused'))
+        await propose(item, url, confirmed)
       }
-      searched++
-      if (searched % 3 === 0) {
-        await progress('Sklepy: wyszukiwanie', 70 + (searched / Math.max(queue.length, 1)) * 15)
+      shopSearched++
+      if (shopSearched % 3 === 0) {
+        await progress('Sklepy: wyszukiwanie', 78 + (shopSearched / Math.max(queue.length, 1)) * 7)
       }
     })
 
@@ -339,7 +578,7 @@ export async function runPriceCheck(payload: Payload, checkId: number): Promise<
       itemsFound: diff.totals.found,
       summary,
       diff,
-      error: [...new Set([searchNote, stopNote].filter(Boolean))].join(' ') || null,
+      error: [...new Set([ceneoNote, searchNote, stopNote].filter(Boolean))].join(' ') || null,
       ...rounded(totals),
     })
 
@@ -429,24 +668,52 @@ async function pool<T>(list: readonly T[], size: number, work: (item: T) => Prom
   await Promise.all(workers)
 }
 
-/** Items with a proposal waiting to be switched on, and every known link address. */
+/**
+ * Items with a proposal waiting to be switched on, items with a Ceneo page (on or off), items
+ * not found on Ceneo in the last `NOT_FOUND_DAYS`, and every known link address.
+ */
 async function linkedItems(payload: Payload) {
-  const all = await payload.find({
-    collection: 'price-sources',
-    select: { itemType: true, itemCode: true, url: true, active: true, proposedByClaude: true },
-    depth: 0,
-    pagination: false,
-    overrideAccess: true,
-  })
+  const [all, notFound] = await Promise.all([
+    payload.find({
+      collection: 'price-sources',
+      select: { itemType: true, itemCode: true, url: true, active: true, proposedByClaude: true },
+      depth: 0,
+      pagination: false,
+      overrideAccess: true,
+    }),
+    payload.find({
+      collection: 'price-observations',
+      where: {
+        note: { equals: CENEO_NOT_FOUND },
+        observedAt: {
+          greater_than: new Date(Date.now() - NOT_FOUND_DAYS * 86_400_000).toISOString(),
+        },
+      },
+      select: { itemType: true, itemCode: true },
+      depth: 0,
+      pagination: false,
+      overrideAccess: true,
+    }),
+  ])
+  const key = (s: { itemType: string; itemCode: string }) => `${s.itemType}:${s.itemCode}`
   return {
-    /** Items with a Claude proposal still switched off. */
+    ceneo: new Set(all.docs.filter((s) => ceneoProductId(s.url) !== null).map(key)),
+    notFound: new Set(notFound.docs.map(key)),
+    /** Items with a Claude proposal of a shop page still switched off (a Ceneo one does not count). */
     pending: new Set(
       all.docs
-        .filter((s) => !s.active && s.proposedByClaude)
+        .filter((s) => !s.active && s.proposedByClaude && ceneoProductId(s.url) === null)
         .map((s) => `${s.itemType}:${s.itemCode}`),
     ),
-    urls: new Set(all.docs.map((s) => s.url)),
+    // Ceneo addresses in one form (`ceneo.pl/1`, `www.ceneo.pl/1;…` are the same page).
+    urls: new Set(all.docs.map((s) => canonical(s.url))),
   }
+}
+
+/** A Ceneo product page as `https://www.ceneo.pl/<id>`; any other address as is. */
+function canonical(url: string): string {
+  const id = ceneoProductId(url)
+  return id === null ? url : ceneoUrl(id)
 }
 
 /** The list started at `offset` (wrapping): each run searches the next items, not the same ones. */

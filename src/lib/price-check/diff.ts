@@ -38,6 +38,8 @@ export type OfferRow = {
   matched: boolean
   /** When the page copy was taken (ISO); missing in reports before 2.11.2026. */
   fetchedAt?: string | null
+  /** The offer was read from a Ceneo product page (`url`), not the shop's own page (ADR-G011). */
+  via?: 'ceneo'
 }
 
 export type ItemRow = CheckItem & {

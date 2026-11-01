@@ -1,9 +1,12 @@
 /**
- * Shops whose offer pages may be linked as cost sources (ADR-G007 §5) — the start list of
- * `price-check-settings`. No marketplaces (Ceneo, Allegro): they mix in third-party offers, and
- * Ceneo's product page loads its offers in the browser only (empty for the fetch tool, 1.11.2026).
+ * Trusted shops (ADR-G007 §5, ADR-G011) — the start list of `price-check-settings`: their own
+ * offer pages may be linked, and only their offers count on a Ceneo page. No marketplaces
+ * (Allegro, Amazon): they mix in third-party sellers.
  */
 export const DEFAULT_SHOPS = ['x-kom.pl', 'morele.net', 'komputronik.pl', 'sferis.pl'] as const
+
+/** Never a trusted shop: Ceneo is read on its own, marketplaces mix in other sellers (ADR-G011). */
+export const NOT_SHOPS = ['ceneo.pl', 'allegro.pl', 'amazon.pl', 'amazon.com', 'amazon.de'] as const
 
 /**
  * The allowed shop of an offer address (`www.x-kom.pl/p/…` → `x-kom.pl`), or `null` when the
@@ -39,4 +42,35 @@ export function onePerShop(
     seen.add(shop)
     return true
   })
+}
+
+/** The price comparison site read for the trusted shops' offers (ADR-G011). */
+export const CENEO = 'ceneo.pl'
+
+/**
+ * The product number of a Ceneo product page (`https://www.ceneo.pl/157489814`, also with
+ * `#…` or `;…` after it), or `null` for any other address — a search, a category, a redirect.
+ */
+export function ceneoProductId(url: string): string | null {
+  let parsed: URL
+  try {
+    parsed = new URL(url)
+  } catch {
+    return null
+  }
+  if (parsed.protocol !== 'https:' || parsed.port !== '' || parsed.username || parsed.password) {
+    return null
+  }
+  const host = parsed.hostname.toLowerCase()
+  if (host !== CENEO && host !== `www.${CENEO}`) return null
+  if (parsed.search !== '') return null
+  return /^\/(\d{4,12})(?:;[^/]*)?$/.exec(parsed.pathname)?.[1] ?? null
+}
+
+/** The one address kept for a Ceneo product page. */
+export const ceneoUrl = (id: string) => `https://www.${CENEO}/${id}`
+
+/** The shop of a cost source: `ceneo.pl` for a Ceneo product page, else a trusted shop or `null`. */
+export function sourceShop(url: string, shops: readonly string[] = DEFAULT_SHOPS): string | null {
+  return ceneoProductId(url) !== null ? CENEO : shopOf(url, shops)
 }
