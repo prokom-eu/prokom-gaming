@@ -4,6 +4,10 @@
   color: var(--p-tx2);
 }
 
+.table :global(td.pn-r) {
+  white-space: nowrap;
+}
+
 .tabs {
   margin: 20px 0 16px;
   overflow-x: auto;

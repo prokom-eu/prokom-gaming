@@ -247,7 +247,7 @@ export function OptionsBoard({ rows, approveHref }: { rows: OptionRow[]; approve
         />
       ) : null}
 
-      <Card>
+      <Card className={styles.table}>
         <DataTable
           caption={`Opcje: ${current.label}`}
           columns={columns}
