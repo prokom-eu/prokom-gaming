@@ -102,6 +102,12 @@ export default buildConfig({
           exact: true,
           meta: { title: 'Gotowe zestawy' },
         },
+        options: {
+          Component: '/admin/options/OptionsView#OptionsView',
+          path: '/opcje',
+          exact: true,
+          meta: { title: 'Opcje konfiguratora' },
+        },
         // `:slug` from `params.segments` (Payload matches the path with path-to-regexp).
         buildEditor: {
           Component: '/admin/builds/BuildEditorView#BuildEditorView',

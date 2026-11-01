@@ -130,7 +130,7 @@ const ITEMS: Record<NavKey, NavItem> = {
     icon: 'layers',
     path: '/opcje',
     roles: ADMIN,
-    ready: false,
+    ready: true,
   },
   // Payload lists in v1, no own screen (spec §1, P0).
   stock: {

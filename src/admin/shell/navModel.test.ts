@@ -25,7 +25,7 @@ describe('panel navigation', () => {
 
   it('hides screens whose session has not been built yet instead of linking to nothing', () => {
     const shown = [...navGroups('admin').flatMap((g) => g.items), ...navMore('admin')]
-    for (const hidden of ['clients', 'reports', 'options', 'stats']) {
+    for (const hidden of ['clients', 'reports', 'stats']) {
       expect(keys(shown)).not.toContain(hidden)
     }
   })
