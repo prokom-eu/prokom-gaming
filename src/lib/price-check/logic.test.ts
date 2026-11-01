@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { decide, marketCost, staleCost } from './market'
 import { parseAnswer, readingSchema } from './schema'
-import { numbersOf, unknownNumbers } from './summary'
+import { numbersIn, numbersOf, summaryInput, unknownNumbers } from './summary'
 import { callCostUsd, monthStart, overBudget, READ_MODEL, SEARCH_MODEL } from './usage'
 
 const reading = {
@@ -166,6 +166,99 @@ describe('summary numbers (ADR-G007 §2 pt 6)', () => {
 
   it('a number the model made up is caught', () => {
     expect(unknownNumbers('RAM podrożał o 12% do 2 500 zł.', numbersOf(diff))).toEqual([12, 2500])
+  })
+
+  it('numbers inside item and build names are not counted (first real run, 1.11.2026)', () => {
+    const text =
+      'Ryzen 7 9800X3D podrożał o 8%, płyta Z890 Wi-Fi też; RTX 5080 16 GB tanieje. Koszt 2 397 zł.'
+    const names = ['Ryzen 7 9800X3D', 'płyta Z890 Wi-Fi', 'RTX 5080 16 GB']
+    expect(unknownNumbers(text, numbersOf(diff), names)).toEqual([])
+    // Without the names they are caught — and „7 9800” is two numbers, not 79 800.
+    expect(unknownNumbers(text, numbersOf(diff))).toEqual([9800, 890, 5080, 16])
+    // An inflected name („płytę”, „Ryzena”) still passes: its model marks are removed.
+    expect(unknownNumbers('Proponuję płytę Z890 Wi-Fi i Ryzena 7 9800X3D.', [], names)).toEqual([])
+    // A number glued to a unit is still a value.
+    expect(unknownNumbers('Koszt 2500zł.', [], names)).toEqual([2500])
+  })
+
+  it('a hard space as the thousands separator', () => {
+    expect(numbersIn('14 750 zł i 2 397 zł')).toEqual([14750, 2397])
+  })
+
+  it('thousands only in groups of three', () => {
+    expect(numbersIn('14 750 zł, 1 054,52 zł, −4,3%, (12,4%), 7 9800')).toEqual([
+      14750, 1054.52, -4.3, 12.4, 7, 9800,
+    ])
+  })
+})
+
+describe('summaryInput', () => {
+  it('plain counts, percents as in the panel, no items without an offer', () => {
+    const item = (title: string, kind: string, extra: object = {}) => ({
+      title,
+      category: 'mobo',
+      cost: 849,
+      market: 1054.52,
+      priceNow: null,
+      priceNew: null,
+      builds: ['Wilkołak'],
+      decision: { kind, ...extra },
+    })
+    const build = (name: string, change: number | null, marginNow: number) => ({
+      name,
+      priceNow: 14440,
+      priceNew: 14680,
+      change,
+      marginNow,
+      marginAfter: 0.1245,
+    })
+    const diff = {
+      items: [
+        item('płyta Z890 Wi-Fi', 'propose', { newCost: 1054.52, change: 0.2421 }),
+        item('RTX 5080 16 GB', 'manual', { market: 5999, change: -0.2021 }),
+        item('Obudowa X', 'nooffer'),
+      ],
+      builds: [
+        build('Wilkołak', 240, 0.10953),
+        build('Skrzat', 0, 0.143),
+        build('Perun', null, 0.117),
+      ],
+      totals: {
+        items: 2,
+        found: 1,
+        proposals: 1,
+        manual: 0,
+        unavailable: 0,
+        nooffer: 1,
+        invoice: 0,
+        queued: 1,
+        minMargin: 0.11,
+        averageNow: 0.1321,
+        averageAfter: 0.1345,
+        lowestNow: 0.1028,
+        lowestNowConfig: null,
+        lowestAfter: 0.1109,
+        batch: 225,
+      },
+    } as unknown as Parameters<typeof summaryInput>[0]
+    const { input, names } = summaryInput(diff)
+    expect(input.liczby).toMatchObject({
+      zestawowZeZmianaCeny: 1,
+      zestawowBezZmiany: 1,
+      zestawowBezCeny: 1,
+      bezOfertyWgRodzaju: { 'płyty główne': 1 },
+      marzaMinimalnaProc: 11,
+      najnizszaMarzaTerazProc: 10.2,
+    })
+    expect(numbersOf(input)).not.toContain(225)
+    expect(input.zmianyPozycji.map((c) => c.pozycja)).toEqual([
+      'płyta Z890 Wi-Fi',
+      'RTX 5080 16 GB',
+    ])
+    // Changes rounded like the report table (−20,2%, not −20,3%).
+    expect(input.zmianyPozycji.map((c) => c.zmianaKosztuProc)).toEqual([24.2, -20.2])
+    expect(input.zestawy[0]!.marzaTerazProc).toBe(10.9)
+    expect(names).toEqual(['płyta Z890 Wi-Fi', 'RTX 5080 16 GB', 'Wilkołak', 'Skrzat', 'Perun'])
   })
 })
 
