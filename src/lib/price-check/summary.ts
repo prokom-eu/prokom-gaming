@@ -49,7 +49,9 @@ const escape = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 /**
  * The text without the given names (case-insensitive, longest first) and without their model
  * marks — words with a digit and a letter (Z890, 9800X3D) — also when the model inflects the
- * name around them („płytę Z890”, „Ryzena 7 9800X3D”).
+ * name around them („płytę Z890”, „Ryzena 7 9800X3D”). Bare numbers of a name go too when the
+ * model shortens it („DDR5 32 GB 6000”, „360 mm”) — but never as a price or a percent: „6000 zł”
+ * and „32%” stay and are checked.
  */
 function withoutNames(text: string, names: readonly string[]): string {
   const withDigit = names.filter((n) => /\d/.test(n))
@@ -60,6 +62,15 @@ function withoutNames(text: string, names: readonly string[]): string {
   let out = text
   for (const name of all) {
     out = out.replace(new RegExp(`(?<![\\p{L}\\d])${escape(name)}(?![\\p{L}\\d])`, 'giu'), ' ')
+  }
+  const bare = new Set(
+    withDigit.flatMap((n) => n.match(/(?<![\p{L}\d.,])\d+(?![\p{L}\d])/gu) ?? []),
+  )
+  for (const n of bare) {
+    out = out.replace(
+      new RegExp(`(?<![\\p{L}\\d]|\\d[.,])${n}(?!\\d|[.,]\\d|\\s?(?:zł|%|proc))`, 'gu'),
+      ' ',
+    )
   }
   return out
 }
