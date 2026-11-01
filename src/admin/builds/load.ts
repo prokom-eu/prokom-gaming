@@ -2,12 +2,11 @@ import 'server-only'
 
 import type { Payload } from 'payload'
 
-import { CatalogError, type Catalog } from '../../lib/pricing/catalog'
+import { CatalogError, catalogAtPublish, type Catalog } from '../../lib/pricing/catalog'
 import { costList } from '../../lib/pricing/cost'
 import { recipeFigures } from '../../lib/pricing/recipe'
 import type { PriceList, PriceSnapshot } from '../../lib/pricing/snapshot'
 import { loadBatch, loadOffer, type OfferData } from '../../lib/pricing/store'
-import { catalogAtPublish } from '../dashboard/margins'
 
 export type OfferStatus = 'published' | 'draft' | 'hidden'
 export type Monitor = 'fullhd' | 'qhd' | 'uhd'

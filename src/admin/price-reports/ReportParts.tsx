@@ -81,7 +81,9 @@ export function AcceptButton({
             try {
               const outcome = await acceptCheck({ checkId })
               if (outcome.ok) {
-                setResult(`zapisano koszty: ${outcome.options} opcji, ${outcome.levels} poziomów`)
+                setResult(
+                  `zapisano koszty: ${outcome.options} opcji, ${outcome.levels} poziomów${outcome.skipped > 0 ? ` · pominięto ${outcome.skipped} (koszt zmienił się od sprawdzenia)` : ''}`,
+                )
                 router.refresh()
               } else setError(outcome.message)
             } catch {

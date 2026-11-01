@@ -15,6 +15,7 @@ import { STATUS, startLine } from './format'
 import { competitorsBySlug, type Competitor } from './load'
 import { AcceptButton, ItemsTable, Progress } from './ReportParts'
 import styles from './reports.module.css'
+import { expireStaleChecks } from '../../lib/price-check/scheduler'
 
 const TITLE = 'Raport sprawdzenia cen'
 
@@ -56,6 +57,8 @@ export async function ReportView({ initPageResult, params }: AdminViewServerProp
   const { payload } = req
   const admin = payload.config.routes.admin
   const back = { href: `${admin}/raporty-cen`, label: 'Raporty cen' }
+  // A run cut off by a restart must not refresh „w toku” forever.
+  await expireStaleChecks(payload)
   const check = id
     ? await payload
         .findByID({

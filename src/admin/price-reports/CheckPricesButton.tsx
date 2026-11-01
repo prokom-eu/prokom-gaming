@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useState, useTransition } from 'react'
+import { useId, useState, useTransition } from 'react'
 
 import { Icon } from '../ui/icons'
 import { startCheck } from './actions'
@@ -20,6 +20,8 @@ export function CheckPricesButton({
   wide?: boolean
 }) {
   const router = useRouter()
+  // The button is rendered twice (top bar and „Więcej”): ids must differ (review P7).
+  const noteId = useId()
   const [message, setMessage] = useState<string | null>(null)
   const [pending, start] = useTransition()
   const run = () =>
@@ -42,13 +44,13 @@ export function CheckPricesButton({
         className="pn-btn pn-btn--gold"
         onClick={run}
         disabled={!enabled || pending}
-        aria-describedby={!enabled || message ? 'pn-check-note' : undefined}
+        aria-describedby={!enabled || message ? noteId : undefined}
       >
         <Icon name="refresh" />
         {pending ? 'Uruchamiam…' : 'Sprawdź ceny'}
       </button>
       {!enabled || message ? (
-        <small id="pn-check-note" className="pn-check__note" role="status">
+        <small id={noteId} className="pn-check__note" role="status">
           {message ?? off}
         </small>
       ) : null}

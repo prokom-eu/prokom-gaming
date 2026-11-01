@@ -1,5 +1,3 @@
-import { dateTime } from '../price-reports/format'
-import { latestReport } from '../price-reports/load'
 import type { AdminViewServerProps } from 'payload'
 
 import { percentShort } from '../../lib/pricing/format'
@@ -17,6 +15,8 @@ import { loadPrices, type PriceItem, type PricesData } from './load'
 import styles from './panelPrices.module.css'
 import { PriceTable, type PriceRowView } from './PriceTable'
 import { WhatIfCard } from './WhatIfCard'
+import { dateTime } from '../price-reports/format'
+import { latestReport } from '../price-reports/load'
 
 const TITLE = 'Centrum cen'
 const LEAD =

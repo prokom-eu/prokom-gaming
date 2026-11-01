@@ -30,6 +30,43 @@ export function isDue(now: Date, days: readonly string[], hour: number): boolean
   return days.includes(w.day) && w.hour === hour
 }
 
+/** A run „w toku” longer than this was cut off (restart, deploy): the job cap is 15 min. */
+export const STALE_MINUTES = 20
+
+/**
+ * Marks runs stuck in `running` (the server restarted mid-run) as `failed`, so they never block
+ * „Sprawdź ceny”, the schedule or a report page forever (review P7). Returns how many.
+ */
+export async function expireStaleChecks(payload: Payload, now = new Date()): Promise<number> {
+  const stale = await payload.find({
+    collection: 'price-checks',
+    where: {
+      status: { equals: 'running' },
+      startedAt: { less_than: new Date(now.getTime() - STALE_MINUTES * 60_000).toISOString() },
+    },
+    select: { status: true },
+    depth: 0,
+    pagination: false,
+    overrideAccess: true,
+  })
+  for (const check of stale.docs) {
+    await payload.update({
+      collection: 'price-checks',
+      id: check.id,
+      // TODO(krystian): wording (no board).
+      data: {
+        status: 'failed',
+        finishedAt: now.toISOString(),
+        error: 'Sprawdzanie przerwane (restart serwera?) — uruchom je jeszcze raz.',
+      },
+      depth: 0,
+      overrideAccess: true,
+    })
+  }
+  if (stale.docs.length > 0) log.warn({ count: stale.docs.length }, 'stale price checks expired')
+  return stale.docs.length
+}
+
 /**
  * Starts a price check (button or schedule): one run at a time, never without Claude. Returns
  * the new check's id, or why not.
@@ -39,6 +76,7 @@ export async function startPriceCheck(
   trigger: 'manual' | 'schedule',
 ): Promise<{ ok: true; id: number } | { ok: false; reason: 'running' | 'no-key' }> {
   if (!readerFor()) return { ok: false, reason: 'no-key' }
+  await expireStaleChecks(payload)
   const running = await payload.count({
     collection: 'price-checks',
     where: { status: { equals: 'running' } },
@@ -75,11 +113,14 @@ export async function runPriceCheckScheduler(payload: Payload): Promise<boolean>
   })
   const now = new Date()
   if (!isDue(now, settings.days ?? [], settings.hour ?? 6)) return false
-  // Once per day and hour: a check already started this hour (manual or not) is enough.
-  const since = new Date(now.getTime() - 60 * 60_000).toISOString()
+  // Once per day and hour: a check already started in this clock hour (manual or not) is
+  // enough. Polish time differs from UTC by whole hours, so the UTC hour boundary is the same.
+  const hourStart = new Date(now)
+  hourStart.setUTCMinutes(0, 0, 0)
+  const since = hourStart.toISOString()
   const recent = await payload.count({
     collection: 'price-checks',
-    where: { startedAt: { greater_than: since } },
+    where: { startedAt: { greater_than_equal: since } },
     overrideAccess: true,
   })
   if (recent.totalDocs > 0) return false

@@ -168,3 +168,25 @@ export function toCatalog(
     settings,
   }
 }
+
+/**
+ * The catalog with costs as they were at publication (`published-prices.costAtPublish`). A
+ * level, option or service without a recorded cost (added after the batch) gets `NaN`, so every
+ * margin that depends on it comes out unknown — shown as „—”, never as a guess.
+ */
+export function catalogAtPublish(
+  catalog: Catalog,
+  rows: readonly Pick<PriceRow, 'itemType' | 'itemCode' | 'costAtPublish'>[],
+): Catalog {
+  const cost = (type: PriceRow['itemType'], code: string) => {
+    const row = rows.find((r) => r.itemType === type && r.itemCode === code)
+    return row?.costAtPublish ?? Number.NaN
+  }
+  const service = rows.find((r) => r.itemType === 'service')?.costAtPublish ?? Number.NaN
+  return {
+    ...catalog,
+    levels: catalog.levels.map((l) => ({ ...l, partsCost: cost('level', l.code) })),
+    options: catalog.options.map((o) => ({ ...o, cost: cost('option', o.code) })),
+    settings: { ...catalog.settings, serviceCost: service },
+  }
+}

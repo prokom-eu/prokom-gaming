@@ -1,5 +1,3 @@
-import { latestReport } from '../price-reports/load'
-import { marketChanges, type MarketRow } from '../price-reports/market'
 import 'server-only'
 
 import type { Payload } from 'payload'
@@ -17,6 +15,8 @@ import { recentEvents, type DashEvent } from './events'
 import { marginsView, type MarginsView } from './margins'
 import { shortName, todoList, type DueOrder, type TodoItem } from './rules'
 import { countByDay, lastDays } from './series'
+import { latestReport } from '../price-reports/load'
+import { marketChanges, type MarketRow } from '../price-reports/market'
 
 /**
  * Everything the Pulpit shows, read once per request (panel spec §2a pt 10, P2: one loader, one

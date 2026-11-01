@@ -35,7 +35,7 @@ export type CallUsage = {
   model: string
   inputTokens: number
   outputTokens: number
-  /** Cache reads and writes are billed like input here (an overestimate, never under). */
+  /** Cache reads and writes, billed like input here (no `cache_control` is set today). */
   cacheTokens?: number
   webSearches?: number
   webFetches?: number
@@ -62,10 +62,10 @@ export function estimateUsd(kind: 'read' | 'search' | 'summary'): number {
       // One page (~25K tokens) and a short JSON answer.
       return callCostUsd({ model: READ_MODEL, inputTokens: 30_000, outputTokens: 800 })
     case 'search':
-      // Up to 3 searches and their results.
+      // Up to 3 searches, their results and up to 3 turns of `pause_turn` (each resends the context).
       return callCostUsd({
         model: SEARCH_MODEL,
-        inputTokens: 40_000,
+        inputTokens: 150_000,
         outputTokens: 1_500,
         webSearches: 3,
       })

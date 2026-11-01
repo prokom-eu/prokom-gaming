@@ -1,7 +1,3 @@
-import { shopsOf } from '../../globals/PriceCheckSettings'
-import { monthStart } from '../../lib/price-check/usage'
-import { PriceCheckSettingsForm } from './PriceCheckSettingsForm'
-import { toPriceCheckValues, type DayKey } from './priceCheckForm'
 import { createHash } from 'node:crypto'
 
 import type { AdminViewServerProps, Payload } from 'payload'
@@ -23,6 +19,10 @@ import { whenLabel } from '../inquiries/format'
 import { MailSettingsForm } from './MailSettingsForm'
 import { toMailFormValues } from './mailForm'
 import { SettingsForm } from './SettingsForm'
+import { shopsOf } from '../../globals/PriceCheckSettings'
+import { monthStart } from '../../lib/price-check/usage'
+import { PriceCheckSettingsForm } from './PriceCheckSettingsForm'
+import { toPriceCheckValues, type DayKey } from './priceCheckForm'
 
 const TITLE = 'Ustawienia'
 

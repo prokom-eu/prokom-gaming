@@ -73,6 +73,16 @@ export async function acceptCheck(raw: unknown): Promise<AcceptResult> {
       return { ok: false, message: 'Ten raport nie ma propozycji do przyjęcia.' }
     }
     if (check.acceptedAt) return { ok: false, message: 'Propozycje z tego raportu już przyjęto.' }
+    // A newer finished report knows today's market better: accept from that one.
+    const newer = await payload.count({
+      collection: 'price-checks',
+      where: { status: { equals: 'done' }, startedAt: { greater_than: check.startedAt } },
+      overrideAccess: true,
+    })
+    if (newer.totalDocs > 0) {
+      // TODO(krystian): message not on the board.
+      return { ok: false, message: 'Jest nowszy raport cen — przyjmij propozycje z niego.' }
+    }
     // Claim the report first: a second click (another tab) finds it accepted.
     await payload.update({
       collection: 'price-checks',

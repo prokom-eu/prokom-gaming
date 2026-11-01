@@ -82,19 +82,26 @@ export class ClaudePriceReader implements PriceReader {
   private async run(
     params: Anthropic.MessageCreateParamsNonStreaming,
     model: string,
-  ): Promise<{ text: string; usage: CallUsage[]; refused: boolean }> {
+  ): Promise<{ text: string; usage: CallUsage[]; refused: boolean; failed: boolean }> {
     const usage: CallUsage[] = []
     const messages = [...params.messages]
-    for (let turn = 0; turn < 3; turn++) {
-      const response = await this.client.messages.create({ ...params, messages })
-      usage.push(usageOf(model, response))
-      if (response.stop_reason === 'refusal') return { text: '', usage, refused: true }
-      if (response.stop_reason !== 'pause_turn') {
-        return { text: lastText(response), usage, refused: false }
+    try {
+      for (let turn = 0; turn < 3; turn++) {
+        const response = await this.client.messages.create({ ...params, messages })
+        usage.push(usageOf(model, response))
+        if (response.stop_reason === 'refusal') {
+          return { text: '', usage, refused: true, failed: false }
+        }
+        if (response.stop_reason !== 'pause_turn') {
+          return { text: lastText(response), usage, refused: false, failed: false }
+        }
+        messages.push({ role: 'assistant', content: response.content })
       }
-      messages.push({ role: 'assistant', content: response.content })
+    } catch {
+      // An error in a later turn: the earlier turns are still paid — keep their usage.
+      return { text: '', usage, refused: false, failed: true }
     }
-    return { text: '', usage, refused: false }
+    return { text: '', usage, refused: false, failed: false }
   }
 
   async read(item: CheckedItem, url: string, shops: readonly string[]): Promise<ReadResult> {
@@ -122,7 +129,7 @@ export class ClaudePriceReader implements PriceReader {
           READ_MODEL,
         )
         usage.push(...result.usage)
-        if (result.refused) return { reading: null, note: 'error', usage }
+        if (result.refused || result.failed) return { reading: null, note: 'error', usage }
         const parsed = parseAnswer(result.text, readingSchema)
         if (parsed.ok) return { reading: parsed.value, note: 'ok', usage }
       } catch {

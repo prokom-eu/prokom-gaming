@@ -2,7 +2,7 @@ import 'server-only'
 
 import type { Payload } from 'payload'
 
-import { catalogAtPublish } from '../../admin/dashboard/margins'
+import { catalogAtPublish } from '../pricing/catalog'
 import { getEnv, priceCheckConfig } from '../env'
 import { errorFields, log } from '../logger'
 import { notify } from '../notify'
@@ -138,7 +138,9 @@ export async function runPriceCheck(payload: Payload, checkId: number): Promise<
         available: r?.available ?? false,
         matched: r?.matches ?? false,
       }
-      offers.set(`${item.itemType}:${item.code}`, [...offerOf(item), row])
+      // Only a valid reading is an offer: an API error or a broken answer says nothing about the
+      // shop, so it never makes an item „niedostępne” (no false alarm — review P7).
+      if (result.note === 'ok') offers.set(`${item.itemType}:${item.code}`, [...offerOf(item), row])
       await payload.create({
         collection: 'price-observations',
         data: {
@@ -231,14 +233,25 @@ export async function runPriceCheck(payload: Payload, checkId: number): Promise<
     // (6) Summary from the numbers only, checked; one retry, else none.
     await progress('Raport i alarm', 92)
     let summary: string | null = null
+    let stopNote: string | null = null
     const diffJson = JSON.stringify(summaryInput(diff))
-    for (let attempt = 0; attempt < 2 && summary === null; attempt++) {
-      guard('summary')
-      const result = await reader.summarize(diffJson)
-      spend(result.usage)
-      if (result.text && unknownNumbers(result.text, numbersOf(summaryInput(diff))).length === 0) {
-        summary = result.text
+    try {
+      for (let attempt = 0; attempt < 2 && summary === null; attempt++) {
+        guard('summary')
+        const result = await reader.summarize(diffJson)
+        spend(result.usage)
+        if (
+          result.text &&
+          unknownNumbers(result.text, numbersOf(summaryInput(diff))).length === 0
+        ) {
+          summary = result.text
+        }
       }
+    } catch (error) {
+      // The limit or the time ran out before the summary: the readings and the recomputation are
+      // done and paid — keep the report, without the summary.
+      if (!(error instanceof Stop)) throw error
+      stopNote = error.message
     }
 
     await save({
@@ -249,6 +262,7 @@ export async function runPriceCheck(payload: Payload, checkId: number): Promise<
       itemsFound: diff.totals.found,
       summary,
       diff,
+      error: stopNote,
       ...rounded(totals),
     })
 
