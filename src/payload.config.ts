@@ -96,6 +96,19 @@ export default buildConfig({
           exact: true,
           meta: { title: 'Do zatwierdzenia' },
         },
+        builds: {
+          Component: '/admin/builds/BuildsView#BuildsView',
+          path: '/zestawy',
+          exact: true,
+          meta: { title: 'Gotowe zestawy' },
+        },
+        // `:slug` from `params.segments` (Payload matches the path with path-to-regexp).
+        buildEditor: {
+          Component: '/admin/builds/BuildEditorView#BuildEditorView',
+          path: '/zestawy/:slug',
+          exact: true,
+          meta: { title: 'Edytor zestawu' },
+        },
         inquiries: {
           Component: '/admin/inquiries/InquiriesView#InquiriesView',
           path: '/zapytania',

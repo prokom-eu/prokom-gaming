@@ -143,7 +143,10 @@ test.describe('publication', () => {
 
   test.beforeAll(async ({ playwright, baseURL }) => {
     panel = await playwright.request.newContext({ baseURL })
-    anon = await playwright.request.newContext({ baseURL, storageState: undefined })
+    anon = await playwright.request.newContext({
+      baseURL,
+      storageState: { cookies: [], origins: [] },
+    })
     headers = adminHeaders()
     const levels = (await (
       await panel.get('/api/power-levels?where[code][equals]=P01&depth=0', { headers })

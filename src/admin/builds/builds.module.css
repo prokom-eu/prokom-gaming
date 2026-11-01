@@ -1,0 +1,457 @@
+/* Gotowe zestawy and the build editor (panel spec §9): panel tokens only (panel-tokens.css). */
+
+.mu {
+  color: var(--p-mu);
+}
+
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+  margin: 20px 0 16px;
+}
+
+.barRight {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+  font-size: 13px;
+}
+
+.switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  color: var(--p-tx2);
+  cursor: pointer;
+}
+
+.grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.head {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.head > span:last-child {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.sigilBox {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  border: 1px solid var(--p-ln2);
+  background: var(--p-s2);
+}
+
+.sigilBox :global(.pn-sigil) {
+  width: 24px;
+  height: 24px;
+}
+
+.name {
+  margin: 0;
+  font-family: var(--font-cinzel), serif;
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: 0.03em;
+}
+
+.head small {
+  font-size: 12px;
+}
+
+.price {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+}
+
+.price b {
+  font-size: 24px;
+  font-weight: 800;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.price small {
+  color: var(--p-mu);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.chips {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.margin {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.recipe {
+  margin: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 6px 12px;
+  font-size: 12.5px;
+  border-bottom: 1px solid var(--p-ln);
+  padding-bottom: 14px;
+}
+
+.recipe dt {
+  color: var(--p-mu);
+}
+
+.recipe dd {
+  margin: 0;
+  color: var(--p-tx2);
+}
+
+.edit {
+  margin-top: auto;
+  justify-content: center;
+  min-height: 44px;
+}
+
+@media (max-width: 1180px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .bar,
+  .barRight {
+    flex-wrap: nowrap;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .barRight > span {
+    display: none;
+  }
+}
+
+/* --- Build editor --- */
+
+.edHead {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 16px 20px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.edHead .sigilBox {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+}
+
+.edHead .sigilBox :global(.pn-sigil) {
+  width: 34px;
+  height: 34px;
+}
+
+.edName {
+  margin: 0 0 4px;
+  font-family: var(--font-cinzel), serif;
+  font-weight: 700;
+  font-size: 31px;
+  letter-spacing: 0.02em;
+}
+
+.edHead p {
+  margin: 0;
+  font-size: 14px;
+}
+
+.edTabs {
+  margin-bottom: 20px;
+  overflow-x: auto;
+}
+
+.edGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 16px;
+  align-items: start;
+}
+
+.edMain {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+
+.edSide {
+  position: sticky;
+  top: 88px;
+  display: grid;
+  gap: 16px;
+}
+
+.hint {
+  margin: 8px 0 0;
+  color: var(--p-mu);
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.tile,
+.choice {
+  display: grid;
+  gap: 4px;
+  align-content: start;
+  text-align: left;
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px solid var(--p-ln);
+  background: var(--p-s2);
+  color: var(--p-tx);
+  font: inherit;
+  cursor: pointer;
+  min-height: 48px;
+}
+
+.tile b,
+.choice b {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.tile[aria-checked='true'],
+.choice[aria-checked='true'] {
+  border-color: var(--p-gold);
+  box-shadow: inset 0 0 0 1px var(--p-gold);
+}
+
+.tile[aria-disabled='true'],
+.choice[aria-disabled='true'] {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.photo {
+  display: grid;
+  place-items: center;
+  height: 96px;
+}
+
+.photo img {
+  max-height: 96px;
+  width: auto;
+  object-fit: contain;
+}
+
+.extra {
+  color: var(--p-ok);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.reason {
+  color: var(--p-mu);
+  font-size: 12px;
+}
+
+.photos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.photos img {
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+.history {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+}
+
+.history li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto 70px;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--p-ln);
+  font-variant-numeric: tabular-nums;
+}
+
+.history li > span {
+  display: grid;
+  gap: 2px;
+}
+
+.history small {
+  color: var(--p-mu);
+  font-size: 12px;
+  text-align: right;
+}
+
+.history li > span small {
+  text-align: left;
+}
+
+.edPrice {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+}
+
+.edPrice b {
+  font-size: 34px;
+  font-weight: 800;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.edPrice small {
+  color: var(--p-tx2);
+  font-size: 14px;
+}
+
+.breakdown {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--p-ln);
+}
+
+.breakdown dd {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.bar2 {
+  margin-top: 14px;
+}
+
+.edSave {
+  display: grid;
+  margin-top: 16px;
+}
+
+.edSave :global(.pn-btn) {
+  justify-content: center;
+  min-height: 48px;
+}
+
+.list {
+  margin: 6px 0 0;
+  padding-left: 18px;
+}
+
+.confirm {
+  display: grid;
+  gap: 12px;
+}
+
+.confirm h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.confirmPrice {
+  margin: 0;
+  font-size: 22px;
+  font-variant-numeric: tabular-nums;
+}
+
+.confirmActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+@media (max-width: 1180px) {
+  .edGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .edSide {
+    position: static;
+  }
+
+  .tiles {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .edHead {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .edStatus {
+    grid-column: 1 / -1;
+    overflow-x: auto;
+  }
+
+  .edName {
+    font-size: 26px;
+  }
+
+  .tiles {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* The action under the thumb (ActionBar) takes „Zapisz” on a phone. */
+  .edSave {
+    display: none;
+  }
+}
