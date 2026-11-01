@@ -368,11 +368,29 @@ export interface Build {
    * /zestawy/<slug>
    */
   slug: string;
+  /**
+   * Zmieniasz w edytorze zestawu (Gotowe zestawy → Edytuj).
+   */
   offerStatus: 'published' | 'draft' | 'hidden';
+  /**
+   * Zmieniasz w edytorze zestawu (Gotowe zestawy → Edytuj).
+   */
   level: number | PowerLevel;
+  /**
+   * Zmieniasz w edytorze zestawu (Gotowe zestawy → Edytuj).
+   */
   case: number | Option;
+  /**
+   * Zmieniasz w edytorze zestawu (Gotowe zestawy → Edytuj).
+   */
   cooler: number | Option;
+  /**
+   * Zmieniasz w edytorze zestawu (Gotowe zestawy → Edytuj).
+   */
   ram: number | Option;
+  /**
+   * Zmieniasz w edytorze zestawu (Gotowe zestawy → Edytuj).
+   */
   ssd: number | Option;
   creature: {
     /**

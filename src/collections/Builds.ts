@@ -5,6 +5,10 @@ import { blockDeleteWithFpsResults } from './FpsResults'
 import { blockDeleteWhenReferenced } from './workshopGuards'
 import { GROUP_OFFER } from './shared'
 
+// The recipe and the status change only in the build editor (/admin/zestawy/<slug>), which asks
+// to confirm a new price on the site (panel spec §9, P0). The API stays writable for the editor.
+const RECIPE_IN_EDITOR = 'Zmieniasz w edytorze zestawu (Gotowe zestawy → Edytuj).'
+
 const optionOf = (name: string, label: string, type: string): Field => ({
   name,
   label,
@@ -15,6 +19,7 @@ const optionOf = (name: string, label: string, type: string): Field => ({
   // drop out of it (the other side: `blockDeactivateWhenUsed` in `usage.ts`). Payload also
   // checks `filterOptions` when saving.
   filterOptions: { type: { equals: type }, active: { equals: true } },
+  admin: { readOnly: true, description: RECIPE_IN_EDITOR },
 })
 
 export const OFFER_STATUSES = [
@@ -71,6 +76,7 @@ export const Builds: CollectionConfig = {
           defaultValue: 'published',
           index: true,
           options: [...OFFER_STATUSES],
+          admin: { readOnly: true, description: RECIPE_IN_EDITOR },
         },
       ],
     },
@@ -80,6 +86,7 @@ export const Builds: CollectionConfig = {
       type: 'relationship',
       relationTo: 'power-levels',
       required: true,
+      admin: { readOnly: true, description: RECIPE_IN_EDITOR },
     },
     {
       type: 'row',

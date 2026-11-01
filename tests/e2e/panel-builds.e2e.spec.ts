@@ -142,19 +142,25 @@ test.describe('saving', () => {
     await expect(sheet).toContainText('11 930 zł')
     await expect(sheet).toContainText(price)
     await sheet.getByRole('button', { name: /^Zapisz z ceną/ }).click()
-    await expect(page.getByText('Zapisano zestaw.')).toBeVisible()
+    await expect(
+      page.getByRole('region', { name: 'Cena zestawu' }).getByText('Zapisano zestaw.'),
+    ).toBeVisible()
     // The build page shows the saved price (the same sum; digits compared without spacing).
     const buildPage = await (await anon.get('/zestawy/bazyliszek')).text()
     expect(buildPage.replace(/\s/g, '')).toContain(`${price.replace(/\D/g, '')}zł`)
 
     // Hidden: saved at once (it leaves the site), then the site and its API do not know it.
     await page.getByRole('radio', { name: 'Ukryty' }).click()
-    await expect(page.getByText('Zapisano zestaw.')).toBeHidden()
+    await expect(
+      page.getByRole('region', { name: 'Cena zestawu' }).getByText('Zapisano zestaw.'),
+    ).toBeHidden()
     await page
       .getByRole('region', { name: 'Cena zestawu' })
       .getByRole('button', { name: 'Zapisz' })
       .click()
-    await expect(page.getByText('Zapisano zestaw.')).toBeVisible()
+    await expect(
+      page.getByRole('region', { name: 'Cena zestawu' }).getByText('Zapisano zestaw.'),
+    ).toBeVisible()
     expect((await anon.get('/zestawy/bazyliszek')).status()).toBe(404)
     const api = (await (
       await anon.get('/api/builds?where[slug][equals]=bazyliszek&depth=0')

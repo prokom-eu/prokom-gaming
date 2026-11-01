@@ -13,7 +13,13 @@ vi.mock('../pricing/store', () => ({
       levels: catalog.levels.map((l) => ({ ...l, futureCost: 1 })),
       options: catalog.options.map((o) => ({ ...o, futureCost: 1 })),
     },
-    builds: [],
+    builds: (['published', 'draft', 'hidden'] as const).map((offerStatus, i) => ({
+      id: i + 1,
+      slug: offerStatus,
+      name: offerStatus,
+      offerStatus,
+      config: { level: 'P01', case: 'C', cooler: 'K', ram: 'R', ssd: 'S' },
+    })),
   }),
   loadBatch: async () => ({
     snapshot: {
@@ -37,5 +43,13 @@ describe('loadInquiryPricing', () => {
     }
     expect(pricing?.offer.levels).toHaveLength(catalog.levels.length)
     expect(pricing?.offer.options).toHaveLength(catalog.options.length)
+  })
+
+  it('offers published builds only: a draft or hidden build cannot be asked for (P6)', async () => {
+    const { loadInquiryPricing } = await import('./pricingStore')
+    const payload = { find: async () => ({ docs: [] }) }
+    const pricing = await loadInquiryPricing(payload as never)
+    expect(pricing?.offer.builds.map((b) => b.slug)).toEqual(['published'])
+    expect(JSON.stringify(pricing?.offer.builds)).not.toContain('offerStatus')
   })
 })

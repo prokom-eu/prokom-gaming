@@ -97,7 +97,7 @@ export async function loadEditor(
     }),
     payload.find({
       collection: 'published-prices',
-      where: { batch: { greater_than: ctx.snapshot.batch - 6 } },
+      where: { batch: { greater_than: ctx.snapshot.batch - 5 } },
       select: { batch: true, itemType: true, itemCode: true, sellPrice: true, publishedAt: true },
       sort: '-batch',
       depth: 0,

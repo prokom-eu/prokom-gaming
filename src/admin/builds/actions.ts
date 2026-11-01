@@ -4,13 +4,14 @@ import { revalidatePath } from 'next/cache'
 import { createLocalReq, type Payload } from 'payload'
 import { z } from 'zod'
 
-import { compatMessage } from '../../lib/compat'
+import { checkCompat, compatMessage, indexOffer, resolveParts } from '../../lib/compat'
 import { errorFields, log } from '../../lib/logger'
-import { costContext, evaluate } from '../../lib/pricing/cost'
+import { loadBatch } from '../../lib/pricing/store'
 import { priceFromSnapshot } from '../../lib/pricing/snapshot'
 import { ITEM_CODE } from '../../lib/pricing/types'
 import { panelActionSession } from '../session'
 import { loadBuildsContext } from './load'
+import { saveDecision } from './saveRule'
 
 export type SaveBuildResult =
   | { ok: true; price: number | null }
@@ -53,35 +54,50 @@ export async function saveBuild(raw: unknown): Promise<SaveBuildResult> {
     const level = catalog.levels.find((l) => l.code === config.level)
     if (!level) return { ok: false, messages: ['Nie ma takiego poziomu mocy.'] }
     for (const slot of ['case', 'cooler', 'ram', 'ssd'] as const) {
-      const option = catalog.options.find((o) => o.code === config[slot] && o.type === slot)
-      if (!option) return { ok: false, messages: [`Nie ma takiej opcji: ${config[slot]}.`] }
+      const code = config[slot]
+      const option = catalog.options.find((o) => o.code === code && o.type === slot)
+      const name = ctx.labels.get(code) ?? code
+      if (!option) return { ok: false, messages: [`Nie ma takiej opcji: ${name}.`] }
       if (!option.active) {
-        return { ok: false, messages: [`${config[slot]} jest wyłączona w konfiguratorze.`] }
+        return { ok: false, messages: [`${name} jest wyłączona w konfiguratorze.`] }
       }
     }
+    // The rules of lib/compat — also for a draft or hidden build, which may have no price.
+    const parts = resolveParts(config, indexOffer(catalog.levels, catalog.options))
+    if (!parts) return { ok: false, messages: ['Nie da się złożyć tego przepisu.'] }
+    const { errors } = checkCompat(parts)
+    if (errors.length > 0)
+      return { ok: false, messages: errors.map((e) => compatMessage(e, level)) }
+
     const price = priceFromSnapshot(config, ctx.snapshot)
-    if (price === null) {
+    const before = priceFromSnapshot(build.config, ctx.snapshot)
+    const decision = saveDecision({
+      current: build.offerStatus,
+      next: status,
+      before,
+      price,
+      confirmedPrice,
+    })
+    if (decision.kind === 'no-price') {
       // TODO(krystian): message not on the board.
       return {
         ok: false,
         messages: [
-          'Przepis ma pozycję bez opublikowanej ceny — zatwierdź ją najpierw w „Do zatwierdzenia”.',
+          'Przepis ma pozycję bez opublikowanej ceny — zatwierdź ją najpierw w „Do zatwierdzenia” albo zapisz zestaw jako szkic.',
         ],
       }
     }
-    const evaluated = evaluate(config, costContext(catalog, ctx.snapshot))
-    if (!evaluated) return { ok: false, messages: ['Nie da się wycenić tego przepisu.'] }
-    if (evaluated.errors.length > 0) {
-      return { ok: false, messages: evaluated.errors.map((e) => compatMessage(e, level)) }
+    if (decision.kind === 'confirm') {
+      return { ok: false, confirm: { from: decision.from, to: decision.to } }
     }
-
-    const before = priceFromSnapshot(build.config, ctx.snapshot)
-    const onSite = status === 'published'
-    const priceChanges = build.offerStatus !== 'published' || before !== price
-    if (onSite && priceChanges && confirmedPrice !== price) {
+    // A batch published since the read would change the price just confirmed: ask again.
+    const newest = await loadBatch(payload)
+    if (newest?.snapshot.batch !== ctx.snapshot.batch) {
       return {
         ok: false,
-        confirm: { from: build.offerStatus === 'published' ? before : null, to: price },
+        messages: [
+          'W międzyczasie opublikowano nowe ceny — sprawdź cenę zestawu i zapisz jeszcze raz.',
+        ],
       }
     }
 

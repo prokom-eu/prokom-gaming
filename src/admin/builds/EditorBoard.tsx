@@ -64,6 +64,8 @@ export function EditorBoard({ data }: { data: EditorData }) {
   const [tab, setTab] = useState<Tab>('recipe')
   const [confirm, setConfirm] = useState<{ from: number | null; to: number } | null>(null)
   const [result, setResult] = useState<SaveBuildResult | null>(null)
+  // TODO(krystian): message not on the board.
+  const [levelNote, setLevelNote] = useState<string | null>(null)
   const [saving, startSave] = useTransition()
 
   const atBatch = recipeFigures(config, prices, costsAtBatch)
@@ -75,12 +77,26 @@ export function EditorBoard({ data }: { data: EditorData }) {
   const dirty = !same(config, build.config) || status !== build.status
   const label = (code: string) => data.options.find((o) => o.code === code)?.label ?? code
   const tone = marginStatus(atBatch.margin, minMargin, warnMargin)
+  // An item without a published price blocks only a build that will be on the site (saveRule).
+  const blocked = price === null && status === 'published'
+  // The outcome of „Zapisz” also in the bar under the thumb: on a phone the price card is below.
+  const outcomeNote =
+    result?.ok === true
+      ? 'Zapisano zestaw.'
+      : result?.ok === false && 'messages' in result
+        ? `Nie zapisano: ${result.messages[0] ?? ''}`
+        : blocked
+          ? 'pozycja bez opublikowanej ceny'
+          : null
 
   const pickLevel = (code: string) => {
     const next =
       switchLevel(config, code, { offer: data.offer, builds: data.builds, prices }) ??
       repairConfig({ ...config, level: code }, data.offer, prices)
     if (next) setConfig(next.config)
+    setLevelNote(
+      next ? null : 'Do tego poziomu nie da się dobrać pasujących części — poziom bez zmian.',
+    )
     setResult(null)
   }
   const pick = (slot: OptionType, code: string) => {
@@ -105,7 +121,7 @@ export function EditorBoard({ data }: { data: EditorData }) {
       type="button"
       className="pn-btn pn-btn--gold"
       onClick={() => save(null)}
-      disabled={!dirty || saving || price === null}
+      disabled={!dirty || saving || blocked}
     >
       <Icon name="check" />
       {saving ? 'Zapisuję…' : 'Zapisz'}
@@ -170,6 +186,11 @@ export function EditorBoard({ data }: { data: EditorData }) {
                 <p className={styles.hint}>
                   {data.levels.find((l) => l.code === config.level)?.detail}
                 </p>
+                {levelNote ? (
+                  <p className={styles.hint} role="status">
+                    {levelNote}
+                  </p>
+                ) : null}
               </Card>
 
               {(['case', 'cooler', 'ram', 'ssd'] as const).map((slot) => {
@@ -301,7 +322,11 @@ export function EditorBoard({ data }: { data: EditorData }) {
               <b>{zl(price)}</b>
               <small>{change === null || change === 0 ? 'bez zmiany' : signedZl(change)}</small>
             </p>
-            <p className={styles.hint}>na stronie dziś {zl(onSite)}</p>
+            <p className={styles.hint}>
+              {build.status === 'published'
+                ? `na stronie dziś ${zl(onSite)}`
+                : 'nie ma go na stronie'}
+            </p>
             <dl className={`pn-kv ${styles.breakdown}`}>
               <dt>Poziom mocy</dt>
               <dd>{zl(lookupPrice(prices.level, config.level) ?? null)}</dd>
@@ -330,10 +355,10 @@ export function EditorBoard({ data }: { data: EditorData }) {
               <MarginBar margin={atBatch.margin} minMargin={minMargin} warnMargin={warnMargin} />
             </div>
             <p className={styles.hint}>linia = minimum {percentShort(minMargin)}</p>
-            {price === null ? (
+            {blocked ? (
               // TODO(krystian): message not on the board.
               <Alert title="Pozycja bez opublikowanej ceny">
-                Zatwierdź ją najpierw w „Do zatwierdzenia” — do tego czasu zapis jest zablokowany.
+                Zatwierdź ją najpierw w „Do zatwierdzenia” albo zapisz zestaw jako szkic.
               </Alert>
             ) : null}
             <div className={styles.edSave}>{saveButton}</div>
@@ -356,7 +381,10 @@ export function EditorBoard({ data }: { data: EditorData }) {
 
       <ActionBar
         value={zl(price)}
-        note={`marża ${percentShort(atBatch.margin)} · dziś ${percentShort(today.margin)}`}
+        note={
+          outcomeNote ??
+          `marża ${percentShort(atBatch.margin)} · dziś ${percentShort(today.margin)}`
+        }
         tone={tone}
       >
         {saveButton}
