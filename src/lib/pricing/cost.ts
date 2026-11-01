@@ -62,6 +62,19 @@ export function sellPrices(catalog: Catalog): PriceList {
   }
 }
 
+/**
+ * Costs in the shape of a price list (level = parts cost, option = cost, service = service
+ * cost): a configuration's cost is then the same sum as its price (`configCost` in `recipe.ts`).
+ * Panel only — it is every cost of the offer.
+ */
+export function costList(catalog: Catalog): PriceList {
+  return {
+    level: Object.fromEntries(catalog.levels.map((l) => [l.code, l.partsCost])),
+    option: Object.fromEntries(catalog.options.map((o) => [o.code, o.cost])),
+    service: catalog.settings.serviceCost,
+  }
+}
+
 export function margin(price: number, cost: number): number {
   return 1 - cost / price
 }
