@@ -1,6 +1,18 @@
 import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-postgres'
 
-import { partKey } from '../lib/pricing/partKey'
+// Frozen copy of lib/pricing/partKey.ts (01.11.2026): a later change of the function must not
+// change what this migration writes on a fresh database.
+function partKey(role: string, internalModel: string): string {
+  const slug = internalModel
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/ł/g, 'l')
+    .replace(/Ł/g, 'L')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+  return `${role}-${slug}`.slice(0, 120)
+}
 
 // P6: cost source of options and parts (ADR-G007 §1), `partKey` of parts and `price-sources`.
 // Existing costs are the shop prices of the seed → `market`. `costUpdatedAt` stays empty for

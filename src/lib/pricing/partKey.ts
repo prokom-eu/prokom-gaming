@@ -6,7 +6,7 @@
 export function partKey(role: string, internalModel: string): string {
   const slug = internalModel
     .normalize('NFKD')
-    .replace(/[̀-ͯ]/g, '')
+    .replace(/[\u0300-\u036f]/g, '')
     .replace(/ł/g, 'l')
     .replace(/Ł/g, 'L')
     .toLowerCase()

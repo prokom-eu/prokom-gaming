@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useRef, useState, useTransition } from 'react'
+import { useEffect, useRef, useState, useTransition } from 'react'
 
 import { plural } from '../../lib/pl'
 import { percent, percentShort, signedZl, zl } from '../../lib/pricing/format'
@@ -92,28 +92,47 @@ export function ApprovalBoard({
     timer.current = setTimeout(async () => {
       const id = ++seq.current
       const keys = rows.filter((r) => next.has(r.key)).map((r) => r.key)
-      const outcome = await previewSelection({ keys })
+      let outcome: SelectionPreview
+      try {
+        outcome = await previewSelection({ keys })
+      } catch {
+        // Network down, session gone, server restarted: say so instead of „sprawdzam…” forever.
+        outcome = { ok: false, messages: ['Nie udało się sprawdzić marży — spróbuj ponownie.'] }
+      }
       if (id !== seq.current) return // a newer selection is being checked
       setPreview(outcome)
       setCheckedFor(keyOf(next, rows))
     }, 250)
   }
 
+  // No check firing after the screen is gone.
+  useEffect(
+    () => () => {
+      if (timer.current) clearTimeout(timer.current)
+    },
+    [],
+  )
+
   const toggle = (row: ApprovalRow) => {
-    if (row.isNew) return
+    if (row.isNew || publishing) return
     const next = new Set(selected)
     if (next.has(row.key)) next.delete(row.key)
     else next.add(row.key)
     check(next)
   }
 
-  const publish = () =>
+  const publish = () => {
+    // A check still on its way must not land on the queue the refresh brings; ticking is off
+    // while publishing, so no newer one starts.
+    seq.current++
+    if (timer.current) clearTimeout(timer.current)
     startPublish(async () => {
       const keys = rows.filter((r) => selected.has(r.key)).map((r) => r.key)
       const outcome = await publishPrices({ keys })
       setResult(outcome)
       if (outcome.ok) router.refresh()
     })
+  }
 
   const count = rows.filter((r) => r.isNew || selected.has(r.key)).length
   const tone = !ready ? undefined : preview.ok && preview.canPublish ? 'ok' : 'bad'
@@ -213,8 +232,10 @@ export function ApprovalBoard({
           rows={rows}
           rowKey={(r) => r.key}
           selection={{
-            label: (r) => `Publikuj: ${r.title}`,
+            label: (r) =>
+              r.isNew ? `Publikuj: ${r.title} (nowa — zawsze publikowana)` : `Publikuj: ${r.title}`,
             checked: (r) => r.isNew || selected.has(r.key),
+            disabled: (r) => r.isNew || publishing,
             onToggle: toggle,
           }}
         />
@@ -229,7 +250,7 @@ export function ApprovalBoard({
       <div className={styles.side}>
         <Card title="Strażnik marży" actions={statusChip} className={styles.guard}>
           <div aria-live="polite" aria-busy={checking}>
-            {preview.ok ? (
+            {preview.ok && preview.compatible !== null ? (
               <>
                 <p className={styles.text}>
                   Sprawdzono <b>{(preview.compatible ?? 0).toLocaleString('pl-PL')}</b> zgodnych

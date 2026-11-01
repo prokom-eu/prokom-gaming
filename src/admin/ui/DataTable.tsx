@@ -11,6 +11,8 @@ type Selection<R> = {
   /** Accessible name of the row's checkbox, e.g. "Zatwierdź: 16 GB DDR4". */
   label: (row: R) => string
   checked: (row: R) => boolean
+  /** A row that cannot change (e.g. a new price that is always published). */
+  disabled?: (row: R) => boolean
   onToggle?: (row: R) => void
   name?: string
   value?: (row: R) => string
@@ -70,6 +72,7 @@ export function DataTable<R>({
                     name={selection.name}
                     value={selection.value?.(row)}
                     checked={selection.checked(row)}
+                    disabled={selection.disabled?.(row)}
                     readOnly={!selection.onToggle}
                     onChange={selection.onToggle ? () => selection.onToggle?.(row) : undefined}
                   />

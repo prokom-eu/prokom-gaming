@@ -7,8 +7,9 @@ import { GROUP_OFFER } from './shared'
 const NOT_A_SHOP = `Adres musi być stroną oferty w jednym ze sklepów: ${DEFAULT_SHOPS.join(', ')}.`
 
 // The shop is always derived from the address, never typed.
-const setShop: CollectionBeforeChangeHook = ({ data }) => {
-  if (typeof data.url === 'string') data.shop = shopOf(data.url.trim()) ?? ''
+const setShop: CollectionBeforeChangeHook = ({ data, originalDoc }) => {
+  const url = data.url ?? (originalDoc as { url?: string } | undefined)?.url
+  data.shop = typeof url === 'string' ? (shopOf(url.trim()) ?? '') : ''
   return data
 }
 
