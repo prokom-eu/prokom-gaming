@@ -155,6 +155,49 @@ describe('review of the Ceneo source', () => {
     expect(titleMatches('Endorfy Vero L6 750 W', 'Endorfy Vero L6 750W (EY7A008)')).toBe(true)
   })
 
+  // Pages from the check of 1.11.2026 that were the product but failed the match.
+  it.each([
+    ['Lexar NM790 1 TB NVMe PCIe 4.0', 'Dysk SSD Lexar NM790 1TB M.2 (LNM790X001TRNNNG)'],
+    [
+      'GOODRAM PX600 Lite 512 GB NVMe PCIe 4.0',
+      'Dysk SSD Goodram PX600 Lite 512GB ( PRPX600L51280)',
+    ],
+    [
+      'Lexar THOR DDR5 16 GB (2x8) 6000 CL38',
+      'Lexar 16GB (2x8GB) 6000 CL38 THOR (LD5U08G60C38LGRGD)',
+    ],
+    ['be quiet! Light Loop 360 ARGB czarny', 'Be Quiet! Light Loop 360mm 3x120mm (BW022)'],
+    ['be quiet! Light Loop 360 ARGB White', 'Be Quiet! Light Loop 360mm White 3x120mm (BW023)'],
+    ['be quiet! Pure Loop 3 LX 360 mm', 'Be Quiet! Chłodzenie CPU Pure Loop3 LX 360mm (BW031EU)'],
+    [
+      'be quiet! Power Zone 2 1000 W Platinum ATX 3.1',
+      'Zasilacz Be Quiet! POWER ZONE 2 1000W 1000 Watt 140 mm ATX 3.1 80+ Platinum (BP008EU)',
+    ],
+    ['Endorfy Supremo FM6 850 W Gold ATX 3.1', 'Zasilacz Endorfy Supremo FM6 850W 80+ Gold Czarny'],
+    [
+      'Intel Core Ultra 7 270K Plus BOX',
+      'Procesor Intel Core Ultra 7 270K Plus 24 Cores (Bx80768270K)',
+    ],
+    [
+      'Gigabyte GeForce RTX 5070 EAGLE OC ICE SFF 12G (biała)',
+      'Gigabyte GeForce RTX 5070 Eagle OC ICE SFF 12GB GDDR7 (GVN5070EAGLEOCICE12GD)',
+    ],
+  ])('the product, named the Ceneo way: %s', (model, title) => {
+    expect(titleMatches(model, title)).toBe(true)
+  })
+
+  it.each([
+    // A white page for the black case; a page that does not name the product; no code in it.
+    ['Endorfy Arx 700 ARGB', 'Obudowa komputerowa Endorfy Arx 700 ARGB biała (EY2A017)'],
+    ['MSI MAG PANO 130R PZ czarna', 'Obudowa komputerowa MSI PC czarny (3067G32R21HH9)'],
+    ['Krux Exo RGB czarna (KRXD004)', 'Obudowa komputerowa Krux Exo RGB Czarna'],
+    // A bare number glued only to the word before it in our name, not to anything.
+    ['Endorfy Fera 5', 'Endorfy Fera 3 do AM5'],
+    ['Gigabyte GeForce RTX 5070 EAGLE OC 12G', 'Gigabyte GeForce RTX 5070 Eagle OC ICE 12GB'],
+  ])('not the product: %s', (model, title) => {
+    expect(titleMatches(model, title)).toBe(false)
+  })
+
   it('today is the Polish date, also just after midnight', () => {
     // 2.11.2026 00:30 in Warsaw is still 1.11 in UTC.
     expect(shippingDays('Wysyłka czw. 5 lis', new Date('2026-11-01T23:30:00Z'))).toBe(3)

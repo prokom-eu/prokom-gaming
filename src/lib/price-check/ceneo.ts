@@ -146,39 +146,61 @@ const words = (s: string) =>
       .filter(Boolean),
   )
 
-/** Words that make another variant of the same model: each must be in both names or in neither. */
-const VARIANTS: readonly (readonly string[])[] = [
-  ['ti'],
-  ['xt'],
-  ['xtx'],
-  ['super'],
-  ['pro'],
-  ['plus'],
-  ['lite'],
-  ['max'],
-  ['argb', 'a-rgb'],
-  ['wifi', 'wifi6e', 'wifi7'],
-  ['white', 'biała', 'biały', 'biala', 'bialy', 'białe', 'biale'],
-  ['tray', 'oem'],
-  ['box'],
+/**
+ * Words that make another variant of the same model. A word in the page title must be in the
+ * item's name too (a „White” page is not the black item). A word of the item's name must be in the
+ * title as well, except in the loose groups: Ceneo titles often leave out ARGB or the packaging.
+ */
+const VARIANTS: readonly { words: readonly string[]; loose?: true }[] = [
+  { words: ['ti'] },
+  { words: ['xt'] },
+  { words: ['xtx'] },
+  { words: ['super'] },
+  { words: ['pro'] },
+  { words: ['plus'] },
+  { words: ['lite'] },
+  { words: ['max'] },
+  { words: ['wifi', 'wifi6e', 'wifi7'] },
+  // Gigabyte's ICE line is the white one.
+  { words: ['white', 'biała', 'biały', 'biala', 'bialy', 'białe', 'biale', 'ice'] },
+  { words: ['argb', 'a-rgb'], loose: true },
+  { words: ['tray', 'oem'], loose: true },
+  { words: ['box'], loose: true },
 ]
 
 /**
+ * Words with a digit that describe the kind of part, not the model — our names have them
+ * („PCIe 4.0”, „ATX 3.1”, „DDR5”), Ceneo titles often do not.
+ */
+const isSpec = (word: string) =>
+  /^\d+[.,]\d+$/.test(word) || /^g?ddr\d+x?$/i.test(word) || /^pcie\d/i.test(word)
+
+/**
  * Is the Ceneo page the item's product? Every model mark of the item (a word with a digit:
- * 9800X3D, 16G, 6000, a code in brackets) must be in the page title as a whole word — only a unit
- * may follow it, so „14400” is not „14400F” and „7900XT” is not „7900XTX” — and variant words
- * (Ti, XT, white, Tray…) must agree. Deterministic — the page cannot talk anything into „matches”; a page
- * that fails waits for Krystian as a proposal, it is never read.
+ * 9800X3D, 16G, 6000) must be in the page title as a whole word — only a unit may follow it, so
+ * „14400” is not „14400F” and „7900XT” is not „7900XTX”; a bare number may be glued to the word
+ * before it („Loop 3” = „Loop3”). The code in brackets counts only when the name has no other mark.
+ * Variant words (Ti, XT, white…) must agree. Deterministic — the page cannot talk anything into
+ * „matches”; a page that fails waits for Krystian as a proposal, it is never read.
  */
 export function titleMatches(model: string, title: string | null): boolean {
   if (!title) return false
-  const outside = model.replace(/\([^)]*\)/g, ' ')
+  const outside = model
+    .replace(/\([^)]*\)/g, ' ')
+    .split(/\s+/)
+    .filter(Boolean)
   const codes = [...model.matchAll(/\(([^)]*)\)/g)]
     .flatMap((m) => m[1]!.split(/\s+/))
     .filter((w) => w.length >= 6 && /\d/.test(w) && /\p{L}/u.test(w))
-  const marks = [...outside.split(/\s+/).filter((w) => /\d/.test(w)), ...codes]
     .map(compact)
-    .filter(Boolean)
+  // Each mark with the forms it may take in the title.
+  const marks: string[][] = outside.flatMap((word, i) => {
+    if (!/\d/.test(word) || isSpec(word)) return []
+    const mark = compact(word)
+    const before = i > 0 ? compact(outside[i - 1]!) : ''
+    return [/^\d+$/.test(mark) && /^\p{L}+$/u.test(before) ? [mark, before + mark] : [mark]]
+  })
+  const required = marks.length > 0 ? marks : codes.map((c) => [c])
   // Separators become spaces; a mark may be split by them in the title („WIFI 7”, „CC-901…”).
   const spaced = ` ${norm(title).replace(/[^\p{L}\d]+/gu, ' ')} `
   const found = (mark: string) =>
@@ -186,13 +208,13 @@ export function titleMatches(model: string, title: string | null): boolean {
       `(?<![\\p{L}\\d])${mark.split('').map(escapeRe).join(' ?')}${UNIT}(?![\\p{L}\\d])`,
       'u',
     ).test(spaced)
-  if (!marks.every(found)) return false
+  if (!required.every((forms) => forms.some(found))) return false
   const modelWords = words(model.replace(/a-rgb/gi, 'argb'))
   const titleWords = words(title.replace(/a-rgb/gi, 'argb'))
   return VARIANTS.every((group) => {
-    const inModel = group.some((w) => modelWords.has(norm(w)))
-    const inTitle = group.some((w) => titleWords.has(norm(w)))
-    return inModel === inTitle
+    const inModel = group.words.some((w) => modelWords.has(norm(w)))
+    const inTitle = group.words.some((w) => titleWords.has(norm(w)))
+    return inTitle ? inModel : !inModel || group.loose === true
   })
 }
 
