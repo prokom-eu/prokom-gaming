@@ -41,7 +41,8 @@ const minutes = (name: string, label: string, defaultValue: number): NumberField
 
 /**
  * Inquiries and mail (panel spec §13, ADR-G008): reply hours of the promise on the site, the
- * reply time shown on the list, the SLA alarm and the signature for {podpis}. The sender is the
+ * reply time shown on the list, the SLA alarm, the signature for {podpis} and the two order
+ * switches (stage e-mail, workshop strip on the home page — P5). The sender is the
  * Gaming mailbox from env (`MAIL_FROM_ADDRESS`) — not editable here.
  */
 export const MailSettings: GlobalConfig = {
@@ -76,6 +77,25 @@ export const MailSettings: GlobalConfig = {
       maxLength: 500,
       // Board Ustawienia, field „Podpis”, 1:1.
       defaultValue: 'Krystian · PRO-KOM Gaming\nRabka-Zdrój, ul. Orkana 16B · +48 18 267 65 11',
+    },
+    // Section „Zamówienia i klienci” of the board Ustawienia (panel spec §13, decided in P5:
+    // here, beside the other mail settings). Switched in the panel view.
+    {
+      type: 'row',
+      fields: [
+        {
+          name: 'stageEmail',
+          label: 'E-mail do klienta przy zmianie etapu',
+          type: 'checkbox',
+          defaultValue: true,
+        },
+        {
+          name: 'workshopStrip',
+          label: 'Pokazuj zamówienia na tablicy warsztatu',
+          type: 'checkbox',
+          defaultValue: true,
+        },
+      ],
     },
   ],
 }

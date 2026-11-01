@@ -29,6 +29,8 @@ export default defineConfig([
   globalIgnores([
     // Documentation, incl. design reference boards with their own (minified) scripts.
     'docs/**',
+    // Claude Code worktrees: other checkouts of this repo, linted in their own folder.
+    '.claude/**',
     '.next/**',
     'node_modules/**',
     'playwright-report/**',

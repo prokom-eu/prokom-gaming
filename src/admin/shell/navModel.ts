@@ -67,13 +67,13 @@ const ITEMS: Record<NavKey, NavItem> = {
     tone: 'bad',
     ready: true,
   },
-  // TODO(P5): `/zamowienia` (workshop board) — until then the Payload list of orders.
+  // Workshop board (P5); the `serwis` role sees it as „Warsztat”.
   orders: {
     key: 'orders',
     label: 'Zamówienia',
     icon: 'box',
-    path: '/collections/orders',
-    roles: ADMIN,
+    path: '/zamowienia',
+    roles: STAFF,
     counter: 'ordersActive',
     tone: 'mu',
     ready: true,
@@ -84,7 +84,7 @@ const ITEMS: Record<NavKey, NavItem> = {
     icon: 'user',
     path: '/klienci',
     roles: ADMIN,
-    ready: false,
+    ready: true,
   },
   pricesCentre: {
     key: 'pricesCentre',
@@ -167,7 +167,7 @@ const ITEMS: Record<NavKey, NavItem> = {
     roles: ADMIN,
     ready: true,
   },
-  // The workshop of the `serwis` role (spec §2a pt 3); own screens in P5.
+  // The workshop of the `serwis` role (spec §2a pt 3): Payload lists in v1.
   tickets: {
     key: 'tickets',
     label: 'Zgłoszenia',
@@ -221,7 +221,7 @@ const MORE: Record<UserRole, NavKey[]> = {
 
 /** The serwis role reads orders as its workshop (spec §2a pt 3, labels of the tabs). */
 const SERWIS_LABELS: Partial<Record<NavKey, Partial<NavItem>>> = {
-  orders: { label: 'Warsztat', icon: 'wrench', roles: STAFF, counter: 'ordersActive', tone: 'mu' },
+  orders: { label: 'Warsztat', icon: 'wrench' },
 }
 
 function itemFor(key: NavKey, role: UserRole): NavItem {

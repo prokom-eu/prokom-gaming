@@ -2404,6 +2404,8 @@ export interface MailSetting {
   replySlaMinutes: number;
   replyAlarmMinutes: number;
   signature: string;
+  stageEmail?: boolean | null;
+  workshopStrip?: boolean | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -2607,6 +2609,8 @@ export interface MailSettingsSelect<T extends boolean = true> {
   replySlaMinutes?: T;
   replyAlarmMinutes?: T;
   signature?: T;
+  stageEmail?: T;
+  workshopStrip?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

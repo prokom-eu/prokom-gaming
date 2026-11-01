@@ -141,20 +141,19 @@ test.describe('signed in with the serwis role', () => {
     await admin.dispose()
   })
 
-  test('sees the workshop only — no inquiries, prices or margins', async ({ page }) => {
+  test('is sent on to the workshop board — no inquiries, prices or margins (P5)', async ({
+    page,
+  }) => {
     await page.goto('/admin/login')
     await page.locator('#field-email').fill(email)
     await page.locator('#field-password').fill(password)
     await page.locator('button[type="submit"]').click()
-    await expect(page).toHaveURL(/\/admin\/?$/)
-
-    await expect(page.getByRole('heading', { level: 1, name: 'Dziś' })).toBeVisible()
-    await expect(main(page).getByRole('heading', { level: 2, name: 'Warsztat' })).toBeVisible()
-    const content = main(page)
-    for (const text of ['Marża', 'Czeka na Ciebie', 'Ostatnie zapytania', 'zł', '%']) {
-      await expect(content, text).not.toContainText(text)
-    }
-    // The whole page and its RSC data too (shell, hidden Payload nav), not just the content.
-    expect(await page.content()).not.toMatch(/Marża|marż|Czeka na Ciebie|PKG-\d{4}/)
+    await expect(page).toHaveURL(/\/admin\/zamowienia$/)
+    await expect(
+      page.getByRole('heading', { level: 1, name: 'Zamówienia i warsztat' }),
+    ).toBeVisible()
+    // What the person sees (Payload's field descriptions in the config are not data).
+    expect(await page.locator('body').innerText()).not.toMatch(/Marża|marż|Czeka na Ciebie|zł/)
+    expect(await page.content()).not.toMatch(/PKG-\d{4}/)
   })
 })

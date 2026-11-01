@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  BOARD_STAGES,
+  boardStripText,
   CHECKLIST_ITEMS,
+  nextStage,
+  stageLabel,
   formatOrderNumber,
   isOrderStage,
   ORDER_STAGE_CHOICES,
@@ -143,5 +147,32 @@ describe('checklist', () => {
   it('has the 8 items of the board with unique keys', () => {
     expect(CHECKLIST_ITEMS).toHaveLength(8)
     expect(new Set(CHECKLIST_ITEMS.map((c) => c.value)).size).toBe(8)
+  })
+})
+
+describe('board stages', () => {
+  it('has the 7 columns without the final state', () => {
+    expect(BOARD_STAGES).toEqual([
+      'offer',
+      'paid',
+      'parts',
+      'assembly',
+      'test',
+      'metric_ready',
+      'shipped',
+    ])
+  })
+
+  it('moves forward one column and stops at "Wysłane"', () => {
+    expect(nextStage('offer')).toBe('paid')
+    expect(nextStage('test')).toBe('metric_ready')
+    expect(nextStage('shipped')).toBeNull()
+    expect(nextStage('delivered')).toBeNull()
+  })
+
+  it('says what the home page strip shows', () => {
+    expect(boardStripText('Skrzat', 'test')).toBe('Skrzat: Testy')
+    expect(boardStripText(null, 'test')).toBeNull()
+    expect(stageLabel('metric_ready')).toBe('Metryka')
   })
 })

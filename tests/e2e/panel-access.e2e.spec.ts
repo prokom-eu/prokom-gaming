@@ -21,6 +21,9 @@ const SCREENS = [
   '/admin/ceny/zatwierdzanie',
   '/admin/ustawienia',
   '/admin/dane',
+  '/admin/zamowienia',
+  '/admin/klienci',
+  '/admin/klient',
   ...(process.env.E2E_SERVER === 'start' ? [] : ['/admin/podglad-panelu']),
 ]
 
@@ -69,7 +72,8 @@ test.describe('signed in with the serwis role', () => {
     await page.locator('#field-email').fill(email)
     await page.locator('#field-password').fill(password)
     await page.locator('button[type="submit"]').click()
-    await expect(page).toHaveURL(/\/admin\/?$/)
+    // P5: the workshop board is the start screen of `serwis`.
+    await expect(page).toHaveURL(/\/admin\/zamowienia$/)
   }
 
   test('admin screens answer "403" inside the workshop frame', async ({ page }) => {

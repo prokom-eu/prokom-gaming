@@ -1,12 +1,25 @@
 # STAN — prokom-gaming
 
-Ostatnia aktualizacja: 01.11.2026, późny wieczór (P7 scalone — Ceneo, 73/94 pozycji z ceną; następne P5).
+Ostatnia aktualizacja: 01.11.2026, noc (P5 — klient i warsztat, PR do scalenia; następne G15 + Umami).
 
 ## W toku
-- **Gałąź:** brak otwartej — P7 i poprawki scalone do `develop` (#56–#63). Ta aktualizacja: `docs/stan-p7-ceneo`.
-- **Zrobione w tej sesji (01.11):** Ceneo jako główne źródło cen (#60, ADR-G011) i dopasowanie strony Ceneo mimo innego zapisu nazwy (#62); przerwany przebieg kończy się po 3 min (#58), podsumowanie przechodzi przy skróconych nazwach i liczbie pozycji bez ceny (#59, #63); panel wyśrodkowany na szerokim ekranie (#61). Przebieg #23 na prawdziwym kluczu: **73/94 pozycji z ceną** (rano 31), 6 min, 2,76 USD.
-- **Niedokończone:** `TODO(krystian):` regulamin Ceneo — potwierdzić z szefem (ADR-G011). 15 pozycji bez oferty — Krystian dopisuje linki ręcznie. EAN-y puste we wszystkich pozycjach (wpisać → pewniejsze wyszukiwanie; kod pod EAN jeszcze nie). Brak testu faz `run.ts` z atrapą stron Ceneo. Prawdziwy telefon i Lighthouse (P6, P7).
-- **Następny krok:** `/zadanie P5` (klient i warsztat: `/admin/klienci`, `/admin/klient`, `/admin/zamowienia`, rola `serwis`) — opis w `docs/zadania/prokomgaming-panel.md` §1, wiersz P5.
+- **Gałąź:** `feat/p5-klient-warsztat` — PR do `develop` (jeden PR, decyzja Krystiana 01.11). Aktualizacja STAN po P7 (#64) już w `develop`.
+- **Zrobione (P5):** `/admin/zamowienia` — tablica 7 etapów, 4 kafle, panel zamówienia z listą kontrolną, notatką warsztatu i „Przesuń do” (`stageHistory` z hooka G14, e-mail etapu z szablonu `stage` albo tekstu ze spec. §4); `/admin/klienci` (lista po e-mailu) i `/admin/klient?zapytanie|konto|zamowienie=<id>` (kafle, 5 zakładek, notatki, eksport JSON, usuwanie na żądanie); rola `serwis` startuje na tablicy (bez kwot, bez karty klienta); Ustawienia → „Zamówienia i klienci” (dwa przełączniki, migracja `p5_order_switches`); Pulpit „Warsztat” → `/admin/zamowienia?z=<id>`. Vitest 859, e2e `panel-orders` i `panel-clients` (1440 + 414), `panel-access`, `panel-dashboard`, `panel-shell`, `home-sections` zielone lokalnie.
+- **Niedokończone:** prawdziwy telefon (Android + iPhone) i Lighthouse panelu — razem z G15. Teksty spoza plansz oznaczone `TODO(krystian)` (niżej).
+- **Następny krok:** scalić PR P5 (po `/przeglad` i zielonym CI), potem `/zadanie G15` (+ Umami, ADR-G009) — opis w `docs/zadania/prokomgaming.md` i `docs/zadania/prokomgaming-panel.md` §1.
+
+## Uwagi na później (P5)
+- **Decyzje Krystiana 01.11:** jeden PR; usuwanie na żądanie: zapytania z wątkami (ścieżka G6 + ślad), wiadomości klienta w „Nieprzypisanych”, zgłoszenia i konto **usuwamy**; zamówienia i egzemplarze **anonimizujemy** (imię „Dane usunięte”, e-mail `usuniete-…@usuniete.invalid`, bez konta, zapytania, notatki i numeru przesyłki; numer, zestaw, cena, metryka zostają) — spec. §6. Wszystko w jednej transakcji.
+- **Odstępstwa od plansz i spec.:** `serwis` nie widzi kwot na tablicy (cena karty, kafel „Wartość w realizacji”) — jak na jego Pulpicie z P2 (spec. §15 „bez cen zakupu i marż”; ostrożniej); tablica tylko do przodu, pomyłkę poprawia się w formularzu zamówienia (link pod przyciskiem); „Wysłane” pokazuje zamówienia z ostatnich 14 dni (`SHIPPED_ON_BOARD_DAYS`, `TODO(krystian)`); e-mail etapu tylko przy wejściu w opłacone, montaż, testy, wysłane (podpowiedź z planszy Ustawienia); karta klienta pokazuje pełny e-mail (spec. §4: pełny w karcie — plansza go maskuje); bez „Zgoda marketingowa (newsletter)” i „zaproszenie wysłane” (nie ma tych funkcji); wejście na kartę także `?zamowienie=<id>`; notatka warsztatu edytowalna w panelu zamówienia (nie ma jej na planszy, a spec. §15 daje serwisowi notatki); start `serwis` przez przekierowanie w przeglądarce z `/admin` (`GoTo` — `redirect()` w widoku Payload daje pustą stronę); „Metryka” bez egzemplarza otwiera tworzenie egzemplarza w Payload.
+- **Przełącznik „Pokazuj zamówienia na tablicy warsztatu”** wyłącza taśmę na stronie głównej i `GET /api/warsztat` (`loadWorkshop` zwraca pustą). „Zaproszenie do konta klienta po wpłacie” z planszy nie jest pokazane — nie ma takiej funkcji (Pomysły na później).
+- **Ślad usunięcia** powstaje tylko dla zapytań (`inquiry-deletions.inquiryId`) — klient bez zapytań (samo zamówienie/konto) zostawia tylko log z liczbami, bez danych osobowych. **Bony** (`vouchers.recipient`, `dedication`) zostają przy usuwaniu — to dane obdarowanego i ważny bon; `TODO(krystian)`: decyzja przy włączaniu bonów.
+- **Push `workshop`** (spec. §14, opcjonalny) — pominięty.
+- **Po przeglądzie P5 (poprawione):** „Nieprzypisane” klienta tylko po dokładnym adresie (`from` = e-mail, było `contains` — eksport i usuwanie brałyby cudze maile, np. `kjan@` dla `jan@`); zanonimizowane zamówienia i egzemplarze (`@usuniete.invalid`) nie są klientami na liście ani w karcie i nie dostają maila etapu.
+- **Do rozważenia (przegląd P5, świadomie bez zmian):** sprawdzenie etapu i zapis przy „Przesuń do” nie są atomowe — dwa kliknięcia w tej samej chwili (dwa urządzenia) mogą przesunąć o dwa etapy; przy 1–2 osobach w warsztacie akceptowalne. Kafel „Wartość w realizacji” liczony na serwerze także dla `serwis` (nie trafia do HTML).
+- **`eslint.config.mjs`:** dopisany ignor `.claude/**` (stare worktree Claude Code); atrybut „tylko do odczytu” zdjęty na czas zmiany (zgoda Krystiana) i przywrócony.
+- **Teksty spoza plansz (`TODO(krystian)`):** temat maila etapu („[Z-…] Twój komputer: <etap>”), komunikaty po przesunięciu i zapisie, pusta kolumna (poza „Oferta przyjęta”), „Popraw w formularzu zamówienia”, lead i stan pusty listy klientów, „woli kontakt e-mailowy”, zdarzenia osi czasu poza planszą, potwierdzenie usunięcia i imię po anonimizacji, „Nie ma takiego klienta”, przycisk „Zapisz notatkę”.
+- **Lokalnie:** baza dev ma ~45 zamówień „Bies” w „Oferta przyjęta” z e2e P3 („Zamień w zamówienie”) — tablica wygląda przez to na zapchaną; testy P5 sprzątają po sobie.
+- **Migracja `p5_order_switches` — `down` usuwa dwa przełączniki** (wracają domyślne zachowania: mail etapu i taśma włączone).
 
 ## Uwagi na później (P7)
 - **Ceneo w praktyce (01.11):** włączony link Ceneo jest zaufany — strona czytana bez sprawdzania tytułu, więc złą stronę trzeba wyłączyć („Sprawdzany”), zanim pójdzie przebieg (przykład: PANO 130R → strona „MSI PC czarny”). Linki odrzucone przez `titleMatches` zostają wyłączone; kolejny przebieg ich nie przelicza. „Przyjmij N propozycji” przyjmuje wszystko naraz — błędną pozycję poprawia się potem importem kosztów (`kod;koszt` albo pełny model). „N wyszukiwań” w raporcie = zapytania web search, nie pozycje (limit 100 pozycji).
@@ -108,7 +121,7 @@ Ostatnia aktualizacja: 01.11.2026, późny wieczór (P7 scalone — Ceneo, 73/94
 - **Usunięcie zestawu z egzemplarzami i egzemplarza ze zgłoszeniami** blokuje hak z komunikatem (`collections/workshopGuards.ts`); w bazie kolumny `NOT NULL` + `set null` zostają.
 - **Ciasteczko logowania wspólne dla panelu i konta** (`payload-token`): zalogowanie się jako klient w tej samej przeglądarce wylogowuje z panelu i odwrotnie. Do zespołu: panel w innej przeglądarce/profilu.
 - **Payload 3.91:** pole tablicy bez dostępu wraca jako `[]` (jak `components` w G3) — dotyczy `orders.checklist` u klienta; `/api/access` pomija wartości `false`.
-- **P5:** widoki tablicy warsztatu na polach z G14; e-mail etapu do klienta; agregacja klienta po e-mailu (`lib/email.ts`).
+- **P5:** zrobione (01.11, `feat/p5-klient-warsztat`).
 - **G15:** Lighthouse `/metryka/*` i `/konto`; `noindex` już jest; sitemap bez metryk i konta.
 - **G16:** po wdrożeniu sprawdzić maile weryfikacji i resetu z obrazu `standalone`; `SITE_URL` w linkach.
 
@@ -241,7 +254,7 @@ Ostatnia aktualizacja: 01.11.2026, późny wieczór (P7 scalone — Ceneo, 73/94
 - 25.10.2026 — pakiet startowy (pierwszy commit, podpisany): CLAUDE.md, specyfikacja `docs/strony/prokomgaming.md`, ADR-G001…G005, plan G0–G16, wzorzec wyglądu v36 (`docs/design/prokomgaming/`), seed (`seed/prokomgaming/`), oczekiwane wyniki testów cen (`tests/fixtures/pricing-expected.json`).
 
 ## Następne kroki
-G1 → G2 → G3 → G4 → G5 → G6 → G7 → G8 → G9 → (kontrola 8.11) → G10 → G11 → G12 → (kontrola 13.11) → G13 → ~~G14~~ (zrobione 31.10) → ~~P1~~ → ~~P3~~ → ~~P4~~ (31.10; push w PR 2) → ~~P2~~ (01.11, #48) → **P6 (~~P6-1~~ #50, ~~P6-2~~ #51, P6-3 #52) → ~~P7~~ (01.11) → P5** → G15 (+ Umami) → **P8** → G16 (produkcja 20.11 — strona **i cały panel** jednym wdrożeniem, decyzja Krystiana 01.11). Kontrole: 9.11 (P6 scalone), 14.11 (P5, P7 scalone). Panel: `docs/zadania/prokomgaming-panel.md` §1.
+G1 → G2 → G3 → G4 → G5 → G6 → G7 → G8 → G9 → (kontrola 8.11) → G10 → G11 → G12 → (kontrola 13.11) → G13 → ~~G14~~ (zrobione 31.10) → ~~P1~~ → ~~P3~~ → ~~P4~~ (31.10; push w PR 2) → ~~P2~~ (01.11, #48) → **P6 (~~P6-1~~ #50, ~~P6-2~~ #51, P6-3 #52) → ~~P7~~ (01.11) → ~~P5~~ (01.11, PR)** → G15 (+ Umami) → **P8** → G16 (produkcja 20.11 — strona **i cały panel** jednym wdrożeniem, decyzja Krystiana 01.11). Kontrole: 9.11 (P6 scalone), 14.11 (P5, P7 scalone). Panel: `docs/zadania/prokomgaming-panel.md` §1.
 
 ## Decyzje (skrót)
 - **Panel w całości na produkcję razem ze stroną (Krystian 01.11.2026):** P5–P8 przed G16, jedno wdrożenie; zastępuje zasadę z 30.10 „sesje P po starcie”. Przy poślizgu (kontrole 9.11, 14.11) przesuwamy produkcję całości — nowa data z szefem, panelu nie tniemy.
@@ -297,6 +310,8 @@ G1 → G2 → G3 → G4 → G5 → G6 → G7 → G8 → G9 → (kontrola 8.11) �
 - [Krystian, przed G16] SPF/DKIM/DMARC domeny nadawcy w Seohost.
 
 ## Pomysły na później
+- Zaproszenie do konta klienta po wpłacie (plansza Ustawienia „Zamówienia i klienci”): e-mail z linkiem do rejestracji, gdy zamówienie wchodzi w „Opłacone” i klient nie ma konta.
+- Push `workshop` dla roli `serwis` przy zmianie etapu (spec. panelu §14, opcjonalny).
 - Sprawdzanie cen po EAN, gdy pole wypełnione: szukanie na Ceneo i w sklepach po kodzie, EAN w tytule/stronie = pewne dopasowanie.
 - Przyjmowanie propozycji z raportu z odznaczaniem pojedynczych pozycji (dziś wszystko naraz).
 - Ponowne sprawdzenie wyłączonych linków Ceneo, gdy `titleMatches` się poprawi (dziś zostają wyłączone).

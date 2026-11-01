@@ -172,3 +172,30 @@ export const CHECKLIST_ITEMS = [
   { value: 'certificate', label: 'Metryka i naklejka z kodem QR' },
   { value: 'packed', label: 'Spakowane, list przewozowy albo SMS „do odbioru”' },
 ] as const
+
+/** The 7 columns of the workshop board (panel spec §7) — `delivered` is not a column. */
+export const BOARD_STAGES: readonly OrderStage[] = ORDER_STAGES.filter((s) => s !== 'delivered')
+
+export function stageLabel(stage: OrderStage): string {
+  return ORDER_STAGE_CHOICES.find((c) => c.value === stage)?.label ?? stage
+}
+
+/**
+ * The stage after `stage` on the board („Przesuń do: …”), `null` from the last column. The board
+ * moves forward only; a mistake is corrected in the Payload form.
+ */
+export function nextStage(stage: OrderStage): OrderStage | null {
+  const i = BOARD_STAGES.indexOf(stage)
+  return i < 0 || i === BOARD_STAGES.length - 1 ? null : (BOARD_STAGES[i + 1] ?? null)
+}
+
+/** „Na tablicy na stronie” in the order panel (board Zamowienia): „Skrzat: Testy”. */
+export function boardStripText(buildName: string | null, stage: OrderStage): string | null {
+  return buildName ? `${buildName}: ${stageLabel(stage)}` : null
+}
+
+/**
+ * Stages that e-mail the customer when the order reaches them (board Ustawienia: „opłacone,
+ * montaż, testy, wysłane”). The others are short workshop steps.
+ */
+export const STAGE_MAIL_STAGES: readonly OrderStage[] = ['paid', 'assembly', 'test', 'shipped']

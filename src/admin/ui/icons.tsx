@@ -131,6 +131,23 @@ const PATHS = {
       <path d="M3 13h5l1 2h6l1-2h5" />
     </>
   ),
+  // Zamowienia and Klient boards (P5).
+  plus: <path d="M12 5v14M5 12h14" />,
+  next: <path d="M9 6l6 6-6 6" />,
+  qr: (
+    <>
+      <rect x="3" y="3" width="7" height="7" rx="1" />
+      <rect x="14" y="3" width="7" height="7" rx="1" />
+      <rect x="3" y="14" width="7" height="7" rx="1" />
+      <path d="M14 14h3v3M21 14v7h-4M17 21h-3" />
+    </>
+  ),
+  phone: (
+    <path d="M5 4h4l2 5-2.5 1.5a11 11 0 005 5L15 13l5 2v4a2 2 0 01-2 2A16 16 0 013 6a2 2 0 012-2z" />
+  ),
+  pencil: <path d="M4 20l4-1 11-11-3-3L5 16zM14 6l3 3" />,
+  download: <path d="M12 4v11M7 10l5 5 5-5M5 20h14" />,
+  trash: <path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" />,
 } satisfies Record<string, ReactNode>
 
 export type IconName = keyof typeof PATHS

@@ -19,6 +19,7 @@ import * as migration_20261031_222946_p4_push from './20261031_222946_p4_push'
 import * as migration_20261031_235857_p6_cost_source from './20261031_235857_p6_cost_source'
 import * as migration_20261101_004700_p6_offer_status from './20261101_004700_p6_offer_status'
 import * as migration_20261101_015242_p7_price_check from './20261101_015242_p7_price_check'
+import * as migration_20261101_201708_p5_order_switches from './20261101_201708_p5_order_switches'
 
 export const migrations = [
   {
@@ -125,5 +126,10 @@ export const migrations = [
     up: migration_20261101_015242_p7_price_check.up,
     down: migration_20261101_015242_p7_price_check.down,
     name: '20261101_015242_p7_price_check',
+  },
+  {
+    up: migration_20261101_201708_p5_order_switches.up,
+    down: migration_20261101_201708_p5_order_switches.down,
+    name: '20261101_201708_p5_order_switches',
   },
 ]

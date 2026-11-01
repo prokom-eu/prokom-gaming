@@ -139,7 +139,7 @@ describe('todoList (spec §3.3)', () => {
     expect(items[1]).toMatchObject({
       title: 'Skrzat (Z-2026-0012): dokończyć testy',
       note: '3 z 8 punktów listy kontrolnej · termin wysyłki 3.11',
-      action: { path: '/collections/orders/1' },
+      action: { path: '/zamowienia?z=1' },
     })
   })
 
