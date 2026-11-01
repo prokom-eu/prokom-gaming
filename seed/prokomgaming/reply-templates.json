@@ -5,7 +5,7 @@
       "name": "Potwierdzenie i termin",
       "kind": "reply",
       "order": 10,
-      "body": "Dzień dobry,\n\ndziękuję za zapytanie {nr}. {zestaw} składamy w Rabce-Zdroju w {termin} od wpłaty; przed wysyłką każdy egzemplarz przechodzi test i pomiar klatek w Twoich grach. Odbiór osobisty w Rabce albo w Zakopanem jest możliwy.\n\nZa chwilę wyślę ofertę z imienną listą części, ważną 48 godzin.\n\n{podpis}"
+      "body": "Dzień dobry,\n\ndziękuję za zapytanie {nr}. {zestaw} składamy w Rabce-Zdroju w {termin} od wpłaty; przed wysyłką każdy egzemplarz przechodzi test i pomiar klatek w Twoich grach. Odbiór osobisty w Rabce-Zdroju jest możliwy.\n\nZa chwilę wyślę ofertę z imienną listą części, ważną 48 godzin.\n\n{podpis}"
     },
     {
       "name": "Oferta z listą części",

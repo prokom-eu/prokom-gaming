@@ -87,8 +87,6 @@ export function SiteFooter({ features }: { features: Features }) {
               <br />
               {company.address}
               <br />
-              Salon: {company.salon}
-              <br />
               NIP {company.nip}
             </p>
             <ul className="foot__links">

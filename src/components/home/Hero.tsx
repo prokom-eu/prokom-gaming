@@ -285,7 +285,7 @@ function HeroCopy() {
         </li>
         <li>
           <IconShop size={17} />
-          <span>Sklepy w Rabce i Zakopanem</span>
+          <span>Sklep w Rabce-Zdroju</span>
         </li>
       </ul>
     </div>

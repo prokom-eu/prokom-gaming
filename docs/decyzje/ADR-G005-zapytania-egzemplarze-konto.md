@@ -46,7 +46,7 @@ Pełny zakres na 20.11 (decyzja Krystiana 25.10.2026) obejmuje: zapytania, metry
 ## Konsekwencje
 - Jedna aplikacja do 20.11; Django dopiero z PRO-KOM System (2027) — migracja zaplanowana.
 - Kolejność cięcia, jeśli kontrola 8.11 albo 13.11 pokaże poślizg: **konto klienta → tablica warsztatu (taśma ze stałym tekstem procesu) → bon i „Gotowe od ręki” → poradniki (1 na start) → metryka online (zostaje PDF)**. Zapytania, cennik, konfigurator, zestawy, FPS — bez cięć.
-- Skrzynka powiadomień Gaming: `gaming@pro-kom.eu` — do potwierdzenia przez szefa i do dodania przy migracji poczty (Seohost).
+- Skrzynka powiadomień Gaming: `gaming@pro-kom.eu` — do potwierdzenia przez szefa i do dodania przy migracji poczty (Seohost). **Aktualizacja 01.11.2026 (Krystian):** skrzynka Gaming to `kontakt@prokomgaming.pl` (adres w zmiennych środowiskowych, nie w kodzie).
 
 ## Uzupełnienie 27.10.2026 (G6 — zapytania: backend)
 Decyzje Krystiana przy planie G6; kontrakt w `src/lib/inquiry/schema.ts` (Zod) i kolekcji `inquiries`.

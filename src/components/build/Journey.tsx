@@ -59,7 +59,7 @@ const STEPS = [
     icon: IconTruck,
     title: 'U Ciebie',
     time: '1–2 dni kurierem',
-    text: 'Kurier z ubezpieczeniem albo odbiór w Rabce lub Zakopanem.',
+    text: 'Kurier z ubezpieczeniem albo odbiór w Rabce-Zdroju.',
   },
 ]
 

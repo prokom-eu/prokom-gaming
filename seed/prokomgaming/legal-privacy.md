@@ -1,6 +1,6 @@
 ## Kto jest administratorem
 
-Administratorem Twoich danych jest PRO-KOM Tadeusz Wójciak, ul. Orkana 16B, 34-700 Rabka-Zdrój, NIP 735-251-14-47. W sprawach danych napisz na gaming@pro-kom.eu albo listownie na adres firmy.
+Administratorem Twoich danych jest PRO-KOM Tadeusz Wójciak, ul. Orkana 16B, 34-700 Rabka-Zdrój, NIP 735-251-14-47. W sprawach danych napisz na kontakt@prokomgaming.pl albo listownie na adres firmy.
 
 ## Jakie dane i po co
 

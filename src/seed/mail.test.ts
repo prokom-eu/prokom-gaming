@@ -11,7 +11,16 @@ const board = readFileSync(
   path.resolve(__dirname, '../../docs/design/prokomgaming/panel/boards/Zapytania.dc.html'),
   'utf8',
 )
-const tpl = JSON.parse(/TPL = (\[\[.*?\]\]);/s.exec(board)?.[1] ?? '[]') as [string, string][]
+// One deliberate change against the board: no salon in Zakopane (Krystian, 01.11.2026).
+const tpl = (
+  JSON.parse(/TPL = (\[\[.*?\]\]);/s.exec(board)?.[1] ?? '[]') as [string, string][]
+).map(([name, body]): [string, string] => [
+  name,
+  body.replace(
+    'Odbiór osobisty w Rabce albo w Zakopanem jest możliwy.',
+    'Odbiór osobisty w Rabce-Zdroju jest możliwy.',
+  ),
+])
 
 describe('reply templates seed', () => {
   it('the four board templates, 1:1 and in order', () => {

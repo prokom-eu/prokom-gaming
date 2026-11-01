@@ -126,8 +126,7 @@ export default function ParentsPage() {
               <li>
                 <Check />
                 <span>
-                  <b>Sklepy stacjonarne.</b> Rabka-Zdrój, ul. Orkana 16B, i Zakopane, ul. Staszica
-                  8.
+                  <b>Sklep stacjonarny.</b> Rabka-Zdrój, ul. Orkana 16B.
                 </span>
               </li>
               <li>

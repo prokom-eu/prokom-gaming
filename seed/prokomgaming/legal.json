@@ -1,5 +1,5 @@
 {
-  "_info": "Globale `legal-terms` i `legal-privacy` (spec. §21). Treść 1:1 z plansz Regulamin i Prywatnosc — PROJEKTY do weryfikacji przez prawnika (draft: true = napis na stronie). Treść w plikach .md obok (## = paragraf § i pozycja spisu treści, > = ramka z uwagą, <br> w ramce = nowa linia); seed zamienia je na Lexical. Z planszy podmienione tylko znane wartości: telefon (+48 18 267 65 11) i e-mail bez „[do potwierdzenia]”; pozostałe nawiasy kwadratowe zostają do decyzji prawnika i Krystiana (spec. §25–§27). „[data publikacji]” = pole effectiveDate (puste do publikacji).",
+  "_info": "Globale `legal-terms` i `legal-privacy` (spec. §21). Treść 1:1 z plansz Regulamin i Prywatnosc — PROJEKTY do weryfikacji przez prawnika (draft: true = napis na stronie). Treść w plikach .md obok (## = paragraf § i pozycja spisu treści, > = ramka z uwagą, <br> w ramce = nowa linia); seed zamienia je na Lexical. Z planszy podmienione tylko znane wartości: telefon (+48 883 200 151, kontakt@prokomgaming.pl — dane od Krystiana 01.11.2026) i e-mail bez „[do potwierdzenia]”; pozostałe nawiasy kwadratowe zostają do decyzji prawnika i Krystiana (spec. §25–§27). „[data publikacji]” = pole effectiveDate (puste do publikacji).",
   "terms": {
     "contentFile": "legal-terms.md",
     "version": "0.1",

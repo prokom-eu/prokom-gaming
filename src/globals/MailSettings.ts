@@ -76,7 +76,7 @@ export const MailSettings: GlobalConfig = {
       required: true,
       maxLength: 500,
       // Board Ustawienia, field „Podpis”, 1:1.
-      defaultValue: 'Krystian · PRO-KOM Gaming\nRabka-Zdrój, ul. Orkana 16B · +48 18 267 65 11',
+      defaultValue: 'Krystian · PRO-KOM Gaming\nRabka-Zdrój, ul. Orkana 16B · +48 883 200 151',
     },
     // Section „Zamówienia i klienci” of the board Ustawienia (panel spec §13, decided in P5:
     // here, beside the other mail settings). Switched in the panel view.

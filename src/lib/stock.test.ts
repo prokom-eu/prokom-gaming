@@ -38,7 +38,7 @@ describe('stockPrice', () => {
 
 describe('locationOf', () => {
   it('gives the badge of the board', () => {
-    expect(locationOf('zakopane')?.badge).toBe('odbiór od ręki')
+    expect(locationOf('rabka')?.badge).toBe('wysyłka w 1–2 dni robocze')
     expect(locationOf('x')).toBeUndefined()
   })
 })
