@@ -65,3 +65,10 @@ Ceny odpowiedników (np. goblinpc.pl) w v1 wpisywane ręcznie z datą w `price-c
 - Marża w panelu liczona jest od ceny sklepowej. Gdy PRO-KOM kupuje taniej, prawdziwa marża jest wyższa; dla części kupowanych regularnie warto wpisywać koszt z faktury.
 - Sklepy mogą blokować automatyczny odczyt albo zmieniać strony — wtedy pozycja ma status „nie znaleziono” i zostaje poprzedni koszt (raport to pokazuje).
 - Nowe kolekcje: `price-sources`, `price-checks`, `price-observations`; nowy global `price-check-settings`; nowe zadanie w kolejce (migracja enuma).
+
+## Uzupełnienie 01.11.2026 — kopia strony z pamięci i próg 7 dni (decyzja Krystiana)
+Pierwszy prawdziwy przebieg pokazał, że tani odczyt (Haiku 5.5 + `web_fetch_20250910`) dostaje kopię strony z pamięci podręcznej narzędzia — w teście sprzed 10 dni. Świeżą stronę (`web_fetch_20260309`, `use_cache: false`) poprawnie czyta tylko Sonnet 5.5, za ok. 0,10 USD zamiast ok. 0,005 USD za odczyt (przy ~100 linkach i dwóch przebiegach w tygodniu ok. 80 USD/mies. zamiast ok. 4 USD — ponad limit z §4).
+- **Zostaje Haiku z kopią z pamięci.** Przy każdej ofercie zapisujemy datę kopii (`retrieved_at`) i pokazujemy ją w raporcie.
+- **Koszt oparty na kopii starszej niż 7 dni (albo bez daty) nie daje propozycji** — pozycja idzie do „do ręcznego sprawdzenia” i nie wywołuje alarmu.
+- Adres oferty idzie do Claude jako zwykły tekst, nie w JSON-ie (narzędzie otwiera tylko adres widoczny w wiadomości).
+- Wrócić do decyzji, jeśli większość pozycji wpada do „do ręcznego sprawdzenia” przez stare kopie.

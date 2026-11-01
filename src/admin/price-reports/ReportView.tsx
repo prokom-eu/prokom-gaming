@@ -240,6 +240,23 @@ export async function ReportView({ initPageResult, params }: AdminViewServerProp
     <div className={styles.stack}>
       {header}
       {check.error ? <Alert title={status.label}>{check.error}</Alert> : null}
+      {diff && (diff.linksProposed ?? 0) > 0 ? (
+        // TODO(krystian): wording (no board).
+        <Alert
+          tone="ok"
+          title={`Claude znalazł ${linksLabel(diff.linksProposed ?? 0)} do ofert`}
+          actions={
+            <a
+              className="pn-btn"
+              href={`${admin}/collections/price-sources?where[active][equals]=false&where[proposedByClaude][equals]=true`}
+            >
+              Linki do ofert
+            </a>
+          }
+        >
+          Zapisały się jako wyłączone. Sprawdź je i włącz — kolejne sprawdzenie odczyta z nich ceny.
+        </Alert>
+      ) : null}
 
       <Card>
         <ol className={styles.steps}>
@@ -294,6 +311,13 @@ export async function ReportView({ initPageResult, params }: AdminViewServerProp
       ) : null}
     </div>,
   )
+}
+
+/** „1 nowy link”, „3 nowe linki”, „5 nowych linków”. */
+function linksLabel(n: number) {
+  if (n === 1) return '1 nowy link'
+  const few = n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14)
+  return few ? `${n} nowe linki` : `${n} nowych linków`
 }
 
 /** „**RAM podrożał.** DDR5 …” → bold lead sentence; the rest as plain text (never HTML). */

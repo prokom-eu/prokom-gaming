@@ -2,6 +2,7 @@ import 'server-only'
 
 import Anthropic from '@anthropic-ai/sdk'
 
+import { log } from '../logger'
 import { shopOf } from '../pricing/sources'
 import { parseAnswer, readingSchema, searchSchema, type Reading } from './schema'
 import { READ_MODEL, SEARCH_MODEL, type CallUsage } from './usage'
@@ -24,6 +25,11 @@ export type ReadResult = {
   reading: Reading | null
   /** `ok`, or why there is no reading: invalid JSON twice, or an API error. */
   note: 'ok' | 'invalid' | 'error'
+  /**
+   * When the fetch tool took its copy of the page (ISO). The cheap fetch serves a cached copy,
+   * which can be days old — the run sends old copies to a check by hand. `null` = unknown.
+   */
+  fetchedAt: string | null
   usage: CallUsage[]
 }
 
@@ -70,6 +76,25 @@ const lastText = (response: Anthropic.Message): string => {
   return texts.map((t) => t.text).join('\n')
 }
 
+/**
+ * The message of one offer reading. The address stands on its own line as plain text: the fetch
+ * tool only opens an address that appears in the user's message, and inside a JSON string it
+ * was refused (`url_not_in_prior_context`, the first real run on 1.11.2026).
+ */
+export function readPrompt(url: string, item: CheckedItem): string {
+  return `Adres oferty: ${url}\n\nWzorzec: ${JSON.stringify(item)}`
+}
+
+/** The date of the page copy the fetch tool returned, or `null` when no page was fetched. */
+export function fetchedAtOf(content: readonly Anthropic.ContentBlock[]): string | null {
+  for (const block of content) {
+    if (block.type === 'web_fetch_tool_result' && block.content.type === 'web_fetch_result') {
+      return block.content.retrieved_at
+    }
+  }
+  return null
+}
+
 export class ClaudePriceReader implements PriceReader {
   private client: Anthropic
 
@@ -82,31 +107,40 @@ export class ClaudePriceReader implements PriceReader {
   private async run(
     params: Anthropic.MessageCreateParamsNonStreaming,
     model: string,
-  ): Promise<{ text: string; usage: CallUsage[]; refused: boolean; failed: boolean }> {
+  ): Promise<{
+    text: string
+    usage: CallUsage[]
+    refused: boolean
+    failed: boolean
+    fetchedAt: string | null
+  }> {
     const usage: CallUsage[] = []
     const messages = [...params.messages]
+    let fetchedAt: string | null = null
     try {
       for (let turn = 0; turn < 3; turn++) {
         const response = await this.client.messages.create({ ...params, messages })
         usage.push(usageOf(model, response))
+        fetchedAt ??= fetchedAtOf(response.content)
         if (response.stop_reason === 'refusal') {
-          return { text: '', usage, refused: true, failed: false }
+          return { text: '', usage, refused: true, failed: false, fetchedAt }
         }
         if (response.stop_reason !== 'pause_turn') {
-          return { text: lastText(response), usage, refused: false, failed: false }
+          return { text: lastText(response), usage, refused: false, failed: false, fetchedAt }
         }
         messages.push({ role: 'assistant', content: response.content })
       }
     } catch {
       // An error in a later turn: the earlier turns are still paid — keep their usage.
-      return { text: '', usage, refused: false, failed: true }
+      return { text: '', usage, refused: false, failed: true, fetchedAt }
     }
-    return { text: '', usage, refused: false, failed: false }
+    return { text: '', usage, refused: false, failed: false, fetchedAt }
   }
 
   async read(item: CheckedItem, url: string, shops: readonly string[]): Promise<ReadResult> {
     const usage: CallUsage[] = []
-    const prompt = JSON.stringify({ adres: url, wzorzec: item })
+    const prompt = readPrompt(url, item)
+    let fetchedAt: string | null = null
     for (let attempt = 0; attempt < 2; attempt++) {
       try {
         const result = await this.run(
@@ -129,14 +163,28 @@ export class ClaudePriceReader implements PriceReader {
           READ_MODEL,
         )
         usage.push(...result.usage)
-        if (result.refused || result.failed) return { reading: null, note: 'error', usage }
+        // The date of the attempt that gave the answer (a retry fetches the page again).
+        fetchedAt = result.fetchedAt ?? fetchedAt
+        if (result.refused || result.failed) {
+          return { reading: null, note: 'error', fetchedAt, usage }
+        }
         const parsed = parseAnswer(result.text, readingSchema)
-        if (parsed.ok) return { reading: parsed.value, note: 'ok', usage }
+        if (parsed.ok)
+          return { reading: parsed.value, note: 'ok', fetchedAt: result.fetchedAt, usage }
+        // Shop pages only, no customer data: the reason helps the next diagnosis.
+        log.warn(
+          {
+            host: new URL(url).hostname,
+            reason: parsed.reason,
+            fetched: result.fetchedAt !== null,
+          },
+          'offer reading rejected',
+        )
       } catch {
-        return { reading: null, note: 'error', usage }
+        return { reading: null, note: 'error', fetchedAt, usage }
       }
     }
-    return { reading: null, note: 'invalid', usage }
+    return { reading: null, note: 'invalid', fetchedAt, usage }
   }
 
   async search(item: CheckedItem, shops: readonly string[]) {
@@ -208,6 +256,10 @@ export class FakePriceReader implements PriceReader {
         reason: '',
       },
       note: 'ok',
+      // `e2e-kopia=10` = a page copy from 10 days ago (the 7-day rule in the run).
+      fetchedAt: new Date(
+        Date.now() - Number(params.get('e2e-kopia') ?? 0) * 86_400_000,
+      ).toISOString(),
       usage: [{ model: READ_MODEL, inputTokens: 2_000, outputTokens: 200, webFetches: 1 }],
     }
   }
