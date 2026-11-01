@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 
+import { BreadcrumbJsonLd } from '@/components/BreadcrumbJsonLd'
 import { PageHeader } from '@/components/content/PageHeader'
 import { Sigil } from '@/components/Sigil'
 import { ButtonLink } from '@/components/ui/Button'
@@ -12,6 +13,7 @@ export const metadata: Metadata = {
   title: 'O nas',
   description:
     'PRO-KOM z Rabki-Zdroju: od 2004 roku składamy komputery, naprawiamy sprzęt i opiekujemy się IT firm. Sklep w Rabce-Zdroju, dane firmy i rejestry.',
+  alternates: { canonical: routes.about },
 }
 
 const NUMBERS = [
@@ -94,6 +96,7 @@ const LINES = [
 export default function AboutPage() {
   return (
     <>
+      <BreadcrumbJsonLd crumbs={[{ name: 'O nas', path: routes.about }]} />
       <PageHeader
         scene="perun"
         size="hero"

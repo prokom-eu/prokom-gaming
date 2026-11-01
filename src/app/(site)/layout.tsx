@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next'
+import { connection } from 'next/server'
 import type { ReactNode } from 'react'
 
 import { CookieBanner } from '@/components/CookieBanner'
@@ -7,15 +8,32 @@ import { MobileTabBar } from '@/components/MobileTabBar'
 import { ShellProvider } from '@/components/shell/ShellProvider'
 import { SiteFooter } from '@/components/SiteFooter'
 import { SiteHeader } from '@/components/SiteHeader'
+import { getEnv } from '@/lib/env'
 import { features } from '@/lib/features'
+import { DESCRIPTIONS, isIndexable, OPEN_GRAPH, SITE_NAME } from '@/lib/seo'
 import { company, cookieBannerEnabled, menuCreatures } from '@/lib/site'
 
 import { fontVariables } from './fonts'
 import './globals.css'
 
-// TODO(krystian): G15 — description, Open Graph, `metadataBase` from the site URL (spec. §23).
-export const metadata: Metadata = {
-  title: { default: 'PRO-KOM Gaming', template: '%s | PRO-KOM Gaming' },
+/**
+ * Defaults of every page (spec. §23). Per request, not at build time: one image serves staging and
+ * production, so the site address (canonical links, Open Graph) and `noindex` come from the
+ * server's environment — a page rendered in `docker build` would keep the build's values.
+ * Pages set their own title, description and `alternates.canonical` (relative to `metadataBase`).
+ */
+export async function generateMetadata(): Promise<Metadata> {
+  await connection()
+  const env = getEnv()
+  return {
+    metadataBase: new URL(env.SITE_URL),
+    title: { default: SITE_NAME, template: `%s | ${SITE_NAME}` },
+    description: DESCRIPTIONS.home,
+    openGraph: OPEN_GRAPH,
+    // Staging and local runs never get indexed; a page's own `robots` (account, certificate…)
+    // replaces this object, and those pages are `noindex` everywhere anyway.
+    ...(isIndexable(env.SITE_ENV) ? {} : { robots: { index: false, follow: false } }),
+  }
 }
 
 // `cover`: lets env(safe-area-inset-bottom) lift the tab bar above the iPhone home bar.

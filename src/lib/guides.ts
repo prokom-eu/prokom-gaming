@@ -1,4 +1,5 @@
 import { plural } from './pl'
+import { breadcrumbJsonLd } from './seo'
 
 /** Topics of the guides (board Poradniki: filters), with their value in the address (`?temat=`). */
 export const GUIDE_CATEGORIES = [
@@ -65,13 +66,17 @@ export function relatedGuides(
   ].slice(0, limit)
 }
 
-/** JSON-LD of a guide: `Article` and `BreadcrumbList` (spec. §23). */
+/**
+ * JSON-LD of a guide: `Article` and `BreadcrumbList` (spec. §23). `image` is the site path of the
+ * header scene (Google asks for an image in an Article).
+ */
 export function guideJsonLd(input: {
   siteUrl: string
   slug: string
   title: string
   lead: string
   author: string
+  image: string
   publishedAt: string | null
   updatedAt: string | null
 }): object[] {
@@ -82,24 +87,16 @@ export function guideJsonLd(input: {
       '@type': 'Article',
       headline: input.title,
       description: input.lead,
+      image: url(input.image),
       author: { '@type': 'Organization', name: input.author },
       publisher: { '@type': 'Organization', name: 'PRO-KOM Gaming' },
       ...(input.publishedAt ? { datePublished: input.publishedAt } : {}),
       ...(input.updatedAt ? { dateModified: input.updatedAt } : {}),
       mainEntityOfPage: url(guidePath(input.slug)),
     },
-    {
-      '@context': 'https://schema.org',
-      '@type': 'BreadcrumbList',
-      itemListElement: [
-        { '@type': 'ListItem', position: 1, name: 'Poradniki', item: url(GUIDES_PATH) },
-        {
-          '@type': 'ListItem',
-          position: 2,
-          name: input.title,
-          item: url(guidePath(input.slug)),
-        },
-      ],
-    },
+    breadcrumbJsonLd(input.siteUrl, [
+      { name: 'Poradniki', path: GUIDES_PATH },
+      { name: input.title, path: guidePath(input.slug) },
+    ]),
   ]
 }

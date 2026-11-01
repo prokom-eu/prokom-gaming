@@ -6,6 +6,7 @@ import {
   firstTierWithRam,
   gameFaq,
   gameJsonLd,
+  gameDescription,
   gameLead,
   hasRequirements,
   parsePicker,
@@ -165,6 +166,15 @@ describe('texts', () => {
     expect(gameLead({ intro: null })).toMatch(/^Sprawdź, ile klatek/)
     expect(gameLead({ intro: ' Night City jest ciężkie. ' })).toBe(
       'Night City jest ciężkie. Sprawdź, ile klatek da każdy nasz poziom mocy w FullHD, 2K i 4K, i który komputer wystarczy na Twój monitor.',
+    )
+  })
+
+  it('meta description: unique per game without an intro, the lead with one (spec. §23)', () => {
+    const a = gameDescription({ name: 'Fortnite', intro: null })
+    expect(a).toContain('Fortnite')
+    expect(a).not.toBe(gameDescription({ name: 'CS2', intro: null }))
+    expect(gameDescription({ name: 'Cyberpunk 2077', intro: 'Night City jest ciężkie.' })).toBe(
+      gameLead({ intro: 'Night City jest ciężkie.' }),
     )
   })
 

@@ -7,7 +7,7 @@ import { cache } from 'react'
 import { GameResults } from '@/components/games/GameResults'
 import { RequirementsBox } from '@/components/games/InfoBoxes'
 import { getEnv } from '@/lib/env'
-import { gameJsonLd, gameLead, gamePath, gameTitle, hasRequirements } from '@/lib/games'
+import { gameDescription, gameJsonLd, gamePath, gameTitle, hasRequirements } from '@/lib/games'
 import { loadGamePage } from '@/lib/games.server'
 
 import '@/components/games/games.css'
@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     // Spec. §23: the template already ends with the brand — no layout suffix.
     title: { absolute: gameTitle(data.game.name) },
-    description: gameLead(data.game),
+    description: gameDescription(data.game),
     alternates: { canonical: new URL(gamePath(data.game.slug), getEnv().SITE_URL).toString() },
   }
 }

@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { connection } from 'next/server'
 
+import { BreadcrumbJsonLd } from '@/components/BreadcrumbJsonLd'
 import { ContactForm } from '@/components/content/ContactForm'
 import { PageHeader } from '@/components/content/PageHeader'
 import { StoreMap } from '@/components/content/StoreMap'
@@ -19,6 +20,7 @@ export const metadata: Metadata = {
   title: 'Kontakt',
   description:
     'Zapytanie o komputer, telefon i e-mail PRO-KOM Gaming. Sklep w Rabce-Zdroju, ul. Orkana 16B. Odpisujemy codziennie od 8 do 22.',
+  alternates: { canonical: routes.contact },
 }
 
 const mapsHref = (query: string) =>
@@ -64,6 +66,7 @@ export default async function ContactPage() {
 
   return (
     <>
+      <BreadcrumbJsonLd crumbs={[{ name: 'Kontakt', path: routes.contact }]} />
       <PageHeader
         scene="licho"
         size="tall"

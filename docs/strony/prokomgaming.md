@@ -191,7 +191,7 @@ Zwrot 14 dni neutralnie (nie atut) · gwarancja PRO-KOM odróżniona od rękojmi
 4. Zapytanie z każdej ścieżki (zestaw, konfiguracja, porównanie, kontakt, bon, gotowe) zapisuje rekord, wysyła 2 maile i pokazuje numer.
 5. Wszystkie strony zgodne ze zrzutami 1440 i 414; dolny pasek, menu i arkusze działają na Androidzie i iPhonie; klawiatura i axe bez błędów.
 6. Lighthouse mobile ≥ 90 (4 kategorie) na: `/`, `/zestawy`, `/zestawy/wampir`, `/konfigurator`, `/komputer-do/cyberpunk-2077`.
-7. Zero nawiasów kwadratowych w HTML produkcji; zero słowa „Santander”, kalkulatora i oferty rat (jedyne dozwolone „raty” jako całe słowo: pytanie FAQ „Czy mogę kupić na raty?” z odpowiedzią „Na razie nie…”; test na całe słowa, nie fragmenty jak „utraty”).
+7. Zero nawiasów kwadratowych w HTML produkcji; zero słowa „Santander”, kalkulatora i oferty rat (jedyne dozwolone „raty” jako całe słowo: pytanie FAQ „Czy mogę kupić na raty?” na `/pytania` albo „Czy da się kupić na raty?” na `/dla-rodzicow` (plansza Rodzice, §16), zawsze z odpowiedzią „Na razie nie…” — ujednolicone w G15; test na całe słowa, nie fragmenty jak „utraty”).
 8. `sitemap.xml`, `robots.txt`, JSON-LD bez błędów w Rich Results Test.
 
 ## 28. Poza zakresem 20.11

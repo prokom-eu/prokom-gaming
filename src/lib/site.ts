@@ -10,6 +10,8 @@ import creaturesSeed from '../../seed/prokomgaming/creatures.json'
 export const company = {
   name: 'PRO-KOM Tadeusz Wójciak',
   address: 'ul. Orkana 16B, 34-700 Rabka-Zdrój',
+  // The same address in parts, for structured data (PostalAddress).
+  postal: { street: 'ul. Orkana 16B', code: '34-700', city: 'Rabka-Zdrój' },
   nip: '735-251-14-47',
   email: 'kontakt@prokomgaming.pl',
   phone: '+48 883 200 151',

@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { connection } from 'next/server'
 
+import { BreadcrumbJsonLd } from '@/components/BreadcrumbJsonLd'
 import { PageHeader } from '@/components/content/PageHeader'
 import { StockList } from '@/components/content/StockList'
 import { IconClock, IconDoc, IconShield, IconTruck } from '@/components/icons'
@@ -23,6 +24,7 @@ export const metadata: Metadata = {
   title: 'Gotowe od ręki',
   description:
     'Komputery do gier złożone, przetestowane i z metryką. Wysyłka w 1–2 dni robocze albo odbiór w sklepie od razu. Rezerwacja na 24 godziny.',
+  alternates: { canonical: routes.stock },
 }
 
 const PROMISES = [
@@ -47,6 +49,7 @@ export default async function StockPage() {
 
   return (
     <>
+      <BreadcrumbJsonLd crumbs={[{ name: 'Gotowe od ręki', path: routes.stock }]} />
       <PageHeader
         scene="perun"
         title="Gotowe od ręki"

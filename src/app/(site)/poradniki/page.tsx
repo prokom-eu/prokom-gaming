@@ -2,11 +2,13 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { connection } from 'next/server'
 
+import { BreadcrumbJsonLd } from '@/components/BreadcrumbJsonLd'
 import { GuideCardView } from '@/components/content/GuideCardView'
 import { PageHeader } from '@/components/content/PageHeader'
 import { GUIDES_PATH, guideList, topicFromParam, type GuideCard } from '@/lib/guides'
 import { loadGuideCards } from '@/lib/guides.server'
 import { errorFields, log } from '@/lib/logger'
+import { routes } from '@/lib/nav'
 
 import '@/components/content/content.css'
 
@@ -14,6 +16,7 @@ export const metadata: Metadata = {
   title: 'Poradniki',
   description:
     'Jak wybrać komputer do gier, jaki monitor do niego dobrać i co zrobić po rozpakowaniu. Krótko i po ludzku, od serwisu PRO-KOM w Rabce-Zdroju.',
+  alternates: { canonical: routes.guides },
 }
 
 /** „Poradniki” (spec. §20, boards Poradniki / Poradniki-telefon). Topic in the address. */
@@ -35,6 +38,7 @@ export default async function GuidesPage({
 
   return (
     <>
+      <BreadcrumbJsonLd crumbs={[{ name: 'Poradniki', path: routes.guides }]} />
       <PageHeader
         scene="baba"
         title="Poradniki"

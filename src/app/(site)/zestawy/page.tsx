@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { connection } from 'next/server'
 
+import { BreadcrumbJsonLd } from '@/components/BreadcrumbJsonLd'
 import { BuildCardView } from '@/components/builds/BuildCardView'
 import { BuildsBrowser, type BrowserItem } from '@/components/builds/BuildsBrowser'
 import { ButtonLink } from '@/components/ui/Button'
@@ -9,10 +10,16 @@ import { dateText } from '@/lib/home'
 import { errorFields, log } from '@/lib/logger'
 import { routes } from '@/lib/nav'
 import { loadPublicOffer } from '@/lib/offer.server'
+import { DESCRIPTIONS } from '@/lib/seo'
 
 import '@/components/builds/builds.css'
 
-export const metadata: Metadata = { title: 'Wszystkie zestawy' }
+// Filters only narrow the same list: every variant of the address points to `/zestawy`.
+export const metadata: Metadata = {
+  title: 'Wszystkie zestawy',
+  description: DESCRIPTIONS.builds,
+  alternates: { canonical: routes.builds },
+}
 
 /** Cards above the fold on desktop (one row of three): loaded at once. */
 const EAGER_CARDS = 3
@@ -47,6 +54,7 @@ export default async function BuildsPage({
 
   return (
     <>
+      <BreadcrumbJsonLd crumbs={[{ name: 'Zestawy', path: routes.builds }]} />
       {/* Background from CSS only (board: a faint forest at 55%): an image here was the LCP
           element and cost ~0.6 s on a phone (Lighthouse, G9). */}
       <header className="bl-head" data-scene-top>

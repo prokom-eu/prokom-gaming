@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { connection } from 'next/server'
 
+import { BreadcrumbJsonLd } from '@/components/BreadcrumbJsonLd'
 import { FaqBrowser } from '@/components/content/FaqBrowser'
 import { PageHeader } from '@/components/content/PageHeader'
 import { JsonLd } from '@/components/JsonLd'
@@ -16,6 +17,7 @@ export const metadata: Metadata = {
   title: 'Pytania i odpowiedzi',
   description:
     'Zakup i płatność, dostawa, zwroty i gwarancja, klatki w grach i pytania rodziców: odpowiedzi PRO-KOM Gaming w jednym miejscu.',
+  alternates: { canonical: routes.faq },
 }
 
 /** „Pytania i odpowiedzi” (spec. §19, boards FAQ / FAQ-telefon). */
@@ -31,6 +33,7 @@ export default async function FaqPage() {
 
   return (
     <>
+      <BreadcrumbJsonLd crumbs={[{ name: 'Pytania i odpowiedzi', path: routes.faq }]} />
       {sections.length > 0 && <JsonLd data={faqPageJsonLd(sections)} />}
       <PageHeader
         scene="licho"

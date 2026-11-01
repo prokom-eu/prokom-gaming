@@ -219,6 +219,17 @@ export function gameLead(game: { intro: string | null }): string {
   return intro ? `${intro} ${template}` : template
 }
 
+/**
+ * Meta description of a game page: unique per game, so 33 pages never share one (spec. §23). The
+ * game's own intro when written in the panel, else a sentence with the game's name.
+ * TODO(krystian): the sentence is a draft (no copy in the boards) — to accept before G16.
+ */
+export function gameDescription(game: { name: string; intro: string | null }): string {
+  const intro = game.intro?.trim()
+  if (intro) return gameLead(game)
+  return `Ile klatek w ${game.name} da każdy nasz komputer w FullHD, 2K i 4K — liczby z niezależnych testów, z etykietą źródła. Sprawdź, który poziom mocy wystarczy na Twój monitor.`
+}
+
 export type GameQuestion = { question: string; answer: string }
 
 /** Capacity of a RAM label, e.g. "32 GB DDR5 6000 CL30" → 32; `null` when it has none. */

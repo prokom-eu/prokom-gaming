@@ -15,16 +15,12 @@ import '@/components/inquiry/inquiry.css'
 
 type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> }
 
-export async function generateMetadata(): Promise<Metadata> {
-  // The environment is read per request (the image build has none).
-  await connection()
-  return {
-    title: 'Zapytanie o komputer',
-    // The entry parameters (`zestaw`, `k`, `z`) only prefill the same page.
-    alternates: { canonical: new URL(routes.inquiry, getEnv().SITE_URL).toString() },
-    description:
-      'Trzy krótkie kroki. Odpiszemy z imienną listą części, aktualną ceną i terminem, zwykle w ciągu godziny.',
-  }
+export const metadata: Metadata = {
+  title: 'Zapytanie o komputer',
+  description:
+    'Trzy krótkie kroki. Odpiszemy z imienną listą części, aktualną ceną i terminem, zwykle w ciągu godziny.',
+  // A form, not content: never in search results (spec. §23); links from it are followed.
+  robots: { index: false, follow: true },
 }
 
 /** The first value of each parameter, as `URLSearchParams` (what `initialState` reads). */
