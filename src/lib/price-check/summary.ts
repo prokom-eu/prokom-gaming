@@ -139,6 +139,8 @@ export function summaryInput(diff: CheckDiff) {
     liczby: {
       pozycjiWszystkich: t.items,
       pozycjiZOferta: t.found,
+      // Claude counts these itself (94 − 73) — given, so the number passes the check.
+      pozycjiBezCeny: t.items - t.found,
       propozycjiDoZatwierdzenia: t.proposals,
       doRecznegoSprawdzenia: t.manual,
       niedostepnych: t.unavailable,

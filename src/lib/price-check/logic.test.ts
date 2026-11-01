@@ -267,6 +267,7 @@ describe('summaryInput', () => {
     } as unknown as Parameters<typeof summaryInput>[0]
     const { input, names } = summaryInput(diff)
     expect(input.liczby).toMatchObject({
+      pozycjiBezCeny: 1,
       zestawowZeZmianaCeny: 1,
       zestawowBezZmiany: 1,
       zestawowBezCeny: 1,
