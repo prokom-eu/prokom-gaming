@@ -63,7 +63,7 @@ export const loadShell = cache(async (payload: Payload, user: ReqUser): Promise<
     }
   }
 
-  const [inquiriesNew, active, prices] = await Promise.all([
+  const [inquiriesNew, active, prices, reportsNew] = await Promise.all([
     payload
       .count({
         collection: 'inquiries',
@@ -73,13 +73,21 @@ export const loadShell = cache(async (payload: Payload, user: ReqUser): Promise<
       .then((r) => r.totalDocs),
     ordersActive,
     priceState(payload),
+    // P7: finished price reports nobody opened yet.
+    payload
+      .count({
+        collection: 'price-checks',
+        where: { status: { in: ['done', 'budget', 'failed'] }, readAt: { exists: false } },
+        overrideAccess: true,
+      })
+      .then((r) => r.totalDocs),
   ])
   const marginAlarm = prices.broken > 0
   return {
     role,
     name,
     initials: initialsOf(name),
-    counts: { inquiriesNew, ordersActive: active, queue: prices.queue },
+    counts: { inquiriesNew, ordersActive: active, queue: prices.queue, reportsNew },
     batchDate: prices.batchDate,
     bell: inquiriesNew + (marginAlarm ? 1 : 0),
     marginAlarm,

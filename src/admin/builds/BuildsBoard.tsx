@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 
-import { marginStatus, percentShort, zl } from '../../lib/pricing/format'
+import { marginStatus, percentShort, signedZl, zl } from '../../lib/pricing/format'
 import { Chip, type Tone } from '../ui/Chip'
 import { Icon } from '../ui/icons'
 import { MarginBar } from '../ui/MarginBar'
@@ -42,11 +42,14 @@ export function BuildsBoard({
   minMargin,
   warnMargin,
   editBase,
+  competitors = {},
 }: {
   cards: BuildCard[]
   minMargin: number
   warnMargin: number
   editBase: string
+  /** Competitors' prices typed in the settings (P7), by build slug. */
+  competitors?: Record<string, { name: string; price: number }>
 }) {
   const [monitor, setMonitor] = useState<MonitorFilter>('all')
   const [sort, setSort] = useState<Sort>('price')
@@ -138,7 +141,21 @@ export function BuildsBoard({
                 <dt>RAM i dysk</dt>
                 <dd>{c.recipe.ramSsd}</dd>
               </dl>
-              {/* TODO(P7): „GoblinPC …” — competitor prices come with price-check-settings. */}
+              {competitors[c.slug] && c.price !== null ? (
+                <p className={styles.rival}>
+                  <span>
+                    {competitors[c.slug]!.name}: {zl(competitors[c.slug]!.price)}
+                  </span>
+                  {/* Ours minus theirs: dearer than the competitor in red (board Zestawy). */}
+                  <b
+                    className={
+                      c.price > competitors[c.slug]!.price ? styles.dearer : styles.cheaper
+                    }
+                  >
+                    {signedZl(c.price - competitors[c.slug]!.price)}
+                  </b>
+                </p>
+              ) : null}
               <a
                 className={`pn-btn ${styles.edit}`}
                 href={`${editBase}/${c.slug}`}

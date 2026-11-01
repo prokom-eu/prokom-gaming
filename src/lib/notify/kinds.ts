@@ -8,6 +8,10 @@ export const CHANNELS = {
   inquiry_sla: { email: true, push: true },
   margin_alarm: { email: true, push: true },
   mail_error: { email: true, push: false },
+  // P7: a price report with an alarm (minimum, part of a build unavailable, big cost change).
+  price_report: { email: true, push: true },
+  // P7: the monthly Claude limit stopped a price check.
+  budget: { email: true, push: false },
 } as const satisfies Record<string, { email: boolean; push: boolean }>
 
 export type NotifyKind = keyof typeof CHANNELS
@@ -18,6 +22,7 @@ export const PUSH_KINDS = [
   'inquiry_reply',
   'inquiry_sla',
   'margin_alarm',
+  'price_report',
 ] as const satisfies readonly NotifyKind[]
 export type PushKind = (typeof PUSH_KINDS)[number]
 
@@ -27,6 +32,7 @@ export const PUSH_KIND_LABELS: Record<PushKind, string> = {
   inquiry_reply: 'Odpowiedź klienta w wątku',
   inquiry_sla: 'Zapytanie bez odpowiedzi',
   margin_alarm: 'Marża poniżej minimum',
+  price_report: 'Raport cen z alarmem',
 }
 
 /** Roles that see each kind: inquiries and margins are `admin` only (spec §15). */
@@ -35,6 +41,7 @@ export const KIND_ROLES: Record<PushKind, readonly ('admin' | 'serwis')[]> = {
   inquiry_reply: ['admin'],
   inquiry_sla: ['admin'],
   margin_alarm: ['admin'],
+  price_report: ['admin'],
 }
 
 export const NOTIFY_SEND_TASK = 'notify-send'

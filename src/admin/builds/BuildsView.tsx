@@ -6,6 +6,7 @@ import { PanelDenied } from '../ui/PanelDenied'
 import { PanelPage } from '../ui/PanelPage'
 import { PanelShell } from '../ui/PanelShell'
 import { BuildsBoard } from './BuildsBoard'
+import { competitorsBySlug } from '../price-reports/load'
 import { buildCards, loadBuildsContext } from './load'
 
 const TITLE = 'Gotowe zestawy'
@@ -26,7 +27,10 @@ export async function BuildsView({ initPageResult }: AdminViewServerProps) {
     )
   }
   const admin = req.payload.config.routes.admin
-  const ctx = await loadBuildsContext(req.payload)
+  const [ctx, rivals] = await Promise.all([
+    loadBuildsContext(req.payload),
+    competitorsBySlug(req.payload),
+  ])
   return (
     <PanelShell req={req} title={TITLE} active="builds" crumbs={[{ label: 'Oferta' }]}>
       <div data-builds-screen>
@@ -39,6 +43,9 @@ export async function BuildsView({ initPageResult }: AdminViewServerProps) {
             minMargin={ctx.offer.catalog.settings.minMargin}
             warnMargin={ctx.warnMargin}
             editBase={`${admin}/zestawy`}
+            competitors={Object.fromEntries(
+              [...rivals].map(([slug, c]) => [slug, { name: c.name, price: c.price }]),
+            )}
           />
         )}
       </div>

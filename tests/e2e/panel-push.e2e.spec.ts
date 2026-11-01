@@ -132,7 +132,8 @@ test('switch on, choose kinds, send a test, remove — with a faked pushManager'
   expect(text).not.toContain('push.example.test')
   expect(text).not.toContain(keys.auth)
   const mine = (JSON.parse(text) as { docs: { kinds: string[] }[] }).docs
-  expect(mine[0]?.kinds).toEqual(['inquiry_new', 'inquiry_reply', 'inquiry_sla'])
+  // P7 added `price_report` (on by default for a new device).
+  expect(mine[0]?.kinds).toEqual(['inquiry_new', 'inquiry_reply', 'inquiry_sla', 'price_report'])
   await api.dispose()
 
   // The test send reaches web-push; the fake endpoint cannot answer, so the panel says so.

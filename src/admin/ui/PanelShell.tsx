@@ -1,6 +1,8 @@
 import type { PayloadRequest } from 'payload'
 import type { ReactNode } from 'react'
 
+import { getEnv, priceCheckConfig } from '../../lib/env'
+import { CheckPricesButton } from '../price-reports/CheckPricesButton'
 import { loadShell, roleLabel, type ShellData } from '../shell/load'
 import { navGroups, navMore, navTabs, type NavItem, type NavKey } from '../shell/navModel'
 import { shortCount } from './count'
@@ -38,6 +40,7 @@ export async function PanelShell({ req, active, title, crumbs = [], back, childr
   const current = (item: NavItem) => (item.key === active ? ('page' as const) : undefined)
   const status = statusText(shell)
   const bellHref = `${admin}/zapytania?filtr=nowe`
+  const checkOn = priceCheckConfig(getEnv()) !== null
 
   const tiles: MoreTile[] = navMore(role).map((item) => ({
     key: item.key,
@@ -112,7 +115,7 @@ export async function PanelShell({ req, active, title, crumbs = [], back, childr
           {role === 'admin' ? <Bell href={bellHref} count={shell.bell} /> : null}
         </header>
 
-        {/* Computer: top bar. Search (P8) and "Sprawdź ceny" (P7) come with their sessions. */}
+        {/* Computer: top bar. Search comes with P8. */}
         <header className="pn-top">
           <nav aria-label="Okruszki">
             <ol className="pn-crumb">
@@ -135,6 +138,9 @@ export async function PanelShell({ req, active, title, crumbs = [], back, childr
             </span>
           ) : null}
           {role === 'admin' ? <Bell href={bellHref} count={shell.bell} /> : null}
+          {role === 'admin' ? (
+            <CheckPricesButton enabled={checkOn} reportsHref={`${admin}/raporty-cen`} />
+          ) : null}
         </header>
 
         <main className="pn-wrap" id="pn-tresc" tabIndex={-1}>
@@ -164,6 +170,11 @@ export async function PanelShell({ req, active, title, crumbs = [], back, childr
               queue={role === 'admin' ? (counts.queue ?? 0) : 0}
               who={{ name: shell.name, initials: shell.initials, role: roleLabel(role) }}
               logoutHref={`${admin}/logout`}
+              action={
+                role === 'admin' ? (
+                  <CheckPricesButton enabled={checkOn} reportsHref={`${admin}/raporty-cen`} wide />
+                ) : undefined
+              }
             />
           </li>
         </ul>

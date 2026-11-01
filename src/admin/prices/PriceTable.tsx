@@ -25,6 +25,8 @@ export type PriceRowView = {
   margin: number | null
   costSource: 'market' | 'invoice' | 'mixed' | 'settings'
   status: 'urgent' | 'new' | 'queued' | 'minor' | 'same'
+  /** No usable offer in the last price check (P7); for a level: one of its parts. */
+  unavailable: boolean
   editPath: string
 }
 
@@ -97,7 +99,7 @@ export function PriceTable({
         ? isChanged(r)
         : state === 'queued'
           ? isQueued(r)
-          : false
+          : r.unavailable
   const byCategory = (r: PriceRowView) => category === 'all' || r.category === category
   const shown = rows.filter((r) => byState(r) && byCategory(r))
   const inState = rows.filter(byState)
@@ -199,10 +201,9 @@ export function PriceTable({
             active={state === 'queued'}
             onClick={() => setState('queued')}
           />
-          {/* TODO(P7): unavailable items come from the price check report. */}
           <FilterPill
             label="Niedostępne"
-            count={0}
+            count={rows.filter((r) => r.unavailable).length}
             active={state === 'unavailable'}
             onClick={() => setState('unavailable')}
           />

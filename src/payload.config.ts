@@ -22,6 +22,9 @@ import { InquiryMessages } from './collections/InquiryMessages'
 import { MailIntakeUnmatched } from './collections/MailIntakeUnmatched'
 import { PushSubscriptions } from './collections/PushSubscriptions'
 import { PriceSources } from './collections/PriceSources'
+import { PriceChecks } from './collections/PriceChecks'
+import { PriceObservations } from './collections/PriceObservations'
+import { PriceCheckSettings } from './globals/PriceCheckSettings'
 import { Media } from './collections/Media'
 import { Options } from './collections/Options'
 import { Orders } from './collections/Orders'
@@ -41,6 +44,7 @@ import { InquiryRetentionTask } from './jobs/inquiryRetention'
 import { InquirySlaTask } from './jobs/inquirySla'
 import { MailIntakeTask } from './jobs/mailIntake'
 import { NotifySendTask } from './jobs/notifySend'
+import { PriceCheckSchedulerTask, PriceCheckTask } from './jobs/priceCheck'
 import { MarginAlarmTask } from './jobs/marginAlarm'
 import { getEnv } from './lib/env'
 import { migrations } from './migrations'
@@ -108,6 +112,18 @@ export default buildConfig({
           exact: true,
           meta: { title: 'Opcje konfiguratora' },
         },
+        reports: {
+          Component: '/admin/price-reports/ReportsView#ReportsView',
+          path: '/raporty-cen',
+          exact: true,
+          meta: { title: 'Raporty cen' },
+        },
+        report: {
+          Component: '/admin/price-reports/ReportView#ReportView',
+          path: '/raporty-cen/:id',
+          exact: true,
+          meta: { title: 'Raport sprawdzenia cen' },
+        },
         // `:slug` from `params.segments` (Payload matches the path with path-to-regexp).
         buildEditor: {
           Component: '/admin/builds/BuildEditorView#BuildEditorView',
@@ -170,15 +186,37 @@ export default buildConfig({
     MailIntakeUnmatched,
     PushSubscriptions,
     PriceSources,
+    PriceChecks,
+    PriceObservations,
   ],
-  globals: [PricingSettings, SiteSettings, LegalTerms, LegalPrivacy, MailSettings, MailIntakeState],
+  globals: [
+    PricingSettings,
+    SiteSettings,
+    LegalTerms,
+    LegalPrivacy,
+    MailSettings,
+    MailIntakeState,
+    PriceCheckSettings,
+  ],
   // Background jobs (ADR-G002 §4.4: margin alarm; ADR-G005: daily inquiry retention). Run inside the Next process
   // (one VPS, not serverless) every minute; the cron starts with the first panel/API request.
   // Running and queueing through the REST API is panel-only: by default any signed-in account
   // could, and customers (G14) sign in too. Finished jobs are removed — nothing to keep.
   jobs: {
-    tasks: [MarginAlarmTask, InquiryRetentionTask, InquirySlaTask, MailIntakeTask, NotifySendTask],
-    autoRun: [{ cron: '* * * * *', queue: 'default', limit: 5 }],
+    tasks: [
+      MarginAlarmTask,
+      InquiryRetentionTask,
+      InquirySlaTask,
+      MailIntakeTask,
+      NotifySendTask,
+      PriceCheckTask,
+      PriceCheckSchedulerTask,
+    ],
+    autoRun: [
+      { cron: '* * * * *', queue: 'default', limit: 5 },
+      // P7: the price check runs up to 15 minutes — its own queue, one at a time.
+      { cron: '* * * * *', queue: 'long', limit: 1 },
+    ],
     deleteJobOnComplete: true,
     access: {
       run: ({ req }) => isAdmin(req),

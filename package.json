@@ -27,6 +27,7 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "1.3.0",
     "@payloadcms/db-postgres": "3.91.0",
     "@payloadcms/email-nodemailer": "3.91.0",
     "@payloadcms/next": "3.91.0",

@@ -56,7 +56,14 @@ const same = (a: Config, b: Config) =>
  * (`recipeFigures`), „Zapisz” asks to confirm a new price on the site. The server checks all of
  * it again on saving.
  */
-export function EditorBoard({ data }: { data: EditorData }) {
+export function EditorBoard({
+  data,
+  competitor = null,
+}: {
+  data: EditorData
+  /** Competitor's price typed in the settings (P7). */
+  competitor?: { name: string; price: number; date: string } | null
+}) {
   const router = useRouter()
   const { build, prices, costsToday, costsAtBatch, minMargin, warnMargin } = data
   const [config, setConfig] = useState<Config>(build.config)
@@ -375,7 +382,18 @@ export function EditorBoard({ data }: { data: EditorData }) {
               ) : null}
             </div>
           </Card>
-          {/* TODO(P7): „Konkurencja” — competitor prices come with price-check-settings. */}
+          {competitor ? (
+            <Card title="Konkurencja">
+              <dl className={`pn-kv ${styles.breakdown}`}>
+                <dt>
+                  {competitor.name} ({competitor.date})
+                </dt>
+                <dd>{zl(competitor.price)}</dd>
+                <dt>My vs {competitor.name.split(' ')[0]}</dt>
+                <dd>{price === null ? '—' : signedZl(price - competitor.price)}</dd>
+              </dl>
+            </Card>
+          ) : null}
         </aside>
       </div>
 

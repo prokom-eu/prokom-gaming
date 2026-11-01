@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto'
 
 import type { AdminViewServerProps, Payload } from 'payload'
 
-import { getEnv, imapConfig, vapidConfig } from '../../lib/env'
+import { getEnv, imapConfig, priceCheckConfig, vapidConfig } from '../../lib/env'
 import { PUSH_KINDS, type PushKind } from '../../lib/notify/kinds'
 import { zl } from '../../lib/pricing/format'
 import { loadBatch } from '../../lib/pricing/store'
@@ -19,6 +19,10 @@ import { whenLabel } from '../inquiries/format'
 import { MailSettingsForm } from './MailSettingsForm'
 import { toMailFormValues } from './mailForm'
 import { SettingsForm } from './SettingsForm'
+import { shopsOf } from '../../globals/PriceCheckSettings'
+import { monthStart } from '../../lib/price-check/usage'
+import { PriceCheckSettingsForm } from './PriceCheckSettingsForm'
+import { toPriceCheckValues, type DayKey } from './priceCheckForm'
 
 const TITLE = 'Ustawienia'
 
@@ -45,7 +49,7 @@ export async function SettingsView({ initPageResult }: AdminViewServerProps) {
 
   const { payload } = req
   const now = new Date()
-  const [settings, hints, mail, intake, devices] = await Promise.all([
+  const [settings, hints, mail, intake, devices, priceCheck, spent] = await Promise.all([
     payload.findGlobal({ slug: 'pricing-settings', depth: 0, overrideAccess: true }),
     loadHints(payload),
     payload.findGlobal({ slug: 'mail-settings', depth: 0, overrideAccess: true }),
@@ -59,6 +63,18 @@ export async function SettingsView({ initPageResult }: AdminViewServerProps) {
       depth: 0,
       overrideAccess: true,
     }),
+    payload.findGlobal({ slug: 'price-check-settings', depth: 0, overrideAccess: true }),
+    // P7: the counter of the monthly Claude limit (spec §13).
+    payload
+      .find({
+        collection: 'price-checks',
+        where: { startedAt: { greater_than_equal: monthStart(now) } },
+        select: { costUsd: true },
+        pagination: false,
+        depth: 0,
+        overrideAccess: true,
+      })
+      .then((r) => r.docs.reduce((sum, c) => sum + (c.costUsd ?? 0), 0)),
   ])
   const pushDevices: PushDevice[] = devices.docs.map((d) => ({
     id: d.id,
@@ -134,6 +150,50 @@ export async function SettingsView({ initPageResult }: AdminViewServerProps) {
               replySlaMinutes: mail.replySlaMinutes,
               replyAlarmMinutes: mail.replyAlarmMinutes,
               signature: mail.signature,
+            })}
+          />
+        </Card>
+        <Card title="Sprawdzanie cen" className="pn-card--section">
+          <dl className="pn-kv">
+            <dt>Claude</dt>
+            <dd>
+              {(() => {
+                const config = priceCheckConfig(getEnv())
+                // TODO(krystian): wording of the states (no board).
+                return config === null
+                  ? 'wyłączone — brak klucza ANTHROPIC_API_KEY'
+                  : config.mode === 'fake'
+                    ? 'atrapa (tryb testowy)'
+                    : 'włączone'
+              })()}
+            </dd>
+            <dt>Wydano w tym miesiącu</dt>
+            <dd>
+              {spent.toFixed(2).replace('.', ',')} z {priceCheck.monthlyBudgetUsd ?? 20} USD
+            </dd>
+            <dt>Sklepy</dt>
+            <dd>{shopsOf(priceCheck).join(', ')}</dd>
+          </dl>
+          <p className="pn-note">
+            Sklepy i ceny konkurencji edytujesz w{' '}
+            <a
+              className="pn-link"
+              href={`${payload.config.routes.admin}/globals/price-check-settings`}
+            >
+              formularzu ustawień sprawdzania cen
+            </a>
+            .
+          </p>
+          <PriceCheckSettingsForm
+            values={toPriceCheckValues({
+              days: (priceCheck.days ?? []) as DayKey[],
+              hour: priceCheck.hour,
+              costMethod: priceCheck.costMethod,
+              outlierPct: priceCheck.outlierPct,
+              alertChangePct: priceCheck.alertChangePct,
+              monthlyBudgetUsd: priceCheck.monthlyBudgetUsd,
+              alertMinMargin: priceCheck.alertMinMargin ?? true,
+              alertUnavailable: priceCheck.alertUnavailable ?? true,
             })}
           />
         </Card>

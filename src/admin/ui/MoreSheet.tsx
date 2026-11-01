@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 
 import { BottomSheet } from '../../components/BottomSheet'
 import { shortCount } from './count'
@@ -24,6 +24,8 @@ type Props = {
   queue: number
   who: { name: string; initials: string; role: string }
   logoutHref: string
+  /** „Sprawdź ceny” (P7, admin only). */
+  action?: ReactNode
 }
 
 /**
@@ -32,7 +34,16 @@ type Props = {
  * `BottomSheet` (<dialog>: focus kept inside, Esc, tap on the backdrop, drag down; focus goes
  * back to this button) in the panel look.
  */
-export function MoreSheet({ tiles, current, status, marginAlarm, queue, who, logoutHref }: Props) {
+export function MoreSheet({
+  tiles,
+  current,
+  status,
+  marginAlarm,
+  queue,
+  who,
+  logoutHref,
+  action,
+}: Props) {
   const [open, setOpen] = useState(false)
   return (
     <>
@@ -68,7 +79,7 @@ export function MoreSheet({ tiles, current, status, marginAlarm, queue, who, log
             ) : null}
           </div>
         ) : null}
-        {/* "Sprawdź ceny" (P7) comes with the price check. */}
+        {action ? <div className="pn-maction">{action}</div> : null}
         <h2>Panel</h2>
         <ul className="pn-mgrid">
           {tiles.map((tile) => (

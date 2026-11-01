@@ -92,6 +92,8 @@ export interface Config {
     'mail-intake-unmatched': MailIntakeUnmatched;
     'push-subscriptions': PushSubscription;
     'price-sources': PriceSource;
+    'price-checks': PriceCheck;
+    'price-observations': PriceObservation;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
     'payload-locked-documents': PayloadLockedDocument;
@@ -124,6 +126,8 @@ export interface Config {
     'mail-intake-unmatched': MailIntakeUnmatchedSelect<false> | MailIntakeUnmatchedSelect<true>;
     'push-subscriptions': PushSubscriptionsSelect<false> | PushSubscriptionsSelect<true>;
     'price-sources': PriceSourcesSelect<false> | PriceSourcesSelect<true>;
+    'price-checks': PriceChecksSelect<false> | PriceChecksSelect<true>;
+    'price-observations': PriceObservationsSelect<false> | PriceObservationsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -141,6 +145,7 @@ export interface Config {
     'legal-privacy': LegalPrivacy;
     'mail-settings': MailSetting;
     'mail-intake-state': MailIntakeState;
+    'price-check-settings': PriceCheckSetting;
     'payload-jobs-stats': PayloadJobsStat;
   };
   globalsSelect: {
@@ -150,6 +155,7 @@ export interface Config {
     'legal-privacy': LegalPrivacySelect<false> | LegalPrivacySelect<true>;
     'mail-settings': MailSettingsSelect<false> | MailSettingsSelect<true>;
     'mail-intake-state': MailIntakeStateSelect<false> | MailIntakeStateSelect<true>;
+    'price-check-settings': PriceCheckSettingsSelect<false> | PriceCheckSettingsSelect<true>;
     'payload-jobs-stats': PayloadJobsStatsSelect<false> | PayloadJobsStatsSelect<true>;
   };
   locale: null;
@@ -164,6 +170,8 @@ export interface Config {
       'inquiry-sla': TaskInquirySla;
       'mail-intake': TaskMailIntake;
       'notify-send': TaskNotifySend;
+      'price-check': TaskPriceCheck;
+      'price-check-scheduler': TaskPriceCheckScheduler;
       inline: {
         input: unknown;
         output: unknown;
@@ -1037,7 +1045,7 @@ export interface PushSubscription {
   endpoint: string;
   p256dh: string;
   auth: string;
-  kinds?: ('inquiry_new' | 'inquiry_reply' | 'inquiry_sla' | 'margin_alarm')[] | null;
+  kinds?: ('inquiry_new' | 'inquiry_reply' | 'inquiry_sla' | 'margin_alarm' | 'price_report')[] | null;
   lastOkAt?: string | null;
   failCount?: number | null;
   disabledAt?: string | null;
@@ -1059,6 +1067,64 @@ export interface PriceSource {
   proposedByClaude?: boolean | null;
   lastOk?: string | null;
   lastError?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "price-checks".
+ */
+export interface PriceCheck {
+  id: number;
+  trigger: 'manual' | 'schedule';
+  status: 'running' | 'done' | 'failed' | 'budget';
+  startedAt: string;
+  finishedAt?: string | null;
+  progress?: number | null;
+  step?: string | null;
+  itemsTotal?: number | null;
+  itemsFound?: number | null;
+  pagesRead?: number | null;
+  searches?: number | null;
+  inputTokens?: number | null;
+  outputTokens?: number | null;
+  costUsd?: number | null;
+  summary?: string | null;
+  diff?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  error?: string | null;
+  readAt?: string | null;
+  acceptedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "price-observations".
+ */
+export interface PriceObservation {
+  id: number;
+  check: number | PriceCheck;
+  itemType: 'option' | 'component';
+  itemCode: string;
+  componentRole?: string | null;
+  url: string;
+  shop?: string | null;
+  title?: string | null;
+  pricePln?: number | null;
+  available?: boolean | null;
+  matched?: boolean | null;
+  method?: ('fetch' | 'search') | null;
+  quote?: string | null;
+  note?: string | null;
+  observedAt: string;
   updatedAt: string;
   createdAt: string;
 }
@@ -1131,7 +1197,15 @@ export interface PayloadJob {
     | {
         executedAt: string;
         completedAt: string;
-        taskSlug: 'inline' | 'margin-alarm' | 'inquiry-retention' | 'inquiry-sla' | 'mail-intake' | 'notify-send';
+        taskSlug:
+          | 'inline'
+          | 'margin-alarm'
+          | 'inquiry-retention'
+          | 'inquiry-sla'
+          | 'mail-intake'
+          | 'notify-send'
+          | 'price-check'
+          | 'price-check-scheduler';
         taskID: string;
         input?:
           | {
@@ -1164,7 +1238,18 @@ export interface PayloadJob {
         id?: string | null;
       }[]
     | null;
-  taskSlug?: ('inline' | 'margin-alarm' | 'inquiry-retention' | 'inquiry-sla' | 'mail-intake' | 'notify-send') | null;
+  taskSlug?:
+    | (
+        | 'inline'
+        | 'margin-alarm'
+        | 'inquiry-retention'
+        | 'inquiry-sla'
+        | 'mail-intake'
+        | 'notify-send'
+        | 'price-check'
+        | 'price-check-scheduler'
+      )
+    | null;
   queue?: string | null;
   waitUntil?: string | null;
   processing?: boolean | null;
@@ -1282,6 +1367,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'price-sources';
         value: number | PriceSource;
+      } | null)
+    | ({
+        relationTo: 'price-checks';
+        value: number | PriceCheck;
+      } | null)
+    | ({
+        relationTo: 'price-observations';
+        value: number | PriceObservation;
       } | null);
   globalSlug?: string | null;
   user:
@@ -1994,6 +2087,54 @@ export interface PriceSourcesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "price-checks_select".
+ */
+export interface PriceChecksSelect<T extends boolean = true> {
+  trigger?: T;
+  status?: T;
+  startedAt?: T;
+  finishedAt?: T;
+  progress?: T;
+  step?: T;
+  itemsTotal?: T;
+  itemsFound?: T;
+  pagesRead?: T;
+  searches?: T;
+  inputTokens?: T;
+  outputTokens?: T;
+  costUsd?: T;
+  summary?: T;
+  diff?: T;
+  error?: T;
+  readAt?: T;
+  acceptedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "price-observations_select".
+ */
+export interface PriceObservationsSelect<T extends boolean = true> {
+  check?: T;
+  itemType?: T;
+  itemCode?: T;
+  componentRole?: T;
+  url?: T;
+  shop?: T;
+  title?: T;
+  pricePln?: T;
+  available?: T;
+  matched?: T;
+  method?: T;
+  quote?: T;
+  note?: T;
+  observedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv_select".
  */
 export interface PayloadKvSelect<T extends boolean = true> {
@@ -2282,6 +2423,48 @@ export interface MailIntakeState {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "price-check-settings".
+ */
+export interface PriceCheckSetting {
+  id: number;
+  days?: ('mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun')[] | null;
+  hour: number;
+  alertMinMargin?: boolean | null;
+  alertUnavailable?: boolean | null;
+  /**
+   * Ułamek: 0,05 = 5%.
+   */
+  alertChangePct: number;
+  costMethod: 'lowest' | 'avg2';
+  /**
+   * Ułamek: 0,05 = 5%.
+   */
+  outlierPct: number;
+  monthlyBudgetUsd: number;
+  /**
+   * Bez Ceneo i Allegro — pokazują oferty marketplace (ADR-G007 §1).
+   */
+  shops?:
+    | {
+        domain: string;
+        id?: string | null;
+      }[]
+    | null;
+  competitors?:
+    | {
+        build: number | Build;
+        name: string;
+        url?: string | null;
+        price: number;
+        checkedAt: string;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-jobs-stats".
  */
 export interface PayloadJobsStat {
@@ -2444,6 +2627,39 @@ export interface MailIntakeStateSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "price-check-settings_select".
+ */
+export interface PriceCheckSettingsSelect<T extends boolean = true> {
+  days?: T;
+  hour?: T;
+  alertMinMargin?: T;
+  alertUnavailable?: T;
+  alertChangePct?: T;
+  costMethod?: T;
+  outlierPct?: T;
+  monthlyBudgetUsd?: T;
+  shops?:
+    | T
+    | {
+        domain?: T;
+        id?: T;
+      };
+  competitors?:
+    | T
+    | {
+        build?: T;
+        name?: T;
+        url?: T;
+        price?: T;
+        checkedAt?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-jobs-stats_select".
  */
 export interface PayloadJobsStatsSelect<T extends boolean = true> {
@@ -2539,6 +2755,28 @@ export interface TaskNotifySend {
     pushed: number;
     failed: number;
     gone: number;
+  };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskPrice-check".
+ */
+export interface TaskPriceCheck {
+  input: {
+    checkId: number;
+  };
+  output: {
+    status: string;
+  };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskPrice-check-scheduler".
+ */
+export interface TaskPriceCheckScheduler {
+  input?: unknown;
+  output: {
+    queued: boolean;
   };
 }
 /**

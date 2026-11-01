@@ -1,3 +1,4 @@
+import { Fragment } from 'react'
 import type { AdminViewServerProps } from 'payload'
 
 import { plural } from '../../lib/pl'
@@ -98,12 +99,7 @@ export async function DashboardView({ initPageResult }: AdminViewServerProps) {
         <div className="pn-dash__side">
           <RecentCard data={data} admin={admin} />
           <WorkshopCard workshop={data.workshop} href={`${admin}/collections/orders`} />
-          <Card title="Ceny na rynku">
-            {/* TODO(krystian): empty-state sentence — the price check comes with P7. */}
-            <EmptyState title="Brak raportu cen" icon="report">
-              Ceny ze sklepów pojawią się po pierwszym sprawdzeniu cen.
-            </EmptyState>
-          </Card>
+          <MarketCard market={data.market} admin={admin} />
         </div>
 
         <Card title="Ruch na stronie" note="30 dni · bez ciasteczek">
@@ -353,6 +349,60 @@ function EventsCard({ data, now }: { data: DashboardData; now: Date }) {
             </li>
           ))}
         </ul>
+      )}
+    </Card>
+  )
+}
+
+/** „Ceny na rynku” (spec §3 pt 5): cost changes per kind from the newest price report (P7). */
+function MarketCard({ market, admin }: { market: DashboardData['market']; admin: string }) {
+  if (!market) {
+    return (
+      <Card title="Ceny na rynku">
+        {/* TODO(krystian): empty-state sentence. */}
+        <EmptyState title="Brak raportu cen" icon="report">
+          Ceny ze sklepów pojawią się po pierwszym sprawdzeniu cen.
+        </EmptyState>
+      </Card>
+    )
+  }
+  const pct = (v: number) => {
+    const text = `${(v * 100).toFixed(1).replace('.', ',').replace('-', '−')}%`
+    return v > 0 ? `+${text}` : text
+  }
+  return (
+    <Card
+      title="Ceny na rynku"
+      note={`raport z ${market.date}`}
+      actions={
+        <a className="pn-link" href={`${admin}/raporty-cen/${market.id}`}>
+          Raport
+        </a>
+      }
+    >
+      {market.rows.length > 0 ? (
+        <dl className="pn-kv">
+          {market.rows.slice(0, 6).map((r) => (
+            <Fragment key={r.label}>
+              <dt>{r.label}</dt>
+              <dd
+                style={{
+                  textAlign: 'right',
+                  color:
+                    r.change > 0.0005
+                      ? 'var(--p-bad)'
+                      : r.change < -0.0005
+                        ? 'var(--p-ok)'
+                        : undefined,
+                }}
+              >
+                {pct(r.change)}
+              </dd>
+            </Fragment>
+          ))}
+        </dl>
+      ) : (
+        <p className="pn-mu">Ostatni raport nie znalazł cen w sklepach.</p>
       )}
     </Card>
   )

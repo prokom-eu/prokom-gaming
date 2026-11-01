@@ -62,6 +62,12 @@ const envSchema = z
       .string()
       .regex(/^(mailto:|https:\/\/)/, 'mailto: or https:// address')
       .optional(),
+    // Price check through the Claude API (ADR-G007, P7). Without it „Sprawdź ceny” is off with a
+    // message (the panel says so). Server only, never in the browser or the repo.
+    ANTHROPIC_API_KEY: z.string().min(1).optional(),
+    // Tests only: `1` = a fake Claude that answers from fixed data (e2e, CI). Refused in a production
+    // build unless SITE_URL is localhost.
+    PRICE_CHECK_FAKE: z.enum(['0', '1']).default('0'),
   })
   // SMTP login is both or neither: a half-set pair would fail only at the first e-mail.
   .refine((env) => Boolean(env.SMTP_USER) === Boolean(env.SMTP_PASS), {
@@ -87,6 +93,17 @@ const envSchema = z
     {
       message: 'set all of VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY and VAPID_SUBJECT, or none',
       path: ['VAPID_SUBJECT'],
+    },
+  )
+  .refine(
+    // A production build may use the fake only on localhost (CI, local e2e on `next start`).
+    (env) =>
+      env.NODE_ENV !== 'production' ||
+      env.PRICE_CHECK_FAKE === '0' ||
+      /^http:\/\/localhost(:\d+)?\/*$/.test(env.SITE_URL ?? ''),
+    {
+      message: 'the fake price check is for tests only',
+      path: ['PRICE_CHECK_FAKE'],
     },
   )
   .refine((env) => env.NODE_ENV !== 'production' || Boolean(env.ALERT_EMAIL), {
@@ -152,6 +169,14 @@ export function vapidConfig(env: Env): VapidConfig | null {
     privateKey: env.VAPID_PRIVATE_KEY,
     subject: env.VAPID_SUBJECT,
   }
+}
+
+export type PriceCheckConfig = { mode: 'live'; apiKey: string } | { mode: 'fake' }
+
+/** How the price check talks to Claude, or `null` when it is off (no key, no fake). */
+export function priceCheckConfig(env: Env): PriceCheckConfig | null {
+  if (env.PRICE_CHECK_FAKE === '1') return { mode: 'fake' }
+  return env.ANTHROPIC_API_KEY ? { mode: 'live', apiKey: env.ANTHROPIC_API_KEY } : null
 }
 
 let cached: Env | undefined
