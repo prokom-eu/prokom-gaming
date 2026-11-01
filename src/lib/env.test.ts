@@ -201,17 +201,20 @@ describe('price check (P7, ADR-G007)', async () => {
     })
     expect(priceCheckConfig(parseEnv({ ...base, PRICE_CHECK_FAKE: '1' }))).toEqual({ mode: 'fake' })
   })
-  it('the fake is refused in production outside CI', () => {
+  it('the fake is refused in a production build outside localhost', () => {
     const prod = {
       ...base,
       NODE_ENV: 'production',
       ALERT_EMAIL: 'a@example.test',
       INQUIRY_NOTIFY_EMAIL: 'b@example.test',
-      SITE_URL: 'https://x.test',
     }
-    expect(() => parseEnv({ ...prod, PRICE_CHECK_FAKE: '1' })).toThrow(/PRICE_CHECK_FAKE/)
-    expect(priceCheckConfig(parseEnv({ ...prod, PRICE_CHECK_FAKE: '1', CI: 'true' }))).toEqual({
-      mode: 'fake',
-    })
+    expect(() =>
+      parseEnv({ ...prod, SITE_URL: 'https://prokomgaming.pl', PRICE_CHECK_FAKE: '1' }),
+    ).toThrow(/PRICE_CHECK_FAKE/)
+    expect(
+      priceCheckConfig(
+        parseEnv({ ...prod, SITE_URL: 'http://localhost:3100', PRICE_CHECK_FAKE: '1' }),
+      ),
+    ).toEqual({ mode: 'fake' })
   })
 })

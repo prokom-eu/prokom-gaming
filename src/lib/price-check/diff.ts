@@ -69,6 +69,8 @@ export type CheckDiff = {
     proposals: number
     manual: number
     unavailable: number
+    /** No offer to read (no links, nothing found). */
+    nooffer: number
     invoice: number
     /** Of the proposals: price change above the queue threshold (go to „Do zatwierdzenia”). */
     queued: number
@@ -167,6 +169,7 @@ export function computeDiff(input: {
       proposals: proposals.length,
       manual: itemRows.filter((i) => i.decision.kind === 'manual').length,
       unavailable: itemRows.filter((i) => i.decision.kind === 'unavailable').length,
+      nooffer: itemRows.filter((i) => i.decision.kind === 'nooffer').length,
       invoice: itemRows.filter((i) => i.decision.kind === 'invoice').length,
       queued: proposals.filter((i) =>
         i.itemType === 'option'

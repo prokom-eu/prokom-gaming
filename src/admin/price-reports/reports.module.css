@@ -197,6 +197,7 @@
   }
 
   .actions,
+  .acceptWrap,
   .actions :global(.pn-btn) {
     width: 100%;
     justify-content: center;

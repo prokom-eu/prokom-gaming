@@ -32,15 +32,19 @@ export type Decision =
   | { kind: 'manual'; market: number; change: number }
   /** Cost from an invoice: never overwritten, only the difference to the market is shown. */
   | { kind: 'invoice'; market: number; change: number }
-  /** No usable offer: the previous cost stays. */
+  /** Offers read, none usable (not in stock, another product): the previous cost stays. */
   | { kind: 'unavailable' }
+  /** No offer to read at all (no links, nothing found): the previous cost stays, no alarm. */
+  | { kind: 'nooffer' }
 
 export function decide(
   item: { cost: number; costSource: 'market' | 'invoice' },
   market: number | null,
   outlierPct: number,
+  /** How many offers were read for the item (0 = nothing to read). */
+  offersRead = 1,
 ): Decision {
-  if (market === null) return { kind: 'unavailable' }
+  if (market === null) return offersRead === 0 ? { kind: 'nooffer' } : { kind: 'unavailable' }
   const change = item.cost > 0 ? (market - item.cost) / item.cost : Number.POSITIVE_INFINITY
   if (item.costSource === 'invoice') return { kind: 'invoice', market, change }
   if (Math.abs(market - item.cost) < 0.01) return { kind: 'same' }

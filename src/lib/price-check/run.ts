@@ -219,7 +219,12 @@ export async function runPriceCheck(payload: Payload, checkId: number): Promise<
     const outlier = settings.outlierPct ?? 0.25
     const decided = items.map((item) => {
       const market = marketCost(offerOf(item), method)
-      return { ...item, market, decision: decide(item, market, outlier), offers: offerOf(item) }
+      return {
+        ...item,
+        market,
+        decision: decide(item, market, outlier, offerOf(item).length),
+        offers: offerOf(item),
+      }
     })
     const diff = await diffOf(payload, decided)
 

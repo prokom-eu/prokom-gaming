@@ -4,8 +4,6 @@ import { z } from 'zod'
 const envSchema = z
   .object({
     NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
-    // Set by GitHub Actions: CI runs the production build (`next start`) with the fake price check.
-    CI: z.string().optional(),
     DATABASE_URL: z.url({ protocol: /^postgres(ql)?$/ }),
     PAYLOAD_SECRET: z.string().min(32),
     // Directory for uploaded files (relative to the app's working directory or absolute);
@@ -67,7 +65,8 @@ const envSchema = z
     // Price check through the Claude API (ADR-G007, P7). Without it „Sprawdź ceny” is off with a
     // message (the panel says so). Server only, never in the browser or the repo.
     ANTHROPIC_API_KEY: z.string().min(1).optional(),
-    // Tests only: `1` = a fake Claude that answers from fixed data (e2e, CI). Refused in production.
+    // Tests only: `1` = a fake Claude that answers from fixed data (e2e, CI). Refused in a production
+    // build unless SITE_URL is localhost.
     PRICE_CHECK_FAKE: z.enum(['0', '1']).default('0'),
   })
   // SMTP login is both or neither: a half-set pair would fail only at the first e-mail.
@@ -97,7 +96,11 @@ const envSchema = z
     },
   )
   .refine(
-    (env) => env.NODE_ENV !== 'production' || env.PRICE_CHECK_FAKE === '0' || env.CI === 'true',
+    // A production build may use the fake only on localhost (CI, local e2e on `next start`).
+    (env) =>
+      env.NODE_ENV !== 'production' ||
+      env.PRICE_CHECK_FAKE === '0' ||
+      /^http:\/\/localhost(:\d+)?\/*$/.test(env.SITE_URL ?? ''),
     {
       message: 'the fake price check is for tests only',
       path: ['PRICE_CHECK_FAKE'],

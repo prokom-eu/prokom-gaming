@@ -98,7 +98,7 @@ export function AcceptButton({
   )
 }
 
-type Filter = 'all' | 'propose' | 'manual' | 'unavailable'
+type Filter = 'all' | 'propose' | 'manual' | 'unavailable' | 'nooffer'
 
 const CATEGORY: Record<ItemRow['category'], string> = {
   case: 'Obudowa',
@@ -117,6 +117,7 @@ const STATUS: Record<ItemRow['decision']['kind'], { tone: Tone; label: string }>
   manual: { tone: 'warn', label: 'do ręcznego sprawdzenia' },
   invoice: { tone: 'info', label: 'koszt z faktury' },
   unavailable: { tone: 'bad', label: 'niedostępne' },
+  nooffer: { tone: 'mu', label: 'brak oferty' },
 }
 
 const pct = (v: number) => {
@@ -127,9 +128,15 @@ const pct = (v: number) => {
 /** „Zmiany cen części” (board Raport): filters, offers with links, status. */
 export function ItemsTable({ items }: { items: ItemRow[] }) {
   const changed = items.filter((i) => i.decision.kind !== 'same')
-  const [filter, setFilter] = useState<Filter>('all')
-  const shown = changed.filter((i) => filter === 'all' || i.decision.kind === filter)
-  const count = (f: Filter) => changed.filter((i) => f === 'all' || i.decision.kind === f).length
+  // „Wszystkie” = what was read; items with nothing to read sit under „Brak oferty” only (before
+  // the links are added that is most of the offer).
+  const matches = (i: ItemRow, f: Filter) =>
+    f === 'all' ? i.decision.kind !== 'nooffer' : i.decision.kind === f
+  const [filter, setFilter] = useState<Filter>(() =>
+    changed.some((i) => i.decision.kind === 'propose') ? 'propose' : 'all',
+  )
+  const shown = changed.filter((i) => matches(i, filter))
+  const count = (f: Filter) => changed.filter((i) => matches(i, f)).length
 
   const columns: Column<ItemRow>[] = [
     {
@@ -250,6 +257,12 @@ export function ItemsTable({ items }: { items: ItemRow[] }) {
             count={count('unavailable')}
             active={filter === 'unavailable'}
             onClick={() => setFilter('unavailable')}
+          />
+          <FilterPill
+            label="Brak oferty"
+            count={count('nooffer')}
+            active={filter === 'nooffer'}
+            onClick={() => setFilter('nooffer')}
           />
         </div>
       }

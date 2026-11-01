@@ -79,6 +79,10 @@ describe('decide', () => {
     expect(decide({ cost: 1000, costSource: 'market' }, null, 0.25)).toEqual({
       kind: 'unavailable',
     })
+    // Nothing to read at all is not „unavailable” (no alarm): „brak oferty”.
+    expect(decide({ cost: 1000, costSource: 'market' }, null, 0.25, 0)).toEqual({
+      kind: 'nooffer',
+    })
   })
 })
 
