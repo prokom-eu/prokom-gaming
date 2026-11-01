@@ -1,12 +1,19 @@
 # STAN — prokom-gaming
 
-Ostatnia aktualizacja: 01.11.2026 (P6-2 — gotowe zestawy i edytor; P6-1 scalone #50).
+Ostatnia aktualizacja: 01.11.2026 (P6-3 — opcje konfiguratora; P6-1 #50 i P6-2 #51 scalone).
 
 ## W toku
-- **Gałąź:** `feat/p6-zestawy` — **P6-2 z 5 PR-ów P6+P7** (P6-1 scalone #50; dalej P6-3 `feat/p6-opcje`, P7-1 `feat/p7-sprawdzanie-cen`, P7-2 `feat/p7-raport-cen`).
-- **Zrobione:** migracja `p6_offer_status` (`builds.offerStatus`: Na stronie / Szkic / Ukryty, istniejące = `published`); `access.read` kolekcji `builds` — gość, klient i każdy odczyt strony (`overrideAccess: false`) widzą tylko `published`, panel wszystko; `loadInquiryOffer()` (zapytanie, „Dopasuj” na karcie) pomija szkice i ukryte (czyta z pominięciem dostępu). `lib/pricing/recipe.ts` (`recipeFigures`: cena = `priceFromSnapshot`, koszt = ta sama suma po `costList()`) — test = `evaluate()` dla 16 zestawów, Bazyliszek 11 930 zł. `/admin/zestawy`: 16 kart (pieczęć, cena, koszt, marża z partii albo dziś, przepis w 4 liniach), filtr monitora z `monitorFilters`, sortowanie. `/admin/zestawy/<slug>` (widok z `:slug`, slug z `params.segments`): status, Przepis (poziom z listy, kafle obudów/chłodzeń ze zdjęciem i dopłatą, RAM/dyski; wyszarzenia z `optionStates`/`lib/compat`, zmiana poziomu przez `switchLevel`), karta ceny na żywo (rozbicie, koszt, marża z partii i dziś, pasek), „Zapisz” (akcja `saveBuild`: walidacja Zod, zgodność, aktywne opcje, pozycja bez opublikowanej ceny blokuje; zestaw na stronie ze zmianą ceny wymaga potwierdzenia dokładnie tej ceny w arkuszu „Cena na stronie: X zł → Y zł”), Treść i zdjęcia (podgląd + „Edytuj treść” → formularz Payload), Historia ceny (suma pozycji w 5 ostatnich partiach + „Po zatwierdzeniu kolejki”), `ActionBar` na telefonie. Zakładka „Zestawy” → nowy ekran. e2e `panel-builds` (1440 + 414; zapis z potwierdzeniem, ukryty = 404 i brak w API).
+- **Gałąź:** `feat/p6-opcje` — **P6-3 z 5 PR-ów P6+P7** (ostatni PR P6; dalej P7, praca nocna 01/02.11 za zgodą Krystiana: „zrób do końca P7, zrób PR, rano scalę”).
+- **Zrobione:** `/admin/opcje` (plansza Opcje): zakładki Obudowy 24 · Chłodzenia 22 · RAM 7 · Dyski 4 · Poziomy mocy 16; tabela (miniatura, nazwa + model, parametry zgodności, koszt, cena na stronie albo „nowa”, w zestawach, źródła cen z `price-sources` — „N źródła” / „brak oferty”, dla poziomów „X/4 części z ofertą”), przełącznik „W konfiguratorze” (hak G4 blokuje wyłączenie opcji z zestawu — komunikat z nazwą zestawu), „Usuń” nieużywanej opcji po potwierdzeniu (razem z jej linkami do ofert; przy opcji z zestawu przycisk wyłączony z „Używana w: …”), panel „Dodaj obudowę/chłodzenie/RAM/dysk”: pola jak w `options`, cena na stronie na żywo (`previewOption` → `optionPreview` = `sellOption` + reguła cennika + dopłata względem najtańszej opublikowanej opcji tej klasy/typu pamięci; testy), linki do ofert (0–4, tylko dozwolone sklepy → `price-sources`), zdjęcie (obudowy i chłodzenia, ≤ 900 KB → `media`); nowa opcja jest wyłączona, kod z nazwy (`freeCode`), czeka w „Do zatwierdzenia” jako nowa. e2e `panel-options` (1440 + 414: zakładki, blokady, dodanie z ceną i odrzuconym linkiem marketplace, kolejka, usunięcie z linkami, axe).
 - **Niedokończone:** prawdziwy telefon (Android + iPhone) i Lighthouse mobile.
-- **Następny krok:** po scaleniu PR P6-2 — `/zadanie P6-3` (gałąź `feat/p6-opcje`): `/admin/opcje` (zakładki, `active`, „Wycofaj/Usuń” z blokadą „Używana w: …”, panel „Dodaj …” z podglądem ceny `sellOption` i linkami do ofert → `price-sources`).
+- **Następny krok:** P7 (`feat/p7-sprawdzanie-cen`) — w toku w nocy; potem kontrola 9.11.
+
+## Uwagi na później (P6-3)
+- **Decyzje Krystiana 01.11:** kolejka G4 bez zmian — zdanie pod tabelą zamiast „wyłączenie… trafia do zatwierdzenia” mówi, że ceny „od” przeliczy następna publikacja (`TODO(krystian)` treść); zakładka „Poziomy mocy” tylko jako tabela (edycja w formularzu Payload, bez „Dodaj poziom”); ikona archiwum = „Usuń” nieużywaną, wycofanie = przełącznik.
+- **Zdjęcie ≤ 900 KB** (sprawdzane też w przeglądarce) — akcje serwera Next mają domyślny limit treści 1 MB (zostawiony dla całej aplikacji). Dodanie (zdjęcie, opcja, linki) i usunięcie (opcja + linki) w jednej transakcji; plik zapisany na dysk przy błędzie zostaje, usunięcie opcji zostawia jej zdjęcie w `media`.
+- **Włączenie opcji bez opublikowanej ceny** jest odrzucane („najpierw zatwierdź cenę”). **Do decyzji (`TODO(krystian)`, przegląd P6-3):** opcja opublikowana jako wyłączona nie przechodzi strażnika marży (`reviewAll` liczy aktywne), więc jej włączenie może dać konfiguracje poniżej minimum bez zatwierdzenia — tak samo jak w formularzu Payload od G4.
+- **Kod nowej opcji** z nazwy (np. `LIAN-LI-LANCOOL-217`, unikalny z sufiksem) — zmiana w formularzu Payload.
+- **Teksty spoza planszy (`TODO(krystian)`):** komunikaty przełącznika, dodania („czeka w Do zatwierdzenia…”), potwierdzenie usunięcia, podpowiedź pustego podglądu ceny, błędy pól.
 
 ## Uwagi na później (P6-2)
 - **Decyzje Krystiana 01.11:** „Nowy zestaw” i „Duplikuj” ukryte w v1 (nowa istota = grafiki + tokeny); zakładka „Treść i zdjęcia” = podgląd + link do formularza Payload; jeden przycisk „Zapisz” zamiast „Zapisz szkic” / „Do zatwierdzenia” z planszy (spec. §9, P0): zestaw na stronie zapisuje się po potwierdzeniu ceny, szkic i ukryty od razu, status przełącznikiem u góry.
@@ -188,6 +195,7 @@ Ostatnia aktualizacja: 01.11.2026 (P6-2 — gotowe zestawy i edytor; P6-1 scalon
 - **Pozycja usunięta z oferty zostawia otwarty wpis `price-history`** (jest w partii N, nie ma jej w N+1, `writeBatch` jej nie zamyka). Dziś nieszkodliwe — części z zestawu nie da się usunąć — ale przed liczeniem „najniższej ceny z 30 dni” zamykać wpisy pozycji, których nie ma w nowej partii.
 
 ## Zrobione
+- 01.11.2026 — **P6-2 (gotowe zestawy, edytor, status zestawu)** scalone do `develop` (#51). Prawdziwy telefon i Lighthouse nadal do zrobienia.
 - 01.11.2026 — **P6-1 (źródło kosztu, Centrum cen, Do zatwierdzenia)** scalone do `develop` (#50). Prawdziwy telefon i Lighthouse nadal do zrobienia.
 - 01.11.2026 — **P2 (Pulpit „Dziś”)** scalona do `develop` (#48). Prawdziwy telefon i Lighthouse nadal do zrobienia.
 - 31.10.2026 — **P4 (odbiór IMAP + push)** scalona do `develop`: #43 (IMAP) i #47 (push, `lib/notify`). Prawdziwy push na telefonie nadal do zrobienia.
@@ -222,7 +230,7 @@ Ostatnia aktualizacja: 01.11.2026 (P6-2 — gotowe zestawy i edytor; P6-1 scalon
 - 25.10.2026 — pakiet startowy (pierwszy commit, podpisany): CLAUDE.md, specyfikacja `docs/strony/prokomgaming.md`, ADR-G001…G005, plan G0–G16, wzorzec wyglądu v36 (`docs/design/prokomgaming/`), seed (`seed/prokomgaming/`), oczekiwane wyniki testów cen (`tests/fixtures/pricing-expected.json`).
 
 ## Następne kroki
-G1 → G2 → G3 → G4 → G5 → G6 → G7 → G8 → G9 → (kontrola 8.11) → G10 → G11 → G12 → (kontrola 13.11) → G13 → ~~G14~~ (zrobione 31.10) → ~~P1~~ → ~~P3~~ → ~~P4~~ (31.10; push w PR 2) → ~~P2~~ (01.11, #48) → **P6 (~~P6-1~~ #50, P6-2 w PR, P6-3) → P7 (P7-1, P7-2) → P5** → G15 (+ Umami) → **P8** → G16 (produkcja 20.11 — strona **i cały panel** jednym wdrożeniem, decyzja Krystiana 01.11). Kontrole: 9.11 (P6 scalone), 14.11 (P5, P7 scalone). Panel: `docs/zadania/prokomgaming-panel.md` §1.
+G1 → G2 → G3 → G4 → G5 → G6 → G7 → G8 → G9 → (kontrola 8.11) → G10 → G11 → G12 → (kontrola 13.11) → G13 → ~~G14~~ (zrobione 31.10) → ~~P1~~ → ~~P3~~ → ~~P4~~ (31.10; push w PR 2) → ~~P2~~ (01.11, #48) → **P6 (~~P6-1~~ #50, ~~P6-2~~ #51, P6-3 w PR) → P7 (P7-1, P7-2) → P5** → G15 (+ Umami) → **P8** → G16 (produkcja 20.11 — strona **i cały panel** jednym wdrożeniem, decyzja Krystiana 01.11). Kontrole: 9.11 (P6 scalone), 14.11 (P5, P7 scalone). Panel: `docs/zadania/prokomgaming-panel.md` §1.
 
 ## Decyzje (skrót)
 - **Panel w całości na produkcję razem ze stroną (Krystian 01.11.2026):** P5–P8 przed G16, jedno wdrożenie; zastępuje zasadę z 30.10 „sesje P po starcie”. Przy poślizgu (kontrole 9.11, 14.11) przesuwamy produkcję całości — nowa data z szefem, panelu nie tniemy.

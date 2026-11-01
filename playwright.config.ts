@@ -17,7 +17,7 @@ process.env.PORT = String(port)
 // they run first, one at a time, and every other test starts after them — so a test reading
 // prices never sees a half-changed price list.
 const DB_WRITERS =
-  /(prices-panel|prices-import|offer-integrity|panel-settings|panel-inquiries|panel-push|panel-builds)\.e2e\.spec\.ts$/
+  /(prices-panel|prices-import|offer-integrity|panel-settings|panel-inquiries|panel-push|panel-builds|panel-options)\.e2e\.spec\.ts$/
 
 export default defineConfig({
   testDir: './tests/e2e',
@@ -53,7 +53,8 @@ export default defineConfig({
       // Phone (414): the prices screen read-only (publishing skips), the inquiry reply path and
       // switching push on (P4).
       name: 'db-writers-414',
-      testMatch: /(prices-panel|panel-inquiries|panel-push|panel-builds)\.e2e\.spec\.ts$/,
+      testMatch:
+        /(prices-panel|panel-inquiries|panel-push|panel-builds|panel-options)\.e2e\.spec\.ts$/,
       workers: 1,
       dependencies: ['db-writers'],
       use: {
