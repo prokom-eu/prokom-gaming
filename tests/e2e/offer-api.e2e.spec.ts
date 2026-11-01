@@ -15,6 +15,11 @@ test.skip(({ isMobile }) => isMobile, 'API test runs in the desktop project only
 const HIDDEN_KEYS = [
   'cost',
   'costAtPublish',
+  // P6: cost source of options and parts (ADR-G007 §1).
+  'costSource',
+  'costNote',
+  'costUpdatedAt',
+  'partKey',
   'components',
   'internalModel',
   'internalRef',
@@ -180,6 +185,8 @@ test.describe('public offer API', () => {
 
   test('price history and pricing settings are panel-only', async ({ request }) => {
     expect((await request.get('/api/price-history')).status()).toBe(403)
+    // P6: offer links (shops, which items we check) are panel-only too.
+    expect((await request.get('/api/price-sources')).status()).toBe(403)
     expect((await request.get('/api/globals/pricing-settings')).status()).toBe(403)
   })
 
