@@ -246,15 +246,17 @@ export async function ReportView({ initPageResult, params }: AdminViewServerProp
           tone="ok"
           title={`Claude znalazł ${linksLabel(diff.linksProposed ?? 0)} do ofert`}
           actions={
-            <a
-              className="pn-btn"
-              href={`${admin}/collections/price-sources?where[active][equals]=false&where[proposedByClaude][equals]=true`}
-            >
-              Linki do ofert
-            </a>
+            (diff.linksProposed ?? 0) > (diff.linksEnabled ?? 0) ? (
+              <a
+                className="pn-btn"
+                href={`${admin}/collections/price-sources?where[active][equals]=false&where[proposedByClaude][equals]=true`}
+              >
+                Linki do sprawdzenia
+              </a>
+            ) : null
           }
         >
-          Zapisały się jako wyłączone. Sprawdź je i włącz — kolejne sprawdzenie odczyta z nich ceny.
+          {linksNote(diff.linksProposed ?? 0, diff.linksEnabled)}
         </Alert>
       ) : null}
 
@@ -318,6 +320,21 @@ function linksLabel(n: number) {
   if (n === 1) return '1 nowy link'
   const few = n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14)
   return few ? `${n} nowe linki` : `${n} nowych linków`
+}
+
+/**
+ * What happened to the found links: those whose reading confirmed the product and a price are on
+ * already (from 2.11.2026; older reports have no `linksEnabled` — all of them waited).
+ */
+function linksNote(found: number, enabled: number | undefined) {
+  if (enabled === undefined) {
+    return 'Zapisały się jako wyłączone. Sprawdź je i włącz — kolejne sprawdzenie odczyta z nich ceny.'
+  }
+  const waiting = found - enabled
+  const on = `Włączone od razu: ${enabled} (Claude potwierdził produkt i cenę).`
+  return waiting > 0
+    ? `${on} Do sprawdzenia: ${waiting} — włącz trafne, kolejne sprawdzenie odczyta z nich ceny.`
+    : on
 }
 
 /** „**RAM podrożał.** DDR5 …” → bold lead sentence; the rest as plain text (never HTML). */

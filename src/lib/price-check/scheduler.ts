@@ -30,8 +30,12 @@ export function isDue(now: Date, days: readonly string[], hour: number): boolean
   return days.includes(w.day) && w.hour === hour
 }
 
-/** A run „w toku” longer than this was cut off (restart, deploy): the job cap is 15 min. */
-export const STALE_MINUTES = 20
+/**
+ * A run „w toku” longer than this was cut off (restart, deploy): a run stops itself at 30 min
+ * (`MAX_MINUTES` in run.ts), plus the wait for the job cron and the call still running — keep
+ * this well above it, or a long full search is marked failed mid-run.
+ */
+export const STALE_MINUTES = 45
 
 /**
  * Marks runs stuck in `running` (the server restarted mid-run) as `failed`, so they never block

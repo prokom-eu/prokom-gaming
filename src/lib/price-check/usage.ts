@@ -62,12 +62,13 @@ export function estimateUsd(kind: 'read' | 'search' | 'summary'): number {
       // One page (~25K tokens) and a short JSON answer.
       return callCostUsd({ model: READ_MODEL, inputTokens: 30_000, outputTokens: 800 })
     case 'search':
-      // Up to 3 searches, their results and up to 3 turns of `pause_turn` (each resends the context).
+      // Up to 5 searches (one per shop), their results and up to 3 turns of `pause_turn` (each
+      // resends the context).
       return callCostUsd({
         model: SEARCH_MODEL,
         inputTokens: 150_000,
         outputTokens: 1_500,
-        webSearches: 3,
+        webSearches: 5,
       })
     case 'summary':
       return callCostUsd({ model: SEARCH_MODEL, inputTokens: 15_000, outputTokens: 1_500 })

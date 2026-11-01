@@ -16,9 +16,10 @@ export const readingSchema = z.object({
 })
 export type Reading = z.infer<typeof readingSchema>
 
-/** Search proposals: offer pages of the item in the allowed shops. */
+/** Search proposals: offer pages of the item in the allowed shops (one per shop). */
 export const searchSchema = z.object({
-  urls: z.array(z.string().max(1000)).max(4),
+  // More than 10 is cut, not refused: the search is paid already.
+  urls: z.array(z.string().max(1000)).transform((urls) => urls.slice(0, 10)),
 })
 export type SearchResult = z.infer<typeof searchSchema>
 
