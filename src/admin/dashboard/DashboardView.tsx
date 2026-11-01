@@ -74,7 +74,7 @@ export async function DashboardView({ initPageResult }: AdminViewServerProps) {
           </a>
         }
       />
-      <PhoneAlarm data={data} href={`${admin}/ceny`} />
+      <PhoneAlarm data={data} href={`${admin}/ceny/zatwierdzanie`} />
       <Tiles data={data} />
       <TodoCard items={data.todo} admin={admin} />
 

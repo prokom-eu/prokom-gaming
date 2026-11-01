@@ -39,7 +39,7 @@ export function pushContent(data: PushData, admin: string): PushContent {
       return {
         title: 'Marża poniżej minimum',
         body: 'Cena na stronie łamie minimum przy dzisiejszych kosztach. Sprawdź ceny.',
-        url: `${admin}/ceny`,
+        url: `${admin}/ceny/zatwierdzanie`,
         tag: 'margin-alarm',
       }
     case 'test':

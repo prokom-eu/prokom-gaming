@@ -413,7 +413,7 @@ export interface Build {
   createdAt: string;
 }
 /**
- * Ceny publikuje ekran „Ceny — publikacja i marże” (/admin/ceny, na końcu menu) po sprawdzeniu marży. Ręcznej edycji nie ma.
+ * Ceny publikuje ekran „Do zatwierdzenia” (/admin/ceny/zatwierdzanie) po sprawdzeniu marży. Ręcznej edycji nie ma.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "published-prices".

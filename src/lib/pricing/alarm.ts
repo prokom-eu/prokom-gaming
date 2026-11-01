@@ -37,7 +37,7 @@ export function marginAlarmMail(
       ...affected.map((b) => `- ${b.name}: ${zl(b.price)} / ${zl(b.cost)} / ${percent(b.margin)}`),
     )
   }
-  lines.push('', `Zatwierdź nowe ceny w panelu: „Ceny — publikacja i marże” (${screenPath}).`)
+  lines.push('', `Zatwierdź nowe ceny w panelu: „Do zatwierdzenia” (${screenPath}).`)
   return {
     subject: `PILNE: marża poniżej ${percent(minMargin)} — ${[...levels].join(', ')}`,
     text: lines.join('\n'),

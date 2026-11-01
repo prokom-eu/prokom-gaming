@@ -174,7 +174,7 @@ function queueItem(input: TodoInput): TodoItem | null {
     icon: urgent ? 'alert' : 'check',
     title: urgent ? `${prices} · marża w konfiguratorze ${percent(q.lowestNow)}` : prices,
     note,
-    action: { label: 'Zatwierdź', path: '/ceny' },
+    action: { label: 'Zatwierdź', path: '/ceny/zatwierdzanie' },
   }
 }
 

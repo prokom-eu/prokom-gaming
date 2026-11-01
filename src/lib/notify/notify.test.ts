@@ -42,7 +42,7 @@ describe('pushContent (ADR-G010 pt 6: no personal data)', () => {
 
   it('margin alarm and the test send open their screens', () => {
     expect(pushContent({ kind: 'margin_alarm' }, '/admin')).toMatchObject({
-      url: '/admin/ceny',
+      url: '/admin/ceny/zatwierdzanie',
     })
     expect(pushContent({ kind: 'test' }, '/admin')).toMatchObject({
       url: '/admin/ustawienia',

@@ -88,7 +88,13 @@ export default buildConfig({
           Component: '/admin/prices/PricesView#PricesView',
           path: '/ceny',
           exact: true,
-          meta: { title: 'Ceny' },
+          meta: { title: 'Centrum cen' },
+        },
+        approval: {
+          Component: '/admin/prices/ApprovalView#ApprovalView',
+          path: '/ceny/zatwierdzanie',
+          exact: true,
+          meta: { title: 'Do zatwierdzenia' },
         },
         inquiries: {
           Component: '/admin/inquiries/InquiriesView#InquiriesView',

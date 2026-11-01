@@ -101,7 +101,7 @@ describe('todoList (spec §3.3)', () => {
       urgent: true,
       title: '11 cen do zatwierdzenia · marża w konfiguratorze 9,2%',
       note: 'Zatwierdzenie przywraca minimum.',
-      action: { label: 'Zatwierdź', path: '/ceny' },
+      action: { label: 'Zatwierdź', path: '/ceny/zatwierdzanie' },
     })
   })
 

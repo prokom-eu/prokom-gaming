@@ -92,7 +92,7 @@ const ITEMS: Record<NavKey, NavItem> = {
     icon: 'tag',
     path: '/ceny',
     roles: ADMIN,
-    ready: false, // P6: the prices centre; the G4 screen sits under "Do zatwierdzenia" until then
+    ready: true,
   },
   reports: {
     key: 'reports',
@@ -103,13 +103,12 @@ const ITEMS: Record<NavKey, NavItem> = {
     tone: 'gold',
     ready: false,
   },
-  // TODO(P6): `/ceny/zatwierdzanie` — until then the G4 prices screen (queue + guard).
   approve: {
     key: 'approve',
     label: 'Do zatwierdzenia',
     short: 'Zatwierdź',
     icon: 'check',
-    path: '/ceny',
+    path: '/ceny/zatwierdzanie',
     roles: ADMIN,
     counter: 'queue',
     tone: 'gold',

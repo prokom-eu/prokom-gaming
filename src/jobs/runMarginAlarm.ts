@@ -27,7 +27,7 @@ export async function runMarginAlarm(
   const { settings } = offer.catalog
   const queue = buildQueue(offer.catalog, current.snapshot)
   const builds = buildsOverview(offer.builds, offer.catalog, current.snapshot, null)
-  const screen = `${payload.config.routes.admin}/ceny`
+  const screen = `${payload.config.routes.admin}/ceny/zatwierdzanie`
   const mail = marginAlarmMail(queue.brokenLevels, builds, settings.minMargin, screen)
   const levels = queue.brokenLevels.map((p) => p.level)
   if (!mail) return { alarmed: false, levels }
