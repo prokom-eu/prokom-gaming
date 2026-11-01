@@ -1,5 +1,21 @@
 /* Prices centre and „Do zatwierdzenia” (panel spec §8): panel tokens only (panel-tokens.css). */
 
+.board,
+.stack {
+  margin-top: 20px;
+}
+
+/* Amounts never break between the number and „zł”; values of key-value cards right-aligned. */
+.board :global(td.pn-r),
+.stack :global(td.pn-r) {
+  white-space: nowrap;
+}
+
+.side :global(.pn-kv) dd,
+.whatIf :global(.pn-kv) dd {
+  text-align: right;
+}
+
 .board {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 340px;
@@ -53,7 +69,7 @@
 }
 
 .foot {
-  padding: 12px 20px 16px;
+  padding-top: 12px;
 }
 
 .note {
@@ -116,7 +132,64 @@
   font-size: 12px;
 }
 
+.stack {
+  display: grid;
+  gap: 16px;
+}
+
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.whatIf {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 24px 40px;
+}
+
+.sliders {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px 24px;
+}
+
+.slider label {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--p-tx2);
+  margin-bottom: 8px;
+}
+
+.slider label b {
+  color: var(--p-tx);
+  font-variant-numeric: tabular-nums;
+}
+
+.slider input[type='range'] {
+  width: 100%;
+  min-height: 32px;
+  accent-color: var(--p-gold);
+}
+
+.tableBar {
+  margin-bottom: 14px;
+  overflow-x: auto;
+}
+
 @media (max-width: 1180px) {
+  .kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .whatIf {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   .board {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -127,6 +200,14 @@
 }
 
 @media (max-width: 760px) {
+  .kpis {
+    gap: 10px;
+  }
+
+  .sliders {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   /* The action under the thumb (ActionBar) takes the publish button on a phone. */
   .publish {
     display: none;

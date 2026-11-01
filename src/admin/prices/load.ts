@@ -115,7 +115,7 @@ export async function loadPrices(payload: Payload): Promise<PricesData | { error
         collection: 'published-prices',
         where: { itemType: { equals: 'service' } },
         sort: '-batch',
-        limit: 10,
+        limit: 5,
         depth: 1,
         populate: { users: { email: true } },
         select: { batch: true, publishedAt: true, publishedBy: true },

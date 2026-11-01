@@ -1,187 +1,168 @@
-import { Banner } from '@payloadcms/ui'
-import type { AdminViewServerProps, Payload } from 'payload'
+import type { AdminViewServerProps } from 'payload'
 
-import { CatalogError } from '../../lib/pricing/catalog'
-import { buildQueue, buildsOverview, problemMessage } from '../../lib/pricing/publish'
-import { loadBatch, loadOffer, type BatchInfo } from '../../lib/pricing/store'
-import { percent, signedZl, zl } from '../../lib/pricing/format'
-import styles from './prices.module.css'
+import { percentShort } from '../../lib/pricing/format'
+import { whatIfBuilds } from '../../lib/pricing/preview'
+import { plural } from '../../lib/pl'
 import { panelAccess } from '../access'
+import { Alert } from '../ui/Alert'
+import { Card, Kpi } from '../ui/Card'
+import { Icon } from '../ui/icons'
 import { PanelDenied } from '../ui/PanelDenied'
 import { PanelPage } from '../ui/PanelPage'
 import { PanelShell } from '../ui/PanelShell'
 import { CostImport } from './CostImport'
-import { PricesQueue } from './PricesQueue'
+import { loadPrices, type PriceItem, type PricesData } from './load'
+import styles from './panelPrices.module.css'
+import { PriceTable, type PriceRowView } from './PriceTable'
+import { WhatIfCard } from './WhatIfCard'
 
-const dateTime = (iso: string) =>
-  new Date(iso).toLocaleString('pl-PL', { dateStyle: 'long', timeStyle: 'short' })
+const TITLE = 'Centrum cen'
+const LEAD =
+  'Wszystkie pozycje cennika: koszt zakupu, cena na stronie i to, co wynika z dzisiejszych kosztów. Ceny sprzedaży liczy cennik; Ty zmieniasz koszty, narzuty i zatwierdzasz.'
 
-// Builds in price order, like on the site (Skrzat … Perun); unpriced ones last.
-const byPrice = (a: { price: number | null }, b: { price: number | null }) =>
-  (a.price ?? Infinity) - (b.price ?? Infinity)
+const dateShort = new Intl.DateTimeFormat('pl-PL', {
+  timeZone: 'Europe/Warsaw',
+  day: '2-digit',
+  month: '2-digit',
+})
 
 /**
- * Panel screen "Ceny" at /admin/ceny (ADR-G002 §4): newest batch, margin guard over the prices on
- * the site, the queue to approve and the builds with price, cost and margin. Admin only — custom
- * views are public by default, so the check is here. Until P6 it is "Do zatwierdzenia" in the
- * panel navigation.
+ * /admin/ceny — Centrum cen (panel spec §8, board Ceny, stany/tel-08): tiles, „Co jeśli?”, every
+ * sold item with costs, prices and status, and the CSV cost import from G4. Publishing lives in
+ * „Do zatwierdzenia”. Admin only — custom views are public by definition, so the check is first.
  */
 export async function PricesView({ initPageResult }: AdminViewServerProps) {
   const { req } = initPageResult
-  const { payload } = req
   const access = panelAccess(req, 'admin')
-  // Nothing about prices is loaded before this (custom views are public by definition).
+  // Nothing about prices is loaded before this.
   if (!access.ok) {
     return (
       <PanelDenied
         req={req}
         reason={access.reason}
-        title="Ceny — publikacja i marże"
+        title={TITLE}
         path="/ceny"
-        active="approve"
+        active="pricesCentre"
       />
     )
   }
+  const admin = req.payload.config.routes.admin
+  const data = await loadPrices(req.payload)
+  const queueCount = 'error' in data ? 0 : data.queue.items.length
 
-  // TODO(P6): split into Centrum cen (/ceny) and Do zatwierdzenia (/ceny/zatwierdzanie).
-  const template = (children: React.ReactNode) => (
-    <PanelShell
-      req={req}
-      title="Ceny — publikacja i marże"
-      active="approve"
-      crumbs={[{ label: 'Ceny' }]}
-    >
-      <div className={styles.page}>
-        {/* data-prices-screen: the e2e accessibility check scans this screen only. */}
-        <div data-prices-screen>
-          <PanelPage title="Ceny — publikacja i marże">{children}</PanelPage>
-        </div>
+  return (
+    <PanelShell req={req} title={TITLE} active="pricesCentre" crumbs={[{ label: 'Ceny' }]}>
+      {/* data-prices-screen: the e2e accessibility check scans this screen only. */}
+      <div data-prices-screen>
+        <PanelPage
+          title={TITLE}
+          lead={LEAD}
+          actions={
+            <a className="pn-btn" href={`${admin}/ceny/zatwierdzanie`}>
+              <Icon name="check" />
+              Do zatwierdzenia · {queueCount}
+            </a>
+          }
+        />
+        {'error' in data ? (
+          <Alert title="Nie można policzyć cen">{data.error}</Alert>
+        ) : (
+          <Centre data={data} admin={admin} />
+        )}
       </div>
     </PanelShell>
   )
+}
 
-  const data = await loadScreen(payload)
-  if ('error' in data) return template(<Banner type="error">{data.error}</Banner>)
+function Centre({ data, admin }: { data: PricesData; admin: string }) {
+  const { offer, current, queue, items, levelParts, warnMargin } = data
+  const { minMargin, publishThreshold } = offer.catalog.settings
+  const batchShort = dateShort.format(new Date(current.snapshot.publishedAt))
+  const rows = items.map((item) => toRow(item, queue))
+  const queued = rows.filter((r) => r.status !== 'same' && r.status !== 'minor').length
+  const minor = rows.filter((r) => r.status === 'minor').length
+  const levels = items.filter((i) => i.category === 'level').length
+  const parts = [...levelParts.values()].reduce((n, p) => n + p.length, 0)
+  const options = items.filter((i) => i.category !== 'level' && i.category !== 'service').length
 
-  const { current, queue, builds, minMargin, publishThreshold } = data
-  const broken = queue.brokenLevels
-
-  return template(
-    <>
-      <p className={styles.lead}>
-        Partia {current.snapshot.batch} z {dateTime(current.snapshot.publishedAt)}
-        {current.publishedBy ? ` · ${current.publishedBy}` : ''}. Marża minimalna{' '}
-        {percent(minMargin)}, próg zatwierdzania {percent(publishThreshold)}.
-      </p>
-
-      <section className={styles.section} aria-labelledby="guard">
-        <h2 id="guard">Strażnik marży — ceny na stronie</h2>
-        {broken.length === 0 ? (
-          <Banner type="success">
-            Wszystkie {queue.publishedReview.compatible.toLocaleString('pl-PL')} zgodnych
-            konfiguracji ma marżę co najmniej {percent(minMargin)} (najniższa{' '}
-            {percent(queue.publishedReview.minMargin?.margin ?? null)}).
-          </Banner>
-        ) : (
-          <Banner type="error">
-            <strong>Pilne: opublikowane ceny przy dzisiejszych kosztach łamią marżę.</strong>
-            <ul className={styles.problems}>
-              {broken.map((problem) => (
-                <li key={problem.level}>{problemMessage(problem, minMargin)}</li>
-              ))}
-            </ul>
-          </Banner>
-        )}
-      </section>
-
-      <section className={styles.section} aria-labelledby="import">
-        <h2 id="import">Import kosztów (CSV)</h2>
-        <CostImport />
-      </section>
-
-      <section className={styles.section} aria-labelledby="queue">
-        <h2 id="queue">Do zatwierdzenia</h2>
-        <PricesQueue items={queue.items} />
-        {queue.minorChanges > 0 && (
-          <p className={styles.hint}>
-            {queue.minorChanges} drobnych zmian (poniżej progu {percent(publishThreshold)}) — ceny
-            na stronie zostają bez zmian.
-          </p>
-        )}
-      </section>
-
-      <section className={styles.section} aria-labelledby="builds">
-        <h2 id="builds">Zestawy</h2>
-        <div
-          className={styles.tableWrap}
-          role="region"
-          aria-label="Zestawy: cena, koszt, marża"
-          tabIndex={0}
+  return (
+    <div className={styles.stack}>
+      {queue.brokenLevels.length > 0 ? (
+        // The guard over the prices on the site (G4): urgent, so on top of the centre.
+        <Alert
+          title="Pilne: opublikowane ceny przy dzisiejszych kosztach łamią marżę."
+          actions={
+            <a className="pn-btn pn-btn--gold pn-btn--sm" href={`${admin}/ceny/zatwierdzanie`}>
+              Do zatwierdzenia
+            </a>
+          }
         >
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                <th scope="col">Zestaw</th>
-                <th scope="col">Cena na stronie</th>
-                <th scope="col">Koszt dziś</th>
-                <th scope="col">Marża</th>
-                <th scope="col">Zmiana od partii {current.snapshot.batch - 1 || '—'}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {[...builds].sort(byPrice).map((b) => (
-                <tr
-                  key={b.slug}
-                  className={b.margin !== null && b.margin < minMargin ? styles.urgent : undefined}
-                >
-                  <th scope="row">{b.name}</th>
-                  <td>{zl(b.price)}</td>
-                  <td>{zl(b.cost)}</td>
-                  <td>{percent(b.margin)}</td>
-                  <td>{signedZl(b.change)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
-    </>,
+          {/* TODO(krystian): sentence not on the board. The fix per level is on „Do zatwierdzenia”. */}
+          {plural(queue.brokenLevels.length, ['Poziom', 'Poziomy', 'Poziomy'])}{' '}
+          {queue.brokenLevels.map((p) => p.level).join(', ')} poniżej minimum{' '}
+          {percentShort(minMargin)} przy cenach ze strony — co podnieść, pokazuje strażnik.
+        </Alert>
+      ) : null}
+      <div className={styles.kpis}>
+        <Kpi
+          label="Pozycje w cenniku"
+          value={String(items.length)}
+          note={`${levels} poziomów (${parts} części), ${options} opcji, usługa`}
+        />
+        <Kpi
+          label={`Zmienione od ${batchShort}`}
+          value={String(queued + minor)}
+          tone={queued > 0 ? 'gold' : undefined}
+          note={`${queued} powyżej progu ${percentShort(publishThreshold)}, ${minor} poniżej`}
+        />
+        {/* TODO(P7): unavailable parts and the last check come from the price check report. */}
+        <Kpi label="Niedostępne" value="—" note="po pierwszym sprawdzeniu cen" />
+        <Kpi label="Ostatnie sprawdzenie" value="—" note="sprawdzanie cen jeszcze nie działa" />
+      </div>
+
+      <WhatIfCard
+        builds={whatIfBuilds(offer.builds, offer.catalog, current.snapshot, levelParts)}
+        minMargin={minMargin}
+        warnMargin={warnMargin}
+      />
+
+      <PriceTable
+        rows={rows}
+        batchShort={batchShort}
+        minMargin={minMargin}
+        warnMargin={warnMargin}
+      />
+
+      <Card title="Import kosztów (CSV)" note="kod lub EAN; koszt">
+        <CostImport />
+      </Card>
+    </div>
   )
 }
 
-type ScreenData = {
-  current: BatchInfo
-  queue: ReturnType<typeof buildQueue>
-  builds: ReturnType<typeof buildsOverview>
-  minMargin: number
-  publishThreshold: number
-}
-
-/**
- * Everything the screen shows. A data error (missing field, broken batch) becomes a message on
- * the screen instead of an error page.
- */
-async function loadScreen(payload: Payload): Promise<ScreenData | { error: string }> {
-  try {
-    const current = await loadBatch(payload)
-    if (!current) return { error: 'Brak opublikowanych cen — uruchom seed.' }
-    const offer = await loadOffer(payload)
-    const previous =
-      current.snapshot.batch > 1 ? await loadBatch(payload, current.snapshot.batch - 1) : null
-    return {
-      current,
-      queue: buildQueue(offer.catalog, current.snapshot),
-      builds: buildsOverview(
-        offer.builds,
-        offer.catalog,
-        current.snapshot,
-        previous?.snapshot ?? null,
-      ),
-      minMargin: offer.catalog.settings.minMargin,
-      publishThreshold: offer.catalog.settings.publishThreshold,
-    }
-  } catch (error) {
-    if (error instanceof CatalogError) return { error: error.message }
-    throw error
+function toRow(item: PriceItem, queue: PricesData['queue']): PriceRowView {
+  const queued = queue.items.find((q) => q.key === item.key)
+  const status: PriceRowView['status'] = queued
+    ? queued.reasons.includes('urgent')
+      ? 'urgent'
+      : queued.reasons.includes('new')
+        ? 'new'
+        : 'queued'
+    : item.published !== null && item.candidate !== item.published
+      ? 'minor'
+      : 'same'
+  return {
+    key: item.key,
+    category: item.category,
+    title: item.title,
+    detail: item.detail,
+    costAtBatch: item.costAtBatch,
+    costToday: item.costToday,
+    published: item.published,
+    candidate: item.candidate,
+    margin: item.margin,
+    costSource: item.costSource,
+    status,
+    editPath: item.editPath,
   }
 }
