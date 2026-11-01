@@ -1,0 +1,210 @@
+/* Price reports (panel spec §11, board Raport): panel tokens only. */
+
+.stack {
+  display: grid;
+  gap: 16px;
+}
+
+.head {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.titleRow {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 12px 24px;
+}
+
+.title {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.lead {
+  margin: 4px 0 0;
+  color: var(--p-tx2);
+  font-size: 14px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.acceptWrap {
+  display: grid;
+  gap: 8px;
+}
+
+.accepted {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.steps li {
+  display: flex;
+  gap: 10px;
+}
+
+.steps li > span:last-child {
+  display: grid;
+  gap: 4px;
+}
+
+.steps small {
+  color: var(--p-tx2);
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+
+.stepNo {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 99px;
+  border: 1px solid color-mix(in srgb, var(--p-ok) 45%, transparent);
+  color: var(--p-ok);
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+.summary {
+  display: grid;
+  gap: 10px;
+}
+
+.note {
+  margin: 0;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid var(--p-ln2);
+  background: var(--p-s2);
+  color: var(--p-tx2);
+  font-size: 13.5px;
+  line-height: 1.55;
+}
+
+.note b {
+  color: var(--p-tx);
+}
+
+.foot {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin: 14px 0 0;
+  color: var(--p-mu);
+  font-size: 12.5px;
+}
+
+.mu {
+  margin: 0;
+  color: var(--p-tx2);
+}
+
+.item {
+  display: grid;
+  gap: 2px;
+}
+
+.item small {
+  color: var(--p-mu);
+  font-size: 12px;
+}
+
+.up {
+  color: var(--p-bad);
+  font-weight: 600;
+}
+
+.down {
+  color: var(--p-ok);
+  font-weight: 600;
+}
+
+.offers summary {
+  cursor: pointer;
+  color: var(--p-gold);
+  min-height: 32px;
+}
+
+.offers ul {
+  margin: 6px 0 0;
+  padding-left: 16px;
+  display: grid;
+  gap: 4px;
+  font-size: 12.5px;
+}
+
+.bar {
+  height: 10px;
+  margin: 12px 0;
+  border-radius: 99px;
+  background: var(--p-s3);
+  overflow: hidden;
+}
+
+.bar span {
+  display: block;
+  height: 100%;
+  background: var(--p-gold);
+  transition: width 0.4s ease;
+}
+
+.stack :global(td.pn-r) {
+  white-space: nowrap;
+}
+
+@media (max-width: 1180px) {
+  .steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .steps {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .title {
+    font-size: 26px;
+  }
+
+  .actions,
+  .actions :global(.pn-btn) {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bar span {
+    transition: none;
+  }
+}

@@ -112,6 +112,18 @@ export default buildConfig({
           exact: true,
           meta: { title: 'Opcje konfiguratora' },
         },
+        reports: {
+          Component: '/admin/price-reports/ReportsView#ReportsView',
+          path: '/raporty-cen',
+          exact: true,
+          meta: { title: 'Raporty cen' },
+        },
+        report: {
+          Component: '/admin/price-reports/ReportView#ReportView',
+          path: '/raporty-cen/:id',
+          exact: true,
+          meta: { title: 'Raport sprawdzenia cen' },
+        },
         // `:slug` from `params.segments` (Payload matches the path with path-to-regexp).
         buildEditor: {
           Component: '/admin/builds/BuildEditorView#BuildEditorView',

@@ -2417,3 +2417,33 @@
 .template-default:has([data-panel]) .app-header {
   display: none;
 }
+
+/* P7: „Sprawdź ceny” in the top bar and the „Więcej” sheet. */
+.pn-check {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+.pn-check--wide {
+  display: flex;
+  align-items: stretch;
+}
+.pn-check--wide .pn-btn {
+  justify-content: center;
+  min-height: 48px;
+}
+.pn-check__note {
+  max-width: 260px;
+  color: var(--p-mu);
+  font-size: 11.5px;
+  line-height: 1.35;
+  text-align: right;
+}
+.pn-check--wide .pn-check__note {
+  max-width: none;
+  text-align: left;
+}
+.pn-maction {
+  margin: 14px 0 6px;
+}

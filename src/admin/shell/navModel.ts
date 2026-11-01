@@ -24,7 +24,7 @@ export type NavKey =
   | 'units'
   | 'data'
 
-export type CounterKey = 'inquiriesNew' | 'ordersActive' | 'queue'
+export type CounterKey = 'inquiriesNew' | 'ordersActive' | 'queue' | 'reportsNew'
 export type BadgeTone = 'bad' | 'gold' | 'mu'
 
 export type NavItem = {
@@ -100,8 +100,9 @@ const ITEMS: Record<NavKey, NavItem> = {
     icon: 'report',
     path: '/raporty-cen',
     roles: ADMIN,
+    counter: 'reportsNew',
     tone: 'gold',
-    ready: false,
+    ready: true,
   },
   approve: {
     key: 'approve',
