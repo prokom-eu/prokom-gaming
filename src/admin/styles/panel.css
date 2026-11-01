@@ -232,6 +232,9 @@
 
 /* ---------- main column, top bar (computer) ---------- */
 .pn-main {
+  /* One column for the page and the top bar: fills the screen up to this width (the 1440
+     boards), centred beyond it, so a wide monitor shows the page in the middle, not at the left. */
+  --pn-col: 1400px;
   flex: 1 1 auto;
   min-width: 0;
   display: flex;
@@ -242,7 +245,7 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 12px 16px;
-  padding: 16px 32px;
+  padding: 16px max(32px, calc((100% - var(--pn-col)) / 2));
   border-bottom: 1px solid var(--p-ln);
   background: rgba(8, 12, 11, 0.92);
 }
@@ -330,8 +333,9 @@
   display: flex;
   flex-direction: column;
   gap: 22px;
-  max-width: 1240px;
+  max-width: calc(var(--pn-col) + 64px);
   width: 100%;
+  margin-inline: auto;
 }
 
 /* ---------- page header ---------- */
