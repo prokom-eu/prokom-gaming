@@ -18,7 +18,7 @@ import {
   type ItemCategory,
   type OfferRow,
 } from './diff'
-import { decide, marketCost, type CostMethod } from './market'
+import { decide, marketCost, staleCost, type CostMethod } from './market'
 import { numbersOf, unknownNumbers } from './summary'
 import { callCostUsd, estimateUsd, monthStart, overBudget, type CallUsage } from './usage'
 
@@ -137,6 +137,7 @@ export async function runPriceCheck(payload: Payload, checkId: number): Promise<
         price: r?.price_pln ?? null,
         available: r?.available ?? false,
         matched: r?.matches ?? false,
+        fetchedAt: result.fetchedAt,
       }
       // Only a valid reading is an offer: an API error or a broken answer says nothing about the
       // shop, so it never makes an item „niedostępne” (no false alarm — review P7).
@@ -188,15 +189,23 @@ export async function runPriceCheck(payload: Payload, checkId: number): Promise<
     // (3) Search for items without a usable offer (market items only — invoice costs stay).
     await progress('Sklepy: wyszukiwanie', 70)
     const method = (settings.costMethod ?? 'lowest') as CostMethod
+    // Items with a proposal waiting to be switched on are skipped, and a known address is never
+    // saved again — before, every run searched (and paid for) the same items and duplicated links.
+    // An item whose active links failed (product gone, another variant) is still searched.
+    const linked = await linkedItems(payload)
     const missing = items.filter(
-      (i) => i.costSource === 'market' && marketCost(offerOf(i), method) === null,
+      (i) =>
+        i.costSource === 'market' &&
+        marketCost(offerOf(i), method) === null &&
+        !linked.pending.has(`${i.itemType}:${i.code}`),
     )
-    for (const item of missing.slice(0, MAX_SEARCHES)) {
+    let linksProposed = 0
+    for (const item of rotate(missing, checkId * MAX_SEARCHES).slice(0, MAX_SEARCHES)) {
       guard('search')
       const found = await reader.search(item.checked, shops)
       spend(found.usage)
-      const known = new Set(item.urls.map((u) => u.url))
-      for (const url of found.urls.filter((u) => !known.has(u)).slice(0, 2)) {
+      for (const url of found.urls.filter((u) => !linked.urls.has(u)).slice(0, 2)) {
+        linked.urls.add(url)
         // Proposed link: switched off until Krystian accepts it (ADR-G007 §2 pt 3).
         await payload
           .create({
@@ -211,6 +220,7 @@ export async function runPriceCheck(payload: Payload, checkId: number): Promise<
             depth: 0,
             overrideAccess: true,
           })
+          .then(() => linksProposed++)
           .catch((error: unknown) => log.warn({ ...errorFields(error) }, 'proposed link refused'))
         await record(item, null, url, 'search')
       }
@@ -224,11 +234,17 @@ export async function runPriceCheck(payload: Payload, checkId: number): Promise<
       return {
         ...item,
         market,
-        decision: decide(item, market, outlier, offerOf(item).length),
+        decision: decide(
+          item,
+          market,
+          outlier,
+          offerOf(item).length,
+          market !== null && staleCost(offerOf(item), method, new Date()),
+        ),
         offers: offerOf(item),
       }
     })
-    const diff = await diffOf(payload, decided)
+    const diff: CheckDiff = { ...(await diffOf(payload, decided)), linksProposed }
 
     // (6) Summary from the numbers only, checked; one retry, else none.
     await progress('Raport i alarm', 92)
@@ -334,6 +350,33 @@ async function pool<T>(list: readonly T[], size: number, work: (item: T) => Prom
     }
   })
   await Promise.all(workers)
+}
+
+/** Items with a proposal waiting to be switched on, and every known link address. */
+async function linkedItems(payload: Payload) {
+  const all = await payload.find({
+    collection: 'price-sources',
+    select: { itemType: true, itemCode: true, url: true, active: true, proposedByClaude: true },
+    depth: 0,
+    pagination: false,
+    overrideAccess: true,
+  })
+  return {
+    /** Items with a Claude proposal still switched off. */
+    pending: new Set(
+      all.docs
+        .filter((s) => !s.active && s.proposedByClaude)
+        .map((s) => `${s.itemType}:${s.itemCode}`),
+    ),
+    urls: new Set(all.docs.map((s) => s.url)),
+  }
+}
+
+/** The list started at `offset` (wrapping): each run searches the next items, not the same ones. */
+function rotate<T>(list: readonly T[], offset: number): T[] {
+  if (list.length === 0) return []
+  const start = ((offset % list.length) + list.length) % list.length
+  return [...list.slice(start), ...list.slice(0, start)]
 }
 
 /** Options and power-level parts (one per `partKey`) with their active offer links. */
@@ -533,7 +576,9 @@ async function alarm(
   const threshold = settings.alertChangePct ?? 0.05
   for (const i of diff.items) {
     const d = i.decision
-    if ((d.kind === 'propose' || d.kind === 'manual') && Math.abs(d.change) > threshold) {
+    // An old page copy alarms nobody: its price may be weeks old (review of fix/p7-odczyt-ofert).
+    const fresh = d.kind === 'propose' || (d.kind === 'manual' && !d.stale)
+    if (fresh && Math.abs(d.change) > threshold) {
       reasons.push(
         `${i.title}: koszt ${zl(i.cost)} → ${zl(d.kind === 'propose' ? d.newCost : d.market)} (${percent(d.change, true)}).`,
       )

@@ -122,6 +122,14 @@ const STATUS: Record<ItemRow['decision']['kind'], { tone: Tone; label: string }>
   nooffer: { tone: 'mu', label: 'brak oferty' },
 }
 
+const dayShort = new Intl.DateTimeFormat('pl-PL', {
+  timeZone: 'Europe/Warsaw',
+  day: '2-digit',
+  month: '2-digit',
+})
+const copyDate = (iso: string | null | undefined) =>
+  iso && Number.isFinite(Date.parse(iso)) ? dayShort.format(new Date(iso)) : null
+
 const pct = (v: number) => {
   const text = `${(v * 100).toFixed(1).replace('.', ',').replace('-', '−')}%`
   return v > 0 ? `+${text}` : text
@@ -215,6 +223,8 @@ export function ItemsTable({ items }: { items: ItemRow[] }) {
                   {o.price !== null ? zl(o.price) : 'brak ceny'}
                   {!o.available ? ' · niedostępna' : ''}
                   {!o.matched ? ' · inny produkt' : ''}
+                  {/* TODO(krystian): wording (no board). */}
+                  {copyDate(o.fetchedAt) ? ` · kopia strony z ${copyDate(o.fetchedAt)}` : ''}
                 </li>
               ))}
             </ul>
@@ -225,7 +235,13 @@ export function ItemsTable({ items }: { items: ItemRow[] }) {
       key: 'status',
       label: 'Status',
       render: (i) => (
-        <Chip tone={STATUS[i.decision.kind].tone}>{STATUS[i.decision.kind].label}</Chip>
+        <span className={styles.item}>
+          <Chip tone={STATUS[i.decision.kind].tone}>{STATUS[i.decision.kind].label}</Chip>
+          {/* TODO(krystian): wording (no board). */}
+          {i.decision.kind === 'manual' && i.decision.stale ? (
+            <small>strona starsza niż 7 dni — sprawdź cenę w sklepie</small>
+          ) : null}
+        </span>
       ),
     },
   ]

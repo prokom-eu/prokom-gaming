@@ -58,6 +58,7 @@ test.describe('a price check on the fake Claude', () => {
   let ram: Option
   let disk: Option
   let box: Option
+  let cooler: Option
   const created: number[] = []
   const startedChecks: number[] = []
 
@@ -73,6 +74,7 @@ test.describe('a price check on the fake Claude', () => {
     ram = list.docs.find((o) => o.code === 'R32')!
     disk = list.docs.find((o) => o.type === 'ssd')!
     box = list.docs.find((o) => o.type === 'case')!
+    cooler = list.docs.find((o) => o.type === 'cooler')!
     const links = [
       // RAM 8% dearer on the market → a proposal.
       {
@@ -83,6 +85,11 @@ test.describe('a price check on the fake Claude', () => {
       { code: disk.code, url: `https://www.x-kom.pl/p/e2e-ssd?e2e-cena=${disk.cost * 2}` },
       // A case out of stock → unavailable.
       { code: box.code, url: 'https://www.x-kom.pl/p/e2e-case?e2e-brak=1' },
+      // A cooler 5% dearer, but from a page copy 10 days old → to check by hand, no proposal.
+      {
+        code: cooler.code,
+        url: `https://www.x-kom.pl/p/e2e-cooler?e2e-cena=${Math.round(cooler.cost * 1.05)}&e2e-kopia=10`,
+      },
     ]
     for (const l of links) {
       const res = await api.post('/api/price-sources', {
@@ -117,6 +124,9 @@ test.describe('a price check on the fake Claude', () => {
     await expect(changes.locator('tbody tr').first()).toContainText(ram.publicLabel)
     await changes.getByRole('button', { name: /^Do sprawdzenia/ }).click()
     await expect(changes.locator('tbody tr').filter({ hasText: disk.publicLabel })).toHaveCount(1)
+    await expect(changes.locator('tbody tr').filter({ hasText: cooler.publicLabel })).toContainText(
+      'strona starsza niż 7 dni',
+    )
     await changes.getByRole('button', { name: /^Niedostępne/ }).click()
     await expect(changes.locator('tbody tr').filter({ hasText: box.publicLabel })).toHaveCount(1)
 

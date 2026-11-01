@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { decide, marketCost } from './market'
+import { decide, marketCost, staleCost } from './market'
 import { parseAnswer, readingSchema } from './schema'
 import { numbersOf, unknownNumbers } from './summary'
 import { callCostUsd, monthStart, overBudget, READ_MODEL, SEARCH_MODEL } from './usage'
@@ -83,6 +83,41 @@ describe('decide', () => {
     expect(decide({ cost: 1000, costSource: 'market' }, null, 0.25, 0)).toEqual({
       kind: 'nooffer',
     })
+  })
+})
+
+describe('old page copies (the cheap fetch serves cached pages)', () => {
+  const now = new Date('2026-11-02T06:00:00Z')
+  const offer = (price: number, daysAgo: number | null) => ({
+    price,
+    available: true,
+    matched: true,
+    fetchedAt:
+      daysAgo === null ? null : new Date(now.getTime() - daysAgo * 86_400_000).toISOString(),
+  })
+
+  it('a copy older than 7 days behind the cost is stale; an unknown date too', () => {
+    expect(staleCost([offer(2397, 2)], 'lowest', now)).toBe(false)
+    expect(staleCost([offer(2397, 7.5)], 'lowest', now)).toBe(true)
+    expect(staleCost([offer(2397, null)], 'lowest', now)).toBe(true)
+  })
+
+  it('only the offers the cost is taken from count', () => {
+    const offers = [offer(2397, 1), offer(2450, 10)]
+    expect(staleCost(offers, 'lowest', now)).toBe(false)
+    expect(staleCost(offers, 'avg2', now)).toBe(true)
+  })
+
+  it('a stale cost goes to a check by hand, never a proposal', () => {
+    expect(decide({ cost: 2219, costSource: 'market' }, 2397, 0.25, 1, true)).toEqual({
+      kind: 'manual',
+      market: 2397,
+      change: (2397 - 2219) / 2219,
+      stale: true,
+    })
+    // The same cost is still „bez zmian”, an invoice cost still „z faktury”.
+    expect(decide({ cost: 2397, costSource: 'market' }, 2397, 0.25, 1, true).kind).toBe('same')
+    expect(decide({ cost: 2000, costSource: 'invoice' }, 2397, 0.25, 1, true).kind).toBe('invoice')
   })
 })
 

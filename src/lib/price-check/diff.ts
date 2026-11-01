@@ -36,6 +36,8 @@ export type OfferRow = {
   price: number | null
   available: boolean
   matched: boolean
+  /** When the page copy was taken (ISO); missing in reports before 2.11.2026. */
+  fetchedAt?: string | null
 }
 
 export type ItemRow = CheckItem & {
@@ -63,6 +65,8 @@ export type BuildRow = {
 export type CheckDiff = {
   items: ItemRow[]
   builds: BuildRow[]
+  /** Offer links Claude found in this run, saved switched off (missing in older reports). */
+  linksProposed?: number
   totals: {
     items: number
     found: number
