@@ -52,6 +52,17 @@ test.describe('accessibility (axe)', () => {
     test(path, async ({ page }) => {
       const response = await page.goto(path)
       expect(response?.status()).toBe(status)
+      // Entrance animations first (e.g. the FAQ fading in from opacity 0): mid-fade, axe measures
+      // a blended colour and reports contrast that no reader sees. On `next start` the page is
+      // ready before the 0.4 s fade ends (G15). Endless ones (pulses) are skipped.
+      await page.evaluate(() =>
+        Promise.all(
+          document
+            .getAnimations()
+            .filter((a) => a.effect?.getTiming().iterations !== Infinity)
+            .map((a) => a.finished.catch(() => undefined)),
+        ),
+      )
       const { violations } = await new AxeBuilder({ page }).withTags(WCAG).analyze()
       // Rule ids and targets only, so a failure reads well in the CI log.
       expect(
