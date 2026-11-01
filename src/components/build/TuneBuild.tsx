@@ -3,11 +3,12 @@
 import Link from 'next/link'
 import { useState, type CSSProperties } from 'react'
 
-import { ButtonLink } from '@/components/ui/Button'
 import { inquiryHref, LIGHTS, tunedNote, type LightKey, type TuneChoice } from '@/lib/buildPage'
 import { routes } from '@/lib/nav'
 import { zl } from '@/lib/pricing/format'
 import type { Config } from '@/lib/pricing/types'
+
+import { AskLink } from './AskLink'
 
 type Props = {
   slug: string
@@ -117,13 +118,14 @@ export function TuneBuild(props: Props) {
             <b>{zl(props.price + diff)}</b>
             <span>{tunedNote(diff, light, zl)}</span>
           </div>
-          <ButtonLink
+          <AskLink
             className="bp-tune__ask"
             size="lg"
+            build={props.slug}
             href={inquiryHref(props.slug, props.config, { ram, ssd, light })}
           >
             Zapytaj o tę wersję
-          </ButtonLink>
+          </AskLink>
           <Link className="lnk" href={`${routes.configurator}?zestaw=${props.slug}`}>
             Więcej zmian w konfiguratorze
           </Link>

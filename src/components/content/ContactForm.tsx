@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useRef, useState, type FormEvent } from 'react'
 
 import { Button } from '@/components/ui/Button'
+import { track } from '@/lib/analytics'
 import { CONTACT_CONSENT_CLAUSE } from '@/lib/inquiry/consent'
 import {
   CONTACT_SEND_ERRORS,
@@ -55,10 +56,11 @@ export function ContactForm({ token }: { token: string }) {
     setSending(true)
     setSendError(null)
     try {
+      const payload = contactPayload(state, { url: window.location.href, token, honeypot })
       const response = await fetch('/api/inquiry', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify(contactPayload(state, { url: window.location.href, token, honeypot })),
+        body: JSON.stringify(payload),
       })
       const body = (await response.json().catch(() => ({}))) as {
         number?: string
@@ -66,6 +68,8 @@ export function ContactForm({ token }: { token: string }) {
         fields?: string[]
       }
       if (response.status === 201 && body.number) {
+        // Statistics: the type only, never the number (ADR-G009 pt 3).
+        track('inquiry_sent', { type: payload.type })
         setSent({ number: body.number, email: state.email.trim() })
         return
       }

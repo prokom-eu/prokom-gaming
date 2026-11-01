@@ -4,11 +4,13 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 
 import { Button } from '@/components/ui/Button'
+import { track } from '@/lib/analytics'
 import {
   canSend,
   draftOf,
   draftQuery,
   goTo,
+  inquiryType,
   LAST_STEP,
   NEXT_LABELS,
   SEND_ERRORS,
@@ -130,6 +132,8 @@ export function InquiryForm({
         fields?: string[]
       }
       if (response.status === 201 && body.number) {
+        // Statistics: the type only, never the number (ADR-G009 pt 3).
+        track('inquiry_sent', { type: inquiryType(state) })
         saveSent(body.number, sentSummaryOf(state, data))
         // The inquiry is sent: the counter goes back to zero.
         restoring.current = true

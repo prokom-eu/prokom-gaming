@@ -38,6 +38,14 @@ const envSchema = z
     // Mailbox of inquiry notifications (ADR-G005). Required in production; locally optional —
     // without it only the customer's confirmation goes out and a warning is logged.
     INQUIRY_NOTIFY_EMAIL: z.email().optional(),
+    // Umami statistics (ADR-G009): the script address (a path on our domain behind Nginx, e.g.
+    // `/_s/script.js`, or a full URL) and the website id from the Umami panel. Both or none; used
+    // only when SITE_ENV is production or staging (`lib/analytics.ts`).
+    UMAMI_SCRIPT_URL: z
+      .string()
+      .regex(/^(\/[^/]|https?:\/\/)/, 'a path starting with / or an http(s) URL')
+      .optional(),
+    UMAMI_WEBSITE_ID: z.uuid().optional(),
     // Closed inquiries (`lost`, `closed`) are deleted this many months after the last status
     // change (ADR-G005; to be confirmed with the privacy policy).
     INQUIRY_RETENTION_MONTHS: z.coerce.number().int().min(1).max(120).default(24),

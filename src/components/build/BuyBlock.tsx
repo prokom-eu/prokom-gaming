@@ -10,6 +10,8 @@ import { dateText } from '@/lib/home'
 import { routes } from '@/lib/nav'
 import { zl } from '@/lib/pricing/format'
 
+import { AskLink } from './AskLink'
+
 /**
  * Sections 2–4 of spec. §6 (board Zestaw `.zb`): „Dlaczego {istota}?” with the look, the photo,
  * „Ile klatek w Twojej grze”; on the right the price with the actions, promises and „Na jaki
@@ -65,13 +67,14 @@ export function BuyBlock({ data, pageUrl }: { data: BuildPageData; pageUrl: stri
                 części potwierdzimy w ofercie ważnej 48 godzin.
               </p>
             )}
-            <ButtonLink
+            <AskLink
               className="bp-price__ask"
               size="lg"
+              build={build.slug}
               href={inquiryHref(build.slug, data.config)}
             >
               Zapytaj o {build.accusative}
-            </ButtonLink>
+            </AskLink>
             <div className="bp-price__more">
               <ButtonLink variant="ghost" href={`${routes.configurator}?zestaw=${build.slug}`}>
                 Zmień części

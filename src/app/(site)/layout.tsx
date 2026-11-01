@@ -8,6 +8,7 @@ import { MobileTabBar } from '@/components/MobileTabBar'
 import { ShellProvider } from '@/components/shell/ShellProvider'
 import { SiteFooter } from '@/components/SiteFooter'
 import { SiteHeader } from '@/components/SiteHeader'
+import { analyticsScript } from '@/lib/analytics'
 import { getEnv } from '@/lib/env'
 import { features } from '@/lib/features'
 import { DESCRIPTIONS, isIndexable, OPEN_GRAPH, SITE_NAME } from '@/lib/seo'
@@ -39,8 +40,11 @@ export async function generateMetadata(): Promise<Metadata> {
 // `cover`: lets env(safe-area-inset-bottom) lift the tab bar above the iPhone home bar.
 export const viewport: Viewport = { viewportFit: 'cover' }
 
-export default function SiteLayout({ children }: { children: ReactNode }) {
+export default async function SiteLayout({ children }: { children: ReactNode }) {
+  // Per request, like the metadata: the statistics script belongs to this server's environment.
+  await connection()
   const flags = features()
+  const stats = analyticsScript(getEnv())
   return (
     <html lang="pl" className={fontVariables}>
       <body>
@@ -59,6 +63,9 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           />
           <CookieBanner enabled={cookieBannerEnabled} />
         </ShellProvider>
+        {/* Umami without cookies (ADR-G009): deferred, never blocks the page; `track()` works
+            without it. Only on production and staging. */}
+        {stats && <script defer src={stats.src} data-website-id={stats.websiteId} />}
       </body>
     </html>
   )

@@ -9,6 +9,7 @@ import { Sigil } from '@/components/Sigil'
 import { SourceLabel } from '@/components/SourceLabel'
 import { ButtonLink } from '@/components/ui/Button'
 import { Segmented } from '@/components/ui/Segmented'
+import { track } from '@/lib/analytics'
 import {
   compareQuery,
   compareView,
@@ -84,6 +85,9 @@ export function Compare({
   const router = useRouter()
   // While that navigation runs, this (default) state must not overwrite the saved builds.
   const restoring = useRef(false)
+  // Statistics (ADR-G009): the comparison was opened.
+  useEffect(() => track('compare_open'), [])
+
   useEffect(() => {
     if (fromLink) return
     const saved = savedSlots(data)
