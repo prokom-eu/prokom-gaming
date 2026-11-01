@@ -286,3 +286,19 @@ describe('schedule (price-check-settings)', async () => {
     expect(isDue(new Date('2026-11-03T05:30:00Z'), ['mon', 'fri'], 6)).toBe(false)
   })
 })
+
+describe('a run cut off by a restart', async () => {
+  const { isCutOff } = await import('./scheduler')
+  const now = new Date('2026-11-01T16:00:00Z')
+  const at = (minutesAgo: number) => new Date(now.getTime() - minutesAgo * 60_000).toISOString()
+  it('a run still saving itself is not cut off, even after 40 min', () => {
+    expect(isCutOff({ startedAt: at(40), updatedAt: at(0.5) }, now)).toBe(false)
+  })
+  it('no save for over 3 min = the process is gone (Ctrl+C, restart)', () => {
+    expect(isCutOff({ startedAt: at(5), updatedAt: at(4) }, now)).toBe(true)
+    expect(isCutOff({ startedAt: at(2), updatedAt: at(2) }, now)).toBe(false)
+  })
+  it('over 45 min is cut off whatever it saves (a hung call)', () => {
+    expect(isCutOff({ startedAt: at(46), updatedAt: at(0) }, now)).toBe(true)
+  })
+})

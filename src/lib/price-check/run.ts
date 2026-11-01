@@ -36,6 +36,11 @@ const SEARCH_MINUTES = 20
 const CONCURRENCY = 4
 /** At most this many items searched per run (each costs money; the monthly limit still applies). */
 const MAX_SEARCHES = 100
+/**
+ * A running check is saved this often even while a long call waits, so a run whose process died
+ * is told apart within minutes (`SILENT_MINUTES` in scheduler.ts — keep it well above this).
+ */
+const HEARTBEAT_SECONDS = 30
 
 type Item = CheckItem & {
   checked: CheckedItem
@@ -116,6 +121,11 @@ export async function runPriceCheck(payload: Payload, checkId: number): Promise<
   }
   const progress = (step: string, value: number) =>
     save({ step, progress: Math.round(value), ...rounded(totals) }).catch(() => undefined)
+  // Each save moves `updatedAt`: the sign that this process still runs the check.
+  const heartbeat = setInterval(() => {
+    void save(rounded(totals)).catch(() => undefined)
+  }, HEARTBEAT_SECONDS * 1000)
+  heartbeat.unref()
 
   try {
     // (1) Items and their links.
@@ -354,6 +364,8 @@ export async function runPriceCheck(payload: Payload, checkId: number): Promise<
     await save({ status, finishedAt: new Date().toISOString(), error: message, ...rounded(totals) })
     if (status === 'budget') await budgetAlarm(payload, checkId, message)
     return status
+  } finally {
+    clearInterval(heartbeat)
   }
 }
 
