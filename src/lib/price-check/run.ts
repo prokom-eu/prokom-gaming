@@ -19,7 +19,7 @@ import {
   type OfferRow,
 } from './diff'
 import { autoEnable, decide, marketCost, staleCost, type CostMethod } from './market'
-import { numbersOf, unknownNumbers } from './summary'
+import { numbersOf, summaryInput, unknownNumbers } from './summary'
 import { callCostUsd, estimateUsd, monthStart, overBudget, type CallUsage } from './usage'
 
 /**
@@ -301,18 +301,18 @@ export async function runPriceCheck(payload: Payload, checkId: number): Promise<
     await progress('Raport i alarm', 92)
     let summary: string | null = null
     let stopNote: string | null = null
-    const diffJson = JSON.stringify(summaryInput(diff))
+    const { input, names } = summaryInput(diff)
+    const allowed = numbersOf(input)
     try {
       for (let attempt = 0; attempt < 2 && summary === null; attempt++) {
         guard('summary')
-        const result = await reader.summarize(diffJson)
+        const result = await reader.summarize(JSON.stringify(input))
         spend(result.usage)
-        if (
-          result.text &&
-          unknownNumbers(result.text, numbersOf(summaryInput(diff))).length === 0
-        ) {
-          summary = result.text
-        }
+        if (!result.text) continue
+        const unknown = unknownNumbers(result.text, allowed, names)
+        if (unknown.length === 0) summary = result.text
+        // Numbers only (no text): which ones the model made up, for the next diagnosis.
+        else log.warn({ checkId, attempt, unknown: unknown.slice(0, 10) }, 'summary rejected')
       }
     } catch (error) {
       // The limit or the time ran out before the summary: the readings and the recomputation are
@@ -583,34 +583,6 @@ async function diffOf(
       costAtBatch: i.itemType === 'option' ? (atBatch.get(`option:${i.code}`) ?? null) : null,
     })),
   })
-}
-
-/** What Claude gets for the summary: the numbers of the report, no shop pages. */
-function summaryInput(diff: CheckDiff) {
-  return {
-    totals: diff.totals,
-    changes: diff.items
-      .filter((i) => i.decision.kind !== 'same')
-      .map((i) => ({
-        pozycja: i.title,
-        rodzaj: i.category,
-        decyzja: i.decision.kind,
-        koszt: i.cost,
-        rynek: i.market,
-        zmiana: 'change' in i.decision ? Math.round(i.decision.change * 1000) / 1000 : null,
-        cenaTeraz: i.priceNow,
-        cenaNowa: i.priceNew,
-        zestawy: i.builds,
-      })),
-    zestawy: diff.builds.map((b) => ({
-      zestaw: b.name,
-      cenaTeraz: b.priceNow,
-      cenaNowa: b.priceNew,
-      zmiana: b.change,
-      marzaTeraz: b.marginNow === null ? null : Math.round(b.marginNow * 1000) / 1000,
-      marzaPo: b.marginAfter === null ? null : Math.round(b.marginAfter * 1000) / 1000,
-    })),
-  }
 }
 
 /** Step 7: e-mail (and push) when the minimum breaks, a build part is unavailable or a cost jumps. */
