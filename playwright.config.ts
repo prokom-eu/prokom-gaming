@@ -14,8 +14,8 @@ const port = Number(process.env.PORT ?? 3100)
 process.env.PORT = String(port)
 
 // Tests that change costs, publish price batches or try to break the offer (and put it back):
-// they run first, one at a time, and every other test starts after them — so a test reading
-// prices never sees a half-changed price list.
+// they run first, one at a time (desktop, then phone), and every other test starts after both —
+// so a test reading prices never sees a half-changed price list.
 const DB_WRITERS =
   /(prices-panel|prices-import|offer-integrity|panel-settings|panel-inquiries|panel-push|panel-builds|panel-options|price-reports)\.e2e\.spec\.ts$/
 
@@ -50,8 +50,8 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } },
     },
     {
-      // Phone (414): the prices screen read-only (publishing skips), the inquiry reply path and
-      // switching push on (P4).
+      // Phone (414): the same writers on the phone — publishing a price batch (prices-panel), the
+      // inquiry reply path, switching push on (P4). Writes too, so the readers wait for it.
       name: 'db-writers-414',
       testMatch:
         /(prices-panel|panel-inquiries|panel-push|panel-builds|panel-options|price-reports)\.e2e\.spec\.ts$/,
@@ -68,13 +68,13 @@ export default defineConfig({
     {
       name: 'desktop-1440',
       testIgnore: DB_WRITERS,
-      dependencies: ['db-writers'],
+      dependencies: ['db-writers-414'],
       use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } },
     },
     {
       name: 'mobile-414',
       testIgnore: DB_WRITERS,
-      dependencies: ['db-writers'],
+      dependencies: ['db-writers-414'],
       use: {
         ...devices['Desktop Chrome'],
         viewport: { width: 414, height: 896 },
