@@ -11,10 +11,11 @@ import { Card, Kpi } from '../ui/Card'
 import { Chip } from '../ui/Chip'
 import { EmptyState } from '../ui/EmptyState'
 import { Icon } from '../ui/icons'
+import { GoTo } from '../ui/GoTo'
 import { PanelDenied } from '../ui/PanelDenied'
 import { PanelPage } from '../ui/PanelPage'
 import { PanelShell } from '../ui/PanelShell'
-import { loadDashboard, loadWorkshop, type DashboardData, type WorkshopData } from './load'
+import { loadDashboard, type DashboardData, type WorkshopData } from './load'
 import { MarginTable } from './MarginTable'
 import type { TodoItem } from './rules'
 
@@ -39,7 +40,7 @@ const LEAD = 'zapytania, warsztat, ceny i ruch w jednym miejscu.'
 /**
  * /admin — Pulpit „Dziś” (panel spec §3, board Main, stany/tel-01-pulpit). Replaces Payload's
  * dashboard. Admin: tiles, „Czeka na Ciebie”, build margins, recent inquiries, workshop, events.
- * `serwis` (P2 decision): the workshop only — no inquiries, prices or margins in the HTML.
+ * `serwis`: sent on to the workshop board (P5) — no inquiries, prices or margins in the HTML.
  * Market prices (P7) and traffic (P8) are empty states until their sessions.
  */
 export async function DashboardView({ initPageResult }: AdminViewServerProps) {
@@ -51,12 +52,11 @@ export async function DashboardView({ initPageResult }: AdminViewServerProps) {
   const now = new Date()
   const admin = req.payload.config.routes.admin
 
+  // `serwis` starts on the workshop board (spec §2a pt 3, P5).
   if (panelAccess(req, 'admin').ok === false) {
-    const workshop = await loadWorkshop(req.payload)
     return (
-      <PanelShell req={req} title={TITLE} active="dashboard">
-        <PanelPage title="Dziś" lead={longDate(now)} />
-        <WorkshopCard workshop={workshop} href={`${admin}/collections/orders`} />
+      <PanelShell req={req} title={TITLE} active="orders">
+        <GoTo href={`${admin}/zamowienia`} label="Przejdź do warsztatu" />
       </PanelShell>
     )
   }
@@ -98,7 +98,7 @@ export async function DashboardView({ initPageResult }: AdminViewServerProps) {
 
         <div className="pn-dash__side">
           <RecentCard data={data} admin={admin} />
-          <WorkshopCard workshop={data.workshop} href={`${admin}/collections/orders`} />
+          <WorkshopCard workshop={data.workshop} href={`${admin}/zamowienia`} />
           <MarketCard market={data.market} admin={admin} />
         </div>
 

@@ -25,7 +25,7 @@ describe('panel navigation', () => {
 
   it('hides screens whose session has not been built yet instead of linking to nothing', () => {
     const shown = [...navGroups('admin').flatMap((g) => g.items), ...navMore('admin')]
-    for (const hidden of ['clients', 'stats']) {
+    for (const hidden of ['stats']) {
       expect(keys(shown)).not.toContain(hidden)
     }
   })
@@ -48,5 +48,12 @@ describe('panel navigation', () => {
     expect(navTabs('admin').find((i) => i.key === 'approve')?.path).toBe('/ceny/zatwierdzanie')
     const shown = [...navGroups('admin').flatMap((g) => g.items), ...navMore('admin')]
     expect(shown.find((i) => i.key === 'pricesCentre')?.path).toBe('/ceny')
+  })
+  it('opens the workshop board and the clients (P5); serwis starts on the board', () => {
+    const shown = [...navGroups('admin').flatMap((g) => g.items), ...navMore('admin')]
+    expect(shown.find((i) => i.key === 'orders')?.path).toBe('/zamowienia')
+    expect(shown.find((i) => i.key === 'clients')?.path).toBe('/klienci')
+    expect(navTabs('serwis')[0]).toMatchObject({ path: '/zamowienia', label: 'Warsztat' })
+    expect(keys(navMore('serwis'))).not.toContain('clients')
   })
 })

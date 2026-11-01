@@ -32,6 +32,9 @@ import { ReportsView as ReportsView_b44d22d31b09cf82da3790267729106f } from '../
 import { ReportView as ReportView_cd9f72439b480528038a8fc0611b4784 } from '../../../admin/price-reports/ReportView'
 import { BuildEditorView as BuildEditorView_1acc4dcf2253ea52f4cd396ff03fc5e5 } from '../../../admin/builds/BuildEditorView'
 import { InquiriesView as InquiriesView_c9e6bcd9bd0ec4b17f2718f75737e298 } from '../../../admin/inquiries/InquiriesView'
+import { OrdersView as OrdersView_fdac4cec14838f7dda13e140b265a6c0 } from '../../../admin/orders/OrdersView'
+import { ClientsView as ClientsView_4c69a3da66da5fca38ee699223696f39 } from '../../../admin/clients/ClientsView'
+import { ClientView as ClientView_97d00c5cb6bb12938e3f242385030c77 } from '../../../admin/clients/ClientView'
 import { SettingsView as SettingsView_6e97004d35601209e35838a90c0fbc84 } from '../../../admin/settings/SettingsView'
 import { DataView as DataView_ba5c2e5f2f9a3e4ab57326938558337a } from '../../../admin/shell/DataView'
 import { PanelPreviewView as PanelPreviewView_d36a78726155b3387125fe3e0b739977 } from '../../../admin/preview/PanelPreviewView'
@@ -73,6 +76,9 @@ export const importMap = {
   "/admin/price-reports/ReportView#ReportView": ReportView_cd9f72439b480528038a8fc0611b4784,
   "/admin/builds/BuildEditorView#BuildEditorView": BuildEditorView_1acc4dcf2253ea52f4cd396ff03fc5e5,
   "/admin/inquiries/InquiriesView#InquiriesView": InquiriesView_c9e6bcd9bd0ec4b17f2718f75737e298,
+  "/admin/orders/OrdersView#OrdersView": OrdersView_fdac4cec14838f7dda13e140b265a6c0,
+  "/admin/clients/ClientsView#ClientsView": ClientsView_4c69a3da66da5fca38ee699223696f39,
+  "/admin/clients/ClientView#ClientView": ClientView_97d00c5cb6bb12938e3f242385030c77,
   "/admin/settings/SettingsView#SettingsView": SettingsView_6e97004d35601209e35838a90c0fbc84,
   "/admin/shell/DataView#DataView": DataView_ba5c2e5f2f9a3e4ab57326938558337a,
   "/admin/preview/PanelPreviewView#PanelPreviewView": PanelPreviewView_d36a78726155b3387125fe3e0b739977,

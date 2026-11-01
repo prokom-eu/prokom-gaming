@@ -26,6 +26,14 @@ export const EMPTY_WORKSHOP: Workshop = { items: [], inWorkshop: 0 }
  */
 export async function loadWorkshop(now: Date = new Date()): Promise<Workshop> {
   const payload = await getPayload({ config })
+  // Switch „Pokazuj zamówienia na tablicy warsztatu” (panel Ustawienia, P5): off = no strip.
+  const settings = await payload.findGlobal({
+    slug: 'mail-settings',
+    select: { workshopStrip: true },
+    depth: 0,
+    overrideAccess: true,
+  })
+  if (settings.workshopStrip === false) return EMPTY_WORKSHOP
   const [{ docs }, { totalDocs }] = await Promise.all([
     payload.find({
       collection: 'orders',

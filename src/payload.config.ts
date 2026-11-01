@@ -137,6 +137,24 @@ export default buildConfig({
           exact: true,
           meta: { title: 'Zapytania' },
         },
+        orders: {
+          Component: '/admin/orders/OrdersView#OrdersView',
+          path: '/zamowienia',
+          exact: true,
+          meta: { title: 'Zamówienia i warsztat' },
+        },
+        clients: {
+          Component: '/admin/clients/ClientsView#ClientsView',
+          path: '/klienci',
+          exact: true,
+          meta: { title: 'Klienci' },
+        },
+        client: {
+          Component: '/admin/clients/ClientView#ClientView',
+          path: '/klient',
+          exact: true,
+          meta: { title: 'Karta klienta' },
+        },
         settings: {
           Component: '/admin/settings/SettingsView#SettingsView',
           path: '/ustawienia',

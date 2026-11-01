@@ -155,3 +155,37 @@ export async function savePriceCheckSettings(
   revalidatePath('/admin/ustawienia')
   return { status: 'saved', at: new Date().toISOString() }
 }
+
+export type SwitchName = 'stageEmail' | 'workshopStrip'
+
+/**
+ * Section „Zamówienia i klienci” (panel spec §13): one switch saved at once, like the switches
+ * on /admin/opcje. Admin only.
+ */
+export async function setOrderSwitch(
+  name: SwitchName,
+  value: boolean,
+): Promise<{ ok: true } | { ok: false; message: string }> {
+  const session = await panelActionSession('admin')
+  // TODO(krystian): texts of the results — not on the board.
+  if (!session) return { ok: false, message: 'Brak uprawnień — zaloguj się do panelu.' }
+  if ((name !== 'stageEmail' && name !== 'workshopStrip') || typeof value !== 'boolean') {
+    return { ok: false, message: 'Nie udało się zapisać.' }
+  }
+  try {
+    await session.payload.updateGlobal({
+      slug: 'mail-settings',
+      data: { [name]: value },
+      user: session.user,
+      overrideAccess: false,
+      depth: 0,
+    })
+  } catch (error) {
+    log.error({ name, ...errorFields(error) }, 'settings: order switch not saved')
+    return { ok: false, message: 'Nie udało się zapisać. Spróbuj ponownie.' }
+  }
+  revalidatePath('/admin/ustawienia')
+  // The strip is on the home page and in GET /api/warsztat.
+  if (name === 'workshopStrip') revalidatePath('/')
+  return { ok: true }
+}

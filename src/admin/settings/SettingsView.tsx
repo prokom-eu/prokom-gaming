@@ -21,6 +21,7 @@ import { toMailFormValues } from './mailForm'
 import { SettingsForm } from './SettingsForm'
 import { shopsOf } from '../../globals/PriceCheckSettings'
 import { monthStart } from '../../lib/price-check/usage'
+import { OrderSwitches } from './OrderSwitches'
 import { PriceCheckSettingsForm } from './PriceCheckSettingsForm'
 import { toPriceCheckValues, type DayKey } from './priceCheckForm'
 
@@ -29,8 +30,8 @@ const TITLE = 'Ustawienia'
 /**
  * /admin/ustawienia (panel spec §13, board Ustawienia). Admin only — `serwis` gets "403"
  * (spec §15). Sections: "Marża i narzuty" (`pricing-settings`, P1), "Zapytania i poczta"
- * (`mail-settings`, P3); the others come with their sessions (P4 notifications, P5 orders,
- * P7 price check, P8 statistics).
+ * (`mail-settings`, P3), "Sprawdzanie cen" (P7), "Zamówienia i klienci" (switches in
+ * `mail-settings`, P5), "Powiadomienia na telefon" (P4); statistics come in P8.
  */
 export async function SettingsView({ initPageResult }: AdminViewServerProps) {
   const { req } = initPageResult
@@ -195,6 +196,14 @@ export async function SettingsView({ initPageResult }: AdminViewServerProps) {
               alertMinMargin: priceCheck.alertMinMargin ?? true,
               alertUnavailable: priceCheck.alertUnavailable ?? true,
             })}
+          />
+        </Card>
+        <Card title="Zamówienia i klienci" className="pn-card--section">
+          <OrderSwitches
+            initial={{
+              stageEmail: mail.stageEmail ?? true,
+              workshopStrip: mail.workshopStrip ?? true,
+            }}
           />
         </Card>
         {/* No board for this section (spec §13): laid out like the others. */}

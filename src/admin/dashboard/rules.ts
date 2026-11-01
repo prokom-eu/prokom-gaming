@@ -205,8 +205,8 @@ function orderItems(input: TodoInput, now: Date): TodoItem[] {
         icon: 'wrench',
         title: `${who}: ${STAGE_TODO[o.stage]}`,
         note: `${checklist}termin wysyłki ${shortDate(o.dueDate)}`,
-        // TODO(P5): the workshop board `/zamowienia` — until then the order in the Payload list.
-        action: { label: 'Warsztat', path: `/collections/orders/${o.id}` },
+        // The workshop board with this order open (P5).
+        action: { label: 'Warsztat', path: `/zamowienia?z=${o.id}` },
       }
     })
 }

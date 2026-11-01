@@ -79,7 +79,7 @@ const dateShort = new Intl.DateTimeFormat('pl-PL', {
 })
 
 /** The Pulpit of the workshop role (P2 decision): the workshop only. */
-export async function loadWorkshop(payload: Payload): Promise<WorkshopData> {
+async function loadWorkshop(payload: Payload): Promise<WorkshopData> {
   const orders = await payload.find({
     collection: 'orders',
     where: { stage: { not_equals: 'delivered' } },

@@ -1,14 +1,28 @@
 # STAN — prokom-gaming
 
-Ostatnia aktualizacja: 01.11.2026, wieczór (P7 — Ceneo jako główne źródło cen, ADR-G011).
+Ostatnia aktualizacja: 01.11.2026, noc (P5 — klient i warsztat, PR do scalenia; następne G15 + Umami).
 
 ## W toku
-- **PR do scalenia:** `feat/p7-ceneo` — Ceneo jako główne źródło cen (ADR-G011). P6 i P7 (#50–#59) scalone.
-- **Zrobione (P7, 01.11):** pełne wyszukiwanie i linki włączane same (#57); przerwany przebieg kończy się po 3 min (#58); podsumowanie przechodzi przy skróconych nazwach (#59); **Ceneo** (ta gałąź): serwer pobiera publiczną stronę produktu Ceneo (bez Claude, co 2 s, uczciwy `User-Agent`), liczą się tylko zaufane sklepy z wysyłką do 3 dni; Claude szuka strony produktu na Ceneo (do 70 pozycji na przebieg), strona włącza się sama, gdy tytuł = model (`titleMatches`) i cena w `outlierPct`; brak wyniku pamiętany 14 dni; Claude nie czyta strony sklepu, którego dostępną ofertę dało Ceneo; „Dozwolone sklepy” → „Zaufane sklepy” (bez Ceneo i marketplace).
-- **Niedokończone:** `TODO(krystian):` regulamin Ceneo — potwierdzić z szefem (ADR-G011, Konsekwencje). Pierwszy przebieg z Ceneo na prawdziwym kluczu (Krystian): „Sprawdź ceny”, potem w raporcie liczba pozycji z ofertą (było 31/94) i koszt (szacunek 5–8 USD). Brak testu logiki faz `run.ts` (Ceneo niedostępne / API padło) — atrapa nie zwraca stron Ceneo. Prawdziwy telefon i Lighthouse (P6, P7).
-- **Następny krok:** scalić PR Ceneo, przebieg z kluczem, ocenić pokrycie; równolegle: układ panelu na szerokim ekranie (osobna gałąź); potem `/zadanie P5` (klient i warsztat).
+- **Gałąź:** `feat/p5-klient-warsztat` — PR do `develop` (jeden PR, decyzja Krystiana 01.11). STAN tej gałęzi zawiera też aktualizację z PR #64 (`docs/stan-p7-ceneo`) — po scaleniu P5 zamknąć #64 albo scalić go najpierw.
+- **Zrobione (P5):** `/admin/zamowienia` — tablica 7 etapów, 4 kafle, panel zamówienia z listą kontrolną, notatką warsztatu i „Przesuń do” (`stageHistory` z hooka G14, e-mail etapu z szablonu `stage` albo tekstu ze spec. §4); `/admin/klienci` (lista po e-mailu) i `/admin/klient?zapytanie|konto|zamowienie=<id>` (kafle, 5 zakładek, notatki, eksport JSON, usuwanie na żądanie); rola `serwis` startuje na tablicy (bez kwot, bez karty klienta); Ustawienia → „Zamówienia i klienci” (dwa przełączniki, migracja `p5_order_switches`); Pulpit „Warsztat” → `/admin/zamowienia?z=<id>`. Vitest 859, e2e `panel-orders` i `panel-clients` (1440 + 414), `panel-access`, `panel-dashboard`, `panel-shell`, `home-sections` zielone lokalnie.
+- **Niedokończone:** prawdziwy telefon (Android + iPhone) i Lighthouse panelu — razem z G15. Teksty spoza plansz oznaczone `TODO(krystian)` (niżej).
+- **Następny krok:** scalić PR P5 (po `/przeglad` i zielonym CI), potem `/zadanie G15` (+ Umami, ADR-G009) — opis w `docs/zadania/prokomgaming.md` i `docs/zadania/prokomgaming-panel.md` §1.
+
+## Uwagi na później (P5)
+- **Decyzje Krystiana 01.11:** jeden PR; usuwanie na żądanie: zapytania z wątkami (ścieżka G6 + ślad), wiadomości klienta w „Nieprzypisanych”, zgłoszenia i konto **usuwamy**; zamówienia i egzemplarze **anonimizujemy** (imię „Dane usunięte”, e-mail `usuniete-…@usuniete.invalid`, bez konta, zapytania, notatki i numeru przesyłki; numer, zestaw, cena, metryka zostają) — spec. §6. Wszystko w jednej transakcji.
+- **Odstępstwa od plansz i spec.:** `serwis` nie widzi kwot na tablicy (cena karty, kafel „Wartość w realizacji”) — jak na jego Pulpicie z P2 (spec. §15 „bez cen zakupu i marż”; ostrożniej); tablica tylko do przodu, pomyłkę poprawia się w formularzu zamówienia (link pod przyciskiem); „Wysłane” pokazuje zamówienia z ostatnich 14 dni (`SHIPPED_ON_BOARD_DAYS`, `TODO(krystian)`); e-mail etapu tylko przy wejściu w opłacone, montaż, testy, wysłane (podpowiedź z planszy Ustawienia); karta klienta pokazuje pełny e-mail (spec. §4: pełny w karcie — plansza go maskuje); bez „Zgoda marketingowa (newsletter)” i „zaproszenie wysłane” (nie ma tych funkcji); wejście na kartę także `?zamowienie=<id>`; notatka warsztatu edytowalna w panelu zamówienia (nie ma jej na planszy, a spec. §15 daje serwisowi notatki); start `serwis` przez przekierowanie w przeglądarce z `/admin` (`GoTo` — `redirect()` w widoku Payload daje pustą stronę); „Metryka” bez egzemplarza otwiera tworzenie egzemplarza w Payload.
+- **Przełącznik „Pokazuj zamówienia na tablicy warsztatu”** wyłącza taśmę na stronie głównej i `GET /api/warsztat` (`loadWorkshop` zwraca pustą). „Zaproszenie do konta klienta po wpłacie” z planszy nie jest pokazane — nie ma takiej funkcji (Pomysły na później).
+- **Ślad usunięcia** powstaje tylko dla zapytań (`inquiry-deletions.inquiryId`) — klient bez zapytań (samo zamówienie/konto) zostawia tylko log z liczbami, bez danych osobowych. **Bony** (`vouchers.recipient`, `dedication`) zostają przy usuwaniu — to dane obdarowanego i ważny bon; `TODO(krystian)`: decyzja przy włączaniu bonów.
+- **Push `workshop`** (spec. §14, opcjonalny) — pominięty.
+- **Po przeglądzie P5 (poprawione):** „Nieprzypisane” klienta tylko po dokładnym adresie (`from` = e-mail, było `contains` — eksport i usuwanie brałyby cudze maile, np. `kjan@` dla `jan@`); zanonimizowane zamówienia i egzemplarze (`@usuniete.invalid`) nie są klientami na liście ani w karcie i nie dostają maila etapu.
+- **Do rozważenia (przegląd P5, świadomie bez zmian):** sprawdzenie etapu i zapis przy „Przesuń do” nie są atomowe — dwa kliknięcia w tej samej chwili (dwa urządzenia) mogą przesunąć o dwa etapy; przy 1–2 osobach w warsztacie akceptowalne. Kafel „Wartość w realizacji” liczony na serwerze także dla `serwis` (nie trafia do HTML).
+- **`eslint.config.mjs`:** dopisany ignor `.claude/**` (stare worktree Claude Code); atrybut „tylko do odczytu” zdjęty na czas zmiany (zgoda Krystiana) i przywrócony.
+- **Teksty spoza plansz (`TODO(krystian)`):** temat maila etapu („[Z-…] Twój komputer: <etap>”), komunikaty po przesunięciu i zapisie, pusta kolumna (poza „Oferta przyjęta”), „Popraw w formularzu zamówienia”, lead i stan pusty listy klientów, „woli kontakt e-mailowy”, zdarzenia osi czasu poza planszą, potwierdzenie usunięcia i imię po anonimizacji, „Nie ma takiego klienta”, przycisk „Zapisz notatkę”.
+- **Lokalnie:** baza dev ma ~45 zamówień „Bies” w „Oferta przyjęta” z e2e P3 („Zamień w zamówienie”) — tablica wygląda przez to na zapchaną; testy P5 sprzątają po sobie.
+- **Migracja `p5_order_switches` — `down` usuwa dwa przełączniki** (wracają domyślne zachowania: mail etapu i taśma włączone).
 
 ## Uwagi na później (P7)
+- **Ceneo w praktyce (01.11):** włączony link Ceneo jest zaufany — strona czytana bez sprawdzania tytułu, więc złą stronę trzeba wyłączyć („Sprawdzany”), zanim pójdzie przebieg (przykład: PANO 130R → strona „MSI PC czarny”). Linki odrzucone przez `titleMatches` zostają wyłączone; kolejny przebieg ich nie przelicza. „Przyjmij N propozycji” przyjmuje wszystko naraz — błędną pozycję poprawia się potem importem kosztów (`kod;koszt` albo pełny model). „N wyszukiwań” w raporcie = zapytania web search, nie pozycje (limit 100 pozycji).
 - **Decyzje i odstępstwa:** P7 w jednym PR (zamiast P7-1 i P7-2) — praca nocna, łańcuch zależnych PR-ów przy scalaniu squash dawałby konflikty. Haiku czyta przez `web_fetch_20250910` (bez dynamicznego filtrowania — jedna strona, taniej); `output_config.effort: 'low'` we wszystkich wywołaniach. Bez serwerowych `fallbacks` przy Sonnet (odmowa = błąd pozycji, nic nie publikuje się samo). Atrapa (`FakePriceReader`) czyta cenę z adresu (`e2e-cena=N`, `e2e-brak`).
 - **Koszty (ADR-G007 §4, stan 01.11.2026):** Haiku 5.5 0,10/0,50 USD za 1 mln (powyżej 100K promptu 0,50/2,50), Sonnet 5.5 2/10, web search 0,01 USD za wyszukiwanie, web fetch bez dopłat (`lib/price-check/usage.ts` — zmieniać przy zmianie cennika). Szacunek przed wywołaniem zawyża (bezpiecznie dla limitu). Pierwszy przebieg bez linków: do 20 wyszukiwań (~0,6 USD).
 - **Do decyzji (`TODO(krystian)`):** limit wydatków [SZEF] (domyślnie 20 USD); treści alarmów, podsumowania atrapy, stanów pustych, etykiet sekcji Ustawień; akceptacja zaproponowanych linków dziś w liście Payload `price-sources` (filtr „Propozycja Claude”) — osobny przycisk w raporcie po v1; koszt części z kilku poziomów, gdy jeden wpis jest „z faktury” → cała część „faktura” (bez propozycji).
@@ -107,7 +121,7 @@ Ostatnia aktualizacja: 01.11.2026, wieczór (P7 — Ceneo jako główne źródł
 - **Usunięcie zestawu z egzemplarzami i egzemplarza ze zgłoszeniami** blokuje hak z komunikatem (`collections/workshopGuards.ts`); w bazie kolumny `NOT NULL` + `set null` zostają.
 - **Ciasteczko logowania wspólne dla panelu i konta** (`payload-token`): zalogowanie się jako klient w tej samej przeglądarce wylogowuje z panelu i odwrotnie. Do zespołu: panel w innej przeglądarce/profilu.
 - **Payload 3.91:** pole tablicy bez dostępu wraca jako `[]` (jak `components` w G3) — dotyczy `orders.checklist` u klienta; `/api/access` pomija wartości `false`.
-- **P5:** widoki tablicy warsztatu na polach z G14; e-mail etapu do klienta; agregacja klienta po e-mailu (`lib/email.ts`).
+- **P5:** zrobione (01.11, `feat/p5-klient-warsztat`).
 - **G15:** Lighthouse `/metryka/*` i `/konto`; `noindex` już jest; sitemap bez metryk i konta.
 - **G16:** po wdrożeniu sprawdzić maile weryfikacji i resetu z obrazu `standalone`; `SITE_URL` w linkach.
 
@@ -204,6 +218,7 @@ Ostatnia aktualizacja: 01.11.2026, wieczór (P7 — Ceneo jako główne źródł
 - **Pozycja usunięta z oferty zostawia otwarty wpis `price-history`** (jest w partii N, nie ma jej w N+1, `writeBatch` jej nie zamyka). Dziś nieszkodliwe — części z zestawu nie da się usunąć — ale przed liczeniem „najniższej ceny z 30 dni” zamykać wpisy pozycji, których nie ma w nowej partii.
 
 ## Zrobione
+- 01.11.2026 — **P7 (sprawdzanie cen przez Claude + Ceneo)** scalone do `develop` (#56–#60, #62, #63; ADR-G007, ADR-G011). Przebieg na prawdziwym kluczu: 73/94 pozycji z ceną. Panel wyśrodkowany na szerokim ekranie (#61). Prawdziwy telefon i Lighthouse nadal do zrobienia.
 - 01.11.2026 — **P6-2 (gotowe zestawy, edytor, status zestawu)** scalone do `develop` (#51). Prawdziwy telefon i Lighthouse nadal do zrobienia.
 - 01.11.2026 — **P6-1 (źródło kosztu, Centrum cen, Do zatwierdzenia)** scalone do `develop` (#50). Prawdziwy telefon i Lighthouse nadal do zrobienia.
 - 01.11.2026 — **P2 (Pulpit „Dziś”)** scalona do `develop` (#48). Prawdziwy telefon i Lighthouse nadal do zrobienia.
@@ -239,7 +254,7 @@ Ostatnia aktualizacja: 01.11.2026, wieczór (P7 — Ceneo jako główne źródł
 - 25.10.2026 — pakiet startowy (pierwszy commit, podpisany): CLAUDE.md, specyfikacja `docs/strony/prokomgaming.md`, ADR-G001…G005, plan G0–G16, wzorzec wyglądu v36 (`docs/design/prokomgaming/`), seed (`seed/prokomgaming/`), oczekiwane wyniki testów cen (`tests/fixtures/pricing-expected.json`).
 
 ## Następne kroki
-G1 → G2 → G3 → G4 → G5 → G6 → G7 → G8 → G9 → (kontrola 8.11) → G10 → G11 → G12 → (kontrola 13.11) → G13 → ~~G14~~ (zrobione 31.10) → ~~P1~~ → ~~P3~~ → ~~P4~~ (31.10; push w PR 2) → ~~P2~~ (01.11, #48) → **P6 (~~P6-1~~ #50, ~~P6-2~~ #51, P6-3 #52) → P7 (PR, jeden) → P5** → G15 (+ Umami) → **P8** → G16 (produkcja 20.11 — strona **i cały panel** jednym wdrożeniem, decyzja Krystiana 01.11). Kontrole: 9.11 (P6 scalone), 14.11 (P5, P7 scalone). Panel: `docs/zadania/prokomgaming-panel.md` §1.
+G1 → G2 → G3 → G4 → G5 → G6 → G7 → G8 → G9 → (kontrola 8.11) → G10 → G11 → G12 → (kontrola 13.11) → G13 → ~~G14~~ (zrobione 31.10) → ~~P1~~ → ~~P3~~ → ~~P4~~ (31.10; push w PR 2) → ~~P2~~ (01.11, #48) → **P6 (~~P6-1~~ #50, ~~P6-2~~ #51, P6-3 #52) → ~~P7~~ (01.11) → ~~P5~~ (01.11, PR)** → G15 (+ Umami) → **P8** → G16 (produkcja 20.11 — strona **i cały panel** jednym wdrożeniem, decyzja Krystiana 01.11). Kontrole: 9.11 (P6 scalone), 14.11 (P5, P7 scalone). Panel: `docs/zadania/prokomgaming-panel.md` §1.
 
 ## Decyzje (skrót)
 - **Panel w całości na produkcję razem ze stroną (Krystian 01.11.2026):** P5–P8 przed G16, jedno wdrożenie; zastępuje zasadę z 30.10 „sesje P po starcie”. Przy poślizgu (kontrole 9.11, 14.11) przesuwamy produkcję całości — nowa data z szefem, panelu nie tniemy.
@@ -287,12 +302,19 @@ G1 → G2 → G3 → G4 → G5 → G6 → G7 → G8 → G9 → (kontrola 8.11) �
 - [czat] 6 poradników w szkicu (na start wystarczy 1 gotowy — plan cięcia §4).
 
 ## Otwarte pytania — panel (30.10)
+- [SZEF] czy regulamin Ceneo pozwala odczytywać publiczne strony produktów (ADR-G011).
+- [PRO-KOM] EAN-y części i opcji (z faktur albo od dystrybutora) — dziś puste wszędzie.
 - [SZEF, przed P4 — odbiór na prawdziwej skrzynce] skrzynka Gaming (`gaming@pro-kom.eu`?) z dostępem IMAP i kontem SMTP dla panelu (od P3 wszystkie maile wychodzą z niej).
-- [Krystian, po P7] klucz `ANTHROPIC_API_KEY` tylko do `.env` (nigdy do repo ani czatu) i jeden ręczny przebieg na 5 pozycjach. [SZEF] limit wydatków (domyślnie 20 USD/mies., ADR-G007 §4).
+- ~~[Krystian, po P7] klucz i ręczny przebieg~~ — zrobione 01.11 (przebieg #23). [SZEF] limit wydatków (domyślnie 20 USD/mies., ADR-G007 §4).
 - [prawnik] polityka prywatności: statystyki bez ciasteczek (Umami), odpowiedzi z panelu.
 - [Krystian, przed G16] SPF/DKIM/DMARC domeny nadawcy w Seohost.
 
 ## Pomysły na później
+- Zaproszenie do konta klienta po wpłacie (plansza Ustawienia „Zamówienia i klienci”): e-mail z linkiem do rejestracji, gdy zamówienie wchodzi w „Opłacone” i klient nie ma konta.
+- Push `workshop` dla roli `serwis` przy zmianie etapu (spec. panelu §14, opcjonalny).
+- Sprawdzanie cen po EAN, gdy pole wypełnione: szukanie na Ceneo i w sklepach po kodzie, EAN w tytule/stronie = pewne dopasowanie.
+- Przyjmowanie propozycji z raportu z odznaczaniem pojedynczych pozycji (dziś wszystko naraz).
+- Ponowne sprawdzenie wyłączonych linków Ceneo, gdy `titleMatches` się poprawi (dziś zostają wyłączone).
 - 7 rodzajów podstawy pod komputerem w hero (kamień, woda, grobowiec, pień, lustro, lód, bazalt — plansza Main) jako obrazy z czatu (G7: jedna wspólna).
 - Błyskawica nad dębem w „Napisz, w co grasz” (animacja z planszy Main, `.fbolt`) — G8 ma statyczny dąb.
 - Rezerwacje-psoty na „Gotowe od ręki”: dziś limit tylko na IP; przy włączaniu strony rozważyć jedną aktywną rezerwację na e-mail albo krótszy czas.
