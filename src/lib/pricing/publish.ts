@@ -242,6 +242,21 @@ function levelProblems(
   })
 }
 
+/**
+ * Prices on the site after publishing the selected queue items (new items always go with them):
+ * the published prices with those items at their candidate price. `count` = items published.
+ */
+export function selectionPrices(
+  queue: QueueState,
+  selectedKeys: readonly string[],
+): { prices: PriceList; count: number } {
+  const selected = new Set(selectedKeys)
+  const toPublish = queue.items.filter((i) => selected.has(i.key) || i.reasons.includes('new'))
+  const prices = clonePrices(queue.effectivePublished)
+  for (const item of toPublish) withPrice(prices, item, item.candidate)
+  return { prices, count: toPublish.length }
+}
+
 export type PublicationPlan =
   | {
       ok: true
@@ -269,13 +284,8 @@ export function planPublication(
   if (stale.length > 0)
     return { ok: false, problems: [{ kind: 'stale_queue', keys: stale }], review: null }
 
-  const selected = new Set(selectedKeys)
-  const toPublish = queue.items.filter((i) => selected.has(i.key) || i.reasons.includes('new'))
-  if (toPublish.length === 0)
-    return { ok: false, problems: [{ kind: 'nothing_selected' }], review: null }
-
-  const prices = clonePrices(queue.effectivePublished)
-  for (const item of toPublish) withPrice(prices, item, item.candidate)
+  const { prices, count } = selectionPrices(queue, selectedKeys)
+  if (count === 0) return { ok: false, problems: [{ kind: 'nothing_selected' }], review: null }
 
   const review = reviewAll(costContext(catalog, prices))
   const problems: PublishProblem[] = levelProblems(review, catalog, queue.candidates)
