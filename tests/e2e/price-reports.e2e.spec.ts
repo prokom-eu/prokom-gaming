@@ -129,8 +129,10 @@ test.describe('a price check on the fake Claude', () => {
 
     await page.getByRole('button', { name: 'Przyjmij 1 propozycję' }).click()
     await expect(page.getByText('zapisano koszty: 1 opcji, 0 poziomów')).toBeVisible()
+    // The page's own request (signed in as admin): the API context of `beforeAll` sat idle
+    // during the run and its kept-alive socket may be closed by now (ECONNRESET in CI).
     const saved = (await (
-      await api.get(`/api/options/${ram.id}?depth=0`, { headers })
+      await page.request.get(`/api/options/${ram.id}?depth=0`)
     ).json()) as Option
     expect(saved.cost).toBe(Math.round(ram.cost * 1.08))
 
