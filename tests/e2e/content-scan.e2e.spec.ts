@@ -3,11 +3,16 @@ import { expect, test, type Page } from '@playwright/test'
 // Spec. §27.7–§27.8 on every page of the sitemap (+ the private pages, which are not in it):
 // no board placeholders like „[telefon]” in the visible text, no instalment offer, no Santander,
 // and unique titles and descriptions (spec. §23). One viewport is enough: the text is the same.
+// „Zero brackets in the HTML” (§27.7) is checked on the text a reader gets, closed `<details>`
+// included: the raw HTML is full of `[` from the RSC payload and JSON-LD arrays. A placeholder is
+// a short bracketed phrase (≤ 40 characters), like the boards' „[telefon gaming]”.
 const PRIVATE = ['/zapytanie', '/metryka', '/konto/logowanie', '/konto/rejestracja']
 
 // The only allowed „raty”: the FAQ question answered „Na razie nie…” (spec. §27.7).
 const ALLOWED_RATY = /Czy (mogę|da się) kupić na raty\?\s*Na razie nie[^.]*\./g
-const INSTALMENTS = /\b(rat|rata|raty|ratach|ratami|ratalnie|ratalny|ratalna|ratalnej|ratalnego)\b/i
+// Word edges by hand, not `\b` (ASCII only in JS): a Polish letter next to it still ends the word.
+const INSTALMENTS =
+  /(?<![\p{L}\p{N}])(rat|rata|raty|ratach|ratami|ratalnie|ratalny|ratalna|ratalnej|ratalnego)(?![\p{L}\p{N}])/iu
 
 /** Text of the page as a reader gets it, closed `<details>` included, no scripts or styles. */
 const pageText = (page: Page) =>

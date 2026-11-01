@@ -8,7 +8,7 @@ import { MobileTabBar } from '@/components/MobileTabBar'
 import { ShellProvider } from '@/components/shell/ShellProvider'
 import { SiteFooter } from '@/components/SiteFooter'
 import { SiteHeader } from '@/components/SiteHeader'
-import { analyticsScript } from '@/lib/analytics'
+import { analyticsScript, UMAMI_BEFORE_SEND, umamiBeforeSend } from '@/lib/analytics'
 import { getEnv } from '@/lib/env'
 import { features } from '@/lib/features'
 import { DESCRIPTIONS, isIndexable, OPEN_GRAPH, SITE_NAME } from '@/lib/seo'
@@ -64,8 +64,26 @@ export default async function SiteLayout({ children }: { children: ReactNode }) 
           <CookieBanner enabled={cookieBannerEnabled} />
         </ShellProvider>
         {/* Umami without cookies (ADR-G009): deferred, never blocks the page; `track()` works
-            without it. Only on production and staging. */}
-        {stats && <script defer src={stats.src} data-website-id={stats.websiteId} />}
+            without it. Only on production and staging. No query, hash, account page or
+            certificate code ever reaches it (`umamiBeforeSend`, review G15); the hook is
+            defined before the tracker reads it. */}
+        {stats && (
+          <>
+            <script
+              dangerouslySetInnerHTML={{
+                __html: `window.${UMAMI_BEFORE_SEND}=${umamiBeforeSend.toString()};`,
+              }}
+            />
+            <script
+              defer
+              src={stats.src}
+              data-website-id={stats.websiteId}
+              data-exclude-search="true"
+              data-exclude-hash="true"
+              data-before-send={UMAMI_BEFORE_SEND}
+            />
+          </>
+        )}
       </body>
     </html>
   )

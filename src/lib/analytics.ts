@@ -32,6 +32,39 @@ export function track<E extends AnalyticsEvent>(
   }
 }
 
+/**
+ * Umami's `data-before-send` hook (tracker 3.4.1: called with `(type, payload)` before every
+ * send; a falsy return cancels it). No secret from an address ever leaves the browser:
+ * - nothing from the account pages (`/konto…`: login, reset and verification tokens);
+ * - no query or hash in `url` or `referrer` (`?token=`, `?nr=PKG-…`; `data-exclude-search`
+ *   covers only `url`, and a same-site referrer is sent as a path with its query);
+ * - the certificate code in `/metryka/<kod>` is a key to that page: sent as `/metryka/*`.
+ * `url` comes as a full address (`https://prokomgaming.pl/…`), a same-site `referrer` as a path:
+ * both forms are handled. Self-contained on purpose: the layout inlines it with `toString()`
+ * (no imports, no closure).
+ */
+export function umamiBeforeSend(
+  _type: string,
+  payload: { url?: string; referrer?: string } & Record<string, unknown>,
+): typeof payload | false {
+  // Origin (optional), then the path.
+  const parts = /^((?:[a-z][a-z0-9+.-]*:)?\/\/[^/?#]*)?([^?#]*)/i
+  const clean = (address: string | undefined) => {
+    if (typeof address !== 'string') return address
+    const match = parts.exec(address)
+    const origin = match?.[1] ?? ''
+    const path = (match?.[2] ?? '').replace(/^\/metryka\/[^/]+/, '/metryka/*')
+    return origin + path
+  }
+  const url = clean(payload.url)
+  const path = typeof url === 'string' ? (parts.exec(url)?.[2] ?? '') : ''
+  if (/^\/konto(\/|$)/.test(path)) return false
+  return { ...payload, url, referrer: clean(payload.referrer) }
+}
+
+/** Name of the hook on `window`, read by the tracker from `data-before-send`. */
+export const UMAMI_BEFORE_SEND = 'pkgUmamiBeforeSend'
+
 export type AnalyticsScript = { src: string; websiteId: string }
 
 /**

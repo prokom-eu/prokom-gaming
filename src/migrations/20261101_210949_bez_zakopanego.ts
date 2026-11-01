@@ -25,6 +25,8 @@ Rabka-Zdrój, ul. Orkana 16B · +48 883 200 151'
 Rabka-Zdrój, ul. Orkana 16B · +48 18 267 65 11';`)
 }
 
+// `down` brings back the enum values and the old default only: rows moved by `up` (pickup cleared,
+// stock moved to Rabka) stay as they are — the old values cannot be told apart any more.
 export async function down({ db }: MigrateDownArgs): Promise<void> {
   await db.execute(sql`
   ALTER TYPE "public"."enum_inquiries_pickup" ADD VALUE 'zakopane';

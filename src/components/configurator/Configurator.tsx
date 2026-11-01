@@ -63,6 +63,7 @@ export function Configurator({ data, initial, initialChanges, fromAddress, siteU
   const headingRef = useRef<HTMLHeadingElement>(null)
   const stepChanged = useRef(false)
   const restoring = useRef(false)
+  const doneTracked = useRef(false)
   const ctx = useMemo(() => ({ offer: data, builds: data.builds, prices: data.prices }), [data])
 
   // Statistics (ADR-G009): one start per visit of the page.
@@ -107,7 +108,11 @@ export function Configurator({ data, initial, initialChanges, fromAddress, siteU
     setNotice(null)
     setState((s) => ({ ...s, step }))
     track('configurator_step', { step })
-    if (step === 'podsumowanie') track('configurator_done')
+    // Once per visit: going back and returning to the summary is not a second finished run.
+    if (step === 'podsumowanie' && !doneTracked.current) {
+      doneTracked.current = true
+      track('configurator_done')
+    }
   }
   const stepIndex = STEPS.findIndex((s) => s.key === state.step)
   const next = STEPS[stepIndex + 1]
