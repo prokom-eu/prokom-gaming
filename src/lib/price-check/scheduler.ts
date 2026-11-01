@@ -38,22 +38,36 @@ export function isDue(now: Date, days: readonly string[], hour: number): boolean
 export const STALE_MINUTES = 45
 
 /**
+ * A running check is saved at least every `HEARTBEAT_SECONDS` (run.ts), which moves its
+ * `updatedAt`. No save for this long = the process that ran it is gone (Ctrl+C, restart, deploy),
+ * so the report says so within minutes instead of after `STALE_MINUTES`. Also covers the wait
+ * in the queue: the job cron picks the run up within a minute.
+ */
+export const SILENT_MINUTES = 3
+
+/** Was this „w toku” run cut off? Pure, tested. */
+export function isCutOff(check: { startedAt: string; updatedAt: string }, now: Date): boolean {
+  const ago = (iso: string) => now.getTime() - Date.parse(iso)
+  return (
+    ago(check.startedAt) > STALE_MINUTES * 60_000 || ago(check.updatedAt) > SILENT_MINUTES * 60_000
+  )
+}
+
+/**
  * Marks runs stuck in `running` (the server restarted mid-run) as `failed`, so they never block
  * „Sprawdź ceny”, the schedule or a report page forever (review P7). Returns how many.
  */
 export async function expireStaleChecks(payload: Payload, now = new Date()): Promise<number> {
   const stale = await payload.find({
     collection: 'price-checks',
-    where: {
-      status: { equals: 'running' },
-      startedAt: { less_than: new Date(now.getTime() - STALE_MINUTES * 60_000).toISOString() },
-    },
-    select: { status: true },
+    where: { status: { equals: 'running' } },
+    select: { startedAt: true, updatedAt: true },
     depth: 0,
     pagination: false,
     overrideAccess: true,
   })
-  for (const check of stale.docs) {
+  const cutOff = stale.docs.filter((check) => isCutOff(check, now))
+  for (const check of cutOff) {
     await payload.update({
       collection: 'price-checks',
       id: check.id,
@@ -67,8 +81,8 @@ export async function expireStaleChecks(payload: Payload, now = new Date()): Pro
       overrideAccess: true,
     })
   }
-  if (stale.docs.length > 0) log.warn({ count: stale.docs.length }, 'stale price checks expired')
-  return stale.docs.length
+  if (cutOff.length > 0) log.warn({ count: cutOff.length }, 'stale price checks expired')
+  return cutOff.length
 }
 
 /**
