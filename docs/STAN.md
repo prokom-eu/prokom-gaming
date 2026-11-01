@@ -3,7 +3,7 @@
 Ostatnia aktualizacja: 01.11.2026, noc (P5 — klient i warsztat, PR do scalenia; następne G15 + Umami).
 
 ## W toku
-- **Gałąź:** `feat/p5-klient-warsztat` — PR do `develop` (jeden PR, decyzja Krystiana 01.11). STAN tej gałęzi zawiera też aktualizację z PR #64 (`docs/stan-p7-ceneo`) — po scaleniu P5 zamknąć #64 albo scalić go najpierw.
+- **Gałąź:** `feat/p5-klient-warsztat` — PR do `develop` (jeden PR, decyzja Krystiana 01.11). Aktualizacja STAN po P7 (#64) już w `develop`.
 - **Zrobione (P5):** `/admin/zamowienia` — tablica 7 etapów, 4 kafle, panel zamówienia z listą kontrolną, notatką warsztatu i „Przesuń do” (`stageHistory` z hooka G14, e-mail etapu z szablonu `stage` albo tekstu ze spec. §4); `/admin/klienci` (lista po e-mailu) i `/admin/klient?zapytanie|konto|zamowienie=<id>` (kafle, 5 zakładek, notatki, eksport JSON, usuwanie na żądanie); rola `serwis` startuje na tablicy (bez kwot, bez karty klienta); Ustawienia → „Zamówienia i klienci” (dwa przełączniki, migracja `p5_order_switches`); Pulpit „Warsztat” → `/admin/zamowienia?z=<id>`. Vitest 859, e2e `panel-orders` i `panel-clients` (1440 + 414), `panel-access`, `panel-dashboard`, `panel-shell`, `home-sections` zielone lokalnie.
 - **Niedokończone:** prawdziwy telefon (Android + iPhone) i Lighthouse panelu — razem z G15. Teksty spoza plansz oznaczone `TODO(krystian)` (niżej).
 - **Następny krok:** scalić PR P5 (po `/przeglad` i zielonym CI), potem `/zadanie G15` (+ Umami, ADR-G009) — opis w `docs/zadania/prokomgaming.md` i `docs/zadania/prokomgaming-panel.md` §1.
