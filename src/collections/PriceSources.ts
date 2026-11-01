@@ -2,22 +2,27 @@ import type { CollectionBeforeChangeHook, CollectionConfig, PayloadRequest } fro
 
 import { adminOnly } from '../access/panel'
 import { allowedShops } from '../lib/price-check/shops'
-import { shopOf } from '../lib/pricing/sources'
+import { ceneoProductId, ceneoUrl, sourceShop } from '../lib/pricing/sources'
 import { GROUP_OFFER } from './shared'
 
+// TODO(krystian): wording (no board).
 const notAShop = (shops: string[]) =>
-  `Adres musi być stroną oferty w jednym ze sklepów: ${shops.join(', ')}.`
+  `Adres musi być stroną produktu na Ceneo (ceneo.pl/123456) albo stroną oferty w jednym ze sklepów: ${shops.join(', ')}.`
 
 // The shop is always derived from the address, never typed.
 const setShop: CollectionBeforeChangeHook = async ({ data, originalDoc, req }) => {
   const url = data.url ?? (originalDoc as { url?: string } | undefined)?.url
   const shops = await allowedShops(req.payload)
-  data.shop = typeof url === 'string' ? (shopOf(url.trim(), shops) ?? '') : ''
+  data.shop = typeof url === 'string' ? (sourceShop(url.trim(), shops) ?? '') : ''
+  // One form per Ceneo page, so the same page is never linked (and read) twice.
+  const id = typeof url === 'string' ? ceneoProductId(url.trim()) : null
+  if (id !== null) data.url = ceneoUrl(id)
   return data
 }
 
 /**
- * Offer links used as cost sources (ADR-G007 §5): 2–4 per item, added in the panel or accepted
+ * Offer links used as cost sources (ADR-G007 §5): a Ceneo product page (the trusted shops'
+ * offers in one page, ADR-G011) and/or offer pages of the shops, added in the panel or accepted
  * from Claude's proposals (P7). `itemCode` is an option code or a part's `partKey`, so one link
  * serves the same part in every power level. Costs live in the items, not here.
  */
@@ -79,7 +84,7 @@ export const PriceSources: CollectionConfig = {
       validate: async (value: string | null | undefined, { req }: { req: PayloadRequest }) => {
         const shops = await allowedShops(req.payload)
         return (
-          (typeof value === 'string' && shopOf(value.trim(), shops) !== null) || notAShop(shops)
+          (typeof value === 'string' && sourceShop(value.trim(), shops) !== null) || notAShop(shops)
         )
       },
     },

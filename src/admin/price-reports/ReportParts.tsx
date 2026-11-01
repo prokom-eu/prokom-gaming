@@ -211,7 +211,7 @@ export function ItemsTable({ items }: { items: ItemRow[] }) {
             </summary>
             <ul>
               {i.offers.map((o) => (
-                <li key={o.url}>
+                <li key={`${o.url}|${o.shop}`}>
                   <a
                     href={o.url}
                     target="_blank"
@@ -219,6 +219,8 @@ export function ItemsTable({ items }: { items: ItemRow[] }) {
                     className="pn-link"
                   >
                     {o.shop || 'sklep'}
+                    {/* TODO(krystian): wording (no board). */}
+                    {o.via === 'ceneo' ? ' przez Ceneo' : ''}
                   </a>{' '}
                   {o.price !== null ? zl(o.price) : 'brak ceny'}
                   {!o.available ? ' · niedostępna' : ''}
