@@ -1,7 +1,13 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { createLocalReq, type Payload } from 'payload'
+import {
+  commitTransaction,
+  createLocalReq,
+  initTransaction,
+  killTransaction,
+  type Payload,
+} from 'payload'
 import { z } from 'zod'
 
 import { errorFields, log } from '../../lib/logger'
@@ -46,6 +52,27 @@ export async function setOptionActive(raw: unknown): Promise<ActionResult> {
   if (!parsed.success) return { ok: false, messages: ['Nieprawidłowe dane.'] }
   const { payload, user } = session
   try {
+    if (parsed.data.active) {
+      // A switched-on option without a published price is not in the configurator anyway — say
+      // so instead of a switch that lies (review P6-3).
+      const [option, batch] = await Promise.all([
+        payload.findByID({
+          collection: 'options',
+          id: parsed.data.id,
+          select: { code: true },
+          depth: 0,
+          overrideAccess: true,
+        }),
+        loadBatch(payload),
+      ])
+      if (!batch || !Object.hasOwn(batch.snapshot.option, option.code)) {
+        // TODO(krystian): message not on the board.
+        return {
+          ok: false,
+          messages: ['Najpierw zatwierdź cenę tej opcji w „Do zatwierdzenia” — potem ją włączysz.'],
+        }
+      }
+    }
     await payload.update({
       collection: 'options',
       id: parsed.data.id,
@@ -85,20 +112,28 @@ export async function deleteOption(raw: unknown): Promise<ActionResult> {
       depth: 0,
       overrideAccess: true,
     })
-    await payload.delete({
-      collection: 'options',
-      id: parsed.data.id,
-      overrideAccess: false,
-      depth: 0,
-      req,
-    })
-    // Its offer links would point at nothing (price-sources keep codes, not relations).
-    await payload.delete({
-      collection: 'price-sources',
-      where: { itemType: { equals: 'option' }, itemCode: { equals: option.code } },
-      overrideAccess: false,
-      req,
-    })
+    // One transaction: the option and its offer links go together, or neither.
+    await initTransaction(req)
+    try {
+      await payload.delete({
+        collection: 'options',
+        id: parsed.data.id,
+        overrideAccess: false,
+        depth: 0,
+        req,
+      })
+      // Its offer links would point at nothing (price-sources keep codes, not relations).
+      await payload.delete({
+        collection: 'price-sources',
+        where: { itemType: { equals: 'option' }, itemCode: { equals: option.code } },
+        overrideAccess: false,
+        req,
+      })
+      await commitTransaction(req)
+    } catch (error) {
+      await killTransaction(req)
+      throw error
+    }
     log.info({ id: parsed.data.id, userId: user.id }, 'option deleted')
     revalidatePath('/', 'layout')
     return { ok: true }
@@ -113,7 +148,7 @@ export async function deleteOption(raw: unknown): Promise<ActionResult> {
 // Costs typed like in a shop: „410”, „199,99”, „1 299”.
 const money = z.preprocess(
   (v) => (typeof v === 'string' ? Number(v.replace(/\s/g, '').replace(',', '.')) : v),
-  z.number().finite().nonnegative().max(100_000),
+  z.number().finite().positive().max(100_000),
 )
 const mm = z.coerce.number().int().min(1).max(2000)
 const klass = z.coerce.number().int().min(1).max(3)
@@ -186,6 +221,11 @@ function parseOption(
     if (data.kind === 'aio360' && !data.radiatorThicknessMm) {
       return { ok: false, messages: ['Podaj grubość chłodnicy AIO (mm).'] }
     }
+  }
+  // A hidden field of the other cooler kind never reaches the database.
+  if (data.type === 'cooler') {
+    if (data.kind === 'air') delete data.radiatorThicknessMm
+    else delete data.heightMm
   }
   return { ok: true, data }
 }
@@ -283,6 +323,7 @@ export async function addOption(form: FormData): Promise<AddResult> {
     .split(/\s+/)
     .map((l) => l.trim())
     .filter(Boolean)
+    .filter((url, i, all) => all.indexOf(url) === i)
   if (links.length > 4) return { ok: false, messages: ['Najwyżej 4 linki do ofert.'] }
   const bad = links.find((l) => !shopOf(l))
   if (bad) {
@@ -306,41 +347,50 @@ export async function addOption(form: FormData): Promise<AddResult> {
   try {
     const req = await asUser(payload, user)
     const code = await freeCode(payload, data.publicLabel)
-    const image = photo
-      ? await payload.create({
-          collection: 'media',
-          data: { alt: data.publicLabel },
-          file: {
-            data: Buffer.from(await photo.arrayBuffer()),
-            mimetype: photo.type,
-            name: photo.name || `${code.toLowerCase()}.webp`,
-            size: photo.size,
-          },
-          overrideAccess: false,
-          req,
-        })
-      : null
-    await payload.create({
-      collection: 'options',
-      data: {
-        ...data,
-        code,
-        active: false,
-        costSource: 'market',
-        image: image?.id ?? null,
-      },
-      overrideAccess: false,
-      depth: 0,
-      req,
-    })
-    for (const url of links) {
+    // One transaction: photo, option and links are saved together, or nothing (a file written
+    // to disk stays — STAN). A retry after an error never leaves a half-made option behind.
+    await initTransaction(req)
+    try {
+      const image = photo
+        ? await payload.create({
+            collection: 'media',
+            data: { alt: data.publicLabel },
+            file: {
+              data: Buffer.from(await photo.arrayBuffer()),
+              mimetype: photo.type,
+              name: photo.name || `${code.toLowerCase()}.${photo.type.split('/')[1] ?? 'webp'}`,
+              size: photo.size,
+            },
+            overrideAccess: false,
+            req,
+          })
+        : null
       await payload.create({
-        collection: 'price-sources',
-        data: { itemType: 'option', itemCode: code, url, active: true, proposedByClaude: false },
+        collection: 'options',
+        data: {
+          ...data,
+          code,
+          active: false,
+          costSource: 'market',
+          image: image?.id ?? null,
+        },
         overrideAccess: false,
         depth: 0,
         req,
       })
+      for (const url of links) {
+        await payload.create({
+          collection: 'price-sources',
+          data: { itemType: 'option', itemCode: code, url, active: true, proposedByClaude: false },
+          overrideAccess: false,
+          depth: 0,
+          req,
+        })
+      }
+      await commitTransaction(req)
+    } catch (error) {
+      await killTransaction(req)
+      throw error
     }
     log.info({ code, type: data.type, links: links.length, userId: user.id }, 'option added')
     revalidatePath('/admin', 'layout')

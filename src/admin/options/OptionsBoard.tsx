@@ -26,6 +26,12 @@ const TABS: { value: OptionsTab; label: string; add?: string; addTitle?: string 
   { value: 'level', label: 'Poziomy mocy' },
 ]
 
+// TODO(krystian): message not on the board.
+const offline = (): ActionResult => ({
+  ok: false,
+  messages: ['Nie udało się wysłać — sprawdź połączenie i spróbuj jeszcze raz.'],
+})
+
 const LEAD =
   'Wszystko, z czego klient składa komputer. Obudowy i chłodzenia widać na stronie z nazwą i zdjęciem; RAM, dyski i części poziomów tylko klasą.'
 
@@ -60,13 +66,13 @@ export function OptionsBoard({ rows, approveHref }: { rows: OptionRow[]; approve
   }
   const toggle = (row: OptionRow) =>
     startTransition(async () => {
-      const outcome = await setOptionActive({ id: row.id, active: !row.active })
+      const outcome = await setOptionActive({ id: row.id, active: !row.active }).catch(offline)
       // TODO(krystian): messages not on the board.
       report(outcome, row.active ? `Wyłączono: ${row.label}` : `Włączono: ${row.label}`)
     })
   const remove = (row: OptionRow) =>
     startTransition(async () => {
-      const outcome = await deleteOption({ id: row.id })
+      const outcome = await deleteOption({ id: row.id }).catch(offline)
       setToDelete(null)
       report(outcome, `Usunięto: ${row.label}`)
     })

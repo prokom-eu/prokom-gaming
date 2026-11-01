@@ -20,6 +20,8 @@ type Field = {
   when?: { field: string; values: string[] }
 }
 
+const MAX_PHOTO = 900 * 1024
+
 const CLASS = [
   { value: '1', label: '1 · podstawowa' },
   { value: '2', label: '2 · średnia' },
@@ -180,7 +182,17 @@ export function AddOption({
     }, 300)
   }
 
-  const submit = (form: FormData) =>
+  // `onSubmit`, not `<form action>`: React resets an action form after it runs, which would
+  // empty the links and the photo after a refused save (review P6-3).
+  const submit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    const form = new FormData(event.currentTarget)
+    const photo = form.get('photo')
+    // Larger bodies never reach the action (Next's 1 MB limit): say it here, like the server.
+    if (photo instanceof File && photo.size > MAX_PHOTO) {
+      setErrors(['Zdjęcie: WebP, PNG, JPEG albo AVIF, najwyżej 900 KB.'])
+      return
+    }
     startSave(async () => {
       for (const key of [...form.keys()]) {
         if (
@@ -192,10 +204,16 @@ export function AddOption({
           form.delete(key)
         }
       }
-      const outcome = await addOption(form)
-      if (outcome.ok) onAdded(values.publicLabel ?? outcome.code)
-      else setErrors(outcome.messages)
+      try {
+        const outcome = await addOption(form)
+        if (outcome.ok) onAdded(values.publicLabel ?? outcome.code)
+        else setErrors(outcome.messages)
+      } catch {
+        // TODO(krystian): message not on the board.
+        setErrors(['Nie udało się wysłać — sprawdź połączenie i spróbuj jeszcze raz.'])
+      }
     })
+  }
 
   return (
     <section className={`pn-card ${styles.add}`} aria-labelledby="add-option-title">
@@ -205,7 +223,7 @@ export function AddOption({
           ×
         </button>
       </div>
-      <form action={submit}>
+      <form onSubmit={submit}>
         <input type="hidden" name="type" value={type} />
         <div className={styles.addGrid}>
           {visible.map((f) => {
@@ -274,7 +292,7 @@ export function AddOption({
               id="add-links"
               name="links"
               rows={3}
-              placeholder="https://… (jeden link w wierszu, 2–4 sklepy)"
+              placeholder="https://… (jeden link w wierszu, 0–4 sklepy)"
               aria-describedby="add-links-hint"
             />
             <small id="add-links-hint" className={styles.hint}>

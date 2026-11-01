@@ -10,7 +10,8 @@ Ostatnia aktualizacja: 01.11.2026 (P6-3 — opcje konfiguratora; P6-1 #50 i P6-2
 
 ## Uwagi na później (P6-3)
 - **Decyzje Krystiana 01.11:** kolejka G4 bez zmian — zdanie pod tabelą zamiast „wyłączenie… trafia do zatwierdzenia” mówi, że ceny „od” przeliczy następna publikacja (`TODO(krystian)` treść); zakładka „Poziomy mocy” tylko jako tabela (edycja w formularzu Payload, bez „Dodaj poziom”); ikona archiwum = „Usuń” nieużywaną, wycofanie = przełącznik.
-- **Zdjęcie ≤ 900 KB** — akcje serwera Next mają domyślny limit treści 1 MB (zostawiony dla całej aplikacji). Zdjęcie i opcja bez transakcji (błąd zapisu opcji zostawia plik w `media`).
+- **Zdjęcie ≤ 900 KB** (sprawdzane też w przeglądarce) — akcje serwera Next mają domyślny limit treści 1 MB (zostawiony dla całej aplikacji). Dodanie (zdjęcie, opcja, linki) i usunięcie (opcja + linki) w jednej transakcji; plik zapisany na dysk przy błędzie zostaje, usunięcie opcji zostawia jej zdjęcie w `media`.
+- **Włączenie opcji bez opublikowanej ceny** jest odrzucane („najpierw zatwierdź cenę”). **Do decyzji (`TODO(krystian)`, przegląd P6-3):** opcja opublikowana jako wyłączona nie przechodzi strażnika marży (`reviewAll` liczy aktywne), więc jej włączenie może dać konfiguracje poniżej minimum bez zatwierdzenia — tak samo jak w formularzu Payload od G4.
 - **Kod nowej opcji** z nazwy (np. `LIAN-LI-LANCOOL-217`, unikalny z sufiksem) — zmiana w formularzu Payload.
 - **Teksty spoza planszy (`TODO(krystian)`):** komunikaty przełącznika, dodania („czeka w Do zatwierdzenia…”), potwierdzenie usunięcia, podpowiedź pustego podglądu ceny, błędy pól.
 

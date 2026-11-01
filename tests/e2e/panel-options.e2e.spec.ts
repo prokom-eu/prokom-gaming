@@ -121,6 +121,8 @@ test.describe('changes', () => {
     await panelForm.getByLabel(/Linki do ofert/).fill('https://allegro.pl/oferta/1')
     await panelForm.getByRole('button', { name: 'Dodaj do zatwierdzenia' }).click()
     await expect(panelForm.getByText(/Link spoza dozwolonych sklepów/)).toBeVisible()
+    // The form keeps what was typed after a refused save.
+    await expect(panelForm.getByLabel(/Linki do ofert/)).toHaveValue('https://allegro.pl/oferta/1')
 
     await panelForm.getByLabel(/Linki do ofert/).fill('https://www.x-kom.pl/p/123-e2e-ram.html')
     await panelForm.getByRole('button', { name: 'Dodaj do zatwierdzenia' }).click()
