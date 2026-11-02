@@ -1,5 +1,6 @@
 # Production deploy (G16): only by hand, after the boss's acceptance in Asana (CLAUDE.md,
-# docs/wdrozenia.md). Input: the SHA that runs on staging now — the server refuses any other
+# docs/wdrozenia.md). Input: the last SHA that passed staging (/srv/prokom/.gaming-staging-ok on the
+# server, also the last „ok” line of gaming-staging in deploys.log) — the server refuses any other
 # (scripts/server/deploy-gate.sh), so production always gets the image staging and the boss saw.
 # The server runs scripts/deploy.sh prod: backup `predeploy` → pull → health → smoke test →
 # automatic rollback (then this run is red). From the terminal (/wdrozenie produkcja):
@@ -12,7 +13,7 @@ on:
   workflow_dispatch:
     inputs:
       sha:
-        description: 'Full commit SHA that runs on staging now (APP_IMAGE_TAG of .env.staging)'
+        description: 'Full commit SHA that passed staging (last ok deploy of gaming-staging)'
         required: true
 
 concurrency:

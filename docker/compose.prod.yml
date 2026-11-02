@@ -57,10 +57,12 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
+    # Two databases (the app with crons every minute, Umami) and the nightly pg_dump; out of memory
+    # here means 503 on the site. The server has 16 GB (ADR-019 in prokom-web; ADR-G001 assumed 8).
     deploy:
       resources:
         limits:
-          memory: 256m
+          memory: 512m
     logging: *logging
 
   # Creates Umami's own database `umami` in the stack's PostgreSQL, once (idempotent, like

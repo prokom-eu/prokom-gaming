@@ -14,6 +14,10 @@ Krok po kroku: pierwsze uruchomienie, dane startowe, wdrożenia, cofnięcie, kop
 | Bramka wdrożeń | `~/bin/prokom-gaming-deploy-gate` | kopia `scripts/server/deploy-gate.sh`, poza plikami wdrożenia |
 | Dzienniki wdrożeń | `/srv/prokom/deploys.log`, `deploy-output.log` | wspólne z `prokom-web` (linie `gaming-staging`, `gaming-prod`) |
 
+**Pliki wdrożenia są wspólne dla obu stosów:** wdrożenie stagingu podmienia `docker/` i `scripts/` także dla produkcji, a staging może wyprzedzać produkcję o dni — nocny `backup.sh prod` i ręczne `$prod …` używają wtedy nowszych plików (jak w `prokom-web`). Zmiana w `compose.prod.yml` albo skryptach, która nie pasuje do starszego obrazu produkcji, wymaga wdrożenia produkcji tym samym obrazem albo ręcznej uwagi.
+
+**SHA dla produkcji:** ostatnie, które przeszło staging — `cat /srv/prokom/.gaming-staging-ok` (pisze je `deploy.sh` po zielonym smoke stagingu; to samo co ostatnia linia `gaming-staging … ok` w `../deploys.log`).
+
 Skróty (w `/srv/prokom/prokom-gaming`):
 ```bash
 staging="docker compose --env-file .env.staging -f docker/compose.prod.yml -f docker/compose.staging.yml"
@@ -109,7 +113,7 @@ Każde scalenie do `develop`: „Image” → „Deploy staging” → bramka �
 4. Bramka: druga linia w `authorized_keys` z `… prokom-gaming-deploy-gate prod` i osobnym kluczem `github-gaming-production`; środowisko GitHub `production` (tylko `develop`) z `PRODUCTION_SSH_KEY`, `PRODUCTION_SSH_TARGET`, `PRODUCTION_SSH_KNOWN_HOSTS`.
 5. Cron: `15 3 * * * cd /srv/prokom/prokom-gaming && scripts/backup.sh prod >> ../backups/backup.log 2>&1`; heartbeat `BACKUP_HEARTBEAT_URL_PROD`; monitor Better Stack `https://prokomgaming.pl/api/health`; Search Console (sitemap).
 
-**Każde wdrożenie:** `gh workflow run deploy-production.yml --repo prokom-eu/prokom-gaming -f sha=<SHA ze stagingu>` (albo Actions → „Deploy production”). Serwer: kopia `predeploy` → obraz → `healthy` → smoke → przy błędzie powrót. Potem smoke przez Nginx: `bash scripts/smoke.sh https://127.0.0.1 prokomgaming.pl` i PR `develop → main`.
+**Każde wdrożenie:** `gh workflow run deploy-production.yml --repo prokom-eu/prokom-gaming -f sha=<SHA, które przeszło staging>` (albo Actions → „Deploy production”). Serwer: kopia `predeploy` → obraz → `healthy` → smoke → przy błędzie powrót. Potem smoke przez Nginx: `bash scripts/smoke.sh https://127.0.0.1 prokomgaming.pl` i PR `develop → main`.
 
 ## 5. Cofnięcie
 

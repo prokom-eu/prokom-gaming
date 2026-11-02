@@ -252,10 +252,17 @@ export default buildConfig({
       cancel: ({ req }) => isAdmin(req),
     },
   },
-  // Production only (G16): jobs a dead container left `processing` would block their task for good.
-  // Not locally: `pnpm seed` or `payload migrate` next to a running `pnpm dev` would release its jobs.
+  // Server only (G16): jobs a dead container left `processing` would block their task for good.
+  // Not with SITE_ENV=local (`pnpm dev`, `pnpm start`, CI): a second process on the same database —
+  // `pnpm seed`, `payload migrate`, `pnpm start` next to `pnpm dev` — would release jobs that run.
+  // A failure is logged, never stops the start.
   onInit: async (payload) => {
-    if (env.NODE_ENV === 'production') await releaseStuckJobs(payload)
+    if (env.NODE_ENV !== 'production' || env.SITE_ENV === 'local') return
+    try {
+      await releaseStuckJobs(payload)
+    } catch (error) {
+      payload.logger.error({ err: error }, 'Could not release stuck jobs')
+    }
   },
   editor: lexicalEditor(),
   // The panel and the site use REST only. A second public API would need its own field-access

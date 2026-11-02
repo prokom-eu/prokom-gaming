@@ -3,8 +3,9 @@
 # prokom-web scripts/deploy.sh with Gaming's names, one site host and Umami in the stack).
 # Usage: scripts/deploy.sh <staging|prod> <sha> [--fail-smoke-for-test]
 #   run by scripts/server/deploy-gate.sh (pipeline) with the deploy files of the same commit.
-# Steps: (prod: backup predeploy) → pull → APP_IMAGE_TAG in .env.<stack> → up -d → app healthy
-# → smoke test on the app's loopback port, for the host of SITE_URL. A failure after the tag change:
+# Steps: (prod: backup predeploy) → pull → APP_IMAGE_TAG in .env.<stack> → up -d app (+ umami, not
+# fatal) → app healthy → smoke test on the app's loopback port, for the host of SITE_URL; staging ok
+# → its SHA in ../.gaming-staging-ok (the only SHA production accepts). A failure after the tag change:
 #   - no new migrations ran → previous tag back, checked with the core smoke test (SMOKE_CORE=1:
 #     health, panel, home page — the full test of this commit may expect routes the old image
 #     does not have), exit 1;
@@ -89,10 +90,15 @@ smoke() {
   return "${PIPESTATUS[0]}"
 }
 
-# The whole stack: the app gets the new tag; postgres and umami start if they are not running.
+# The app with its new tag (postgres starts with it as a dependency). Umami separately and never
+# fatal: statistics down must not roll back — or fake a failed rollback of — a working app.
 start() {
-  "${compose[@]}" up -d 2>&1 | while IFS= read -r l; do log "$l"; done
-  [ "${PIPESTATUS[0]}" -eq 0 ] && wait_healthy
+  "${compose[@]}" up -d app 2>&1 | while IFS= read -r l; do log "$l"; done
+  [ "${PIPESTATUS[0]}" -eq 0 ] || return 1
+  "${compose[@]}" up -d umami 2>&1 | while IFS= read -r l; do log "$l"; done
+  [ "${PIPESTATUS[0]}" -eq 0 ] ||
+    log "umami not started — the app runs without statistics; check: docker logs prokom-gaming-$stack-umami-1"
+  wait_healthy
 }
 
 fail() {
@@ -143,6 +149,9 @@ smoke || fail
 
 log "done, ${sha:0:7} is running"
 record "ok"
+# Production accepts only an image that passed staging's smoke test (deploy-gate.sh). Not the tag
+# in .env.staging: after a failed deploy that stays on the new, failed SHA.
+if [ "$stack" = staging ]; then echo "$sha" >"$root/../.gaming-staging-ok"; fi
 
 # Old app images fill the disk: keep the images both stacks name in their .env files.
 keep=" $sha $prev "

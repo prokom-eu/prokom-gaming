@@ -16,8 +16,8 @@
 # (RESTORE_CONFIRM=<project> answers it).
 # Settings: `.env.backup` (or BACKUP_ENV=<file>) — AGE_IDENTITY: file with the PRIVATE age key,
 # taken from the password manager for the restore and deleted afterwards. A plain `.tar` (same
-# inside, not encrypted) needs no key: only for the starting data from the public seed — never for a
-# backup of a server (personal data).
+# inside, not encrypted) needs no key: only the starting data from the public seed, refused unless
+# its manifest says kind=import — never a decrypted backup of a server (personal data).
 set -euo pipefail
 export MSYS_NO_PATHCONV=1 # Git Bash on Windows (local test): keep container paths as they are
 
@@ -77,6 +77,11 @@ rm "$work/backup.tar"
 echo "--- manifest"
 cat "$work/manifest.txt"
 echo "---"
+
+if [ "$plain" = 1 ] && [ "$(sed -n 's/^kind=//p' "$work/manifest.txt")" != import ]; then
+  log "an unencrypted file must be starting data (kind=import in its manifest) — never a server backup; nothing was changed"
+  exit 1
+fi
 
 backup_db="$(sed -n 's/^database=//p' "$work/manifest.txt")"
 if [ "$backup_db" != "$db" ] && [ "${RESTORE_ANY_DB:-}" != 1 ]; then

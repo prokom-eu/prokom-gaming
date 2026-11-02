@@ -6,8 +6,8 @@
 # The pipeline sends only `deploy <stack> <sha>`; the stack must match the key's argument. It sends
 # no files: the deploy files (docker/, scripts/, .env.example) come out of the image
 # ghcr.io/prokom-eu/prokom-gaming:<sha> (/deploy, Dockerfile), which only the "Image" workflow
-# builds from develop. Production accepts only the SHA that staging runs now (APP_IMAGE_TAG in
-# .env.staging) — an image that has passed staging's smoke test and the boss's look.
+# builds from develop. Production accepts only the last SHA that passed staging's smoke test
+# (../.gaming-staging-ok, written by deploy.sh) — the image staging runs and the boss looked at.
 # Installed OUTSIDE the deploy files, so a deploy never replaces it:
 #   install -m 700 scripts/server/deploy-gate.sh ~/bin/prokom-gaming-deploy-gate
 # By hand on the server (same path as the pipeline):
@@ -33,9 +33,11 @@ flock -w 600 9 || { echo "deploy-gate: another deploy still running" >&2; exit 1
 export DEPLOY_LOCK_HELD=1
 
 if [ "$stack" = prod ]; then
-  on_staging="$(sed -n 's/^APP_IMAGE_TAG=//p' "$repo/.env.staging" | tail -1)"
-  [ "$sha" = "$on_staging" ] ||
-    { echo "deploy-gate: production takes only the image staging runs now (${on_staging:0:7})" >&2; exit 1; }
+  passed="$(cat "$repo/../.gaming-staging-ok" 2>/dev/null || true)"
+  if [ -z "$passed" ] || [ "$sha" != "$passed" ]; then
+    echo "deploy-gate: production takes only the last image that passed staging (${passed:0:7})" >&2
+    exit 1
+  fi
 fi
 
 work="$(mktemp -d "$repo/../.deploy-files-XXXXXX")"

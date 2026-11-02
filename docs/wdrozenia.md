@@ -14,7 +14,7 @@ Panel jest pod `/admin` tej samej domeny (ADR-G001 §3) — na stagingu za tym s
 ## Pipeline
 1. **PR** → `ci.yml`: lint, format, typecheck, Vitest, build, e2e, gitleaks.
 2. **Scalenie do `develop`** → `image.yml`: obraz `ghcr.io/prokom-eu/prokom-gaming:<SHA>` (z plikami wdrożenia tego commita w `/deploy`) → `deploy-staging.yml`: serwer dostaje **tylko SHA**, bramka (`scripts/server/deploy-gate.sh`) wyjmuje pliki wdrożenia z obrazu i uruchamia `scripts/deploy.sh staging <SHA>`: pobranie → `APP_IMAGE_TAG` w `.env.staging` → `up -d` → `healthy` (migracje przy starcie) → `scripts/smoke.sh` na porcie aplikacji. Błąd → powrót do poprzedniego obrazu (gdy nie weszły nowe migracje), przebieg czerwony.
-3. **Produkcja — tylko po akceptacji szefa w Asanie:** `deploy-production.yml` uruchamiany ręcznie (Actions → „Deploy production” albo `gh workflow run deploy-production.yml -f sha=<SHA>` w `/wdrozenie produkcja`). Serwer przyjmuje wyłącznie SHA, które **działa teraz na stagingu**; `deploy.sh prod` robi najpierw kopię `predeploy`, potem to samo co staging. Obraz na produkcję nie jest budowany drugi raz.
+3. **Produkcja — tylko po akceptacji szefa w Asanie:** `deploy-production.yml` uruchamiany ręcznie (Actions → „Deploy production” albo `gh workflow run deploy-production.yml -f sha=<SHA>` w `/wdrozenie produkcja`). Serwer przyjmuje wyłącznie SHA, które **ostatnie przeszło staging** (zielony smoke — `/srv/prokom/.gaming-staging-ok`, pisze go `deploy.sh`); `deploy.sh prod` robi najpierw kopię `predeploy`, potem to samo co staging. Obraz na produkcję nie jest budowany drugi raz.
 4. **`main`** = stan produkcji: po udanym wdrożeniu PR `develop → main` (zapis, co jest na produkcji; obraz z `main` nie powstaje).
 
 Dlaczego ręczny workflow, a nie `deploy.sh` z SSH: wdrożenie przez Claude Code to jedna komenda `gh`, bez klucza do serwera na komputerze; serwer i tak pilnuje, że na produkcję idzie tylko obraz sprawdzony na stagingu (decyzja Krystiana 02.11).
@@ -24,7 +24,7 @@ Dlaczego ręczny workflow, a nie `deploy.sh` z SSH: wdrożenie przez Claude Code
 ## Obraz i start aplikacji
 - `Dockerfile`: pełna instalacja → `pnpm build` (zmienne tylko atrapy) → obraz z `.next/standalone`, użytkownik `node`, `HEALTHCHECK` na `/api/health` co 15 s, pliki wdrożenia w `/deploy`.
 - **Migracje** uruchamia aplikacja przy starcie (`prodMigrations`); wdrożenie gotowe, gdy `/api/health` = 200.
-- **Zadania w tle** (alarm marży, retencja, SLA, odbiór IMAP, push, sprawdzanie cen, raport tygodniowy): cron Payload startuje z pierwszym `/api/health` (zdrowie Dockera, G16) — nie czeka na wejście do panelu. Przy starcie zadania, które zostały w `processing` po zabitym kontenerze, są zwalniane (`src/jobs/releaseStuck.ts`).
+- **Zadania w tle** (alarm marży, retencja, SLA, odbiór IMAP, push, sprawdzanie cen, raport tygodniowy): cron Payload startuje z pierwszym `/api/health` (zdrowie Dockera, G16) — nie czeka na wejście do panelu. Przy starcie zadania, które zostały w `processing` po zabitym kontenerze, są zwalniane (`src/jobs/releaseStuck.ts`; tylko na serwerze — `SITE_ENV` staging albo production).
 - **Strefa czasu:** kontener w UTC (bez `TZ`). Retencja zapytań idzie o 3:00 UTC (4:00/5:00 w Polsce); raport tygodniowy liczy czas polski sam.
 - Logi: JSON na stdout (`lib/logger`, logger Payload). Odczyt: `docker logs prokom-gaming-staging-app-1`.
 
@@ -34,8 +34,8 @@ Dlaczego ręczny workflow, a nie `deploy.sh` z SSH: wdrożenie przez Claude Code
 | Usługa | Limit pamięci (prod / staging) | Port na loopbacku (prod / staging) | Uwagi |
 |---|---|---|---|
 | `app` | 1024 / 768 MB | 3200 / 3201 | sieć `prokom-proxy`; wolumen `media` |
-| `postgres` | 256 MB | — | bazy: aplikacji i `umami` |
-| `umami` | 384 MB | 3210 / 3211 | Umami 3.4.1 (ADR-G009); publicznie tylko skrypt i zbieranie przez Nginx; panel Umami tunelem SSH |
+| `postgres` | 512 MB | — | bazy: aplikacji i `umami`, nocny `pg_dump` (ADR-G001 zakładało 256 MB przy serwerze 8 GB — serwer ma 16 GB) |
+| `umami` | 384 MB | 3210 / 3211 | Umami 3.4.1 (ADR-G009); publicznie tylko skrypt i zbieranie przez Nginx; panel Umami tunelem SSH; jego awaria nie cofa wdrożenia aplikacji |
 | `umami-db` | — | — | jednorazowo tworzy bazę `umami` |
 
 Staging zawsze czyta `.env.staging` (na sztywno w nakładce) — nie może dostać sekretów produkcji.
