@@ -6,14 +6,12 @@ import { z } from 'zod'
 
 import { getEnv, imapConfig } from '../../lib/env'
 import { errorFields, log } from '../../lib/logger'
-import {
-  addInquiryNote,
-  loadReplyContext,
-  sendInquiryReply,
-  topicOf,
-} from '../../lib/inquiry/thread.server'
+import { addInquiryNote, loadReplyContext, sendInquiryReply } from '../../lib/inquiry/thread.server'
 import { CONFIG_TYPES, INQUIRY_STATUSES, type InquiryStatus } from '../../lib/inquiry/types'
 import { panelActionSession } from '../session'
+import { findInquiries, type SearchHit } from './search'
+
+export type { SearchHit }
 import { STATUS_CHIP } from './format'
 
 /**
@@ -253,8 +251,6 @@ export async function convertToOrder(raw: { inquiryId: number }): Promise<Action
   }
 }
 
-export type SearchHit = { number: string; name: string; topic: string; status: InquiryStatus }
-
 /**
  * Search by number, name or build (spec §4): POST through this action, so a name never goes into
  * an address or a log. At most 20 hits; `null` = no access or the search failed.
@@ -266,32 +262,7 @@ export async function searchInquiries(query: string): Promise<SearchHit[] | null
   const q = query.trim().slice(0, 60)
   if (q.length < 2) return []
   try {
-    const { docs } = await session.payload.find({
-      collection: 'inquiries',
-      where: {
-        or: [{ number: { like: q } }, { name: { like: q } }, { 'build.name': { like: q } }],
-      },
-      select: {
-        number: true,
-        name: true,
-        type: true,
-        status: true,
-        budget: true,
-        voucher: true,
-        build: true,
-      },
-      populate: { builds: { name: true } },
-      sort: '-createdAt',
-      limit: 20,
-      depth: 1,
-      overrideAccess: true,
-    })
-    return docs.map((d) => ({
-      number: d.number ?? `#${d.id}`,
-      name: d.name,
-      topic: topicOf(d),
-      status: d.status,
-    }))
+    return await findInquiries(session.payload, q)
   } catch (error) {
     log.error({ ...errorFields(error) }, 'inquiries: search failed')
     return null
