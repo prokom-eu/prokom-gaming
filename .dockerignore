@@ -8,8 +8,11 @@ node_modules
 media
 backups
 docs
-seed
-tests
+# The seed's JSON stays: src/lib/site.ts imports creatures.json (shell data). Photos are seed-only.
+seed/*/media
+# Fixtures stay: `next build` type-checks the unit tests, and they (and src/seed/offer.ts) import them.
+tests/*
+!tests/fixtures
 playwright-report
 test-results
 coverage
@@ -18,5 +21,4 @@ coverage
 !.env.example
 *.log
 Dockerfile
-docker
-scripts
+# docker/ and scripts/ stay: the image carries the deploy files of its commit (/deploy, G16).

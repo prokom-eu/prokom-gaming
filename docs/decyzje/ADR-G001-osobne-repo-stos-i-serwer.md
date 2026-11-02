@@ -26,6 +26,10 @@ PRO-KOM Gaming startuje 20.11.2026 (sezon grudniowy). W tym samym czasie `prokom
 7. **Wspólnego kodu z `prokom-web` nie wydzielamy** (paczka npm = źródło kolizji i pracy). Kopiujemy wzorce: `lib/env.ts`, logger, `submitInquiry()` (kontrakt ADR-003), CI, Dockerfile, skrypty `start.ps1`/`koniec.ps1`, komendy Claude Code. Znak PRO-KOM — pliki SVG do `public/brand/` (linia „Gaming”, akcent złoty „Grom” `#F2C230`, ADR-G003).
 8. **Konto klienta, metryka, zgłoszenia** — na start w Payload (ADR-G005), z kontraktem danych pod przyszłą Strefę Klienta / PRO-KOM System (Django, 2027). Bez drugiej aplikacji w 2026.
 
+## Aktualizacja 02.11.2026 (G16, decyzja Krystiana)
+- **Serwer (pkt 5):** zamiast Seohost 4 vCPU / 8 GB — VPS **webh.pl 4 vCPU / 16 GB** (ADR-019 w `prokom-web`, 31.10.2026). Stosy, sieć `prokom-proxy` i Nginx w `prokom-web` bez zmian.
+- **Limity pamięci (pkt 5):** app 1 GB / staging 768 MB bez zmian; **PostgreSQL 512 MB** zamiast 256 MB (dwie bazy — aplikacji i `umami` z ADR-G009 — oraz nocny `pg_dump`; brak pamięci = 503 na stronie); Umami 384 MB (ADR-G009). Szczegóły: `docs/wdrozenia.md`.
+
 ## Konsekwencje
 - Budowa Gaming nie blokuje wdrożeń `prokom-web` i odwrotnie. Jedyny punkt styku: szablon Nginx w `prokom-web` (G16) i wspólny VPS.
 - Pamięć serwera: 4 aplikacje Node + 4 bazy na 8 GB — mieści się przy limitach i swapie; monitoring RAM (80% → powiadomienie). Jeśli zabraknie — staging Gaming włączamy tylko na czas akceptacji.

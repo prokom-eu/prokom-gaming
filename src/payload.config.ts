@@ -45,6 +45,7 @@ import { InquirySlaTask } from './jobs/inquirySla'
 import { MailIntakeTask } from './jobs/mailIntake'
 import { NotifySendTask } from './jobs/notifySend'
 import { PriceCheckSchedulerTask, PriceCheckTask } from './jobs/priceCheck'
+import { releaseStuckJobs } from './jobs/releaseStuck'
 import { MarginAlarmTask } from './jobs/marginAlarm'
 import { WeeklyReportTask } from './jobs/weeklyReport'
 import { getEnv } from './lib/env'
@@ -224,7 +225,8 @@ export default buildConfig({
     PriceCheckSettings,
   ],
   // Background jobs (ADR-G002 §4.4: margin alarm; ADR-G005: daily inquiry retention). Run inside the Next process
-  // (one VPS, not serverless) every minute; the cron starts with the first panel/API request.
+  // (one VPS, not serverless) every minute; the cron starts with the first panel/API request — on the
+  // server that is the Docker health check (`/api/health` asks for the crons, G16).
   // Running and queueing through the REST API is panel-only: by default any signed-in account
   // could, and customers (G14) sign in too. Finished jobs are removed — nothing to keep.
   jobs: {
@@ -249,6 +251,18 @@ export default buildConfig({
       queue: ({ req }) => isAdmin(req),
       cancel: ({ req }) => isAdmin(req),
     },
+  },
+  // Server only (G16): jobs a dead container left `processing` would block their task for good.
+  // Not with SITE_ENV=local (`pnpm dev`, `pnpm start`, CI): a second process on the same database —
+  // `pnpm seed`, `payload migrate`, `pnpm start` next to `pnpm dev` — would release jobs that run.
+  // A failure is logged, never stops the start.
+  onInit: async (payload) => {
+    if (env.NODE_ENV !== 'production' || env.SITE_ENV === 'local') return
+    try {
+      await releaseStuckJobs(payload)
+    } catch (error) {
+      payload.logger.error({ err: error }, 'Could not release stuck jobs')
+    }
   },
   editor: lexicalEditor(),
   // The panel and the site use REST only. A second public API would need its own field-access
