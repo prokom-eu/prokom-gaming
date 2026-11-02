@@ -2229,6 +2229,11 @@
 .pn-dash__alarm {
   display: none;
 }
+/* „Ruch na stronie”: the 30-day line is the card's picture (board Main). */
+.pn-dash__traffic .pn-spark {
+  height: 120px;
+  margin: 4px 0 12px;
+}
 /* Board: two columns of at least 520 px, each card at the top of its row. */
 .pn-dash__cols {
   display: grid;
