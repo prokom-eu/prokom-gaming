@@ -4,6 +4,7 @@ import { join } from 'node:path'
 import { describe, it } from 'vitest'
 
 import { confirmationEmail, notificationEmail, type InquiryForEmail } from '../inquiry/emails'
+import { replyHtml } from '../inquiry/replyHtml'
 import { LOGO_CID } from './layout'
 
 /**
@@ -89,5 +90,58 @@ describe.runIf(out)('mail preview', () => {
         panelUrl: 'https://prokomgaming.pl/admin/zapytania/PKG-2026-0047',
       }),
     )
+    const signature = 'Krystian · PRO-KOM Gaming\nRabka-Zdrój, ul. Orkana 16B · +48 883 200 151'
+    const brand = {
+      number: 'PKG-2026-0047',
+      signature,
+      siteUrl: 'https://prokomgaming.pl',
+      replyAddress: 'kontakt@prokomgaming.pl',
+    }
+    write('b-odpowiedz', {
+      subject: 'Re: [PKG-2026-0047] Wilkołak',
+      ...replyHtml({
+        ...brand,
+        body: `Dzień dobry,
+
+dziękuję za zapytanie PKG-2026-0047. Wilkołaka składamy w Rabce-Zdroju w 5–10 dni roboczych od wpłaty; przed wysyłką każdy egzemplarz przechodzi test i pomiar klatek w Twoich grach. Odbiór osobisty w Rabce-Zdroju jest możliwy.
+
+Za chwilę wyślę ofertę z imienną listą części, ważną 48 godzin.
+
+${signature}`,
+      }),
+    })
+    const parts = [
+      { role: 'Procesor', model: 'AMD Ryzen 7 7800X3D' },
+      { role: 'Karta graficzna', model: 'MSI GeForce RTX 5070 Ventus 2X OC 12G' },
+      { role: 'Płyta główna', model: 'MSI B650 Gaming Plus WiFi' },
+      { role: 'Zasilacz', model: 'Corsair RM750e 750 W 80+ Gold' },
+      { role: 'Pamięć RAM', model: 'Kingston Fury Beast 32 GB (2×16) DDR5 6000 CL30' },
+      { role: 'Dysk', model: 'Samsung 990 EVO Plus 2 TB NVMe' },
+      { role: 'Obudowa', model: 'Lian Li Lancool 207 biała' },
+      { role: 'Chłodzenie', model: 'Thermalright Peerless Assassin 120 SE' },
+    ]
+    write('b-oferta', {
+      subject: 'Re: [PKG-2026-0047] Wilkołak',
+      ...replyHtml({
+        ...brand,
+        body: `Dzień dobry,
+
+przesyłam ofertę PKG-2026-0047: Wilkołak, 9 890 zł z montażem, testami, Windows 11 i wysyłką. Oferta ważna 48 godzin.
+
+Skład:
+${parts.map((p) => `• ${p.model}`).join('\n')}
+
+Płatność przelewem albo BLIK po pro formie. Gwarancja 2 lata, kurier odbiera od Ciebie.
+
+${signature}`,
+        offer: {
+          topic: 'Wilkołak',
+          buildName: 'Wilkołak',
+          parts,
+          price: '9 890 zł',
+          leadTime: '5–10 dni roboczych',
+        },
+      }),
+    })
   })
 })

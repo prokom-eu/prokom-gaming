@@ -132,6 +132,7 @@ export type KeyValue = { label: string; value: string; href?: string; strong?: b
 export type MailBlock =
   | { kind: 'paragraph'; text: string; muted?: boolean }
   | { kind: 'heading'; text: string }
+  | { kind: 'list'; items: string[] }
   | { kind: 'section'; title: string; rows: KeyValue[]; note?: string }
   | {
       kind: 'card'
@@ -259,6 +260,16 @@ function block(b: MailBlock): string {
       return row(
         'padding:0 0 16px',
         `<p style="margin:0;font:16px/1.7 ${SANS};color:${b.muted ? C.muted : C.text2}">${lines(b.text)}</p>`,
+      )
+    case 'list':
+      return row(
+        'padding:0 0 18px',
+        `<table ${TABLE} width="100%">${b.items
+          .map(
+            (item) =>
+              `<tr><td valign="top" width="18" style="width:18px;padding:9px 0 0"><div style="width:6px;height:6px;border-radius:3px;background:${C.gold};font-size:0;line-height:0">&nbsp;</div></td><td valign="top" style="padding:2px 0;font:15px/1.6 ${SANS};color:${C.text}">${lines(item)}</td></tr>`,
+          )
+          .join('')}</table>`,
       )
     case 'heading':
       return row('padding:6px 0 12px', eyebrow(b.text))

@@ -88,6 +88,7 @@ export async function sendReply(raw: {
       templateId: input.data.templateId,
       user: found.user,
       fromAddress: env.MAIL_FROM_ADDRESS,
+      siteUrl: env.SITE_URL,
     })
     revalidatePath(PATH)
     if (result.ok) {
