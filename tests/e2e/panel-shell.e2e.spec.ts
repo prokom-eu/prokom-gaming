@@ -109,8 +109,8 @@ test.describe('phone (414)', () => {
     await expect(sheet.getByRole('link', { name: /Zamówienia/ })).toBeVisible()
     await expect(sheet.getByRole('link', { name: /Dane \(listy\)/ })).toBeVisible()
     await expect(sheet.getByRole('link', { name: 'Wyloguj' })).toBeVisible()
-    // Screens without their session yet are hidden, not dead links (spec §2a pt 3).
-    await expect(sheet.getByRole('link', { name: /Statystyki/ })).toHaveCount(0)
+    // P8: every screen of the sheet exists now, Statystyki included (spec §2a pt 4).
+    await expect(sheet.getByRole('link', { name: /Statystyki/ })).toBeVisible()
     expect(await sheet.evaluate((el) => el.contains(document.activeElement))).toBe(true)
 
     await page.keyboard.press('Escape')

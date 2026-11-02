@@ -273,6 +273,154 @@
 .pn-sp {
   flex: 1;
 }
+
+/* ---------- search (P8): field in the top bar, full screen on a phone ---------- */
+.pn-search {
+  position: relative;
+  flex: 0 1 400px;
+  min-width: 220px;
+}
+.pn-srch {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 40px;
+  padding: 0 10px 0 12px;
+  border: 1px solid var(--p-ln2);
+  border-radius: 10px;
+  background: var(--p-s1);
+  color: var(--p-mu);
+}
+.pn-srch:focus-within {
+  border-color: var(--p-gold);
+  box-shadow: 0 0 0 1px var(--p-gold);
+}
+/* The whole field shows the focus (above), not the bare input inside it. */
+.pn .pn-srch input:focus-visible {
+  outline: none;
+}
+.pn-srch input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: 0;
+  background: none;
+  color: var(--p-tx);
+  font: inherit;
+  font-size: 14px;
+  outline: none;
+}
+.pn-srch input::placeholder {
+  color: var(--p-mu);
+}
+.pn-srch kbd {
+  padding: 2px 6px;
+  border: 1px solid var(--p-ln2);
+  border-radius: 6px;
+  color: var(--p-mu);
+  font: 600 11px/1.2 inherit;
+}
+.pn-search__pop {
+  position: absolute;
+  z-index: 60;
+  top: calc(100% + 6px);
+  left: 0;
+  width: max(100%, 420px);
+  max-height: min(70vh, 560px);
+  overflow: auto;
+  padding: 8px;
+  border: 1px solid var(--p-ln2);
+  border-radius: 12px;
+  background: var(--p-s1);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+}
+.pn-search__note {
+  margin: 0;
+  padding: 10px;
+  color: var(--p-mu);
+  font-size: 13px;
+}
+.pn-search__group h3 {
+  margin: 8px 10px 4px;
+  color: var(--p-mu);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.pn-search__group ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.pn-search__group a {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 40px;
+  padding: 9px 10px;
+  border-radius: 8px;
+  color: var(--p-tx);
+  text-decoration: none;
+  font-size: 14px;
+}
+.pn-search__group a:hover,
+.pn-search__group a:focus-visible {
+  background: var(--p-s3);
+}
+.pn-search__group small {
+  flex: none;
+  color: var(--p-mu);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.pn-searchdlg {
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: var(--p-bg);
+  color: var(--p-tx);
+}
+.pn-searchdlg::backdrop {
+  background: var(--p-bg);
+}
+.pn-searchdlg__hd {
+  position: sticky;
+  top: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: calc(env(safe-area-inset-top) + 10px) 16px 10px;
+  border-bottom: 1px solid var(--p-ln);
+  background: var(--p-bg);
+}
+.pn-searchdlg__hd .pn-srch {
+  flex: 1;
+  height: 48px;
+}
+.pn-searchdlg__hd .pn-srch input {
+  font-size: 16px;
+}
+.pn-searchdlg__hd .pn-link {
+  min-height: 48px;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.pn-searchdlg__body {
+  padding: 8px 8px calc(env(safe-area-inset-bottom) + 24px);
+}
+.pn-searchdlg__body .pn-search__group a {
+  min-height: 48px;
+  font-size: 15px;
+}
 .pn-live {
   display: flex;
   align-items: center;
@@ -574,7 +722,12 @@
   background: var(--p-s2);
   border: 1px solid var(--p-ln);
 }
-.pn-seg button {
+.pn-seg button,
+.pn-seg a {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  white-space: nowrap;
   height: 32px;
   padding: 0 12px;
   border: 0;
@@ -585,7 +738,8 @@
   font-size: 13px;
   cursor: pointer;
 }
-.pn-seg button[aria-checked='true'] {
+.pn-seg button[aria-checked='true'],
+.pn-seg a[aria-current='page'] {
   background: var(--p-s3);
   color: var(--p-tx);
   box-shadow: inset 0 0 0 1px var(--p-ln2);
@@ -2222,6 +2376,11 @@
 }
 .pn-dash__alarm {
   display: none;
+}
+/* „Ruch na stronie”: the 30-day line is the card's picture (board Main). */
+.pn-dash__traffic .pn-spark {
+  height: 120px;
+  margin: 4px 0 12px;
 }
 /* Board: two columns of at least 520 px, each card at the top of its row. */
 .pn-dash__cols {

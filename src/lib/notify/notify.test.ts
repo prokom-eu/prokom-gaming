@@ -16,6 +16,7 @@ describe('channels (panel spec §14)', () => {
       mail_error: { email: true, push: false },
       price_report: { email: true, push: true },
       budget: { email: true, push: false },
+      weekly_report: { email: true, push: false },
     })
     expect(PUSH_KINDS).toEqual([
       'inquiry_new',

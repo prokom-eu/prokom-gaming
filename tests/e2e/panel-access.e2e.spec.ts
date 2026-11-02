@@ -24,6 +24,7 @@ const SCREENS = [
   '/admin/zamowienia',
   '/admin/klienci',
   '/admin/klient',
+  '/admin/statystyki',
   ...(process.env.E2E_SERVER === 'start' ? [] : ['/admin/podglad-panelu']),
 ]
 
@@ -83,6 +84,8 @@ test.describe('signed in with the serwis role', () => {
       '/admin/ceny',
       '/admin/ceny/zatwierdzanie',
       '/admin/ustawienia',
+      // P8: sales statistics are admin-only (spec §15); no `input` = no panel search either.
+      '/admin/statystyki',
     ]) {
       await page.goto(path)
       await expect(

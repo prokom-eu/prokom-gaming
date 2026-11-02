@@ -241,7 +241,8 @@ test.describe('computer', () => {
     const { number, name } = await newInquiry('szu')
     await page.goto('/admin/zapytania')
     await expect(page.locator('form.pn-cmp[data-ready]')).toBeVisible()
-    await page.getByRole('searchbox').fill(name)
+    // The inbox's own field — the panel search (P8) is a searchbox in the top bar too.
+    await page.getByRole('searchbox', { name: 'Szukaj zapytań' }).fill(name)
     const hit = page.getByRole('region', { name: 'Wyniki wyszukiwania' }).getByRole('link')
     await expect(hit.first()).toContainText(number)
     expect(page.url()).not.toContain(encodeURIComponent(name.split(' ')[0] as string))

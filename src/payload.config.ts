@@ -46,6 +46,7 @@ import { MailIntakeTask } from './jobs/mailIntake'
 import { NotifySendTask } from './jobs/notifySend'
 import { PriceCheckSchedulerTask, PriceCheckTask } from './jobs/priceCheck'
 import { MarginAlarmTask } from './jobs/marginAlarm'
+import { WeeklyReportTask } from './jobs/weeklyReport'
 import { getEnv } from './lib/env'
 import { migrations } from './migrations'
 
@@ -155,6 +156,12 @@ export default buildConfig({
           exact: true,
           meta: { title: 'Karta klienta' },
         },
+        stats: {
+          Component: '/admin/stats/StatsView#StatsView',
+          path: '/statystyki',
+          exact: true,
+          meta: { title: 'Statystyki strony' },
+        },
         settings: {
           Component: '/admin/settings/SettingsView#SettingsView',
           path: '/ustawienia',
@@ -229,6 +236,7 @@ export default buildConfig({
       NotifySendTask,
       PriceCheckTask,
       PriceCheckSchedulerTask,
+      WeeklyReportTask,
     ],
     autoRun: [
       { cron: '* * * * *', queue: 'default', limit: 5 },

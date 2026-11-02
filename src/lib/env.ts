@@ -46,6 +46,17 @@ const envSchema = z
       .regex(/^(\/[^/]|https?:\/\/)/, 'a path starting with / or an http(s) URL')
       .optional(),
     UMAMI_WEBSITE_ID: z.uuid().optional(),
+    // Statistics in the panel (ADR-G009 pt 4, P8): Umami's API over the Docker network (e.g.
+    // `http://umami:3000`) and an API key of the Umami user (Settings → API keys). Both or none;
+    // without them the panel hides traffic and keeps the numbers from our database.
+    UMAMI_URL: z
+      .url({ protocol: /^https?$/ })
+      .transform((url) => url.replace(/\/+$/, ''))
+      .optional(),
+    UMAMI_API_KEY: z.string().min(1).optional(),
+    // Tests only: `1` = fixed traffic numbers instead of Umami (e2e, CI). Refused in a production
+    // build unless SITE_URL is localhost.
+    UMAMI_FAKE: z.enum(['0', '1']).default('0'),
     // Closed inquiries (`lost`, `closed`) are deleted this many months after the last status
     // change (ADR-G005; to be confirmed with the privacy policy).
     INQUIRY_RETENTION_MONTHS: z.coerce.number().int().min(1).max(120).default(24),
@@ -112,6 +123,24 @@ const envSchema = z
     {
       message: 'the fake price check is for tests only',
       path: ['PRICE_CHECK_FAKE'],
+    },
+  )
+  .refine((env) => Boolean(env.UMAMI_URL) === Boolean(env.UMAMI_API_KEY), {
+    message: 'set both UMAMI_URL and UMAMI_API_KEY, or neither',
+    path: ['UMAMI_API_KEY'],
+  })
+  .refine((env) => !env.UMAMI_URL || Boolean(env.UMAMI_WEBSITE_ID), {
+    message: 'required with UMAMI_URL (which site to read)',
+    path: ['UMAMI_WEBSITE_ID'],
+  })
+  .refine(
+    (env) =>
+      env.NODE_ENV !== 'production' ||
+      env.UMAMI_FAKE === '0' ||
+      /^http:\/\/localhost(:\d+)?\/*$/.test(env.SITE_URL ?? ''),
+    {
+      message: 'the fake statistics are for tests only',
+      path: ['UMAMI_FAKE'],
     },
   )
   .refine((env) => env.NODE_ENV !== 'production' || Boolean(env.ALERT_EMAIL), {
@@ -185,6 +214,21 @@ export type PriceCheckConfig = { mode: 'live'; apiKey: string } | { mode: 'fake'
 export function priceCheckConfig(env: Env): PriceCheckConfig | null {
   if (env.PRICE_CHECK_FAKE === '1') return { mode: 'fake' }
   return env.ANTHROPIC_API_KEY ? { mode: 'live', apiKey: env.ANTHROPIC_API_KEY } : null
+}
+
+export type UmamiConfig =
+  { mode: 'live'; url: string; apiKey: string; websiteId: string } | { mode: 'fake' }
+
+/** Where the panel reads traffic from, or `null` when statistics are off (no UMAMI_URL). */
+export function umamiConfig(env: Env): UmamiConfig | null {
+  if (env.UMAMI_FAKE === '1') return { mode: 'fake' }
+  if (!env.UMAMI_URL || !env.UMAMI_API_KEY || !env.UMAMI_WEBSITE_ID) return null
+  return {
+    mode: 'live',
+    url: env.UMAMI_URL,
+    apiKey: env.UMAMI_API_KEY,
+    websiteId: env.UMAMI_WEBSITE_ID,
+  }
 }
 
 let cached: Env | undefined

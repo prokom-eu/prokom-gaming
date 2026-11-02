@@ -3,6 +3,7 @@ import type { ReactNode } from 'react'
 
 import { getEnv, priceCheckConfig } from '../../lib/env'
 import { CheckPricesButton } from '../price-reports/CheckPricesButton'
+import { PanelSearch } from '../search/PanelSearch'
 import { loadShell, roleLabel, type ShellData } from '../shell/load'
 import { navGroups, navMore, navTabs, type NavItem, type NavKey } from '../shell/navModel'
 import { shortCount } from './count'
@@ -112,10 +113,11 @@ export async function PanelShell({ req, active, title, crumbs = [], back, childr
               {title}
             </span>
           )}
+          {role === 'admin' ? <PanelSearch admin={admin} mode="phone" /> : null}
           {role === 'admin' ? <Bell href={bellHref} count={shell.bell} /> : null}
         </header>
 
-        {/* Computer: top bar. Search comes with P8. */}
+        {/* Computer: top bar. The search is admin-only (P8): serwis has nothing to search there. */}
         <header className="pn-top">
           <nav aria-label="Okruszki">
             <ol className="pn-crumb">
@@ -130,6 +132,7 @@ export async function PanelShell({ req, active, title, crumbs = [], back, childr
               </li>
             </ol>
           </nav>
+          {role === 'admin' ? <PanelSearch admin={admin} mode="bar" /> : null}
           <span className="pn-sp" />
           {status ? (
             <span className="pn-live">

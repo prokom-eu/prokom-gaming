@@ -15,7 +15,9 @@ import { recentEvents, type DashEvent } from './events'
 import { marginsView, type MarginsView } from './margins'
 import { shortName, todoList, type DueOrder, type TodoItem } from './rules'
 import { countByDay, lastDays } from './series'
+import { traffic } from '../../lib/umami'
 import { latestReport } from '../price-reports/load'
+import { fillDays, periodRange, ratio } from '../stats/model'
 import { marketChanges, type MarketRow } from '../price-reports/market'
 
 /**
@@ -61,6 +63,17 @@ export type DashboardData = {
   events: DashEvent[]
   /** P7: the newest price report — „Ceny na rynku”. */
   market: { id: number; date: string; rows: MarketRow[] } | null
+  /** P8: visitors from Umami, 30 days; `null` without Umami (the tile and the card hide). */
+  traffic: TrafficData | null
+}
+
+export type TrafficData = {
+  today: number
+  total: number
+  /** Visitors per day, 30 days, oldest first. */
+  series: number[]
+  inquiries: number
+  conversion: number | null
 }
 
 const DAY_MS = 86_400_000
@@ -100,7 +113,10 @@ export async function loadDashboard(payload: Payload, now: Date): Promise<Dashbo
   const days = lastDays(now)
   const since = new Date(`${days[0]}T00:00:00Z`).getTime() - DAY_MS // a margin for the time zone
 
-  const [mail, monthly, waiting, recent, dueOrders, workshop, prices, events, report] =
+  const period = periodRange(now, 30)
+  const reader = traffic()
+
+  const [mail, monthly, waiting, recent, dueOrders, workshop, prices, events, report, visits] =
     await Promise.all([
       payload.findGlobal({ slug: 'mail-settings', depth: 0, overrideAccess: true }),
       payload.find({
@@ -149,6 +165,7 @@ export async function loadDashboard(payload: Payload, now: Date): Promise<Dashbo
       loadPrices(payload),
       loadEvents(payload),
       latestReport(payload),
+      reader ? reader.summary({ startAt: period.startAt, endAt: period.endAt }) : null,
     ])
 
   const replyHours: ReplyHours = mail.replyHours ?? DEFAULT_REPLY_HOURS
@@ -158,6 +175,8 @@ export async function loadDashboard(payload: Payload, now: Date): Promise<Dashbo
     days,
   )
   const view = prices.ok ? prices.view : null
+  const visitorSeries = visits ? fillDays(visits.daily, period.dayKeys) : null
+  const inquiries30 = series.reduce((n, v) => n + v, 0)
 
   const orders: DueOrder[] = dueOrders.docs.flatMap((o) =>
     o.dueDate && isOrderStage(o.stage)
@@ -176,6 +195,16 @@ export async function loadDashboard(payload: Payload, now: Date): Promise<Dashbo
   )
 
   return {
+    traffic:
+      visits && visitorSeries
+        ? {
+            today: visitorSeries.at(-1) ?? 0,
+            total: visits.visitors,
+            series: visitorSeries,
+            inquiries: inquiries30,
+            conversion: ratio(inquiries30, visits.visitors),
+          }
+        : null,
     market: report
       ? {
           id: report.id,
@@ -233,7 +262,7 @@ export async function loadDashboard(payload: Payload, now: Date): Promise<Dashbo
 
 let remembered: { key: string; value: PricesData } | null = null
 
-async function loadPrices(payload: Payload): Promise<PricesData> {
+export async function loadPrices(payload: Payload): Promise<PricesData> {
   try {
     const builds = await payload
       .find({ collection: 'builds', sort: '-updatedAt', limit: 1, depth: 0, overrideAccess: true })

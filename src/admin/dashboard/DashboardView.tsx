@@ -2,6 +2,7 @@ import { Fragment } from 'react'
 import type { AdminViewServerProps } from 'payload'
 
 import { plural } from '../../lib/pl'
+import { num, pct } from '../stats/model'
 import { percentShort } from '../../lib/pricing/format'
 import { ORDER_STAGE_CHOICES } from '../../lib/orders'
 import { panelAccess } from '../access'
@@ -16,6 +17,7 @@ import { PanelDenied } from '../ui/PanelDenied'
 import { PanelPage } from '../ui/PanelPage'
 import { PanelShell } from '../ui/PanelShell'
 import { loadDashboard, type DashboardData, type WorkshopData } from './load'
+import { Spark } from '../ui/Spark'
 import { MarginTable } from './MarginTable'
 import type { TodoItem } from './rules'
 
@@ -41,7 +43,7 @@ const LEAD = 'zapytania, warsztat, ceny i ruch w jednym miejscu.'
  * /admin — Pulpit „Dziś” (panel spec §3, board Main, stany/tel-01-pulpit). Replaces Payload's
  * dashboard. Admin: tiles, „Czeka na Ciebie”, build margins, recent inquiries, workshop, events.
  * `serwis`: sent on to the workshop board (P5) — no inquiries, prices or margins in the HTML.
- * Market prices (P7) and traffic (P8) are empty states until their sessions.
+ * Traffic (P8) comes from Umami: without it the tile disappears and the card says so.
  */
 export async function DashboardView({ initPageResult }: AdminViewServerProps) {
   const { req } = initPageResult
@@ -68,11 +70,16 @@ export async function DashboardView({ initPageResult }: AdminViewServerProps) {
         title="Dziś"
         lead={`${longDate(now)} · ${LEAD}`}
         actions={
-          // „Statystyki” comes with its screen (P8).
-          <a className="pn-btn" href={`${admin}/zapytania`}>
-            <Icon name="mail" />
-            Zapytania
-          </a>
+          <>
+            <a className="pn-btn" href={`${admin}/statystyki`}>
+              <Icon name="chart" />
+              Statystyki
+            </a>
+            <a className="pn-btn" href={`${admin}/zapytania`}>
+              <Icon name="mail" />
+              Zapytania
+            </a>
+          </>
         }
       />
       <PhoneAlarm data={data} href={`${admin}/ceny/zatwierdzanie`} />
@@ -102,12 +109,7 @@ export async function DashboardView({ initPageResult }: AdminViewServerProps) {
           <MarketCard market={data.market} admin={admin} />
         </div>
 
-        <Card title="Ruch na stronie" note="30 dni · bez ciasteczek">
-          {/* TODO(krystian): empty-state sentence — statistics (Umami) come with P8. */}
-          <EmptyState title="Statystyki jeszcze nie działają" icon="chart">
-            Ruch na stronie pojawi się po podłączeniu statystyk.
-          </EmptyState>
-        </Card>
+        <TrafficCard traffic={data.traffic} href={`${admin}/statystyki`} />
 
         <EventsCard data={data} now={now} />
       </div>
@@ -181,7 +183,15 @@ function Tiles({ data }: { data: DashboardData }) {
         note={`${vsYesterday} · ${waiting}`}
         spark={inquiries.series}
       />
-      {/* „Odwiedzający dziś” disappears without Umami (spec §3 pt 2) — until P8. */}
+      {/* „Odwiedzający dziś” disappears without Umami (spec §3 pt 2). */}
+      {data.traffic ? (
+        <Kpi
+          label="Odwiedzający dziś"
+          value={num(data.traffic.today)}
+          note={`30 dni: ${num(data.traffic.total)}`}
+          spark={data.traffic.series}
+        />
+      ) : null}
       <Kpi
         label="Średnia marża gotowców"
         value={percentShort(view?.average.today ?? null)}
@@ -349,6 +359,41 @@ function EventsCard({ data, now }: { data: DashboardData; now: Date }) {
             </li>
           ))}
         </ul>
+      )}
+    </Card>
+  )
+}
+
+/** „Ruch na stronie” (spec §3, board Main): 30 days of visitors from Umami. */
+function TrafficCard({ traffic, href }: { traffic: DashboardData['traffic']; href: string }) {
+  return (
+    <Card
+      title="Ruch na stronie"
+      note="30 dni · bez ciasteczek"
+      className="pn-dash__traffic"
+      actions={
+        <a className="pn-link" href={href}>
+          Statystyki
+        </a>
+      }
+    >
+      {traffic ? (
+        <>
+          <Spark values={traffic.series} />
+          <dl className="pn-kv">
+            <dt>Odwiedzający</dt>
+            <dd style={{ textAlign: 'right' }}>{num(traffic.total)}</dd>
+            <dt>Zapytania</dt>
+            <dd style={{ textAlign: 'right' }}>{num(traffic.inquiries)}</dd>
+            <dt>Konwersja</dt>
+            <dd style={{ textAlign: 'right' }}>{pct(traffic.conversion, 2)}</dd>
+          </dl>
+        </>
+      ) : (
+        // TODO(krystian): empty-state sentence — no state without statistics on the board.
+        <EmptyState title="Statystyki ruchu są wyłączone" icon="chart">
+          Ruch na stronie pojawi się po podłączeniu Umami.
+        </EmptyState>
       )}
     </Card>
   )

@@ -21,6 +21,7 @@ const defaults = {
   IMAP_PORT: 993,
   INQUIRY_RETENTION_MONTHS: 24,
   PRICE_CHECK_FAKE: '0',
+  UMAMI_FAKE: '0',
 }
 
 describe('parseEnv', () => {
@@ -216,5 +217,41 @@ describe('price check (P7, ADR-G007)', async () => {
         parseEnv({ ...prod, SITE_URL: 'http://localhost:3100', PRICE_CHECK_FAKE: '1' }),
       ),
     ).toEqual({ mode: 'fake' })
+  })
+})
+
+describe('panel statistics (P8, ADR-G009 pt 4)', async () => {
+  const { umamiConfig } = await import('./env')
+  const site = 'e4fbb44a-06c4-498f-a794-c65a04547432'
+  it('is off without the API, live with URL + key + site, fake for tests', () => {
+    expect(umamiConfig(parseEnv(valid))).toBeNull()
+    expect(
+      umamiConfig(
+        parseEnv({
+          ...valid,
+          UMAMI_URL: 'http://umami:3000/',
+          UMAMI_API_KEY: 'key',
+          UMAMI_WEBSITE_ID: site,
+        }),
+      ),
+    ).toEqual({ mode: 'live', url: 'http://umami:3000', apiKey: 'key', websiteId: site })
+    expect(umamiConfig(parseEnv({ ...valid, UMAMI_FAKE: '1' }))).toEqual({ mode: 'fake' })
+  })
+  it('wants the URL and key together, and the site with them', () => {
+    expect(() => parseEnv({ ...valid, UMAMI_URL: 'http://umami:3000' })).toThrow(/UMAMI_API_KEY/)
+    expect(() =>
+      parseEnv({ ...valid, UMAMI_URL: 'http://umami:3000', UMAMI_API_KEY: 'key' }),
+    ).toThrow(/UMAMI_WEBSITE_ID/)
+  })
+  it('the fake is refused in a production build outside localhost', () => {
+    const prod = {
+      ...valid,
+      NODE_ENV: 'production',
+      ALERT_EMAIL: 'a@example.test',
+      INQUIRY_NOTIFY_EMAIL: 'b@example.test',
+    }
+    expect(() =>
+      parseEnv({ ...prod, SITE_URL: 'https://prokomgaming.pl', UMAMI_FAKE: '1' }),
+    ).toThrow(/UMAMI_FAKE/)
   })
 })

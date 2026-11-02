@@ -23,11 +23,12 @@ describe('panel navigation', () => {
     expect(all.every((i) => i.roles.includes('serwis'))).toBe(true)
   })
 
-  it('hides screens whose session has not been built yet instead of linking to nothing', () => {
-    const shown = [...navGroups('admin').flatMap((g) => g.items), ...navMore('admin')]
-    for (const hidden of ['stats']) {
-      expect(keys(shown)).not.toContain(hidden)
-    }
+  it('shows the statistics to the admin under „Analiza”, never to serwis (P8)', () => {
+    const analysis = navGroups('admin').find((g) => g.label === 'Analiza')
+    expect(analysis?.items.map((i) => i.path)).toEqual(['/statystyki'])
+    expect(keys(navMore('admin'))).toContain('stats')
+    const serwis = [...navGroups('serwis').flatMap((g) => g.items), ...navMore('serwis')]
+    expect(keys(serwis)).not.toContain('stats')
   })
 
   it('keeps the sidebar groups in the order of the boards', () => {
@@ -35,6 +36,7 @@ describe('panel navigation', () => {
       'Codziennie',
       'Ceny',
       'Oferta',
+      'Analiza',
       'System',
     ])
   })

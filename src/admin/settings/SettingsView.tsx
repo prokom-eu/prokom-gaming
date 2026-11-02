@@ -2,7 +2,8 @@ import { createHash } from 'node:crypto'
 
 import type { AdminViewServerProps, Payload } from 'payload'
 
-import { getEnv, imapConfig, priceCheckConfig, vapidConfig } from '../../lib/env'
+import { getEnv, imapConfig, priceCheckConfig, umamiConfig, vapidConfig } from '../../lib/env'
+import { traffic } from '../../lib/umami'
 import { PUSH_KINDS, type PushKind } from '../../lib/notify/kinds'
 import { zl } from '../../lib/pricing/format'
 import { loadBatch } from '../../lib/pricing/store'
@@ -24,6 +25,7 @@ import { monthStart } from '../../lib/price-check/usage'
 import { OrderSwitches } from './OrderSwitches'
 import { PriceCheckSettingsForm } from './PriceCheckSettingsForm'
 import { toPriceCheckValues, type DayKey } from './priceCheckForm'
+import { WeeklySwitch } from './WeeklySwitch'
 
 const TITLE = 'Ustawienia'
 
@@ -31,7 +33,8 @@ const TITLE = 'Ustawienia'
  * /admin/ustawienia (panel spec §13, board Ustawienia). Admin only — `serwis` gets "403"
  * (spec §15). Sections: "Marża i narzuty" (`pricing-settings`, P1), "Zapytania i poczta"
  * (`mail-settings`, P3), "Sprawdzanie cen" (P7), "Zamówienia i klienci" (switches in
- * `mail-settings`, P5), "Powiadomienia na telefon" (P4); statistics come in P8.
+ * `mail-settings`, P5), "Statystyki strony" (P8: Umami and the Monday report), "Powiadomienia
+ * na telefon" (P4).
  */
 export async function SettingsView({ initPageResult }: AdminViewServerProps) {
   const { req } = initPageResult
@@ -50,7 +53,7 @@ export async function SettingsView({ initPageResult }: AdminViewServerProps) {
 
   const { payload } = req
   const now = new Date()
-  const [settings, hints, mail, intake, devices, priceCheck, spent] = await Promise.all([
+  const [settings, hints, mail, intake, devices, priceCheck, spent, umami] = await Promise.all([
     payload.findGlobal({ slug: 'pricing-settings', depth: 0, overrideAccess: true }),
     loadHints(payload),
     payload.findGlobal({ slug: 'mail-settings', depth: 0, overrideAccess: true }),
@@ -76,6 +79,7 @@ export async function SettingsView({ initPageResult }: AdminViewServerProps) {
         overrideAccess: true,
       })
       .then((r) => r.docs.reduce((sum, c) => sum + (c.costUsd ?? 0), 0)),
+    umamiState(now),
   ])
   const pushDevices: PushDevice[] = devices.docs.map((d) => ({
     id: d.id,
@@ -197,6 +201,21 @@ export async function SettingsView({ initPageResult }: AdminViewServerProps) {
               alertUnavailable: priceCheck.alertUnavailable ?? true,
             })}
           />
+          <WeeklySwitch name="weeklyPrices" initial={priceCheck.weeklyPrices ?? true} />
+        </Card>
+        <Card title="Statystyki strony" className="pn-card--section">
+          <dl className="pn-kv">
+            <dt>Narzędzie</dt>
+            <dd>
+              Umami, na naszym serwerze
+              <small className={`pn-kv__note pn-kv__note--${umami.tone}`}>{umami.note}</small>
+            </dd>
+            <dt>Ciasteczka</dt>
+            <dd>brak</dd>
+            <dt>Zdarzenia</dt>
+            <dd>konfigurator: start, kroki, koniec; zapytanie wysłane; dobór pod grę</dd>
+          </dl>
+          <WeeklySwitch name="weeklyTraffic" initial={priceCheck.weeklyTraffic ?? true} />
         </Card>
         <Card title="Zamówienia i klienci" className="pn-card--section">
           <OrderSwitches
@@ -261,4 +280,20 @@ async function loadHints(payload: Payload): Promise<Partial<Record<FieldName, st
     ),
     ...(batch ? { serviceCost: `na stronie: ${zl(batch.snapshot.service)}` } : {}),
   }
+}
+
+/**
+ * „Narzędzie” in „Statystyki strony” (spec §13: the Umami address and the connection, read only,
+ * from env). One small read of today's numbers (cached 5 min) tells whether Umami answers.
+ */
+async function umamiState(now: Date): Promise<{ note: string; tone: 'ok' | 'bad' | 'mu' }> {
+  const config = umamiConfig(getEnv())
+  // TODO(krystian): wording of the states (the board shows only the tool).
+  if (!config) return { note: 'wyłączone — brak UMAMI_URL i UMAMI_API_KEY', tone: 'mu' }
+  if (config.mode === 'fake') return { note: 'atrapa (tryb testowy)', tone: 'mu' }
+  const end = Math.floor(now.getTime() / 300_000) * 300_000
+  const answer = await traffic()?.summary({ startAt: end - 86_400_000, endAt: end })
+  return answer
+    ? { note: `połączone · ${config.url}`, tone: 'ok' }
+    : { note: `nie odpowiada · ${config.url}`, tone: 'bad' }
 }

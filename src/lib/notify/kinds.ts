@@ -12,6 +12,8 @@ export const CHANNELS = {
   price_report: { email: true, push: true },
   // P7: the monthly Claude limit stopped a price check.
   budget: { email: true, push: false },
+  // P8: the Monday report (traffic, sales, prices and margins) — e-mail only.
+  weekly_report: { email: true, push: false },
 } as const satisfies Record<string, { email: boolean; push: boolean }>
 
 export type NotifyKind = keyof typeof CHANNELS

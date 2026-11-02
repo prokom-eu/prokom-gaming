@@ -157,7 +157,7 @@ const ITEMS: Record<NavKey, NavItem> = {
     icon: 'chart',
     path: '/statystyki',
     roles: ADMIN,
-    ready: false,
+    ready: true,
   },
   settings: {
     key: 'settings',
