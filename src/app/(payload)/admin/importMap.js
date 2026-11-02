@@ -35,6 +35,7 @@ import { InquiriesView as InquiriesView_c9e6bcd9bd0ec4b17f2718f75737e298 } from 
 import { OrdersView as OrdersView_fdac4cec14838f7dda13e140b265a6c0 } from '../../../admin/orders/OrdersView'
 import { ClientsView as ClientsView_4c69a3da66da5fca38ee699223696f39 } from '../../../admin/clients/ClientsView'
 import { ClientView as ClientView_97d00c5cb6bb12938e3f242385030c77 } from '../../../admin/clients/ClientView'
+import { StatsView as StatsView_f9f3e930dacdb50ddebc4d806f5b5f86 } from '../../../admin/stats/StatsView'
 import { SettingsView as SettingsView_6e97004d35601209e35838a90c0fbc84 } from '../../../admin/settings/SettingsView'
 import { DataView as DataView_ba5c2e5f2f9a3e4ab57326938558337a } from '../../../admin/shell/DataView'
 import { PanelPreviewView as PanelPreviewView_d36a78726155b3387125fe3e0b739977 } from '../../../admin/preview/PanelPreviewView'
@@ -79,6 +80,7 @@ export const importMap = {
   "/admin/orders/OrdersView#OrdersView": OrdersView_fdac4cec14838f7dda13e140b265a6c0,
   "/admin/clients/ClientsView#ClientsView": ClientsView_4c69a3da66da5fca38ee699223696f39,
   "/admin/clients/ClientView#ClientView": ClientView_97d00c5cb6bb12938e3f242385030c77,
+  "/admin/stats/StatsView#StatsView": StatsView_f9f3e930dacdb50ddebc4d806f5b5f86,
   "/admin/settings/SettingsView#SettingsView": SettingsView_6e97004d35601209e35838a90c0fbc84,
   "/admin/shell/DataView#DataView": DataView_ba5c2e5f2f9a3e4ab57326938558337a,
   "/admin/preview/PanelPreviewView#PanelPreviewView": PanelPreviewView_d36a78726155b3387125fe3e0b739977,

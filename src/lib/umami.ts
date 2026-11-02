@@ -13,6 +13,7 @@ import { errorFields, log } from './logger'
  *   the local day, `y` = distinct visitors that day,
  * - `metrics?type=channel|path|entry|device|event` → `[{ x, y }]` (paths, entries and devices
  *   count distinct visitors, events count events),
+ * - `events/stats?event=` → `{ data: { visitors } }` (unique visitors with that event),
  * - `event-data/values?event=&propertyName=` → `[{ value, total }]`.
  * Filters take an operator prefix (`re.` = regex). Every answer is checked with Zod; no answer,
  * a bad one or more than 3 s = `null` (the panel hides traffic, never fails). Answers stay in
@@ -33,13 +34,16 @@ export type TrafficSummary = {
 
 /** The rest of Statystyki. */
 export type TrafficDetails = {
+  /** Umami channels (`direct`, `organicSearch`, …) — „Wejścia bezpośrednie” comes from here. */
   channels: Share[]
+  /** Referrer domains (`google.com`, `facebook.com`, …). */
+  referrers: Share[]
   entries: Share[]
   devices: Share[]
   /** Visitors of each `/zestawy/<slug>` page. */
   buildPages: Share[]
-  /** Counts of our events (`lib/analytics.ts`), e.g. `configurator_done`. */
-  events: Record<string, number>
+  /** Unique visitors who finished the configurator (`configurator_done`, funnel step 3). */
+  finishedConfig: number
   /** `game_pick` by game slug. */
   games: Share[]
   /** Unique visitors who opened a build page or the configurator (funnel step 2). */
@@ -59,6 +63,7 @@ const BUILD_PAGE_PATH = 're.^/zestawy/[^/]+$'
 const statsSchema = z.object({ visitors: z.number(), pageviews: z.number() })
 const xy = z.array(z.object({ x: z.string().nullable(), y: z.number() }))
 const pageviewsSchema = z.object({ sessions: xy })
+const eventStatsSchema = z.object({ data: z.object({ visitors: z.number() }) })
 const valuesSchema = z.array(z.object({ value: z.string().nullable(), total: z.number() }))
 
 type Fetch = typeof fetch
@@ -130,28 +135,40 @@ export function createUmamiReader(
     },
 
     async details(range: Range): Promise<TrafficDetails | null> {
-      const [channels, entries, devices, buildPages, events, games, browsed] = await Promise.all([
-        metrics(range, 'channel'),
-        metrics(range, 'entry'),
-        metrics(range, 'device'),
-        metrics(range, 'path', { path: BUILD_PAGE_PATH }),
-        metrics(range, 'event'),
-        get(
-          'event-data/values',
-          { ...range, event: 'game_pick', propertyName: 'game' },
-          valuesSchema,
-        ),
-        get('stats', { ...range, path: BROWSED_OFFER_PATH }, statsSchema),
-      ])
-      if (!channels || !entries || !devices || !buildPages || !events || !games || !browsed) {
+      const [channels, referrers, entries, devices, buildPages, finished, games, browsed] =
+        await Promise.all([
+          metrics(range, 'channel'),
+          metrics(range, 'referrer'),
+          metrics(range, 'entry'),
+          metrics(range, 'device'),
+          metrics(range, 'path', { path: BUILD_PAGE_PATH }),
+          get('events/stats', { ...range, event: 'configurator_done' }, eventStatsSchema),
+          get(
+            'event-data/values',
+            { ...range, event: 'game_pick', propertyName: 'game' },
+            valuesSchema,
+          ),
+          get('stats', { ...range, path: BROWSED_OFFER_PATH }, statsSchema),
+        ])
+      if (
+        !channels ||
+        !referrers ||
+        !entries ||
+        !devices ||
+        !buildPages ||
+        !finished ||
+        !games ||
+        !browsed
+      ) {
         return null
       }
       return {
         channels,
+        referrers,
         entries,
         devices,
         buildPages,
-        events: Object.fromEntries(events.map((e) => [e.name, e.count])),
+        finishedConfig: finished.data.visitors,
         games: games
           .filter((g) => g.value !== null)
           .map((g) => ({ name: g.value ?? '', count: g.total })),
@@ -188,9 +205,15 @@ export const fakeReader: TrafficReader = {
   async details() {
     return {
       channels: [
-        { name: 'search', count: 600 },
+        { name: 'organicSearch', count: 600 },
         { name: 'direct', count: 400 },
-        { name: 'social', count: 234 },
+        { name: 'organicSocial', count: 234 },
+      ],
+      referrers: [
+        { name: 'google.com', count: 550 },
+        { name: 'facebook.com', count: 150 },
+        { name: 'm.youtube.com', count: 84 },
+        { name: 'bing.com', count: 50 },
       ],
       entries: [
         { name: '/', count: 700 },
@@ -207,7 +230,7 @@ export const fakeReader: TrafficReader = {
         { name: '/zestawy/bazyliszek', count: 200 },
         { name: '/zestawy/skrzat', count: 100 },
       ],
-      events: { configurator_start: 300, configurator_done: 120, game_pick: 90 },
+      finishedConfig: 120,
       games: [
         { name: 'fortnite', count: 40 },
         { name: 'counter-strike-2', count: 30 },

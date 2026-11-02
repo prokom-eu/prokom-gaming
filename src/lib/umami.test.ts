@@ -23,6 +23,7 @@ function umamiFetch(overrides: Record<string, unknown> = {}) {
     },
     metrics: [{ x: 'direct', y: 3 }],
     'event-data/values': [{ value: 'counter-strike-2', total: 1 }],
+    'events/stats': { data: { events: 9, visitors: 2, visits: 2, uniqueEvents: 1 } },
     ...overrides,
   }
   return vi.fn(async (input: string | URL | Request, _init?: RequestInit) => {
@@ -63,7 +64,8 @@ describe('Umami reader (P8)', () => {
     const details = await createUmamiReader(config, fetchImpl).details(range)
     expect(details?.games).toEqual([{ name: 'counter-strike-2', count: 1 }])
     expect(details?.browsedOffer).toBe(3)
-    expect(details?.events).toEqual({ direct: 3 })
+    expect(details?.finishedConfig).toBe(2)
+    expect(details?.referrers).toEqual([{ name: 'direct', count: 3 }])
     const urls = fetchImpl.mock.calls.map((c) => decodeURIComponent(String(c[0])))
     expect(urls.some((u) => u.includes(`path=${BROWSED_OFFER_PATH}`))).toBe(true)
   })

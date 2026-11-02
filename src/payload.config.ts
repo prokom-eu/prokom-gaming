@@ -155,6 +155,12 @@ export default buildConfig({
           exact: true,
           meta: { title: 'Karta klienta' },
         },
+        stats: {
+          Component: '/admin/stats/StatsView#StatsView',
+          path: '/statystyki',
+          exact: true,
+          meta: { title: 'Statystyki strony' },
+        },
         settings: {
           Component: '/admin/settings/SettingsView#SettingsView',
           path: '/ustawienia',

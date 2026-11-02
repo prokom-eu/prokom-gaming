@@ -1,0 +1,208 @@
+/* Statystyki strony (panel spec §12, board Statystyki): panel tokens only (panel-tokens.css). */
+
+.wide,
+.cols2,
+.cols3,
+.missing {
+  margin-top: 16px;
+}
+
+.cols2,
+.cols3 {
+  display: grid;
+  gap: 16px;
+  align-items: start;
+}
+.cols2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.cols3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+/* The builds table runs to the card's edges (board). */
+.flush :global(.pn-tbx) {
+  margin: 0 -20px -20px;
+}
+
+/* Chart */
+.chart {
+  margin: 8px 0 0;
+}
+.chart svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.chart .phoneSvg {
+  display: none;
+}
+.grid {
+  stroke: var(--p-ln);
+  stroke-width: 1;
+}
+.axis {
+  fill: var(--p-mu);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.bar {
+  fill: var(--p-info);
+  opacity: 0.55;
+}
+.area {
+  fill: var(--p-gold);
+  opacity: 0.16;
+}
+.line {
+  fill: none;
+  stroke: var(--p-gold);
+  stroke-width: 2.4;
+  stroke-linejoin: round;
+}
+
+/* Funnel */
+.funnel {
+  list-style: none;
+  margin: 4px 0 12px;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+}
+.funnel li {
+  display: grid;
+  grid-template-columns: minmax(0, 11rem) minmax(0, 1fr) 4.5rem 3.5rem;
+  align-items: center;
+  gap: 12px;
+  min-height: 40px;
+}
+.funnelLabel {
+  color: var(--p-tx2);
+  font-size: 14px;
+}
+.funnelTrack {
+  display: block;
+  height: 30px;
+}
+.funnelTrack span {
+  display: block;
+  height: 100%;
+  border-radius: 6px;
+  background: linear-gradient(
+    90deg,
+    var(--p-gold),
+    color-mix(in srgb, var(--p-gold) 45%, transparent)
+  );
+}
+.funnelValue {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.funnelShare {
+  text-align: right;
+  color: var(--p-mu);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Share bars */
+.bars {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+.bars li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 6px 12px;
+  font-size: 14px;
+  color: var(--p-tx2);
+}
+.bars b {
+  color: var(--p-tx);
+  font-variant-numeric: tabular-nums;
+}
+.barTrack {
+  grid-column: 1 / -1;
+  display: block;
+  height: 8px;
+  border-radius: 99px;
+  background: var(--p-s3);
+}
+.barTrack span {
+  display: block;
+  height: 100%;
+  border-radius: 99px;
+  background: var(--p-gold);
+}
+
+/* Devices and entries */
+.devBar {
+  display: flex;
+  height: 10px;
+  border-radius: 99px;
+  overflow: hidden;
+  background: var(--p-s3);
+}
+.devPhone {
+  background: var(--p-gold);
+}
+.devComputer {
+  background: var(--p-info);
+}
+.devTablet {
+  background: var(--p-mu);
+}
+.entries {
+  margin: 14px 0 0;
+  display: grid;
+  gap: 8px;
+}
+.entries div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 14px;
+  color: var(--p-tx2);
+}
+.entries dt {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.entries dd {
+  margin: 0;
+  color: var(--p-tx);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 1180px) {
+  .cols3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .cols2,
+  .cols3 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .funnel li {
+    grid-template-columns: minmax(0, 1fr) 4rem 3.5rem;
+  }
+  .funnelTrack {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    height: 14px;
+  }
+  .flush :global(.pn-tbx) {
+    margin: 0;
+  }
+  .chart .wideSvg {
+    display: none;
+  }
+  .chart .phoneSvg {
+    display: block;
+  }
+}
