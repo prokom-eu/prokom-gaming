@@ -4,7 +4,10 @@ import { join } from 'node:path'
 import { describe, it } from 'vitest'
 
 import { confirmationEmail, notificationEmail, type InquiryForEmail } from '../inquiry/emails'
+import { resetEmailHtml, verifyEmailHtml } from '../account/emails'
 import { replyHtml } from '../inquiry/replyHtml'
+import { alertHtml } from '../notify/alertMail'
+import { buildStageMail } from '../orderMail'
 import { LOGO_CID } from './layout'
 
 /**
@@ -141,6 +144,51 @@ ${signature}`,
           price: '9 890 zł',
           leadTime: '5–10 dni roboczych',
         },
+      }),
+    })
+    for (const [name, stage] of [
+      ['c-etap-montaz', 'assembly'],
+      ['c-etap-wyslane', 'shipped'],
+    ] as const) {
+      write(
+        name,
+        buildStageMail({
+          to: 'jan.kowalski@example.test',
+          orderNumber: 'Z-2026-0019',
+          stage,
+          buildName: 'Wilkołak',
+          signature,
+          template: null,
+          trackingNumber: stage === 'shipped' ? '6234 5678 9012 3456' : null,
+          siteUrl: 'https://prokomgaming.pl',
+        }),
+      )
+    }
+    write('d-konto-weryfikacja', {
+      subject: 'Potwierdź adres e-mail — konto PRO-KOM Gaming',
+      html: verifyEmailHtml({
+        name: 'Jan',
+        link: 'https://prokomgaming.pl/konto/potwierdz?token=abc',
+      }),
+    })
+    write('d-konto-haslo', {
+      subject: 'Nowe hasło do konta PRO-KOM Gaming',
+      html: resetEmailHtml({ name: 'Jan', link: 'https://prokomgaming.pl/konto/haslo?token=abc' }),
+    })
+    write('e-alert-ceny', {
+      subject: 'Raport cen: zmiany wymagające uwagi',
+      ...alertHtml({
+        subject: 'Raport cen: zmiany wymagające uwagi',
+        text: [
+          'Sprawdzanie cen znalazło zmiany wymagające uwagi:',
+          '',
+          '- MSI GeForce RTX 5070 Ventus 2X: +180 zł u dostawcy (marża Wilkołaka spada do 9%)',
+          '- AMD Ryzen 7 7800X3D: brak w magazynie u 2 z 3 dostawców',
+          '',
+          'Raport: https://prokomgaming.pl/admin/raporty-cen/7',
+          'Nic nie zmieniło się na stronie — nowe ceny zatwierdzasz w panelu.',
+        ].join('\n'),
+        siteUrl: 'https://prokomgaming.pl',
       }),
     })
   })

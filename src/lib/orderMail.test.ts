@@ -35,4 +35,26 @@ describe('buildStageMail', () => {
     const mail = buildStageMail({ ...base, template: `${DEFAULT_STAGE_TEMPLATE} <b>` })
     expect(mail.html).toContain('&lt;b&gt;')
   })
+
+  it('HTML (board 09 C): stage of 7, headline, the bar, order rows, signature, the mark', () => {
+    const mail = buildStageMail({ ...base, stage: 'assembly', template: null })
+    expect(mail.html).toContain('Etap 4 z 7')
+    expect(mail.html).toContain('Składamy Twój komputer.')
+    expect(mail.html).toContain('Metryka')
+    expect(mail.html).toContain('Z-2026-0012')
+    expect(mail.html).toContain('Krystian · PRO-KOM Gaming')
+    expect(mail.attachments[0]?.cid).toBe('logo@prokomgaming.pl')
+  })
+
+  it('HTML: the tracking number once shipped', () => {
+    const mail = buildStageMail({
+      ...base,
+      stage: 'shipped',
+      template: null,
+      trackingNumber: '6234 5678 9012',
+    })
+    expect(mail.html).toContain('Numer przesyłki')
+    expect(mail.html).toContain('6234 5678 9012')
+    expect(mail.html).toContain('Etap 7 z 7')
+  })
 })

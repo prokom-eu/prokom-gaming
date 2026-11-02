@@ -97,6 +97,8 @@ u+.body a,#MessageViewBody a{color:inherit;text-decoration:none}
   .btn{display:table!important;margin:0 0 10px!important;width:100%!important}
   .btn td{text-align:center!important}
   .price{font-size:28px!important}
+  .stage-l{font-size:9px!important;letter-spacing:-.01em}
+  .stage-c{padding:0!important}
   .logo{width:120px!important;height:auto!important}
   .outer{padding-left:8px!important;padding-right:8px!important}
 }
@@ -113,7 +115,22 @@ export function esc(value: string): string {
 
 /** Plain text with line breaks as escaped HTML. */
 function lines(value: string): string {
-  return esc(value).replace(/\r?\n/g, '<br>')
+  return (
+    esc(value)
+      // Numbers like Z-2026-0019 never break at a hyphen.
+      .replace(/\b([A-Z]{1,3}-\d{4}-\d{4})\b/g, '<span style="white-space:nowrap">$1</span>')
+      .replace(/\r?\n/g, '<br>')
+  )
+}
+
+/**
+ * The mark set in text, for mails that cannot carry an attachment (Payload's account e-mails take
+ * HTML only): PRO–KOM with the gold dash, GAMING under a gold rule — the brand book's lockup.
+ */
+function wordmark(width: number): string {
+  const size = Math.round(width * 0.165)
+  return `<table ${TABLE} style="border-collapse:separate"><tr><td style="font:900 ${size}px/1 'Arial Black','Segoe UI',Arial,sans-serif;letter-spacing:.01em;color:${C.text};white-space:nowrap">PRO<span style="color:${C.gold}">&ndash;</span>KOM</td></tr>
+<tr><td align="right" style="padding-top:${Math.round(size * 0.25)}px"><table ${TABLE} align="right"><tr><td style="border-top:2px solid ${C.gold};padding-top:${Math.round(size * 0.2)}px;font:700 ${Math.max(8, Math.round(size * 0.36))}px/1 ${SANS};letter-spacing:.32em;color:${C.text}">GAMING</td></tr></table></td></tr></table>`
 }
 
 /** Only http(s), mailto: and tel: links leave our hands. */
@@ -181,6 +198,8 @@ export type MailInput = {
   lead?: string
   blocks: MailBlock[]
   footer: MailFooter
+  /** The mark in text instead of the attached image (mails sent without attachments). */
+  textLogo?: boolean
 }
 
 /** The footer: the brand mark, contact you can tap, links, the legal line and why the mail came. */
@@ -390,10 +409,10 @@ ${b.aside.note ? `<div style="font:12px/1.4 ${SANS};color:${C.muted}">${esc(b.as
         .map((name, i) => {
           const done = i < b.current
           const now = i === b.current
-          return `<td align="center" valign="top" width="${Math.floor(100 / total)}%" style="padding:0 2px">
+          return `<td class="stage-c" align="center" valign="top" width="${Math.floor(100 / total)}%" style="padding:0 2px">
 <div style="height:4px;line-height:4px;font-size:0;border-radius:2px;${done || now ? GOLD_LINE : `background:${C.lineStrong}`}">&nbsp;</div>
 <table ${TABLE} align="center" style="margin:12px auto 8px;border-collapse:separate"><tr><td align="center" width="28" height="28" style="width:28px;height:28px;border-radius:14px;${done ? `background:${C.gold};` : now ? `border:2px solid ${C.gold};` : `border:1px solid ${C.lineStrong};`}font:700 12px/28px ${SANS};color:${done ? C.onGold : now ? C.gold : C.muted}">${done ? '&#10003;' : i + 1}</td></tr></table>
-<div style="font:${now ? '700' : '500'} 11px/1.3 ${SANS};color:${now ? C.text : C.muted}">${esc(name)}</div>
+<div class="stage-l" style="font:${now ? '700' : '500'} 11px/1.3 ${SANS};color:${now ? C.text : C.muted}">${esc(name)}</div>
 </td>`
         })
         .join('')
@@ -422,13 +441,13 @@ ${eyebrow(b.title)}
         `<table ${TABLE} width="100%" bgcolor="${C.panel}" style="background:${C.panel};background-image:radial-gradient(80% 140% at 100% 50%,${C.gold}1f 0%,${C.gold}00 65%);border:1px solid ${C.lineStrong};border-radius:16px;border-collapse:separate"><tr>
 <td class="stack" valign="middle" style="padding:20px 22px">
 ${b.title ? `<div style="font:700 16px/1.45 ${SANS};color:${C.text}">${esc(b.title)}</div>` : ''}
-<div style="padding-top:3px;font:14px/1.6 ${SANS};color:${C.muted}">${lines(b.text)}</div></td>
+<div style="padding-top:3px;font:14px/1.6 ${SANS};color:${C.muted};word-break:break-word;overflow-wrap:anywhere">${lines(b.text)}</div></td>
 ${b.button ? `<td class="stack" valign="middle" align="right" style="padding:20px 12px 10px 22px;white-space:nowrap">${button(b.button.label, b.button.href, true)}</td>` : ''}
 </tr></table>`,
       )
     case 'signature':
       return row(
-        'padding:12px 0 6px',
+        'padding:12px 0 26px',
         `<div style="height:1px;line-height:1px;font-size:0;background:${C.line};margin-bottom:20px">&nbsp;</div>
 <table ${TABLE}><tr>
 <td valign="middle" style="padding-right:18px;border-right:2px solid ${C.gold}"><img src="cid:${LOGO_CID}" width="112" alt="PRO-KOM Gaming" style="display:block;width:112px;height:auto;border:0"></td>
@@ -556,6 +575,14 @@ ${footer(input.footer)}
 </table>
 </body>
 </html>`
+  if (input.textLogo) {
+    return {
+      html: html.replace(/<img src="cid:[^"]+" width="(\d+)"[^>]*>/g, (_, w: string) =>
+        wordmark(Number(w)),
+      ),
+      attachments: [],
+    }
+  }
   return {
     html,
     attachments: [
