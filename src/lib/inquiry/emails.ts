@@ -177,13 +177,18 @@ function computerRows(
   lightColor: InquiryForEmail['lightColor'],
 ): KeyValue[] {
   return [
-    ...PART_KEYS.map((key) => {
+    ...PART_KEYS.flatMap((key) => {
       const code = computer.config[key]
-      const label = computer.labels[key] ?? code
-      return {
-        label: PART_LABELS[key],
-        value: withCodes && label !== code ? `${label} (${code})` : label,
-      }
+      const name = computer.labels[key]
+      // The customer never sees a bare code: no public name, no row.
+      if (!name && !withCodes) return []
+      const label = name ?? code
+      return [
+        {
+          label: PART_LABELS[key],
+          value: withCodes && label !== code ? `${label} (${code})` : label,
+        },
+      ]
     }),
     ...kv('Światło', lightColor ? labelOf(LIGHT_COLOR_CHOICES, lightColor) : undefined),
   ]

@@ -21,7 +21,10 @@ import { LOGO_PNG_BASE64, LOGO_PNG_SIZE } from './logo'
 
 export const LOGO_CID = 'logo@prokomgaming.pl'
 
-/** Colours from docs/design/prokomgaming/tokens.css. */
+/**
+ * Colours from src/styles/tokens.css (ADR-G003). Mail programs know no CSS variables, so the values
+ * are copied here; `tokens.mail.test.ts` fails when they drift from the tokens.
+ */
 export const MAIL_COLORS = {
   page: '#040706', // --smola
   tag: '#07100e', // --noc
@@ -42,7 +45,7 @@ export const MAIL_COLORS = {
 const C = MAIL_COLORS
 
 /** Accent of each build (tokens `--c-<build>`), by the build's name. */
-const BUILD_ACCENTS: Record<string, string> = {
+export const BUILD_ACCENTS: Record<string, string> = {
   skrzat: '#E0A64B',
   licho: '#7CF26B',
   bies: '#C3F25B',
@@ -513,9 +516,10 @@ export function renderMail(input: MailInput): RenderedMail {
 <style>${STYLE}</style>
 </head>
 <body class="body" bgcolor="${C.page}" style="margin:0;padding:0;background:${C.page};width:100%">
-<div style="display:none;max-height:0;overflow:hidden;opacity:0;font-size:1px;line-height:1px;color:${C.page}">${esc(input.preheader)}&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;</div>
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;font-size:1px;line-height:1px;color:${C.page};mso-hide:all">${esc(input.preheader)}&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;</div>
 <table ${TABLE} width="100%" bgcolor="${C.page}" style="background:${C.page}">
 <tr><td class="outer" align="center" style="padding:28px 12px 36px">
+<!--[if mso]><table role="presentation" width="600" align="center" cellpadding="0" cellspacing="0" border="0"><tr><td><![endif]-->
 <table ${TABLE} width="600" style="width:100%;max-width:600px;border-collapse:separate">
 <tr><td bgcolor="${C.tag}" style="background:${C.tag};background-image:radial-gradient(110% 120% at 100% 0%,rgba(242,194,48,.16) 0%,rgba(242,194,48,0) 55%);border:1px solid ${C.line};border-bottom:0;border-radius:20px 20px 0 0">
 <table ${TABLE} width="100%">
@@ -536,6 +540,7 @@ ${input.blocks.map(block).join('\n')}
 </td></tr>
 ${footer(input.footer)}
 </table>
+<!--[if mso]></td></tr></table><![endif]-->
 </td></tr>
 </table>
 </body>
