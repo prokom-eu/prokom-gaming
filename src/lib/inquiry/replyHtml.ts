@@ -6,9 +6,11 @@ import { buildAccent, renderMail, type MailBlock, type RenderedMail } from '../m
  * brand layout. The text stays the source — nothing here adds words the panel did not show.
  * - The signature (from the mail settings) at the end becomes the signature block with the mark.
  * - A paragraph of „• …” lines becomes a list.
- * - An offer (template kind `offer`) gets the offer card: every part by name with its role, the
- *   total, the lead time, how long it is valid and „Akceptuję ofertę”. The parts list in the text
- *   is then left out of the HTML (the card shows it); the plain-text version keeps it.
+ * - An offer (template kind `offer`): when the text lists exactly the parts of the configuration,
+ *   that list becomes the offer card — each part with its role — and „Akceptuję ofertę”. The
+ *   card shows the total, the lead time and the validity only when the text says them, in the
+ *   same words; an edited list (a part swapped, removed) stays a plain list and gets no card.
+ *   The plain-text version is the text as written.
  * Pure — no Payload, no SMTP.
  */
 
@@ -50,27 +52,42 @@ const isHeadedList = (lines: string[]) =>
 
 const stripBullet = (line: string) => line.replace(BULLET, '')
 
-function splitSignature(body: string, signature: string | null): { text: string; sign: string } {
+/** The written signature at the end of a text, split off (empty when it is not there). */
+export function splitSignature(
+  body: string,
+  signature: string | null,
+): { text: string; sign: string } {
   const sign = (signature ?? '').replace(/\r\n/g, '\n').trim()
   if (sign && body.endsWith(sign)) return { text: body.slice(0, -sign.length).trim(), sign }
   return { text: body, sign: '' }
 }
 
-function offerBlocks(input: ReplyHtmlInput, offer: ReplyOffer): MailBlock[] {
+const norm = (value: string) => value.replace(/\s+/g, ' ').trim().toLowerCase()
+
+/** The list in the text is the configuration's parts — same models, nothing added or dropped. */
+function listsParts(items: string[], parts: OfferPart[]): boolean {
+  const a = items.map(norm).sort()
+  const b = parts.map((p) => norm(p.model)).sort()
+  return a.length === b.length && a.every((item, i) => item === b[i])
+}
+
+function offerBlocks(input: ReplyHtmlInput, offer: ReplyOffer, text: string): MailBlock[] {
+  const says = (value: string | null) => (value ? norm(text).includes(norm(value)) : false)
   const accept = `mailto:${input.replyAddress}?subject=${encodeURIComponent(
     `Re: [${input.number}] Akceptuję ofertę`,
   )}&body=${encodeURIComponent(`Akceptuję ofertę ${input.number}.`)}`
   return [
     {
       kind: 'card',
-      eyebrow: `Oferta ${input.number} · ważna ${OFFER_VALIDITY}`,
+      eyebrow: says(OFFER_VALIDITY)
+        ? `Oferta ${input.number} · ważna ${OFFER_VALIDITY}`
+        : `Oferta ${input.number}`,
       title: offer.topic,
-      subtitle: offer.leadTime ? `Termin złożenia: ${offer.leadTime} od wpłaty` : undefined,
+      subtitle: says(offer.leadTime) ? `Termin złożenia: ${offer.leadTime}` : undefined,
       accent: buildAccent(offer.buildName),
       rows: offer.parts.map((p) => ({ label: p.role, value: p.model })),
-      price: offer.price
-        ? { label: 'Razem brutto', value: offer.price, note: 'z montażem i testami' }
-        : undefined,
+      // The total only when the text names the same amount — never a second, different price.
+      price: offer.price && says(offer.price) ? { label: 'Razem', value: offer.price } : undefined,
     },
     {
       kind: 'buttons',
@@ -79,7 +96,7 @@ function offerBlocks(input: ReplyHtmlInput, offer: ReplyOffer): MailBlock[] {
     {
       kind: 'paragraph',
       muted: true,
-      text: '„Akceptuję ofertę” otwiera odpowiedź do nas — wystarczy ją wysłać. Potem przyślemy fakturę pro forma.',
+      text: '„Akceptuję ofertę” otwiera odpowiedź do nas — wystarczy ją wysłać.',
     },
   ]
 }
@@ -93,24 +110,27 @@ export function replyHtml(input: ReplyHtmlInput): RenderedMail {
   let offerPlaced = false
   for (const paragraph of text.split(/\n{2,}/)) {
     const lines = paragraph.split('\n').map((l) => l.trimEnd())
-    if (offer && (isList(lines) || isHeadedList(lines))) {
-      // The card lists the parts with their roles — no second list from the text.
-      if (!offerPlaced) blocks.push(...offerBlocks(input, offer))
+    const headed = isHeadedList(lines)
+    const items = headed
+      ? lines.slice(1).map(stripBullet)
+      : isList(lines)
+        ? lines.map(stripBullet)
+        : null
+    if (offer && !offerPlaced && items && listsParts(items, offer.parts)) {
+      // This list is the configuration: the card shows it with the roles.
+      blocks.push(...offerBlocks(input, offer, text))
       offerPlaced = true
       continue
     }
-    if (isHeadedList(lines)) {
+    if (headed) {
       blocks.push({ kind: 'heading', text: (lines[0] ?? '').replace(/:\s*$/, '') })
-      blocks.push({ kind: 'list', items: lines.slice(1).map(stripBullet) })
-    } else if (isList(lines)) {
-      blocks.push({ kind: 'list', items: lines.map(stripBullet) })
+      blocks.push({ kind: 'list', items: items ?? [] })
+    } else if (items) {
+      blocks.push({ kind: 'list', items })
     } else if (paragraph.trim()) {
       blocks.push({ kind: 'paragraph', text: paragraph.trim() })
     }
   }
-  // An offer whose text has no parts list: the card goes after the opening paragraphs.
-  if (offer && !offerPlaced)
-    blocks.splice(Math.min(2, blocks.length), 0, ...offerBlocks(input, offer))
 
   // Only the signature that was written — the panel adds none on its own.
   if (sign) blocks.push({ kind: 'signature', lines: signatureLines(sign, input.siteUrl) })
@@ -118,13 +138,14 @@ export function replyHtml(input: ReplyHtmlInput): RenderedMail {
   const firstSentence =
     text
       .split(/\n{2,}/)
-      .find((p) => !/^dzień dobry/i.test(p.trim()))
+      .map((p) => p.replace(/^\s*dzień dobry[,!.]?\s*/i, '').trim())
+      .find((p) => p !== '')
       ?.replace(/^\s*[•\-–]\s+/gm, '')
       ?.replace(/\s+/g, ' ')
       .slice(0, 140) ?? ''
   return renderMail({
     preheader: firstSentence,
-    tagLabel: `${offer ? 'Oferta' : 'Odpowiedź'} ${input.number}`,
+    tagLabel: `${offerPlaced ? 'Oferta' : 'Odpowiedź'} ${input.number}`,
     blocks,
     footer: mailFooter(
       input.siteUrl,

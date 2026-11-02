@@ -49,13 +49,15 @@ describe('replyHtml', () => {
     expect(html).not.toContain('Rabka-Zdrój, ul. Orkana 16B · +48 883 200 151')
   })
 
-  it('offer: card with each part and its role, total, lead time, validity and the accept mailto', () => {
+  it('offer: card with each part and its role, the total named in the text, the accept mailto', () => {
     const { html } = replyHtml({ ...base, body: offerBody, offer })
-    expect(html).toContain('Oferta PKG-2026-0047 · ważna 48 godzin')
+    expect(html).toContain('Oferta PKG-2026-0047')
+    // Neither validity nor lead time is in this text — the card does not add them.
+    expect(html).not.toContain('ważna 48 godzin')
+    expect(html).not.toContain('Termin złożenia')
     expect(html).toContain('Karta graficzna')
     expect(html).toContain('MSI GeForce RTX 5070 Ventus 2X 12G')
     expect(html).toContain('9 890 zł')
-    expect(html).toContain('Termin złożenia: 5–10 dni roboczych od wpłaty')
     expect(html).toContain(
       'mailto:kontakt@prokomgaming.pl?subject=Re%3A%20%5BPKG-2026-0047%5D%20Akcept',
     )
@@ -63,6 +65,47 @@ describe('replyHtml', () => {
     // The list from the text is replaced by the card, not shown twice.
     expect(html.match(/AMD Ryzen 7 7800X3D/g)).toHaveLength(1)
     expect(html).not.toContain('Skład')
+  })
+
+  it('offer: validity and lead time on the card only when the text says them', () => {
+    const body = offerBody.replace(
+      'z montażem.',
+      'z montażem. Oferta ważna 48 godzin, składamy w 5–10 dni roboczych.',
+    )
+    const { html } = replyHtml({ ...base, body, offer })
+    expect(html).toContain('Oferta PKG-2026-0047 · ważna 48 godzin')
+    expect(html).toContain('Termin złożenia: 5–10 dni roboczych')
+  })
+
+  it('offer: a list that is not the configuration (part swapped) stays a list, no card', () => {
+    const body = offerBody.replace('AMD Ryzen 7 7800X3D', 'AMD Ryzen 7 9800X3D')
+    const { html } = replyHtml({ ...base, body, offer })
+    expect(html).not.toContain('Akceptuję ofertę')
+    expect(html).toContain('AMD Ryzen 7 9800X3D')
+    expect(html).not.toContain('Karta graficzna')
+  })
+
+  it('offer: a price changed by hand in the text never shows a second amount on the card', () => {
+    const body = offerBody.replace('9 890 zł', '9 490 zł')
+    const { html } = replyHtml({ ...base, body, offer })
+    expect(html).toContain('Karta graficzna')
+    expect(html).toContain('9 490 zł')
+    expect(html).not.toContain('9 890 zł')
+  })
+
+  it('offer: other lists in the text stay', () => {
+    const body = offerBody.replace(
+      'Płatność przelewem',
+      'W cenie:\n• Windows 11\n• wysyłka\n\nPłatność przelewem',
+    )
+    const { html } = replyHtml({ ...base, body, offer })
+    expect(html).toContain('Windows 11')
+    expect(html).toContain('W cenie')
+  })
+
+  it('preheader: a one-paragraph reply loses only the greeting', () => {
+    const { html } = replyHtml({ ...base, body: 'Dzień dobry, komputer jest gotowy do odbioru.' })
+    expect(html).toContain('>komputer jest gotowy do odbioru.')
   })
 
   it('a plain list in a reply (no offer) becomes a list', () => {
