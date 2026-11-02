@@ -16,8 +16,8 @@ import { errorFields, log } from './logger'
  * - `events/stats?event=` → `{ data: { visitors } }` (unique visitors with that event),
  * - `event-data/values?event=&propertyName=` → `[{ value, total }]`.
  * Filters take an operator prefix (`re.` = regex). Every answer is checked with Zod; no answer,
- * a bad one or more than 3 s = `null` (the panel hides traffic, never fails). Answers stay in
- * memory for 5 minutes (one VPS process). Nothing personal is sent or read: paths, channels,
+ * a bad one or more than 3 s = `null` (the panel hides traffic, never fails) and Umami counts as
+ * down for a minute. Answers stay in memory for 5 minutes (one VPS process). Nothing personal is sent or read: paths, channels,
  * devices and our own event names only.
  */
 
@@ -54,6 +54,8 @@ export type Range = { startAt: number; endAt: number }
 
 const TIMEOUT_MS = 3000
 const TTL_MS = 5 * 60 * 1000
+/** After a failure Umami counts as down this long: no 3 s wait on every Pulpit (review P8). */
+const DOWN_MS = 60 * 1000
 export const TIMEZONE = 'Europe/Warsaw'
 
 /** Funnel step 2: a build page or the configurator (not the `/zestawy` list itself). */
@@ -78,6 +80,20 @@ export function createUmamiReader(
   now: () => number = Date.now,
 ) {
   const memory = new Map<string, Cached>()
+  let downUntil = 0
+
+  /** Failed: hide traffic everywhere for a minute instead of waiting for Umami on each read. */
+  const failed = () => {
+    downUntil = now() + DOWN_MS
+    return null
+  }
+
+  /** Keeps only fresh answers: the range moves every 5 minutes, so old keys never come back. */
+  const remember = (key: string, value: unknown) => {
+    const at = now()
+    for (const [k, v] of memory) if (at - v.at >= TTL_MS) memory.delete(k)
+    memory.set(key, { at, value })
+  }
 
   async function get<T>(
     endpoint: string,
@@ -90,6 +106,7 @@ export function createUmamiReader(
     const key = `${endpoint}?${query}`
     const hit = memory.get(key)
     if (hit && now() - hit.at < TTL_MS) return hit.value as T
+    if (now() < downUntil) return null
     try {
       const res = await fetchImpl(`${config.url}/api/websites/${config.websiteId}/${key}`, {
         headers: { authorization: `Bearer ${config.apiKey}`, accept: 'application/json' },
@@ -98,18 +115,18 @@ export function createUmamiReader(
       })
       if (!res.ok) {
         log.warn({ endpoint, status: res.status }, 'umami: request refused')
-        return null
+        return failed()
       }
       const parsed = schema.safeParse(await res.json())
       if (!parsed.success) {
         log.warn({ endpoint }, 'umami: unexpected answer')
-        return null
+        return failed()
       }
-      memory.set(key, { at: now(), value: parsed.data })
+      remember(key, parsed.data)
       return parsed.data
     } catch (error) {
       log.warn({ endpoint, ...errorFields(error) }, 'umami: request failed')
-      return null
+      return failed()
     }
   }
 

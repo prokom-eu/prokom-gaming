@@ -54,6 +54,8 @@ export type StatsData = {
   conversion: number | null
   orders: number
   ordersSeries: number[]
+  /** Inquiries of the period with an offer (`offer_sent` or `won`) — funnel step 5. */
+  offered: number
   /** Orders per inquiry („8,0% zapytań kończy się zakupem”). */
   orderRate: number | null
   /** Sum of prices of orders paid in the period (Krystian 02.11), whole złoty. */
@@ -110,18 +112,19 @@ export async function loadStats(payload: Payload, period: Period): Promise<Stats
   const inquiryDays = inquiries.docs.map((d) => dayKey(d.createdAt))
   const inquiriesSeries = period.dayKeys.map((day) => inquiryDays.filter((d) => d === day).length)
   const paid = orders.docs
-    .map((o) => ({ at: paidAt(o.stageHistory), price: o.price ?? 0 }))
+    .map((o) => ({ at: paidAt(o.stageHistory), price: o.price ?? null }))
     .filter(
-      (o): o is { at: number; price: number } =>
+      (o): o is { at: number; price: number | null } =>
         o.at !== null && o.at >= period.startAt && o.at < period.endAt,
     )
   const ordersPerDay = period.dayKeys.map(
     (day) => paid.filter((o) => dayKey(new Date(o.at)) === day).length,
   )
   const revenuePerDay = period.dayKeys.map((day) =>
-    paid.filter((o) => dayKey(new Date(o.at)) === day).reduce((n, o) => n + o.price, 0),
+    paid.filter((o) => dayKey(new Date(o.at)) === day).reduce((n, o) => n + (o.price ?? 0), 0),
   )
   const revenue = Math.round(revenuePerDay.reduce((n, v) => n + v, 0))
+  const priced = paid.filter((o) => o.price !== null).length
   const offered = inquiries.docs.filter((d) => (OFFERED as readonly string[]).includes(d.status))
   const won = inquiries.docs.filter((d) => d.status === 'won')
 
@@ -178,7 +181,9 @@ export async function loadStats(payload: Payload, period: Period): Promise<Stats
     orderRate: ratio(paid.length, inquiries.docs.length),
     revenue,
     revenueSeries: cumulative(revenuePerDay),
-    average: paid.length > 0 ? Math.round(revenue / paid.length) : null,
+    // An order without a price counts as an order, but not in the average (review P8).
+    average: priced > 0 ? Math.round(revenue / priced) : null,
+    offered: offered.length,
     funnel: steps,
     loss: biggestLoss(steps),
     sources: live

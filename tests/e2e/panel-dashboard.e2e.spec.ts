@@ -32,8 +32,10 @@ test.describe('signed in as admin', () => {
     ]) {
       await expect(main(page).getByText(label, { exact: true })).toBeVisible()
     }
-    // Without Umami (P8) the visitors tile is gone, not empty.
-    await expect(main(page).getByText('Odwiedzający dziś')).toHaveCount(0)
+    // P8: the visitors tile comes from Umami (the fake in CI); without Umami it is gone, not empty.
+    await expect(main(page).getByText('Odwiedzający dziś')).toHaveCount(
+      process.env.UMAMI_FAKE === '1' ? 1 : 0,
+    )
 
     await expect(page.getByRole('heading', { name: 'Czeka na Ciebie' })).toBeVisible()
     for (const title of [

@@ -90,6 +90,25 @@ describe('Umami reader (P8)', () => {
     ).toBeNull()
   })
 
+  it('after a failure skips Umami for a minute, then asks again', async () => {
+    let now = 0
+    let up = false
+    const healthy = umamiFetch()
+    const fetchImpl = vi.fn(async (input: string | URL | Request, init?: RequestInit) => {
+      if (!up) throw new Error('timeout')
+      return healthy(input, init)
+    })
+    const reader = createUmamiReader(config, fetchImpl, () => now)
+    expect(await reader.summary(range)).toBeNull()
+    const calls = fetchImpl.mock.calls.length
+    up = true
+    now = 59_000
+    expect(await reader.summary(range)).toBeNull()
+    expect(fetchImpl.mock.calls.length).toBe(calls)
+    now = 61_000
+    expect(await reader.summary(range)).not.toBeNull()
+  })
+
   it('keeps answers for 5 minutes', async () => {
     const fetchImpl = umamiFetch()
     let now = 0

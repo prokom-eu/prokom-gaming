@@ -53,7 +53,8 @@ function moveFocus(
   if (event.key === 'ArrowDown') {
     event.preventDefault()
     links[Math.min(links.length - 1, at + 1)]?.focus()
-  } else if (event.key === 'ArrowUp') {
+  } else if (event.key === 'ArrowUp' && at >= 0) {
+    // Only between the links: in the field ArrowUp keeps moving the caret.
     event.preventDefault()
     if (at <= 0) input?.focus()
     else links[at - 1]?.focus()

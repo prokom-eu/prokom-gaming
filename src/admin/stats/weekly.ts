@@ -44,7 +44,7 @@ export async function runWeeklyReport(payload: Payload, now = new Date()): Promi
             : 'off',
       sales: {
         inquiries: stats.inquiries,
-        offered: stats.funnel[4]?.count ?? 0,
+        offered: stats.offered,
         orders: stats.orders,
         revenue: stats.revenue,
       },
@@ -60,13 +60,21 @@ export async function runWeeklyReport(payload: Payload, now = new Date()): Promi
           : 'missing',
       statsUrl: `${getEnv().SITE_URL}${payload.config.routes.admin}/statystyki?okres=7`,
     }
-    await notify(payload, { kind: 'weekly_report', push: null, email: weeklyReportText(data) })
-    await payload.updateGlobal({
-      slug: 'price-check-settings',
-      data: { weeklyReportSentAt: now.toISOString() },
-      depth: 0,
-      overrideAccess: true,
-    })
+    // The date first: a failure after queueing must not send the report again an hour later.
+    const mark = (at: string | null) =>
+      payload.updateGlobal({
+        slug: 'price-check-settings',
+        data: { weeklyReportSentAt: at },
+        depth: 0,
+        overrideAccess: true,
+      })
+    await mark(now.toISOString())
+    try {
+      await notify(payload, { kind: 'weekly_report', push: null, email: weeklyReportText(data) })
+    } catch (error) {
+      await mark(settings.weeklyReportSentAt ?? null)
+      throw error
+    }
     log.info({ inquiries: stats.inquiries, orders: stats.orders }, 'weekly report queued')
     return true
   } catch (error) {

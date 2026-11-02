@@ -19,16 +19,18 @@ export function periodOf(value: unknown): PeriodDays {
 const HOUR_MS = 3_600_000
 const FIVE_MIN_MS = 5 * 60_000
 
+const warsawHour = new Intl.DateTimeFormat('en-GB', {
+  timeZone: 'Europe/Warsaw',
+  hour: '2-digit',
+  hourCycle: 'h23',
+})
+
 /** The instant a Polish day starts (00:00 Europe/Warsaw — CET or CEST). */
 export function warsawMidnight(day: string): number {
   const utc = Date.parse(`${day}T00:00:00Z`)
   for (const offset of [1, 2]) {
     const t = utc - offset * HOUR_MS
-    const parts = new Intl.DateTimeFormat('en-GB', {
-      timeZone: 'Europe/Warsaw',
-      hour: '2-digit',
-      hourCycle: 'h23',
-    }).format(new Date(t))
+    const parts = warsawHour.format(new Date(t))
     if (dayKey(new Date(t)) === day && parts === '00') return t
   }
   return utc - HOUR_MS

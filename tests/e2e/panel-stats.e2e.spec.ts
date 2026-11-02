@@ -39,7 +39,8 @@ test('the screen: period switch, tiles, chart and funnel', async ({ page }) => {
   await expect(funnel.getByText('Zamówili')).toBeVisible()
 
   if (fake) {
-    await expect(main.getByText('1 234', { exact: true })).toBeVisible()
+    // The visitors tile (the same number heads the funnel).
+    await expect(main.locator('.pn-kpi', { hasText: 'Odwiedzający' })).toContainText('1 234')
     await expect(funnel.getByText('Obejrzeli zestaw albo konfigurator')).toBeVisible()
     const sources = page.getByRole('region', { name: 'Skąd przychodzą' })
     await expect(sources.getByText('Google (wyszukiwarka)')).toBeVisible()

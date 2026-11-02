@@ -9,10 +9,10 @@ import { errorFields, log } from '../../lib/logger'
 import { addInquiryNote, loadReplyContext, sendInquiryReply } from '../../lib/inquiry/thread.server'
 import { CONFIG_TYPES, INQUIRY_STATUSES, type InquiryStatus } from '../../lib/inquiry/types'
 import { panelActionSession } from '../session'
+import { STATUS_CHIP } from './format'
 import { findInquiries, type SearchHit } from './search'
 
 export type { SearchHit }
-import { STATUS_CHIP } from './format'
 
 /**
  * Actions of /admin/zapytania (panel spec §4, ADR-G008). Each one checks the admin role on the
