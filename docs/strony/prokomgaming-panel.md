@@ -133,7 +133,7 @@ Rozbudowa ekranu z G4, bez zmiany logiki publikacji i strażnika.
 - Odchylenie > `outlierPct` (domyślnie 25%) od poprzedniego kosztu → pozycja „do ręcznego sprawdzenia”, bez propozycji.
 
 ## 12. Statystyki (szczegóły: ADR-G009)
-- Okres: 7 / 30 dni (plansza), później 90 i własny zakres. Kafle: odwiedzający (Umami), zapytania (baza) + konwersja, zamówienia (baza), przychód z zamówień (suma cen zamówień wysłanych/opłaconych — definicja w P8 z Krystianem). Wykres dzienny: odwiedzający (linia) + zapytania (słupki).
+- Okres: 7 / 30 dni (plansza), później 90 i własny zakres. Kafle: odwiedzający (Umami), zapytania (baza) + konwersja, zamówienia (baza), przychód z zamówień (**P8, Krystian 02.11:** suma cen zamówień, które w okresie weszły w „Opłacone” albo dalej — data z `stageHistory`; „Zamówienia” = te same zamówienia, „% zapytań kończy się zakupem” = zamówienia / zapytania okresu). Wykres dzienny: odwiedzający (linia) + zapytania (słupki).
 - Lejek: odwiedzający → obejrzeli zestaw albo konfigurator (zdarzenia Umami) → skończyli konfigurację (`configurator_done`) → wysłali zapytanie (baza) → dostali ofertę (status `offer_sent` lub dalej) → zamówili (`won`). Przy każdym kroku procent względem poprzedniego.
 - Skąd przychodzą (Umami: źródła), najczęściej oglądane zestawy (odsłony `/zestawy/<slug>` + zapytania o zestaw z bazy), gry wybierane w doborze (zdarzenie `game_pick`), urządzenia, strony wejścia.
 - Pod tytułem: „Ruch ze statystyk bez ciasteczek (Umami na naszym serwerze), zapytania i sprzedaż z panelu. Bez danych osobowych.”

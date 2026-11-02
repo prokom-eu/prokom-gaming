@@ -189,3 +189,36 @@ export async function setOrderSwitch(
   if (name === 'workshopStrip') revalidatePath('/')
   return { ok: true }
 }
+
+export type WeeklySwitch = 'weeklyPrices' | 'weeklyTraffic'
+
+/**
+ * The Monday report switches (P8): „Raport tygodniowy w poniedziałek” (section „Sprawdzanie
+ * cen”) and „Raport tygodniowy ruchu” (section „Statystyki strony”), both in
+ * `price-check-settings`. Saved at once, like the order switches. Admin only.
+ */
+export async function setWeeklySwitch(
+  name: WeeklySwitch,
+  value: boolean,
+): Promise<{ ok: true } | { ok: false; message: string }> {
+  const session = await panelActionSession('admin')
+  // TODO(krystian): texts of the results — not on the board.
+  if (!session) return { ok: false, message: 'Brak uprawnień — zaloguj się do panelu.' }
+  if ((name !== 'weeklyPrices' && name !== 'weeklyTraffic') || typeof value !== 'boolean') {
+    return { ok: false, message: 'Nie udało się zapisać.' }
+  }
+  try {
+    await session.payload.updateGlobal({
+      slug: 'price-check-settings',
+      data: { [name]: value },
+      user: session.user,
+      overrideAccess: false,
+      depth: 0,
+    })
+  } catch (error) {
+    log.error({ name, ...errorFields(error) }, 'settings: weekly switch not saved')
+    return { ok: false, message: 'Nie udało się zapisać. Spróbuj ponownie.' }
+  }
+  revalidatePath('/admin/ustawienia')
+  return { ok: true }
+}

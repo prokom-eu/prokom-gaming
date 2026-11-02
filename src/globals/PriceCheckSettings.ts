@@ -103,6 +103,32 @@ export const PriceCheckSettings: GlobalConfig = {
         },
       ],
     },
+    // P8: the Monday report to ALERT_EMAIL (job `weekly-report`, 07:00 Polish time). Two switches
+    // like the board Ustawienia: prices and margins (section „Sprawdzanie cen”) and traffic
+    // (section „Statystyki strony”). Both off = no report.
+    {
+      type: 'row',
+      fields: [
+        {
+          name: 'weeklyPrices',
+          label: 'Raport tygodniowy w poniedziałek (zmiany i marże)',
+          type: 'checkbox',
+          defaultValue: true,
+        },
+        {
+          name: 'weeklyTraffic',
+          label: 'Raport tygodniowy ruchu',
+          type: 'checkbox',
+          defaultValue: true,
+        },
+        {
+          name: 'weeklyReportSentAt',
+          label: 'Raport tygodniowy wysłany',
+          type: 'date',
+          admin: { readOnly: true, date: { pickerAppearance: 'dayAndTime' } },
+        },
+      ],
+    },
     {
       name: 'shops',
       label: 'Zaufane sklepy',

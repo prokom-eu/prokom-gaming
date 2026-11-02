@@ -53,6 +53,17 @@ export function periodRange(now: Date, days: PeriodDays): Period {
   }
 }
 
+/**
+ * The week before today: the 7 Polish days ending yesterday (the Monday report covers Monday to
+ * Sunday). `days` stays 7.
+ */
+export function previousWeek(now: Date): Period {
+  const today = dayKey(now)
+  const yesterdayNoon = new Date(Date.parse(`${today}T12:00:00Z`) - 86_400_000)
+  const dayKeys = lastDays(yesterdayNoon, 7)
+  return { days: 7, dayKeys, startAt: warsawMidnight(dayKeys[0]!), endAt: warsawMidnight(today) }
+}
+
 /** A value for every day of the period (missing days = 0), oldest first. */
 export function fillDays(rows: readonly DayCount[], dayKeys: readonly string[]): number[] {
   const byDay = new Map(rows.map((r) => [r.day, r.count]))

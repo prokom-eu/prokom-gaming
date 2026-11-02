@@ -172,6 +172,7 @@ export interface Config {
       'notify-send': TaskNotifySend;
       'price-check': TaskPriceCheck;
       'price-check-scheduler': TaskPriceCheckScheduler;
+      'weekly-report': TaskWeeklyReport;
       inline: {
         input: unknown;
         output: unknown;
@@ -1205,7 +1206,8 @@ export interface PayloadJob {
           | 'mail-intake'
           | 'notify-send'
           | 'price-check'
-          | 'price-check-scheduler';
+          | 'price-check-scheduler'
+          | 'weekly-report';
         taskID: string;
         input?:
           | {
@@ -1248,6 +1250,7 @@ export interface PayloadJob {
         | 'notify-send'
         | 'price-check'
         | 'price-check-scheduler'
+        | 'weekly-report'
       )
     | null;
   queue?: string | null;
@@ -2443,6 +2446,9 @@ export interface PriceCheckSetting {
    */
   outlierPct: number;
   monthlyBudgetUsd: number;
+  weeklyPrices?: boolean | null;
+  weeklyTraffic?: boolean | null;
+  weeklyReportSentAt?: string | null;
   /**
    * Liczą się tylko ich oferty — na stronach Ceneo i z linków do sklepów. Bez marketplace (Allegro, Amazon) — ADR-G011.
    */
@@ -2642,6 +2648,9 @@ export interface PriceCheckSettingsSelect<T extends boolean = true> {
   costMethod?: T;
   outlierPct?: T;
   monthlyBudgetUsd?: T;
+  weeklyPrices?: T;
+  weeklyTraffic?: T;
+  weeklyReportSentAt?: T;
   shops?:
     | T
     | {
@@ -2781,6 +2790,16 @@ export interface TaskPriceCheckScheduler {
   input?: unknown;
   output: {
     queued: boolean;
+  };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskWeekly-report".
+ */
+export interface TaskWeeklyReport {
+  input?: unknown;
+  output: {
+    sent: boolean;
   };
 }
 /**

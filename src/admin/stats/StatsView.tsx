@@ -10,7 +10,7 @@ import { PanelDenied } from '../ui/PanelDenied'
 import { PanelPage } from '../ui/PanelPage'
 import { PanelShell } from '../ui/PanelShell'
 import { loadStats, type BuildRow, type StatsData } from './load'
-import { num, pct, periodOf, PERIODS, type ShareRow } from './model'
+import { num, pct, periodOf, periodRange, PERIODS, type ShareRow } from './model'
 import styles from './stats.module.css'
 import { TrafficChart } from './TrafficChart'
 
@@ -42,7 +42,7 @@ export async function StatsView({ initPageResult, searchParams }: AdminViewServe
   }
   const admin = req.payload.config.routes.admin
   const days = periodOf(one(searchParams?.okres))
-  const data = await loadStats(req.payload, new Date(), days)
+  const data = await loadStats(req.payload, periodRange(new Date(), days))
   const on = data.traffic === 'on'
 
   return (

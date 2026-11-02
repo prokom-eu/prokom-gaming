@@ -14,14 +14,12 @@ import {
   fillDays,
   funnel,
   paidAt,
-  periodRange,
   ratio,
   shares,
   sourceRows,
   type DeviceShares,
   type FunnelStep,
   type Period,
-  type PeriodDays,
   type ShareRow,
 } from './model'
 
@@ -75,10 +73,10 @@ const trusted = { overrideAccess: true, depth: 0, pagination: false } as const
 const OFFERED = ['offer_sent', 'won'] as const
 const BUILD_ROWS = 6
 
-export async function loadStats(payload: Payload, now: Date, days: PeriodDays): Promise<StatsData> {
-  const period = periodRange(now, days)
+export async function loadStats(payload: Payload, period: Period): Promise<StatsData> {
   const range = { startAt: period.startAt, endAt: period.endAt }
   const from = new Date(period.startAt).toISOString()
+  const to = new Date(period.endAt).toISOString()
   const reader = traffic()
 
   const [summary, details, inquiries, orders, builds, games] = await Promise.all([
@@ -86,7 +84,7 @@ export async function loadStats(payload: Payload, now: Date, days: PeriodDays): 
     reader ? reader.details(range) : Promise.resolve<TrafficDetails | null>(null),
     payload.find({
       collection: 'inquiries',
-      where: { createdAt: { greater_than_equal: from } },
+      where: { createdAt: { greater_than_equal: from, less_than: to } },
       select: { createdAt: true, status: true, build: true },
       ...trusted,
     }),
@@ -113,7 +111,10 @@ export async function loadStats(payload: Payload, now: Date, days: PeriodDays): 
   const inquiriesSeries = period.dayKeys.map((day) => inquiryDays.filter((d) => d === day).length)
   const paid = orders.docs
     .map((o) => ({ at: paidAt(o.stageHistory), price: o.price ?? 0 }))
-    .filter((o): o is { at: number; price: number } => o.at !== null && o.at >= period.startAt)
+    .filter(
+      (o): o is { at: number; price: number } =>
+        o.at !== null && o.at >= period.startAt && o.at < period.endAt,
+    )
   const ordersPerDay = period.dayKeys.map(
     (day) => paid.filter((o) => dayKey(new Date(o.at)) === day).length,
   )

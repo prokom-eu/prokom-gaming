@@ -262,7 +262,7 @@ export async function loadDashboard(payload: Payload, now: Date): Promise<Dashbo
 
 let remembered: { key: string; value: PricesData } | null = null
 
-async function loadPrices(payload: Payload): Promise<PricesData> {
+export async function loadPrices(payload: Payload): Promise<PricesData> {
   try {
     const builds = await payload
       .find({ collection: 'builds', sort: '-updatedAt', limit: 1, depth: 0, overrideAccess: true })
