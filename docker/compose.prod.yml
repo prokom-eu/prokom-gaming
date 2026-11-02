@@ -1,0 +1,114 @@
+# Production stack (ADR-G001 §5, G16): the app from the GHCR image + PostgreSQL + Umami (ADR-G009).
+# Nginx is the shared `prokom-proxy` stack from the prokom-web repo; it reaches the app as
+# `prokom-gaming-prod-app-1` and Umami's public paths as `prokom-gaming-prod-umami-1` on the
+# `prokom-proxy` network. Staging = this file + compose.staging.yml.
+# Start (from the repo root, with the environment file next to it — never committed):
+#   docker compose --env-file .env.prod -f docker/compose.prod.yml up -d
+# `.env.prod` = app variables (docs/wdrozenia.md) + the server-only block of .env.example
+# (APP_IMAGE_TAG, POSTGRES_PASSWORD, APP_PORT, UMAMI_PORT, UMAMI_APP_SECRET). DATABASE_URL points at
+# the `postgres` service: postgresql://prokom:<POSTGRES_PASSWORD>@postgres:5432/prokom_gaming_prod.
+# Deploy and rollback: scripts/deploy.sh (docs/wdrozenia.md, docs/runbook.md).
+
+name: prokom-gaming-prod
+
+x-logging: &logging # Docker keeps the JSON logs; rotation so they never fill the disk.
+  driver: json-file
+  options:
+    max-size: '10m'
+    max-file: '5'
+
+services:
+  app:
+    image: ghcr.io/prokom-eu/prokom-gaming:${APP_IMAGE_TAG:?set APP_IMAGE_TAG (commit SHA)}
+    restart: unless-stopped
+    # Relative to this file; ENV_FILE overrides it (e.g. a local test with another file).
+    env_file: ${ENV_FILE:-../.env.prod}
+    environment:
+      NODE_ENV: production
+      MEDIA_DIR: /app/media
+    networks: [default, proxy]
+    ports:
+      # Only on the loopback: smoke test on the server and the first admin through an SSH tunnel
+      # (docs/runbook.md). The public entry is Nginx.
+      - '127.0.0.1:${APP_PORT:-3200}:3000'
+    volumes:
+      - media:/app/media
+    depends_on:
+      postgres:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 1024m
+    logging: *logging
+
+  postgres:
+    image: postgres:17.11-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: prokom
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+      POSTGRES_DB: prokom_gaming_prod
+    # No published port: only this stack and `docker compose exec` reach it.
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U prokom -d prokom_gaming_prod']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    deploy:
+      resources:
+        limits:
+          memory: 256m
+    logging: *logging
+
+  # Creates Umami's own database `umami` in the stack's PostgreSQL, once (idempotent, like
+  # compose.dev.yml), then exits.
+  umami-db:
+    image: postgres:17.11-alpine
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PGPASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+    command: >-
+      sh -c "psql -h postgres -U prokom -d postgres -tAc
+      \"SELECT 1 FROM pg_database WHERE datname = 'umami'\" | grep -q 1
+      || psql -h postgres -U prokom -d postgres -c 'CREATE DATABASE umami'"
+    restart: 'no'
+    logging: *logging
+
+  # Statistics without cookies (ADR-G009). Public through Nginx only for the tracker script and the
+  # collect endpoint (/_s/script.js, /_s/api/send); Umami's own panel only through an SSH tunnel to
+  # the loopback port (docs/runbook.md). The app reads its API over this network (UMAMI_URL).
+  umami:
+    # Pinned (ADR-G009 pt 1): the image of the Umami docs, release 3.4.1 — same as compose.dev.yml.
+    image: docker.umami.is/umami-software/umami:3.4.1
+    restart: unless-stopped
+    depends_on:
+      umami-db:
+        condition: service_completed_successfully
+    environment:
+      # POSTGRES_PASSWORD must be URL-safe (hex), it goes into this address as is.
+      DATABASE_URL: postgresql://prokom:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}@postgres:5432/umami
+      APP_SECRET: ${UMAMI_APP_SECRET:?set UMAMI_APP_SECRET}
+      DISABLE_TELEMETRY: '1'
+      DISABLE_UPDATES: '1'
+    networks: [default, proxy]
+    ports:
+      - '127.0.0.1:${UMAMI_PORT:-3210}:3000'
+    deploy:
+      resources:
+        limits:
+          memory: 384m
+    logging: *logging
+
+networks:
+  proxy:
+    name: prokom-proxy
+    external: true
+
+volumes:
+  pgdata:
+  media:

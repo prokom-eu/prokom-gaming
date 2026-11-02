@@ -1,0 +1,24 @@
+# Staging stack (ADR-G001 §5, G16): the production file with a few differences, run as its own
+# project with its own database, Umami and volumes, next to production on the same server:
+#   docker compose --env-file .env.staging -f docker/compose.prod.yml -f docker/compose.staging.yml up -d
+# `.env.staging`: like `.env.prod` with SITE_ENV=staging, SITE_URL=https://staging.prokomgaming.pl,
+# APP_PORT=3201, UMAMI_PORT=3211 and DATABASE_URL ending in /prokom_gaming_staging; its own VAPID
+# pair and Umami website. Nginx adds the password and noindex.
+
+name: prokom-gaming-staging
+
+services:
+  app:
+    # Fixed here, not taken from ENV_FILE: a missing line must never hand staging the
+    # production secrets (`!override` replaces the value instead of keeping the base one).
+    env_file: !override ../.env.staging
+    deploy:
+      resources:
+        limits:
+          memory: 768m
+
+  postgres:
+    environment:
+      POSTGRES_DB: prokom_gaming_staging
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U prokom -d prokom_gaming_staging']
