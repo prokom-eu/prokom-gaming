@@ -21,7 +21,7 @@ const BAR_STAGES = ORDER_STAGE_CHOICES.filter((c) => c.value !== 'delivered')
 
 /**
  * Headline and the line under it for each stage that sends a mail (`STAGE_MAIL_STAGES`).
- * Board 09 C shows `assembly`; TODO(krystian): the others are drafts in the same tone.
+ * Board 09 C shows `assembly`; the others in the same tone (accepted by Krystian 03.11.2026).
  */
 const STAGE_HEADLINES: Partial<Record<OrderStage, { title: string; lead: string }>> = {
   paid: {
@@ -76,7 +76,7 @@ export function buildStageMail(input: {
   const tracking = input.trackingNumber?.trim()
   return {
     to: input.to,
-    // TODO(krystian): subject of the stage e-mail — not on any board.
+    // Not on any board; accepted by Krystian 03.11.2026.
     subject: `[${input.orderNumber}] Twój komputer: ${etap}`,
     text: tracking ? `${clean}\n\nNumer przesyłki: ${tracking}` : clean,
     ...stageHtml({ ...input, text: clean, etap }),

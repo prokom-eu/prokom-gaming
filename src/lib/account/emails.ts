@@ -1,6 +1,6 @@
 // E-mails of the customer account (verify, password reset). Payload sends them through the same
 // adapter as inquiries; it takes HTML only — the brand layout with the mark set in text.
-// TODO(krystian): wording of both e-mails — not on any board.
+// Wording not on any board; accepted by Krystian 03.11.2026.
 
 import { mailFooter, originOf } from '../mail/brand'
 import { renderMail } from '../mail/layout'
