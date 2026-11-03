@@ -36,9 +36,10 @@ const STAGE_HEADLINES: Partial<Record<OrderStage, { title: string; lead: string 
     title: 'Testujemy Twój komputer.',
     lead: 'Komputer jest złożony. Teraz test obciążeniowy i pomiary klatek w grach — wyniki trafią do metryki.',
   },
+  // Neutral: the same stage covers a courier and a pickup in the shop (checklist „SMS do odbioru”).
   shipped: {
-    title: 'Komputer jest w drodze.',
-    lead: 'Spakowany i wysłany. Kurier odezwie się przed doręczeniem.',
+    title: 'Komputer jest spakowany i gotowy.',
+    lead: 'Wydaliśmy go kurierowi albo czeka na odbiór w Rabce-Zdroju — tak, jak ustaliliśmy.',
   },
 }
 
@@ -71,11 +72,13 @@ export function buildStageMail(input: {
     .replace(/\{(zestaw|podpis)\}/g, '')
     .replace(/[ \t]{2,}/g, ' ')
     .trim()
+  // The text version says what the HTML shows: the tracking number once there is one.
+  const tracking = input.trackingNumber?.trim()
   return {
     to: input.to,
     // TODO(krystian): subject of the stage e-mail — not on any board.
     subject: `[${input.orderNumber}] Twój komputer: ${etap}`,
-    text: clean,
+    text: tracking ? `${clean}\n\nNumer przesyłki: ${tracking}` : clean,
     ...stageHtml({ ...input, text: clean, etap }),
   }
 }

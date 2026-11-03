@@ -6,18 +6,6 @@ import { mailFooter, originOf } from '../mail/brand'
 import { renderMail } from '../mail/layout'
 import { routes } from '../nav'
 
-const ESCAPES: Record<string, string> = {
-  '&': '&amp;',
-  '<': '&lt;',
-  '>': '&gt;',
-  '"': '&quot;',
-  "'": '&#39;',
-}
-
-export function escapeHtml(value: string): string {
-  return value.replace(/[&<>"']/g, (c) => ESCAPES[c] as string)
-}
-
 /**
  * One account e-mail in the brand layout. Payload sends these without attachments, so the mark is
  * set in text (`textLogo`). The link is a button and, below it, plain text to copy.

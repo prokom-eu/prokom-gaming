@@ -56,5 +56,6 @@ describe('buildStageMail', () => {
     expect(mail.html).toContain('Numer przesyłki')
     expect(mail.html).toContain('6234 5678 9012')
     expect(mail.html).toContain('Etap 7 z 7')
+    expect(mail.text).toContain('Numer przesyłki: 6234 5678 9012')
   })
 })
