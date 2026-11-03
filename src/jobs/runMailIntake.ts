@@ -4,9 +4,9 @@ import type { PayloadRequest } from 'payload'
 
 import { getEnv, imapConfig } from '../lib/env'
 import { isAcceptance } from '../lib/inquiry/acceptance'
-import { confirmAcceptance } from '../lib/inquiry/acceptance.server'
+import { AcceptanceError, confirmAcceptance } from '../lib/inquiry/acceptance.server'
 import { errorFields } from '../lib/logger'
-import { inquiryTopic } from '../lib/inquiry/subject'
+import { inquiryPanelPath, inquiryTopic } from '../lib/inquiry/subject'
 import { mailErrorEmail } from '../lib/mail/alarm'
 import { imapMailbox } from '../lib/mail/imap.server'
 import { runIntake } from '../lib/mail/intake'
@@ -107,13 +107,44 @@ export async function runMailIntake(req: PayloadRequest): Promise<MailIntakeIO['
       fromAddress: env.MAIL_FROM_ADDRESS,
       siteUrl: env.SITE_URL,
     })
-      .then((outcome) => payload.logger.info({ inquiry: a.inquiryId, outcome }, 'Acceptance'))
-      .catch((error: unknown) =>
+      .then((result) => payload.logger.info({ inquiry: a.inquiryId, ...result }, 'Acceptance'))
+      .catch(async (error: unknown) => {
+        const stage = error instanceof AcceptanceError ? error.stage : 'load'
+        const cause = error instanceof AcceptanceError ? error.original : error
         payload.logger.error(
-          { inquiry: a.inquiryId, ...errorFields(error) },
+          { inquiry: a.inquiryId, stage, ...errorFields(cause) },
           'Acceptance confirmation not sent',
-        ),
-      )
+        )
+        // Nothing went out: the team answers by hand instead of losing the customer's „yes”.
+        const found = await payload
+          .findByID({
+            collection: 'inquiries',
+            id: a.inquiryId,
+            select: { number: true },
+            depth: 0,
+            overrideAccess: true,
+          })
+          .catch(() => null)
+        const number = found?.number ?? `#${a.inquiryId}`
+        await notify(
+          payload,
+          {
+            kind: 'mail_error',
+            push: null,
+            email: {
+              // TODO(krystian): wording of this alarm (no board).
+              subject: `Akceptacja oferty ${number} — potwierdzenie nie wyszło`,
+              text: [
+                `Klient zaakceptował ofertę ${number}, ale automatyczne potwierdzenie nie zostało wysłane.`,
+                'Odpisz mu ręcznie z panelu — jego odpowiedź jest w wątku.',
+                '',
+                `Zapytanie w panelu: ${env.SITE_URL}${inquiryPanelPath(number)}`,
+              ].join('\n'),
+            },
+          },
+          { req },
+        ).catch(() => undefined)
+      })
   }
   // One push per inquiry that got an answer in this run (panel spec §14 `inquiry_reply`).
   for (const id of replied) {

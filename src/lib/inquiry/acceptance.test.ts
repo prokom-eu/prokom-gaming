@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest'
 
-import { acceptanceApplies, acceptanceMail, isAcceptance } from './acceptance'
+import {
+  acceptanceMail,
+  acceptanceSkip,
+  acceptanceThreadIds,
+  isAcceptance,
+  isAcceptanceId,
+} from './acceptance'
+import { replyHtml } from './replyHtml'
 
 describe('isAcceptance', () => {
   it('finds „Akceptuję ofertę” in any case, with or without Polish letters', () => {
@@ -8,24 +15,61 @@ describe('isAcceptance', () => {
     expect(isAcceptance('RE: AKCEPTUJE OFERTE')).toBe(true)
     expect(isAcceptance('Re: [PKG-2026-0001] Wilkołak')).toBe(false)
     expect(isAcceptance('Nie akceptuję tej oferty')).toBe(false)
+    expect(isAcceptance('Re: [PKG-2026-0001] Nie akceptuję ofertę')).toBe(false)
+  })
+
+  it('matches the subject the offer’s „Akceptuję ofertę” button writes', () => {
+    const { html } = replyHtml({
+      number: 'PKG-2026-0001',
+      body: 'Skład:\n• A',
+      signature: null,
+      siteUrl: 'https://prokomgaming.pl',
+      replyAddress: 'kontakt@prokomgaming.pl',
+      offer: {
+        topic: 'X',
+        buildName: null,
+        parts: [{ role: 'Procesor', model: 'A' }],
+        price: null,
+        leadTime: null,
+      },
+    })
+    const subject = decodeURIComponent(/subject=([^&"]+)/.exec(html)?.[1] ?? '')
+    expect(isAcceptance(subject)).toBe(true)
   })
 })
 
-describe('acceptanceApplies', () => {
+describe('acceptanceSkip', () => {
   const ok = {
     subject: 'Re: [PKG-2026-0001] Akceptuję ofertę',
     fromCustomer: true,
     status: 'offer_sent' as const,
     alreadyConfirmed: false,
   }
-  it('confirms the customer’s acceptance after an offer or an order', () => {
-    expect(acceptanceApplies(ok)).toBe(true)
-    expect(acceptanceApplies({ ...ok, status: 'won' })).toBe(true)
+  it('confirms the customer’s acceptance while the offer is out', () => {
+    expect(acceptanceSkip(ok)).toBeNull()
   })
-  it('never for a stranger, without an offer, or twice', () => {
-    expect(acceptanceApplies({ ...ok, fromCustomer: false })).toBe(false)
-    expect(acceptanceApplies({ ...ok, status: 'in_progress' })).toBe(false)
-    expect(acceptanceApplies({ ...ok, alreadyConfirmed: true })).toBe(false)
+  it('never for a stranger, outside offer_sent (also not after an order), or twice', () => {
+    expect(acceptanceSkip({ ...ok, fromCustomer: false })).toBe('stranger')
+    expect(acceptanceSkip({ ...ok, status: 'won' })).toBe('status')
+    expect(acceptanceSkip({ ...ok, status: 'in_progress' })).toBe('status')
+    expect(acceptanceSkip({ ...ok, alreadyConfirmed: true })).toBe('already')
+    expect(acceptanceSkip({ ...ok, subject: 'Re: pytanie' })).toBe('not_acceptance')
+  })
+})
+
+describe('acceptanceThreadIds', () => {
+  it('puts the customer’s acceptance last, whatever the thread order says', () => {
+    expect(acceptanceThreadIds('<c>', ['<offer>', '<accept>', '<later>'], '<accept>')).toEqual([
+      '<c>',
+      '<offer>',
+      '<later>',
+      '<accept>',
+    ])
+  })
+  it('marks our confirmation by its Message-ID', () => {
+    expect(isAcceptanceId('<accept-1@prokomgaming.pl>')).toBe(true)
+    expect(isAcceptanceId('<1@prokomgaming.pl>')).toBe(false)
+    expect(isAcceptanceId(null)).toBe(false)
   })
 })
 

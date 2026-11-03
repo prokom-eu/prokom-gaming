@@ -5,14 +5,35 @@ import { randomUUID } from 'node:crypto'
 import type { Payload } from 'payload'
 
 import { originOf } from '../mail/brand'
-import { ACCEPTANCE_TOPIC, acceptanceApplies, acceptanceMail } from './acceptance'
+import {
+  ACCEPTANCE_ID_PREFIX,
+  acceptanceMail,
+  acceptanceSkip,
+  acceptanceThreadIds,
+  isAcceptanceId,
+  type SkipReason,
+} from './acceptance'
 import { newMessageId } from './replyMail'
 import { inquiryTopic } from './subject'
 
+/** Where a confirmation failed: before anything went out (`save`) or at SMTP (`send`). */
+export class AcceptanceError extends Error {
+  constructor(
+    readonly stage: 'save' | 'send',
+    readonly original: unknown,
+  ) {
+    super(`Acceptance confirmation failed at ${stage}`)
+    this.name = 'AcceptanceError'
+  }
+}
+
+export type AcceptanceOutcome = { outcome: 'sent' } | { outcome: 'skipped'; reason: SkipReason }
+
 /**
  * Confirms a customer's „Akceptuję ofertę” that the mailbox reader put into a thread: checks the
- * rules (`acceptanceApplies`), sends the brand confirmation in the same thread and saves it there.
- * Returns what happened, for the log (ids only). Called per stored message by the intake job.
+ * rules (`acceptanceSkip`), saves the confirmation in the thread, then sends it. Saving first means
+ * a confirmation that went out is always in the thread (and never goes out twice); a failed send
+ * removes the saved line again and throws `AcceptanceError('send')`, so the job can alarm.
  */
 export async function confirmAcceptance(
   payload: Payload,
@@ -25,7 +46,7 @@ export async function confirmAcceptance(
     fromAddress: string
     siteUrl: string | undefined
   },
-): Promise<'sent' | 'skipped'> {
+): Promise<AcceptanceOutcome> {
   const inquiry = await payload.findByID({
     collection: 'inquiries',
     id: input.inquiryId,
@@ -43,32 +64,25 @@ export async function confirmAcceptance(
     depth: 1,
     overrideAccess: true,
   })
-  const earlier = await payload.find({
+  const thread = await payload.find({
     collection: 'inquiry-messages',
     where: { inquiry: { equals: inquiry.id } },
-    select: { messageId: true, subject: true, direction: true },
+    select: { messageId: true },
     sort: 'at',
     pagination: false,
     depth: 0,
     overrideAccess: true,
   })
-  const number = inquiry.number ?? `#${inquiry.id}`
-  const fromCustomer =
-    !!input.from && input.from.trim().toLowerCase() === inquiry.email.trim().toLowerCase()
-  const alreadyConfirmed = earlier.docs.some(
-    (m) => m.direction === 'out' && (m.subject ?? '').includes(ACCEPTANCE_TOPIC),
-  )
-  if (
-    !acceptanceApplies({
-      subject: input.subject,
-      fromCustomer,
-      status: inquiry.status,
-      alreadyConfirmed,
-    })
-  ) {
-    return 'skipped'
-  }
+  const reason = acceptanceSkip({
+    subject: input.subject,
+    fromCustomer:
+      !!input.from && input.from.trim().toLowerCase() === inquiry.email.trim().toLowerCase(),
+    status: inquiry.status,
+    alreadyConfirmed: thread.docs.some((m) => isAcceptanceId(m.messageId)),
+  })
+  if (reason) return { outcome: 'skipped', reason }
 
+  const number = inquiry.number ?? `#${inquiry.id}`
   const buildName = typeof inquiry.build === 'object' && inquiry.build ? inquiry.build.name : null
   const site = await payload.findGlobal({
     slug: 'site-settings',
@@ -76,7 +90,7 @@ export async function confirmAcceptance(
     depth: 0,
     overrideAccess: true,
   })
-  const messageId = newMessageId(input.fromAddress, randomUUID())
+  const messageId = newMessageId(input.fromAddress, `${ACCEPTANCE_ID_PREFIX}${randomUUID()}`)
   const mail = acceptanceMail({
     to: inquiry.email,
     number,
@@ -90,36 +104,53 @@ export async function confirmAcceptance(
     leadTime: site.fulfilment ?? null,
     siteUrl: originOf(input.siteUrl ?? ''),
     messageId,
-    // The customer's acceptance is the newest message of the thread.
-    previousIds: [
+    previousIds: acceptanceThreadIds(
       inquiry.confirmationMessageId,
-      ...earlier.docs.map((m) => m.messageId),
-      ...(earlier.docs.some((m) => m.messageId === input.messageId) ? [] : [input.messageId]),
-    ],
+      thread.docs.map((m) => m.messageId),
+      input.messageId,
+    ),
   })
-  await payload.sendEmail(mail)
 
   const now = new Date().toISOString()
-  await payload.create({
-    collection: 'inquiry-messages',
-    data: {
-      inquiry: inquiry.id,
-      direction: 'out',
-      at: now,
-      subject: mail.subject,
-      body: mail.text,
-      messageId,
-      inReplyTo: mail.inReplyTo ?? null,
-    },
-    depth: 0,
-    overrideAccess: true,
-  })
-  await payload.update({
-    collection: 'inquiries',
-    id: inquiry.id,
-    data: { lastActivityAt: now },
-    depth: 0,
-    overrideAccess: true,
-  })
-  return 'sent'
+  let savedId: number
+  try {
+    const saved = await payload.create({
+      collection: 'inquiry-messages',
+      data: {
+        inquiry: inquiry.id,
+        direction: 'out',
+        at: now,
+        subject: mail.subject,
+        body: mail.text,
+        messageId,
+        inReplyTo: mail.inReplyTo ?? null,
+      },
+      depth: 0,
+      overrideAccess: true,
+    })
+    savedId = saved.id
+  } catch (error) {
+    throw new AcceptanceError('save', error)
+  }
+
+  try {
+    // RFC 3834: an automatic answer — the customer's own autoresponder must not reply to it.
+    await payload.sendEmail({ ...mail, headers: { 'Auto-Submitted': 'auto-replied' } })
+  } catch (error) {
+    await payload
+      .delete({ collection: 'inquiry-messages', id: savedId, overrideAccess: true })
+      .catch(() => undefined)
+    throw new AcceptanceError('send', error)
+  }
+
+  await payload
+    .update({
+      collection: 'inquiries',
+      id: inquiry.id,
+      data: { lastActivityAt: now },
+      depth: 0,
+      overrideAccess: true,
+    })
+    .catch(() => undefined)
+  return { outcome: 'sent' }
 }

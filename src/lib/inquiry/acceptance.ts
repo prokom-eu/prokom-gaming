@@ -9,34 +9,56 @@ import type { InquiryStatus } from './types'
  * written by their own mail program (the offer's `mailto:` gives only plain text), so what can
  * look like the brand is our answer to it. Pure — the intake job decides, loads and sends.
  *
- * Rules (decision 03.11.2026):
+ * Rules (Krystian, 03.11.2026; docs/STAN.md „Maile marki”):
  * - only an answer from the customer's own address (never a stranger quoting the number),
- * - only when an offer went out (`offer_sent`) or the order is already made (`won`),
- * - only once per inquiry — the job checks the thread for an earlier confirmation.
+ * - only while the offer is out (`offer_sent`) — after an order made by hand the „next step:
+ *   pro forma” could already be done,
+ * - only once per inquiry — our confirmation carries `<accept-…@…>` as its Message-ID.
  * No price in this mail: the amount stays the one in the offer the customer accepted.
  */
 
-/** The topic of the confirmation in the thread — also how the job finds an earlier one. */
+/** The topic of the confirmation in the thread. */
 export const ACCEPTANCE_TOPIC = 'Mamy Twoją akceptację'
 
-/** „Akceptuję ofertę” in a subject, with or without Polish letters, any case. */
+/** Prefix of our confirmation's Message-ID — the mark that it was already sent. */
+export const ACCEPTANCE_ID_PREFIX = 'accept-'
+
+export const isAcceptanceId = (messageId: string | null | undefined) =>
+  !!messageId && messageId.startsWith(`<${ACCEPTANCE_ID_PREFIX}`)
+
+/** „Akceptuję ofertę” in a subject, with or without Polish letters, any case; not „nie akceptuję”. */
 export function isAcceptance(subject: string): boolean {
-  const plain = subject.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
-  return /akceptuje\s+oferte/.test(plain)
+  const plain = subject.toLowerCase().normalize('NFD').replace(/\p{M}/gu, '')
+  return /(?<!nie\s)akceptuje\s+oferte/.test(plain)
 }
 
-export function acceptanceApplies(input: {
+export type SkipReason = 'not_acceptance' | 'stranger' | 'status' | 'already'
+
+/** `null` = confirm; else why not (logged, no personal data). */
+export function acceptanceSkip(input: {
   subject: string
   fromCustomer: boolean
   status: InquiryStatus
   alreadyConfirmed: boolean
-}): boolean {
-  return (
-    isAcceptance(input.subject) &&
-    input.fromCustomer &&
-    (input.status === 'offer_sent' || input.status === 'won') &&
-    !input.alreadyConfirmed
-  )
+}): SkipReason | null {
+  if (!isAcceptance(input.subject)) return 'not_acceptance'
+  if (!input.fromCustomer) return 'stranger'
+  if (input.status !== 'offer_sent') return 'status'
+  if (input.alreadyConfirmed) return 'already'
+  return null
+}
+
+/** Thread ids for the confirmation: the customer's acceptance always last (In-Reply-To). */
+export function acceptanceThreadIds(
+  confirmationId: string | null | undefined,
+  threadIds: readonly (string | null | undefined)[],
+  acceptanceId: string | null,
+): (string | null | undefined)[] {
+  return [
+    confirmationId,
+    ...threadIds.filter((id) => id !== acceptanceId && id !== confirmationId),
+    acceptanceId,
+  ]
 }
 
 export type AcceptanceMail = RenderedMail & {
