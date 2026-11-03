@@ -75,6 +75,20 @@ describe('notificationEmail', () => {
     }
   })
 
+  it('HTML: the person, the computer, buttons to the panel and to reply, escaped text', () => {
+    expect(mail.html).toContain('Jan')
+    expect(mail.html).toContain('href="http://localhost:3100/admin/collections/inquiries/7"')
+    expect(mail.html).toContain('mailto:jan@example.test?subject=Re%3A%20%5BPKG-2026-0007%5D')
+    expect(mail.html).toContain('Proszę o kontakt po 16.')
+    expect(mail.html).toContain('#E0322B') // Wampir's colour
+    const evil = notificationEmail(
+      { ...inquiry, message: '<img src=x onerror=alert(1)>' },
+      { to: 'g@example.test', panelUrl: 'x' },
+    )
+    expect(evil.html).not.toContain('<img src=x')
+    expect(evil.attachments?.[0]?.cid).toBe('logo@prokomgaming.pl')
+  })
+
   it('keeps header values on one line', () => {
     const evil = notificationEmail(
       {
@@ -124,6 +138,15 @@ describe('confirmationEmail', () => {
     for (const text of ['Proszę o kontakt', '+48 600 100 200', '7352511447', 'Blender', '(P13)']) {
       expect(mail.text).not.toContain(text)
     }
+  })
+
+  it('HTML: no name, message, contact details or codes either; links to the site', () => {
+    for (const text of ['Proszę o kontakt', '+48 600 100 200', '7352511447', 'Blender', '(P13)']) {
+      expect(mail.html).not.toContain(text)
+    }
+    expect(mail.html).not.toMatch(/>Jan</)
+    expect(mail.html).toContain('Mamy Twoje zapytanie.')
+    expect(mail.html).toContain('https://prokomgaming.pl/polityka-prywatnosci')
   })
 
   it("names the picked light colour; nothing when it is the creature's own", () => {

@@ -18,6 +18,7 @@ import {
 } from './emails'
 import { priceComputer, type InquiryOffer, type PricedComputer } from './price'
 import { newMessageId } from './replyMail'
+import { originOf } from '../mail/brand'
 import { inquiryPanelPath, inquiryTopic } from './subject'
 import { inquiryFieldErrors, parseInquiryInput } from './schema'
 import {
@@ -335,7 +336,11 @@ export async function submitInquiryWith(
     emails.push({
       kind: 'confirmation',
       email: {
-        ...confirmationEmail(forEmail, { responseTime, replyTo: deps.notifyTo }),
+        ...confirmationEmail(forEmail, {
+          responseTime,
+          replyTo: deps.notifyTo,
+          siteUrl: originOf(deps.panelUrl(id, number)),
+        }),
         messageId: confirmationId,
       },
     })
