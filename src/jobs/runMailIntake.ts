@@ -3,6 +3,8 @@ import 'server-only'
 import type { PayloadRequest } from 'payload'
 
 import { getEnv, imapConfig } from '../lib/env'
+import { isAcceptance } from '../lib/inquiry/acceptance'
+import { confirmAcceptance } from '../lib/inquiry/acceptance.server'
 import { errorFields } from '../lib/logger'
 import { inquiryTopic } from '../lib/inquiry/subject'
 import { mailErrorEmail } from '../lib/mail/alarm'
@@ -27,6 +29,13 @@ export async function runMailIntake(req: PayloadRequest): Promise<MailIntakeIO['
     req,
   })
   const replied = new Set<number>()
+  // „Akceptuję ofertę” answers: confirmed after the run (the rules are checked there).
+  const accepted: {
+    inquiryId: number
+    subject: string
+    from: string | null
+    messageId: string | null
+  }[] = []
   const result = await runIntake({
     client: imapMailbox(config),
     state: {
@@ -37,7 +46,17 @@ export async function runMailIntake(req: PayloadRequest): Promise<MailIntakeIO['
     ownAddress: env.MAIL_FROM_ADDRESS,
     store: async (mail) => {
       const stored = await storeIncoming(payload, mail, now)
-      if (stored.inquiryId !== undefined) replied.add(stored.inquiryId)
+      if (stored.inquiryId !== undefined) {
+        replied.add(stored.inquiryId)
+        if (isAcceptance(mail.subject)) {
+          accepted.push({
+            inquiryId: stored.inquiryId,
+            subject: mail.subject,
+            from: mail.from,
+            messageId: mail.messageId,
+          })
+        }
+      }
       return stored.result
     },
     now,
@@ -81,6 +100,20 @@ export async function runMailIntake(req: PayloadRequest): Promise<MailIntakeIO['
     ).catch((error: unknown) =>
       payload.logger.error({ ...errorFields(error) }, 'Mail intake alarm not queued'),
     )
+  }
+  for (const a of accepted) {
+    await confirmAcceptance(payload, {
+      ...a,
+      fromAddress: env.MAIL_FROM_ADDRESS,
+      siteUrl: env.SITE_URL,
+    })
+      .then((outcome) => payload.logger.info({ inquiry: a.inquiryId, outcome }, 'Acceptance'))
+      .catch((error: unknown) =>
+        payload.logger.error(
+          { inquiry: a.inquiryId, ...errorFields(error) },
+          'Acceptance confirmation not sent',
+        ),
+      )
   }
   // One push per inquiry that got an answer in this run (panel spec §14 `inquiry_reply`).
   for (const id of replied) {

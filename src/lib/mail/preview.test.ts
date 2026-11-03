@@ -5,6 +5,7 @@ import { describe, it } from 'vitest'
 
 import { confirmationEmail, notificationEmail, type InquiryForEmail } from '../inquiry/emails'
 import { resetEmailHtml, verifyEmailHtml } from '../account/emails'
+import { acceptanceMail } from '../inquiry/acceptance'
 import { replyHtml } from '../inquiry/replyHtml'
 import { alertHtml } from '../notify/alertMail'
 import { buildStageMail } from '../orderMail'
@@ -191,5 +192,18 @@ ${signature}`,
         siteUrl: 'https://prokomgaming.pl',
       }),
     })
+    write(
+      'b-akceptacja',
+      acceptanceMail({
+        to: 'jan.kowalski@example.test',
+        number: 'PKG-2026-0047',
+        topic: 'Wilkołak',
+        buildName: 'Wilkołak',
+        leadTime: '5–10 dni roboczych od wpłaty',
+        siteUrl: 'https://prokomgaming.pl',
+        messageId: '<a@prokomgaming.pl>',
+        previousIds: [],
+      }),
+    )
   })
 })
