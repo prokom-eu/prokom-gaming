@@ -1,3 +1,5 @@
+import type { RenderedMail } from '../mail/layout'
+import { replyHtml, type ReplyHtmlInput } from './replyHtml'
 import { replySubject } from './subject'
 
 /**
@@ -45,12 +47,16 @@ export type ReplyMail = {
   subject: string
   text: string
   html: string
+  attachments?: RenderedMail['attachments']
   messageId: string
   inReplyTo?: string
   references?: string[]
 }
 
-/** One reply from the panel: `Re: [PKG-…] <topic>`, the text as written — no signature added. */
+/**
+ * One reply from the panel: `Re: [PKG-…] <topic>`, the text as written — no signature added.
+ * With `brand` the HTML is the brand layout (`replyHtml`); without it, simple paragraphs.
+ */
 export function buildReplyMail(input: {
   to: string
   number: string
@@ -58,13 +64,18 @@ export function buildReplyMail(input: {
   body: string
   messageId: string
   previousIds: readonly (string | null | undefined)[]
+  brand?: Omit<ReplyHtmlInput, 'number' | 'body'>
 }): ReplyMail {
   const text = input.body.replace(/\r\n/g, '\n').trim()
+  const branded = input.brand
+    ? replyHtml({ ...input.brand, number: input.number, body: text })
+    : null
   return {
     to: input.to,
     subject: replySubject(input.number, input.topic),
     text,
-    html: textToHtml(text),
+    html: branded?.html ?? textToHtml(text),
+    ...(branded ? { attachments: branded.attachments } : {}),
     messageId: input.messageId,
     ...threadHeaders(input.previousIds),
   }

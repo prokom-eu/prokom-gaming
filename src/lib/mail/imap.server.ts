@@ -77,6 +77,14 @@ export type SentCopy = {
   subject: string
   text: string
   html: string
+  /** The inline mark (CID) of the brand layout — without it the copy shows a broken image. */
+  attachments?: {
+    filename: string
+    content: string
+    encoding: 'base64'
+    cid: string
+    contentType: string
+  }[]
   messageId: string
   inReplyTo?: string
   references?: string[]

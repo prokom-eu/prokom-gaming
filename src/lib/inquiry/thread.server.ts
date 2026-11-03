@@ -10,6 +10,8 @@ import { zl } from '../pricing/format'
 import type { Config } from '../pricing/types'
 import { priceComputer } from './price'
 import { loadInquiryPricing } from './pricingStore'
+import { originOf } from '../mail/brand'
+import type { OfferPart } from './replyHtml'
 import { buildReplyMail, newMessageId, type ReplyMail } from './replyMail'
 import { statusAfterReply } from './status'
 import { inquiryTopic } from './subject'
@@ -56,8 +58,22 @@ const fullConfig = (config: Inquiry['config']): Config | null => {
     : null
 }
 
-/** Internal models of the configuration: CPU, GPU, board, PSU, then RAM, disk, case, cooling. */
-async function internalModels(payload: Payload, config: Config): Promise<string[]> {
+const ROLE_LABELS: Record<(typeof PART_ORDER)[number] | (typeof OPTION_KEYS)[number], string> = {
+  cpu: 'Procesor',
+  gpu: 'Karta graficzna',
+  mobo: 'Płyta główna',
+  psu: 'Zasilacz',
+  ram: 'Pamięć RAM',
+  ssd: 'Dysk',
+  case: 'Obudowa',
+  cooler: 'Chłodzenie',
+}
+
+/**
+ * Internal models of the configuration with their role: CPU, GPU, board, PSU, then RAM, disk,
+ * case, cooling. A model is the maker and the model (e.g. „AMD Ryzen 7 7800X3D”).
+ */
+async function internalParts(payload: Payload, config: Config): Promise<OfferPart[]> {
   const [levels, options] = await Promise.all([
     payload.find({
       collection: 'power-levels',
@@ -78,10 +94,38 @@ async function internalModels(payload: Payload, config: Config): Promise<string[
   ])
   const components = levels.docs[0]?.components ?? []
   const byCode = new Map(options.docs.map((o) => [o.code, o.internalModel]))
-  const levelModels = PART_ORDER.flatMap((role) =>
-    components.filter((c) => c.role === role).map((c) => c.internalModel),
+  const levelParts = PART_ORDER.flatMap((role) =>
+    components
+      .filter((c) => c.role === role)
+      .map((c) => ({ role: ROLE_LABELS[role], model: c.internalModel })),
   )
-  return [...levelModels, ...OPTION_KEYS.map((key) => byCode.get(config[key]) ?? '')]
+  return [
+    ...levelParts,
+    ...OPTION_KEYS.map((key) => ({ role: ROLE_LABELS[key], model: byCode.get(config[key]) ?? '' })),
+  ].filter((p) => p.model.trim() !== '')
+}
+
+/** Today's price and the parts of an inquiry's computer; nothing for an inquiry without one. */
+async function computerFacts(
+  payload: Payload,
+  inquiry: Inquiry,
+): Promise<{ priceToday: number | null; parts: OfferPart[] | null }> {
+  const config = fullConfig(inquiry.config)
+  const hasComputer =
+    (CONFIG_TYPES as readonly string[]).includes(inquiry.type) || inquiry.type === 'ready'
+  if (!hasComputer || !config) return { priceToday: null, parts: null }
+  const [pricing, parts] = await Promise.all([
+    loadInquiryPricing(payload),
+    internalParts(payload, config),
+  ])
+  let priceToday: number | null = null
+  if (inquiry.type === 'ready') {
+    priceToday = inquiry.priceAtInquiry ?? null
+  } else if (pricing) {
+    const result = priceComputer({ config }, pricing.offer, pricing.snapshot)
+    priceToday = result.ok ? result.price : null
+  }
+  return { priceToday, parts }
 }
 
 export type ReplyContext = {
@@ -110,25 +154,9 @@ export async function loadReplyContext(
       overrideAccess: true,
     }),
   ])
-  const config = fullConfig(inquiry.config)
   const hasComputer =
     (CONFIG_TYPES as readonly string[]).includes(inquiry.type) || inquiry.type === 'ready'
-
-  let priceToday: number | null = null
-  let parts: string | null = null
-  if (hasComputer && config) {
-    const [pricing, models] = await Promise.all([
-      loadInquiryPricing(payload),
-      internalModels(payload, config),
-    ])
-    if (inquiry.type === 'ready') {
-      priceToday = inquiry.priceAtInquiry ?? null
-    } else if (pricing) {
-      const result = priceComputer({ config }, pricing.offer, pricing.snapshot)
-      priceToday = result.ok ? result.price : null
-    }
-    parts = partsList(models)
-  }
+  const { priceToday, parts } = await computerFacts(payload, inquiry)
 
   return {
     priceToday,
@@ -136,7 +164,7 @@ export async function loadReplyContext(
       nr: inquiry.number,
       zestaw: hasComputer ? topicOf(inquiry) : null,
       cena: priceToday === null ? null : zl(priceToday),
-      czesci: parts,
+      czesci: parts ? partsList(parts.map((p) => p.model)) : null,
       termin: site.fulfilment,
       podpis: settings.signature,
     },
@@ -165,6 +193,8 @@ export async function sendInquiryReply(
     templateId: number | null
     user: User
     fromAddress: string
+    /** The site's address (`SITE_URL`) for the footer links; the default when not absolute. */
+    siteUrl?: string
   },
 ): Promise<SendReplyResult> {
   requireAdmin(input.user)
@@ -197,6 +227,18 @@ export async function sendInquiryReply(
     }),
   ])
 
+  const isOffer = template?.kind === 'offer'
+  const [settings, site, facts] = await Promise.all([
+    payload.findGlobal({ slug: 'mail-settings', depth: 0, overrideAccess: true }),
+    payload.findGlobal({
+      slug: 'site-settings',
+      select: { fulfilment: true },
+      depth: 0,
+      overrideAccess: true,
+    }),
+    isOffer ? computerFacts(payload, inquiry) : null,
+  ])
+
   const messageId = newMessageId(input.fromAddress, randomUUID())
   const mail = buildReplyMail({
     to: inquiry.email,
@@ -205,6 +247,21 @@ export async function sendInquiryReply(
     body,
     messageId,
     previousIds: [inquiry.confirmationMessageId, ...earlier.docs.map((m) => m.messageId)],
+    brand: {
+      signature: settings.signature ?? null,
+      siteUrl: originOf(input.siteUrl ?? ''),
+      replyAddress: input.fromAddress,
+      offer:
+        facts?.parts && facts.parts.length > 0
+          ? {
+              topic: topicOf(inquiry),
+              buildName: buildName(inquiry),
+              parts: facts.parts,
+              price: facts.priceToday === null ? null : zl(facts.priceToday),
+              leadTime: site.fulfilment ?? null,
+            }
+          : null,
+    },
   })
   try {
     await payload.sendEmail(mail)

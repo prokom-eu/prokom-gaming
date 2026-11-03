@@ -5,6 +5,8 @@ import type {
   CollectionConfig,
 } from 'payload'
 
+import { PANEL_RESET_SUBJECT, panelResetEmailHtml, panelResetUrl } from '../lib/account/emails'
+import { getEnv } from '../lib/env'
 import { isAdmin, isPanelUser, USER_ROLES } from '../access/panel'
 import { enforcePasswordPolicy } from './passwordPolicy'
 import { GROUP_ADMIN } from './shared'
@@ -57,6 +59,18 @@ export const Users: CollectionConfig = {
     maxLoginAttempts: 5,
     lockTime: 15 * 60 * 1000,
     tokenExpiration: 2 * 60 * 60,
+    forgotPassword: {
+      generateEmailSubject: () => PANEL_RESET_SUBJECT,
+      generateEmailHTML: (args) =>
+        panelResetEmailHtml({
+          link: panelResetUrl(
+            getEnv().SITE_URL,
+            args?.req?.payload.config.routes.admin ?? '/admin',
+            args?.req?.payload.config.admin.routes.reset ?? '/reset',
+            args?.token ?? '',
+          ),
+        }),
+    },
   },
   access: {
     admin: ({ req }) => isPanelUser(req),

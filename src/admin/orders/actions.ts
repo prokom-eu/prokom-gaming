@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 
 import { isErasedEmail } from '../../lib/clients'
+import { getEnv } from '../../lib/env'
 import { errorFields, log } from '../../lib/logger'
 import { buildStageMail } from '../../lib/orderMail'
 import {
@@ -114,6 +115,8 @@ export async function moveStage(raw: { orderId: number; from: string }): Promise
       buildName: build,
       signature: settings.signature ?? null,
       template: templates.docs[0]?.body ?? null,
+      trackingNumber: order.trackingNumber ?? null,
+      siteUrl: getEnv().SITE_URL,
     })
     await payload.sendEmail(mail)
     log.info({ order: orderId, stage: order.stage }, 'orders: stage e-mail sent')
