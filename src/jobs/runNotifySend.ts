@@ -9,6 +9,7 @@ import { errorFields } from '../lib/logger'
 import type { NotifyChannel, NotifyEvent } from '../lib/notify'
 import { pushContent } from '../lib/notify/content'
 import { deliverPush, type PushOutcome } from '../lib/notify/deliver'
+import { alertHtml } from '../lib/notify/alertMail'
 import { CHANNELS } from '../lib/notify/kinds'
 import { pushTargets, type Subscription } from '../lib/notify/recipients'
 import type { NotifySendIO } from './notifySend'
@@ -29,7 +30,8 @@ export async function runNotifySend(
   // E-mail — throws on SMTP failure, so the job is retried (the push is its own job).
   if (channel === 'email' && event.kind !== 'test' && CHANNELS[event.kind].email && event.email) {
     if (env.ALERT_EMAIL) {
-      await payload.sendEmail({ to: env.ALERT_EMAIL, ...event.email })
+      const { html, attachments } = alertHtml({ ...event.email, siteUrl: env.SITE_URL })
+      await payload.sendEmail({ to: env.ALERT_EMAIL, ...event.email, html, attachments })
       result.emailed = true
     } else {
       payload.logger.warn({ kind: event.kind }, 'Notify: ALERT_EMAIL not set, no e-mail sent')

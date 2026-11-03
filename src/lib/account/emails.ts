@@ -1,31 +1,44 @@
 // E-mails of the customer account (verify, password reset). Payload sends them through the same
-// adapter as inquiries; it takes HTML only, so the text is turned into plain paragraphs.
+// adapter as inquiries; it takes HTML only — the brand layout with the mark set in text.
 // TODO(krystian): wording of both e-mails — not on any board.
 
+import { mailFooter, originOf } from '../mail/brand'
+import { renderMail } from '../mail/layout'
 import { routes } from '../nav'
 
-const ESCAPES: Record<string, string> = {
-  '&': '&amp;',
-  '<': '&lt;',
-  '>': '&gt;',
-  '"': '&quot;',
-  "'": '&#39;',
-}
-
-export function escapeHtml(value: string): string {
-  return value.replace(/[&<>"']/g, (c) => ESCAPES[c] as string)
-}
-
-/** Paragraphs of text; a line that is exactly the link becomes a clickable link. */
-function html(paragraphs: string[], link: string): string {
-  const body = paragraphs
-    .map((p) =>
-      p === link
-        ? `<p><a href="${escapeHtml(link)}">${escapeHtml(link)}</a></p>`
-        : `<p>${escapeHtml(p)}</p>`,
-    )
-    .join('\n')
-  return `<!doctype html><html lang="pl"><body style="font-family:Arial,sans-serif;line-height:1.5">${body}</body></html>`
+/**
+ * One account e-mail in the brand layout. Payload sends these without attachments, so the mark is
+ * set in text (`textLogo`). The link is a button and, below it, plain text to copy.
+ */
+function accountMail(input: {
+  preheader: string
+  title: string
+  greeting: string
+  lead: string
+  button: string
+  link: string
+  after: string
+  note: string
+}): string {
+  const siteUrl = originOf(input.link)
+  return renderMail({
+    preheader: input.preheader,
+    tagLabel: 'Konto PRO-KOM Gaming',
+    title: input.title,
+    lead: `${input.greeting} ${input.lead}`,
+    blocks: [
+      { kind: 'buttons', buttons: [{ label: input.button, href: input.link, primary: true }] },
+      { kind: 'paragraph', text: input.after },
+      {
+        kind: 'callout',
+        title: 'Przycisk nie działa?',
+        text: `Skopiuj ten adres do przeglądarki:
+${input.link}`,
+      },
+    ],
+    footer: mailFooter(siteUrl, input.note),
+    textLogo: true,
+  }).html
 }
 
 function greeting(name: unknown): string {
@@ -50,28 +63,53 @@ export const VERIFY_SUBJECT = 'Potwierdź adres e-mail — konto PRO-KOM Gaming'
 export const RESET_SUBJECT = 'Nowe hasło do konta PRO-KOM Gaming'
 
 export function verifyEmailHtml({ name, link }: { name: unknown; link: string }): string {
-  return html(
-    [
-      greeting(name),
-      'kliknij link, żeby potwierdzić adres e-mail i dokończyć zakładanie konta PRO-KOM Gaming:',
-      link,
-      'Po potwierdzeniu zobaczysz w koncie swoje komputery, ich etap, metrykę i gwarancje.',
-      'Jeśli to nie Ty zakładałeś(-aś) konto, zignoruj tę wiadomość.',
-      'Pozdrawiamy, PRO-KOM Gaming',
-    ],
+  return accountMail({
+    preheader: 'Jedno kliknięcie i konto jest gotowe.',
+    title: 'Potwierdź adres e-mail',
+    greeting: greeting(name),
+    lead: 'kliknij przycisk, żeby potwierdzić adres e-mail i dokończyć zakładanie konta PRO-KOM Gaming.',
+    button: 'Potwierdzam adres',
     link,
-  )
+    after: 'Po potwierdzeniu zobaczysz w koncie swoje komputery, ich etap, metrykę i gwarancje.',
+    note: 'Jeśli to nie Ty zakładałeś(-aś) konto, zignoruj tę wiadomość.',
+  })
 }
 
 export function resetEmailHtml({ name, link }: { name: unknown; link: string }): string {
-  return html(
-    [
-      greeting(name),
-      'ktoś (pewnie Ty) poprosił o nowe hasło do konta PRO-KOM Gaming. Ustawisz je tutaj — link działa przez godzinę:',
-      link,
-      'Jeśli to nie Ty, zignoruj tę wiadomość — dotychczasowe hasło dalej działa.',
-      'Pozdrawiamy, PRO-KOM Gaming',
-    ],
+  return accountMail({
+    preheader: 'Link do nowego hasła działa przez godzinę.',
+    title: 'Ustaw nowe hasło',
+    greeting: greeting(name),
+    lead: 'ktoś (pewnie Ty) poprosił o nowe hasło do konta PRO-KOM Gaming. Ustawisz je przyciskiem niżej — link działa przez godzinę.',
+    button: 'Ustawiam nowe hasło',
     link,
-  )
+    after: 'Po zmianie zalogujesz się nowym hasłem na każdym urządzeniu.',
+    note: 'Jeśli to nie Ty, zignoruj tę wiadomość — dotychczasowe hasło dalej działa.',
+  })
+}
+
+export const PANEL_RESET_SUBJECT = 'Nowe hasło do panelu PRO-KOM Gaming'
+
+/** Reset of a panel account (Users): the admin's own reset page; same look as the customer's. */
+export function panelResetEmailHtml({ link }: { link: string }): string {
+  return accountMail({
+    preheader: 'Link do nowego hasła do panelu działa przez godzinę.',
+    title: 'Nowe hasło do panelu',
+    greeting: 'Cześć,',
+    lead: 'ktoś (pewnie Ty) poprosił o nowe hasło do panelu PRO-KOM Gaming. Ustawisz je przyciskiem niżej — link działa przez godzinę.',
+    button: 'Ustawiam nowe hasło',
+    link,
+    after: 'Panel jest tylko dla zespołu PRO-KOM Gaming.',
+    note: 'Jeśli to nie Ty, zignoruj tę wiadomość i daj znać administratorowi — dotychczasowe hasło dalej działa.',
+  })
+}
+
+/** Link of the panel reset: Payload's own reset page (`/admin/reset/<token>`). */
+export function panelResetUrl(
+  siteUrl: string,
+  adminRoute: string,
+  resetRoute: string,
+  token: string,
+) {
+  return new URL(`${adminRoute}${resetRoute}/${encodeURIComponent(token)}`, siteUrl).toString()
 }
