@@ -39,6 +39,10 @@ const readPublished: Access = ({ req }) =>
  * `seed/prokomgaming/creatures.json`; the creature colour lives only in `tokens.css`
  * (`--c-<slug>`, ADR-G003 §2) and sigil/scene files follow from `creature.key`.
  */
+/** Limits of the „Wyróżnik” texts (runda v2 §2; title 48, not 40 — Strzyga's has 41, Krystian 04.11). */
+export const HIGHLIGHT_TITLE_MAX = 48
+export const HIGHLIGHT_BODY_MAX = 240
+
 export const Builds: CollectionConfig = {
   slug: 'builds',
   labels: { singular: 'Zestaw', plural: 'Zestawy' },
@@ -98,6 +102,37 @@ export const Builds: CollectionConfig = {
       ],
     },
     {
+      // „Wyróżnik” on the build page and under the name on /zestawy (ADR-G013 pt 1, runda v2 §2):
+      // one thing about the computer itself that sets it apart from its neighbours.
+      name: 'highlight',
+      label: 'Wyróżnik',
+      type: 'group',
+      admin: {
+        description:
+          'O samym komputerze (części, zastosowanie, wygląd) — bez podań. Przejrzyj przy każdej zmianie części zestawu.',
+      },
+      fields: [
+        {
+          name: 'title',
+          label: 'Tytuł',
+          type: 'text',
+          required: true,
+          maxLength: HIGHLIGHT_TITLE_MAX,
+          admin: {
+            description: `Do ${HIGHLIGHT_TITLE_MAX} znaków. Pod imieniem na liście zestawów.`,
+          },
+        },
+        {
+          name: 'body',
+          label: 'Treść',
+          type: 'textarea',
+          required: true,
+          maxLength: HIGHLIGHT_BODY_MAX,
+          admin: { description: `1–2 zdania, do ${HIGHLIGHT_BODY_MAX} znaków.` },
+        },
+      ],
+    },
+    {
       name: 'creature',
       label: 'Istota',
       type: 'group',
@@ -136,9 +171,11 @@ export const Builds: CollectionConfig = {
             { name: 'look', label: 'Wygląd', type: 'text', required: true },
           ],
         },
-        { name: 'short', label: 'Krótko', type: 'textarea', required: true },
+        // Retired texts from folk tales (ADR-G013 pt 1, R2): no longer on the site, hidden in the
+        // panel; the data stays until the next clean-up round.
+        { name: 'short', label: 'Krótko', type: 'textarea', admin: { hidden: true } },
         { name: 'motto', label: 'Motto', type: 'textarea', required: true },
-        { name: 'myth', label: 'Z podań', type: 'textarea', required: true },
+        { name: 'myth', label: 'Z podań', type: 'textarea', admin: { hidden: true } },
         { name: 'why', label: 'Dlaczego ta istota', type: 'textarea', required: true },
         { name: 'giftTitle', label: 'Dar — tytuł', type: 'text', required: true },
         { name: 'gift', label: 'Dar — opis', type: 'textarea', required: true },
@@ -161,17 +198,18 @@ export const Builds: CollectionConfig = {
               'Wymienia procesor i kartę z nazwy — zaktualizuj przy zmianie części poziomu mocy.',
           },
         },
-        { name: 'legend', label: 'Legenda', type: 'textarea', required: true },
+        { name: 'legend', label: 'Legenda', type: 'textarea', admin: { hidden: true } },
         {
           name: 'legendSource',
           label: 'Źródło legendy',
           type: 'group',
+          admin: { hidden: true },
           fields: [
             {
               type: 'row',
               fields: [
-                { name: 'title', label: 'Tytuł', type: 'text', required: true },
-                { name: 'url', label: 'Adres', type: 'text', required: true },
+                { name: 'title', label: 'Tytuł', type: 'text' },
+                { name: 'url', label: 'Adres', type: 'text' },
               ],
             },
           ],

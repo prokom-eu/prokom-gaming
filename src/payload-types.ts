@@ -401,6 +401,19 @@ export interface Build {
    * Zmieniasz w edytorze zestawu (Gotowe zestawy → Edytuj).
    */
   ssd: number | Option;
+  /**
+   * O samym komputerze (części, zastosowanie, wygląd) — bez podań. Przejrzyj przy każdej zmianie części zestawu.
+   */
+  highlight: {
+    /**
+     * Do 48 znaków. Pod imieniem na liście zestawów.
+     */
+    title: string;
+    /**
+     * 1–2 zdania, do 240 znaków.
+     */
+    body: string;
+  };
   creature: {
     /**
      * Nazwa plików pieczęci i scen w /public, np. „baba” dla Baby Jagi.
@@ -412,9 +425,9 @@ export interface Build {
     shell: 'dark' | 'white';
     biome: string;
     look: string;
-    short: string;
+    short?: string | null;
     motto: string;
-    myth: string;
+    myth?: string | null;
     why: string;
     giftTitle: string;
     gift: string;
@@ -426,10 +439,10 @@ export interface Build {
      * Wymienia procesor i kartę z nazwy — zaktualizuj przy zmianie części poziomu mocy.
      */
     heroText: string;
-    legend: string;
-    legendSource: {
-      title: string;
-      url: string;
+    legend?: string | null;
+    legendSource?: {
+      title?: string | null;
+      url?: string | null;
     };
   };
   /**
@@ -1568,6 +1581,12 @@ export interface BuildsSelect<T extends boolean = true> {
   cooler?: T;
   ram?: T;
   ssd?: T;
+  highlight?:
+    | T
+    | {
+        title?: T;
+        body?: T;
+      };
   creature?:
     | T
     | {

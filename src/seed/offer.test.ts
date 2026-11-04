@@ -120,6 +120,19 @@ describe('mapping to Payload documents', () => {
     expect(doc.creature.legend).toBe(baba.legend)
     expect(doc.creature.legendSource).toEqual(baba.legendSource)
   })
+
+  it('takes the „Wyróżnik” 1:1 from the build (runda v2 §2)', () => {
+    const build = seed.builds.find((b) => b.slug === 'baba-jaga')!
+    const doc = mapBuild(
+      build,
+      seed.creatures.find((c) => c.slug === 'baba-jaga')!,
+      refs,
+    )
+    expect(doc.highlight).toEqual({
+      title: 'Procesor stworzony do gier',
+      body: build.highlight.body,
+    })
+  })
 })
 
 describe('first price batch', () => {
