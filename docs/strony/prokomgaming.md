@@ -85,7 +85,7 @@ Kolejność sekcji (plansza Main, telefon: Telefon):
 
 ## 5. Wszystkie zestawy `/zestawy` (G9)
 - Nagłówek „Wszystkie zestawy” + lead z planszy. Filtry: **Monitor** (Wszystkie, FullHD, 2K, 4K) · **Budżet** (Każdy, do 9 tys., 9–15 tys., ponad 15 tys.) · **Rodzaj** (Wszystkie, AMD, Intel, Białe) + licznik. Filtry w adresie (`?monitor=2k&budzet=…`).
-- Karty: scena, poziom (`tierRoman`), kraina (`tierLabel`), imię, motto, 2–3 części (`components[].publicLabel`), Cyberpunk 2077 w `targetResolution` poziomu z etykietą źródła, cena, „Zobacz”. Kolejność: cena rosnąco.
+- Karty: scena, poziom (`tierRoman`), kraina (`tierLabel`), imię, tytuł „Wyróżnika” (`highlight.title`, ADR-G013 — do R2 zdanie z podań), 2–3 części (`components[].publicLabel`), Cyberpunk 2077 w `targetResolution` poziomu z etykietą źródła, cena, „Zobacz”. Kolejność: cena rosnąco.
 - Reguły filtrów (jak JS planszy Zestawy): Monitor wg `power-levels.monitorFilters` (FullHD = Moc I–IV, 2K = Moc IV–VII, 4K = Moc VII–IX); Budżet: do 9 tys. = cena < 9 000, 9–15 tys. = 9 000–15 000, ponad 15 tys. = > 15 000; Rodzaj: AMD/Intel **wg procesora**, Białe = obudowa biała (`creatures.shell = white`). W adresie: `?monitor=fullhd|2k|4k&budzet=do9|9-15|od15&rodzaj=amd|intel|biale`.
 - Pusty wynik: „Żaden zestaw nie pasuje do tych filtrów” + „Wyczyść filtry”.
 - „Nadal nie wiesz, który?” → konfigurator / zapytanie.
@@ -93,7 +93,7 @@ Kolejność sekcji (plansza Main, telefon: Telefon):
 
 ## 6. Karta zestawu `/zestawy/[slug]` (G9)
 Sekcje (plansza Zestaw):
-1. Hero: scena istoty, imię, przydomek, poziom; legenda „Z podań” ze źródłem; „W grach” (dar); przełącznik poprzedni/następny (16 istot). Galeria: przód, wnętrze, w ciemności, film z testu — prawdziwe zdjęcia naszego egzemplarza (do sesji zdjęciowej: poglądowe z podpisem).
+1. Hero: scena istoty, imię, przydomek, poziom; „Wyróżnik” — tytuł i 1–2 zdania o samym komputerze, bez źródła (ADR-G013, R2; do R2 legenda „Z podań” ze źródłem); „W grach” (dar); przełącznik poprzedni/następny (16 istot). Galeria: przód, wnętrze, w ciemności, film z testu — prawdziwe zdjęcia naszego egzemplarza (do sesji zdjęciowej: poglądowe z podpisem).
 2. **Dlaczego {istota}?** + wygląd (kolor światła; zmiana koloru przyciskiem na obudowie — tekst z planszy).
 3. Cena (z `lib/pricing/`), „z montażem, Windows 11 i wysyłką”, data ceny (= data ostatniej publikacji cen, ADR-G002 §2), „Listę części potwierdzimy w ofercie ważnej 48 godzin”; **Zapytaj o {istotę}** · Zmień części (→ konfigurator z przepisem) · Porównaj · Wyślij rodzicowi ze specyfikacją (link + mail/SMS przez `mailto:`/`sms:`); obietnice (gotowy w 5–10 dni roboczych, wysyłka w cenie albo odbiór, metryka, 2 lata gwarancji z odbiorem). Na jaki monitor: FullHD / 2K / 4K z oceną jak w JS planszy Zestaw (z klatek zestawu).
 4. **Ile klatek w Twojej grze** — 12+ gier, segmenty FullHD/2K/4K, etykiety źródeł, „Jak liczymy?”.

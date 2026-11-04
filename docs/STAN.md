@@ -207,7 +207,7 @@ Ostatnia aktualizacja: 04.11.2026, noc (R2 — „Wyróżnik” zamiast „Z pod
 - **Migracja `faq_build` — `down` kasuje pytania grupy `build`.** Przy seedzie bez znaczenia; po G13 (pytania edytowane w panelu) cofnięcie tej migracji na produkcji usunie treść — przed `migrate:down` kopia tabeli `faq`.
 - **G15 — karta zestawu:** `alternates.canonical`, `openGraph` (zdjęcie zestawu), cache odczytu (każde wejście czyta katalog z kosztami — server-only, mapowany pole po polu — ofertę i tabelę FPS); Lighthouse 82–84.
 - **Treści do potwierdzenia na karcie (`TODO(krystian)`):** temat i treść „Wyślij rodzicowi” (mail i SMS, napis „albo SMS-em” nie z planszy), zakres GPSR + PDF instrukcji (prawnik), „Miejsce na rozbudowę” (model płyty), długość testu i lista „Co w pudełku” ([serwis]; dopisek planszy „Lista do potwierdzenia…” nie jest pokazywany), prawdziwe zdjęcia egzemplarzy (`builds.photos`), opinie (ukryte).
-- **Spec. §5 mówi „motto” na karcie listy** — plansza (`.zc-my`) i kod pokazują `creature.short` (np. „Domowy duszek z polskich podań…”). Poprawić zdanie w `docs/strony/prokomgaming.md` §5 (`motto` → `short`).
+- ~~Spec. §5 mówi „motto” na karcie listy~~ — od R2 karta listy pokazuje tytuł „Wyróżnika” (`highlight.title`), spec. §5 poprawiona.
 - **G15 — `/zestawy`:** metadane (opis), `canonical` bez parametrów filtrów (filtry tworzą warianty adresu), `BreadcrumbList`; Lighthouse 83–85 razem z budżetem głównej.
 - **Błąd bazy na `/zestawy`:** zostaje nagłówek i „Nadal nie wiesz…” bez kart i bez komunikatu (jak główna w G8). Do rozważenia jedno zdanie zastępcze, jeśli zdarzy się na produkcji.
 - **Nagłówek `/zestawy` bez lasu w tle** (plansza: blady las SVG przy 55%) — decyzja Krystiana 28.10 dla wydajności; jeśli wrócić, to lekki SVG/CSS, nie obraz.

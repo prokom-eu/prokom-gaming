@@ -74,7 +74,7 @@ export function BuildHero({ data }: { data: BuildPageData }) {
         <div>
           <span className="bp-k">Wyróżnik</span>
           <b className="bp-hl__t nm">{build.highlight.title}</b>
-          <p className="bp-hl__p">{build.highlight.body}</p>
+          {build.highlight.body && <p className="bp-hl__p">{build.highlight.body}</p>}
         </div>
       </div>
 

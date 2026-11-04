@@ -175,7 +175,25 @@ test.describe('saving', () => {
 })
 
 test.describe('„Wyróżnik” in the panel (runda v2 §2)', () => {
+  test.use({ storageState: ADMIN_STATE })
   test.skip(({ isMobile }) => isMobile, 'writes in the desktop project only')
+
+  test('the build form shows „Wyróżnik” with its two fields; the folk-tale fields are not shown', async ({
+    page,
+    request,
+  }) => {
+    const list = (await (
+      await request.get('/api/builds?where[slug][equals]=strzyga&depth=0', {
+        headers: adminHeaders(),
+      })
+    ).json()) as { docs: { id: number; highlight: { title: string } }[] }
+    await page.goto(`/admin/collections/builds/${list.docs[0]!.id}`)
+    await expect(page.getByText('Wyróżnik', { exact: true }).first()).toBeVisible()
+    await expect(page.locator('#field-highlight__title')).toHaveValue(list.docs[0]!.highlight.title)
+    await expect(page.locator('#field-highlight__body')).toBeEditable()
+    await expect(page.locator('#field-creature__legend')).toBeHidden()
+    await expect(page.locator('#field-creature__myth')).toBeHidden()
+  })
 
   test('the title takes up to 48 characters, longer is refused', async ({
     playwright,

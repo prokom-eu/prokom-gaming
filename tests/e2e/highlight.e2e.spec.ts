@@ -29,7 +29,7 @@ test.describe('Wyróżnik', () => {
 
   test('/zestawy: the highlight title under every name', async ({ page }) => {
     await page.goto('/zestawy')
-    const lines = await page.locator('.bl-card__short').allTextContents()
+    const lines = await page.locator('.bl-card__hl').allTextContents()
     expect(lines).toHaveLength(16)
     expect(lines).toEqual(expect.arrayContaining(buildsSeed.items.map((b) => b.highlight.title)))
     await expect(page.getByText('Domowy duszek z polskich podań')).toHaveCount(0)
