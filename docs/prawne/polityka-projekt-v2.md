@@ -1,6 +1,6 @@
 # Polityka prywatności — projekt v0.2 do weryfikacji przez prawnika
 
-Przygotowane 04.11.2026 (sesja R1, `docs/design/prokomgaming/runda-v2/ZMIANY.md` §1.4–1.5). **To projekt, nie tekst opublikowany.** W panelu nic się nie zmienia: napis „Projekt do weryfikacji przez prawnika” zostaje, dopóki prawnik i właściciel nie zaakceptują treści (ADR-G013 pkt 5).
+Przygotowane 04.11.2026 (sesja R1, `docs/design/prokomgaming/runda-v2/ZMIANY.md` §1.4–1.5). **To projekt, nie tekst opublikowany.** Kod i seed się nie zmieniają. W panelu produkcji przed włączeniem Umami Krystian wkleja tylko akapit „Statystyki” (niżej, decyzja 04.11, kolejność w `docs/wdrozenia.md`). Napis „Projekt do weryfikacji przez prawnika” zostaje, dopóki prawnik i właściciel nie zaakceptują całej treści (ADR-G013 pkt 5).
 
 **Podstawa:** wersja 0.1 z `seed/prokomgaming/legal-privacy.md` (treść z planszy „Prywatnosc”). Jeśli w panelu produkcji ktoś zmienił politykę, przed wysłaniem do prawnika porównaj ją z panelem (Panel → Polityka prywatności).
 

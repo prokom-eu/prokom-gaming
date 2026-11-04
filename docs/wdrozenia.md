@@ -65,6 +65,8 @@ Staging zawsze czyta `.env.staging` (na sztywno w nakładce) — nie może dosta
 | `APP_PORT`, `UMAMI_PORT` | 3201, 3211 | 3200, 3210 | |
 | `UMAMI_APP_SECRET` | osobny | osobny | `openssl rand -hex 32` |
 
+**Staging:** zmienne `UMAMI_*` w `.env.staging` muszą być **przed scaleniem** PR z R1 (wdrożenie stagingu rusza samo).
+
 **Umami na produkcji — kolejność (R1, 04.11.2026):** (1) panel produkcji → Polityka prywatności → wklej akapit „Statystyki” z `docs/prawne/polityka-projekt-v2.md` (napis „Projekt do weryfikacji…” zostaje do akceptacji prawnika); (2) panel Umami (tunel SSH) → strona „produkcja” → jej identyfikator; (3) `.env.prod`: `UMAMI_SCRIPT_URL=/_s/script.js`, `UMAMI_WEBSITE_ID=<id>`; (4) wdrożenie. Sprawdzenie: na głównej `<script src="/_s/script.js" data-website-id=…>`, w Umami widać wejście.
 
 **Nigdy na serwerze:** `UMAMI_FAKE=1`, `PRICE_CHECK_FAKE=1` (aplikacja odmówi startu), `SEED_ADMIN_*`, `PORT`, `MEDIA_DIR` (ustawia compose).

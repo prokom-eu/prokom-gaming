@@ -80,6 +80,8 @@ if [ "${SMOKE_CORE:-}" != 1 ]; then
     # Statistics: the layout adds the tracker only with UMAMI_SCRIPT_URL and UMAMI_WEBSITE_ID set
     # (docs/wdrozenia.md) — without them the site works, but Umami counts nothing.
     contains / '<script[^>]*src="/_s/script\.js"[^>]*data-website-id="[0-9a-f-]{36}"' 'the Umami script'
+    # Through Nginx the tracker itself comes from the umami container (/_s/ → umami).
+    if [ "$scheme" = https ]; then check 200 /_s/script.js; fi
   fi
   if [ "$scheme" = https ]; then
     # Nginx closes the first-admin form for good (an empty `users` table would let anyone in).
