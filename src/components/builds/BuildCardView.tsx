@@ -44,7 +44,7 @@ export function BuildCardView({ card, eager = false }: { card: BuildCard; eager?
             {card.name}
           </Link>
         </h2>
-        <p className="lore bl-card__short">{card.short}</p>
+        <p className="lore bl-card__short">{card.highlight}</p>
         {card.specs.length > 0 && (
           <ul className="bl-card__specs" aria-label="W skrócie">
             {card.specs.map((s) => (

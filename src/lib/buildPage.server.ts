@@ -28,8 +28,8 @@ export type BuildPageData = {
     why: string
     giftTitle: string
     gift: string
-    legend: string
-    legendSource: { title: string; url: string }
+    /** „Wyróżnik” in the hero (runda v2 §2) — replaced „Z podań”. */
+    highlight: { title: string; body: string }
   }
   config: Config
   /** Public labels of the parts in „Twoja wersja” and the sticky bar. */
@@ -71,13 +71,12 @@ export async function loadBuildPage(slug: string): Promise<BuildPageData | null>
     select: {
       slug: true,
       level: true,
+      highlight: { title: true, body: true },
       creature: {
         genitive: true,
         why: true,
         giftTitle: true,
         gift: true,
-        legend: true,
-        legendSource: { title: true, url: true },
       },
     },
     limit: 1,
@@ -149,8 +148,7 @@ export async function loadBuildPage(slug: string): Promise<BuildPageData | null>
       why: doc.creature.why,
       giftTitle: doc.creature.giftTitle,
       gift: doc.creature.gift,
-      legend: doc.creature.legend,
-      legendSource: { title: doc.creature.legendSource.title, url: doc.creature.legendSource.url },
+      highlight: { title: doc.highlight.title, body: doc.highlight.body },
     },
     config: recipe.config,
     ramType: level.ramType,

@@ -10,8 +10,9 @@ import { buildHref, routes } from '@/lib/nav'
 
 /**
  * Build page hero (spec. §6 pt 1, board Zestaw `.zh5`): the creature's scene, crumbs, tier, epithet
- * and the giant name in its material, the case on the stage, „Z podań” with its source on the
- * left, „W grach” and the previous / next creature on the right.
+ * and the giant name in its material, the case on the stage, „Wyróżnik” (about the computer —
+ * runda v2 §2, it replaced „Z podań”) on the left, „W grach” and the previous / next creature on
+ * the right.
  */
 export function BuildHero({ data }: { data: BuildPageData }) {
   const { build, switcher } = data
@@ -66,17 +67,14 @@ export function BuildHero({ data }: { data: BuildPageData }) {
         )}
       </div>
 
-      <div className="bp-myth">
-        <span className="bp-myth__sigil" aria-hidden="true">
+      <div className="bp-hl">
+        <span className="bp-hl__sigil" aria-hidden="true">
           <Sigil id={build.key} size={44} />
         </span>
         <div>
-          <span className="bp-k">Z podań</span>
-          <p className="lore">{build.legend}</p>
-          <a className="bp-src" href={build.legendSource.url} rel="noopener" target="_blank">
-            Źródło: {build.legendSource.title}
-            <span className="sr-only"> (otwiera się w nowej karcie)</span>
-          </a>
+          <span className="bp-k">Wyróżnik</span>
+          <b className="bp-hl__t nm">{build.highlight.title}</b>
+          <p className="bp-hl__p">{build.highlight.body}</p>
         </div>
       </div>
 

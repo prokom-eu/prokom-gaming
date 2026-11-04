@@ -74,7 +74,7 @@ export const seedExtras = new Map<string, CardExtras>(
     return [
       b.slug,
       {
-        short: c.short,
+        highlight: b.highlight.title,
         shell: c.shell,
         monitorFilters: level.monitorFilters,
         platform: level.platform,

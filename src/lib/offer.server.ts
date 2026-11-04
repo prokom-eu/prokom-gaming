@@ -45,12 +45,12 @@ export async function loadOffer(payload: Payload): Promise<OfferData> {
         cooler: true,
         ram: true,
         ssd: true,
+        highlight: { title: true },
         creature: {
           key: true,
           accusative: true,
           epithet: true,
           look: true,
-          short: true,
           shell: true,
           heroTitle: true,
           heroText: true,
@@ -130,7 +130,7 @@ export async function loadOffer(payload: Payload): Promise<OfferData> {
     const level = levelId === null ? undefined : levelById.get(levelId)
     if (!level) continue
     extras.set(b.slug, {
-      short: b.creature.short,
+      highlight: b.highlight.title,
       shell: b.creature.shell,
       monitorFilters: level.monitorFilters ?? [],
       platform: level.platform,

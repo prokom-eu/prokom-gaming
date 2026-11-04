@@ -271,8 +271,8 @@ export function EditorBoard({
               <dl className="pn-kv">
                 <dt>Przydomek</dt>
                 <dd>{build.texts.epithet || '—'}</dd>
-                <dt>Krótko</dt>
-                <dd>{build.texts.short || '—'}</dd>
+                <dt>Wyróżnik</dt>
+                <dd>{build.texts.highlight || '—'}</dd>
                 <dt>Dlaczego ta istota</dt>
                 <dd>{build.texts.why || '—'}</dd>
               </dl>
