@@ -18,7 +18,7 @@ import { getEnv } from '@/lib/env'
 import { EMPTY_HOME, type HomeData } from '@/lib/home'
 import { loadHome } from '@/lib/home.server'
 import { errorFields, log } from '@/lib/logger'
-import { DESCRIPTIONS, HOME_TITLE, organizationJsonLd } from '@/lib/seo'
+import { DESCRIPTIONS, HOME_TITLE, organizationJsonLd, websiteJsonLd } from '@/lib/seo'
 import { EMPTY_WORKSHOP, loadWorkshop, type Workshop } from '@/lib/workshop.server'
 
 import '@/components/home/home.css'
@@ -51,8 +51,9 @@ export default async function HomePage() {
   ])
   return (
     <>
-      {/* The brand and the shop (spec. §23): Organization + LocalBusiness. */}
-      <JsonLd data={organizationJsonLd(getEnv().SITE_URL)} />
+      {/* The brand and the shop (spec. §23): Organization + LocalBusiness; the site name for
+          Google (WebSite, runda v2 §1.1). */}
+      <JsonLd data={[...organizationJsonLd(getEnv().SITE_URL), websiteJsonLd(getEnv().SITE_URL)]} />
       <Hero data={home.hero} />
       <WorkshopStrip items={workshop.items} />
       <StartPaths />

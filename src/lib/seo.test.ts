@@ -7,6 +7,7 @@ import {
   organizationJsonLd,
   robotsRules,
   sitemapEntries,
+  websiteJsonLd,
 } from './seo'
 
 const SITE = 'https://prokomgaming.pl'
@@ -115,5 +116,17 @@ describe('robotsRules', () => {
   })
   it('staging: nothing', () => {
     expect(robotsRules(SITE, 'staging')).toEqual({ rules: { userAgent: '*', disallow: '/' } })
+  })
+})
+
+describe('websiteJsonLd (runda v2 §1.1)', () => {
+  it('the site name Google shows, linked to the brand', () => {
+    expect(websiteJsonLd(SITE)).toMatchObject({
+      '@type': 'WebSite',
+      name: 'PRO-KOM Gaming',
+      alternateName: 'PRO-KOM Gaming Rabka-Zdrój',
+      url: 'https://prokomgaming.pl/',
+      publisher: { '@id': 'https://prokomgaming.pl/#organizacja' },
+    })
   })
 })

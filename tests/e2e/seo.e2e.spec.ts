@@ -57,8 +57,38 @@ test.describe('seo', () => {
   test('home: the brand and the one shop', async ({ page }) => {
     await page.goto('/')
     const items = await jsonLd(page)
-    expect(types(items)).toEqual(expect.arrayContaining(['Organization', 'ComputerStore']))
+    expect(types(items)).toEqual(
+      expect.arrayContaining(['Organization', 'ComputerStore', 'WebSite']),
+    )
+    const site = items.find((i) => i['@type'] === 'WebSite')
+    expect(site).toMatchObject({
+      name: 'PRO-KOM Gaming',
+      alternateName: 'PRO-KOM Gaming Rabka-Zdrój',
+    })
     expect(JSON.stringify(items)).not.toMatch(/Zakopane/)
+  })
+
+  test('home: icons Google can read and the large link preview (runda v2 §1.1–1.2)', async ({
+    page,
+    request,
+  }) => {
+    const favicon = await request.get('/favicon.ico')
+    expect(favicon.status()).toBe(200)
+    expect(favicon.headers()['content-type']).toBe('image/x-icon')
+    await page.goto('/')
+    await expect(page.locator('link[rel="icon"][href^="/favicon.ico"]')).toHaveCount(1)
+    for (const size of ['192x192', '512x512']) {
+      const href = await page
+        .locator(`link[rel="icon"][type="image/png"][sizes="${size}"]`)
+        .getAttribute('href')
+      const icon = await request.get(href ?? '')
+      expect(icon.status(), size).toBe(200)
+      expect(icon.headers()['content-type']).toBe('image/png')
+    }
+    await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute(
+      'content',
+      'summary_large_image',
+    )
   })
 
   test('build page: product with an offer, breadcrumbs and FAQ; title of spec. §23', async ({

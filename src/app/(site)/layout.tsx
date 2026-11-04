@@ -31,6 +31,9 @@ export async function generateMetadata(): Promise<Metadata> {
     title: { default: SITE_NAME, template: `%s | ${SITE_NAME}` },
     description: DESCRIPTIONS.home,
     openGraph: OPEN_GRAPH,
+    // Large preview on X and in apps that read Twitter tags; the picture is the page's
+    // `opengraph-image` (runda v2 §1.2) — X falls back to og:image without `twitter:image`.
+    twitter: { card: 'summary_large_image' },
     // Staging and local runs never get indexed; a page's own `robots` (account, certificate…)
     // replaces this object, and those pages are `noindex` everywhere anyway.
     ...(isIndexable(env.SITE_ENV) ? {} : { robots: { index: false, follow: false } }),
