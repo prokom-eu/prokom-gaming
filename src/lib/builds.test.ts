@@ -46,7 +46,7 @@ describe('buildCards', () => {
     expect(wampir).toMatchObject({
       name: 'Wampir',
       key: 'wampir',
-      short: 'Słowo „wampir” ma słowiańskie korzenie.',
+      highlight: '4K i wysokie odświeżanie w jednym',
       tierRoman: 'VII',
       tierLabel: '4K',
       specs: ['Ryzen 7 9800X3D', 'RTX 5070 Ti 16 GB', 'monitor 4K'],

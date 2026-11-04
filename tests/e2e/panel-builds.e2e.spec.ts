@@ -173,3 +173,55 @@ test.describe('saving', () => {
     expect(links('bazyliszek')).toBe(links('wampir') - 1)
   })
 })
+
+test.describe('„Wyróżnik” in the panel (runda v2 §2)', () => {
+  test.use({ storageState: ADMIN_STATE })
+  test.skip(({ isMobile }) => isMobile, 'writes in the desktop project only')
+
+  test('the build form shows „Wyróżnik” with its two fields; the folk-tale fields are not shown', async ({
+    page,
+    request,
+  }) => {
+    const list = (await (
+      await request.get('/api/builds?where[slug][equals]=strzyga&depth=0', {
+        headers: adminHeaders(),
+      })
+    ).json()) as { docs: { id: number; highlight: { title: string } }[] }
+    await page.goto(`/admin/collections/builds/${list.docs[0]!.id}`)
+    await expect(page.getByText('Wyróżnik', { exact: true }).first()).toBeVisible()
+    await expect(page.locator('#field-highlight__title')).toHaveValue(list.docs[0]!.highlight.title)
+    await expect(page.locator('#field-highlight__body')).toBeEditable()
+    await expect(page.locator('#field-creature__legend')).toBeHidden()
+    await expect(page.locator('#field-creature__myth')).toBeHidden()
+  })
+
+  test('the title takes up to 48 characters, longer is refused', async ({
+    playwright,
+    baseURL,
+  }) => {
+    const panel = await playwright.request.newContext({ baseURL })
+    const headers = adminHeaders()
+    const list = (await (
+      await panel.get('/api/builds?where[slug][equals]=strzyga&depth=0', { headers })
+    ).json()) as { docs: { id: number; highlight: { title: string; body: string } }[] }
+    const strzyga = list.docs[0]!
+    try {
+      const tooLong = await panel.patch(`/api/builds/${strzyga.id}`, {
+        headers,
+        data: { highlight: { ...strzyga.highlight, title: 'x'.repeat(49) } },
+      })
+      expect(tooLong.status()).toBe(400)
+      const fits = await panel.patch(`/api/builds/${strzyga.id}`, {
+        headers,
+        data: { highlight: { ...strzyga.highlight, title: 'x'.repeat(48) } },
+      })
+      expect(fits.status()).toBe(200)
+    } finally {
+      await panel.patch(`/api/builds/${strzyga.id}`, {
+        headers,
+        data: { highlight: strzyga.highlight },
+      })
+      await panel.dispose()
+    }
+  })
+})

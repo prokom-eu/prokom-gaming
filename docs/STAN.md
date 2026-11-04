@@ -1,15 +1,17 @@
 # STAN — prokom-gaming
 
-Ostatnia aktualizacja: 04.11.2026, wieczór (R1 — favicon, og:image, Umami, projekt polityki; przed PR).
+Ostatnia aktualizacja: 04.11.2026, noc (R2 — „Wyróżnik” zamiast „Z podań”; przed PR).
 
 ## W toku
-- **Gałąź:** `fix/r1-favicon-og-umami` (od `origin/develop` po #73). Runda wyglądu v2: plan i prompty `docs/zadania/gaming-runda-v2.md`, spec `docs/design/prokomgaming/runda-v2/ZMIANY.md`, ADR-G013 — pakiet zacommitowany w tym PR.
-- **Zrobione:** `src/app/favicon.ico` (16/32/48) i `(site)/icon1.png`, `icon2.png` (192/512) z `icon.svg` (`scripts/site-icons.mjs`); JSON-LD `WebSite` na głównej (`websiteJsonLd`); `twitter:card=summary_large_image`; `opengraph-image` dla głównej, 16 zestawów (scena, imię, moc, „od” z opublikowanej ceny), 33 gier (3 zestawy z klatkami i etykietą źródła), poradników i 13 stron treści (`src/lib/og/`, kroje TTF `src/assets/og/` z `scripts/subset-site-fonts.py --og`, kolory pilnowane testem z `tokens.css`); smoke: `/favicon.ico` i skrypt Umami na głównej (`SMOKE_UMAMI=0` lokalnie); `docs/prawne/polityka-projekt-v2.md` dla prawnika (panel i seed bez zmian).
-- **Umami — przyczyna:** kod był dobry, na produkcji brakuje `UMAMI_SCRIPT_URL`/`UMAMI_WEBSITE_ID` (świadomie, ADR-G009 pkt 5). Decyzja Krystiana 04.11: włączamy teraz — akapit „Statystyki” z projektu v2 wklejony w panelu, napis „Projekt do weryfikacji” zostaje. **Kolejność na produkcji:** akapit → zmienne w `.env.prod` → wdrożenie (`docs/wdrozenia.md`), inaczej smoke cofnie wdrożenie. **Przed scaleniem PR:** `UMAMI_SCRIPT_URL=/_s/script.js` i `UMAMI_WEBSITE_ID` (strona „staging”) w `.env.staging` — wdrożenie stagingu rusza samo po scaleniu, a bez nich smoke je cofnie.
-- **Odkryte przy polityce (do decyzji, lista na końcu projektu):** tekst mówi „zapytania do 12 miesięcy”, `INQUIRY_RETENTION_MONTHS` = 24; kopie B2 to odbiorca danych (region?); link „Ustawienia cookies” w stopce prowadzi do polityki, a baneru nie ma.
-- **Następny krok:** `/przeglad` → `/pr` → po scaleniu staging (Krystian: §4 planu rundy — favicon, Messenger z linkiem głównej i Wampira, wejście w Umami) → produkcja → Search Console „Poproś o zindeksowanie” → projekt polityki do prawnika. Potem **R2** (`feat/r2-wyroznik`).
+- **Gałąź:** `feat/r2-wyroznik` (od `origin/develop` po R1 #74). Plan rundy: `docs/zadania/gaming-runda-v2.md`, spec `runda-v2/ZMIANY.md` §2, ADR-G013 pkt 1.
+- **Zrobione:** grupa `highlight { title ≤ 48, body ≤ 240 }` w `builds` (wymagana), migracja `20261104_211926_r2_highlight` (dodaje kolumny, 16 tekstów z §2 po slugu, `myth`/`short`/`legend`/`legendSource` bez NOT NULL — dane zostają, ukryte w panelu), seed `builds.json` z tymi samymi tekstami (test `src/seed/highlight.test.ts`); karta zestawu: blok „Wyróżnik” w miejscu „Z podań” (bez linku źródła); `/zestawy`: tytuł wyróżnika pod imieniem; podgląd edytora w panelu: „Wyróżnik” zamiast „Krótko”; `tmp/` w `.gitignore` (zrzuty przed/po).
+- **Decyzje Krystiana 04.11:** limit tytułu 48 (Strzyga 41 znaków; §2 mówiło 40); `short` ukryte jak `myth`. Karty na głównej i „Inne istoty” bez zmian — pokazują przydomek i `heroTitle`/`heroText`, nie podania. Fakty tabeli §2 zgodne z seedem (części, klatki CS2/Valorant/CoD dla „powyżej 144”).
+- **Sprawdzone lokalnie:** lint, typecheck, 971 testów; e2e `highlight`, `build-page`, `builds-list` (1440 i 414), `panel-builds`, `a11y` (62/62); zrzuty przed/po w `tmp/zrzuty-przed/r2`, `tmp/zrzuty-po/r2`.
+- **Następny krok:** `/przeglad` → `/pr` → staging (migracja!) → Krystian: 3 karty z „Wyróżnikiem”, w panelu tekst edytowalny → produkcja (migracja tylko dodaje kolumny; kopię robi `deploy.sh`). Potem **GN-1** (`docs/zadania/gaming-nawigacja.md` §2, zrzuty „przed” po R2).
+- **R1 (scalone #74):** na stagingu i produkcji `UMAMI_*` muszą być w `.env.*` (smoke); akapit „Statystyki” w panelu produkcji przed zmiennymi; Search Console; projekt polityki do prawnika.
 
-## Pomysły na później (R1)
+## Pomysły na później (R1–R2)
+- Teksty `why`, `gift`, `motto` zestawów nawiązują do istot („Tak jak Licho nie śpi…”) — nie są podaniami, zostały (R2 poza zakresem); do przejrzenia przy porządkach treści. Usunięcie kolumn `myth`/`short`/`legend*` — runda porządków.
 - Pamięć podręczna obrazków podglądu zestawów i gier (dziś każde żądanie czyta ofertę i rysuje, 0,15–0,3 s) — np. cache do następnej publikacji cen; świadomie bez, żeby nie pokazać starej ceny.
 - Podglądy `bon`/`gotowe` odpowiadają 200 także przy wyłączonej stronie (nic nie wycieka).
 
@@ -205,7 +207,7 @@ Ostatnia aktualizacja: 04.11.2026, wieczór (R1 — favicon, og:image, Umami, pr
 - **Migracja `faq_build` — `down` kasuje pytania grupy `build`.** Przy seedzie bez znaczenia; po G13 (pytania edytowane w panelu) cofnięcie tej migracji na produkcji usunie treść — przed `migrate:down` kopia tabeli `faq`.
 - **G15 — karta zestawu:** `alternates.canonical`, `openGraph` (zdjęcie zestawu), cache odczytu (każde wejście czyta katalog z kosztami — server-only, mapowany pole po polu — ofertę i tabelę FPS); Lighthouse 82–84.
 - **Treści do potwierdzenia na karcie (`TODO(krystian)`):** temat i treść „Wyślij rodzicowi” (mail i SMS, napis „albo SMS-em” nie z planszy), zakres GPSR + PDF instrukcji (prawnik), „Miejsce na rozbudowę” (model płyty), długość testu i lista „Co w pudełku” ([serwis]; dopisek planszy „Lista do potwierdzenia…” nie jest pokazywany), prawdziwe zdjęcia egzemplarzy (`builds.photos`), opinie (ukryte).
-- **Spec. §5 mówi „motto” na karcie listy** — plansza (`.zc-my`) i kod pokazują `creature.short` (np. „Domowy duszek z polskich podań…”). Poprawić zdanie w `docs/strony/prokomgaming.md` §5 (`motto` → `short`).
+- ~~Spec. §5 mówi „motto” na karcie listy~~ — od R2 karta listy pokazuje tytuł „Wyróżnika” (`highlight.title`), spec. §5 poprawiona.
 - **G15 — `/zestawy`:** metadane (opis), `canonical` bez parametrów filtrów (filtry tworzą warianty adresu), `BreadcrumbList`; Lighthouse 83–85 razem z budżetem głównej.
 - **Błąd bazy na `/zestawy`:** zostaje nagłówek i „Nadal nie wiesz…” bez kart i bez komunikatu (jak główna w G8). Do rozważenia jedno zdanie zastępcze, jeśli zdarzy się na produkcji.
 - **Nagłówek `/zestawy` bez lasu w tle** (plansza: blady las SVG przy 55%) — decyzja Krystiana 28.10 dla wydajności; jeśli wrócić, to lekki SVG/CSS, nie obraz.

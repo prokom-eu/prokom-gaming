@@ -91,6 +91,8 @@ export type SeedBuild = {
   cooler: string
   ram: string
   ssd: string
+  /** „Wyróżnik” (runda v2 §2) — the same texts as migration `r2_highlight`. */
+  highlight: { title: string; body: string }
   internalRef: string
 }
 
@@ -218,6 +220,7 @@ export function mapBuild(b: SeedBuild, c: SeedCreature, refs: BuildRefs): BuildD
     name: b.name,
     offerStatus: 'published',
     ...refs,
+    highlight: { title: b.highlight.title, body: b.highlight.body },
     creature: {
       key: c.id,
       accusative: c.accusative,

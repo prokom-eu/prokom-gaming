@@ -153,7 +153,7 @@
   font-weight: 500;
   color: color-mix(in srgb, var(--c) 65%, var(--hero-realm));
 }
-.bp-myth {
+.bp-hl {
   position: absolute;
   z-index: 3;
   left: 40px;
@@ -163,23 +163,24 @@
   gap: 16px;
   width: 400px;
 }
-.bp-myth__sigil {
+.bp-hl__sigil {
   flex: none;
   color: var(--c);
   filter: drop-shadow(0 0 10px var(--c));
 }
-.bp-myth p {
-  margin: 6px 0 0;
-  font-size: 20px;
-  line-height: 1.32;
-  color: var(--hero-spec);
+.bp-hl__t {
+  display: block;
+  margin-top: 4px;
+  font-size: 24px;
+  line-height: 1.15;
+  color: var(--white);
 }
-.bp-src {
-  display: inline-block;
-  margin-top: 10px;
-  font-size: 12px;
-  color: var(--flt-label);
-  border-bottom: 1px solid color-mix(in srgb, var(--kosc) 25%, transparent);
+.bp-hl__p {
+  margin: 8px 0 0;
+  font-family: var(--font-text);
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--hero-spec);
 }
 .bp-gift {
   position: absolute;
@@ -1290,7 +1291,7 @@
   .bp-crumbs,
   .bp-title,
   .bp-stage,
-  .bp-myth,
+  .bp-hl,
   .bp-gift {
     position: relative;
     inset: auto;
@@ -1324,13 +1325,13 @@
     height: min(86vw, 420px);
     margin: calc(min(86vw, 420px) / -2) 0 0 calc(min(86vw, 420px) / -2);
   }
-  .bp-myth,
+  .bp-hl,
   .bp-gift {
     width: auto;
     margin: 22px 18px 0;
   }
-  .bp-myth p {
-    font-size: 17px;
+  .bp-hl__t {
+    font-size: 22px;
   }
   .bp-gift b.h {
     font-size: 28px;

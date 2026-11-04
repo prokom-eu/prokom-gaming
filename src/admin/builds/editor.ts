@@ -36,7 +36,7 @@ export type EditorData = {
     tier: string
     updatedAt: string
     editHref: string
-    texts: { epithet: string; short: string; why: string }
+    texts: { epithet: string; highlight: string; why: string }
     photos: { src: string; alt: string }[]
   }
   levels: EditorLevel[]
@@ -78,7 +78,8 @@ export async function loadEditor(
       id: recipe.id,
       select: {
         updatedAt: true,
-        creature: { epithet: true, short: true, why: true },
+        highlight: { title: true },
+        creature: { epithet: true, why: true },
         photos: true,
       },
       populate: { media: { url: true, filename: true, alt: true } },
@@ -148,7 +149,7 @@ export async function loadEditor(
       editHref: `${admin}/collections/builds/${recipe.id}`,
       texts: {
         epithet: doc.creature?.epithet ?? '',
-        short: doc.creature?.short ?? '',
+        highlight: doc.highlight?.title ?? '',
         why: doc.creature?.why ?? '',
       },
       photos: (doc.photos ?? []).flatMap((p) => {

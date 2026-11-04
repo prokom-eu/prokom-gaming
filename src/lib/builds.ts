@@ -66,7 +66,8 @@ export type BuildCard = {
   name: string
   /** File key of the scene and sigil (`baba` for Baba Jaga). */
   key: string
-  short: string
+  /** Title of the build's „Wyróżnik” under the name (runda v2 §2). */
+  highlight: string
   tierRoman: string
   tierLabel: string
   /** Chips: CPU, GPU (public labels) and the tier hint (board: „monitor 4K”). */
@@ -81,7 +82,7 @@ export type BuildCard = {
 
 /** Extra public fields per build slug (from `loadOffer()`). */
 export type CardExtras = {
-  short: string
+  highlight: string
   shell: 'dark' | 'white'
   monitorFilters: readonly Resolution[]
   platform: string
@@ -101,7 +102,7 @@ export function buildCards(hero: HeroData, extras: ReadonlyMap<string, CardExtra
       slug: b.slug,
       name: b.name,
       key: b.key,
-      short: extra.short,
+      highlight: extra.highlight,
       tierRoman: b.tierRoman,
       tierLabel: b.tierLabel,
       specs: [b.cpu, b.gpu, hint].filter((s): s is string => Boolean(s)),

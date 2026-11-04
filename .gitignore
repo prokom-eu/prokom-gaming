@@ -17,3 +17,6 @@ playwright/.auth/
 .claude/worktrees/
 # Next.js (generated)
 next-env.d.ts
+
+# Working files (screenshots before/after of runda v2: tmp/zrzuty-przed/<session>/)
+tmp/
