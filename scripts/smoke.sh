@@ -12,6 +12,8 @@
 #   SMOKE_INSECURE=1 accept a self-signed certificate (local test of Nginx)
 #   SMOKE_CORE=1     only health, panel login and the home page — routes every version has
 #                    (deploy.sh checks a rolled-back older image with it)
+#   SMOKE_UMAMI=0    skip the statistics check (a local run without UMAMI_* — on the servers the
+#                    home page must carry the Umami script, runda v2 §1.3)
 # Through Nginx (https base) it also checks that the first-admin form is closed (docs/runbook.md).
 # Exit code 1 on any failure.
 set -euo pipefail
@@ -29,9 +31,10 @@ else
   port=$([ "$scheme" = https ] && echo 443 || echo 80)
 fi
 
-curl_opts=(-s -o /dev/null -w '%{http_code}' --max-time 15)
-[ -n "${SMOKE_AUTH:-}" ] && curl_opts+=(-u "$SMOKE_AUTH")
-[ "${SMOKE_INSECURE:-}" = 1 ] && curl_opts+=(-k)
+base_opts=(-s --max-time 15)
+[ -n "${SMOKE_AUTH:-}" ] && base_opts+=(-u "$SMOKE_AUTH")
+[ "${SMOKE_INSECURE:-}" = 1 ] && base_opts+=(-k)
+curl_opts=("${base_opts[@]}" -o /dev/null -w '%{http_code}')
 
 failures=0
 
@@ -49,6 +52,17 @@ check() {
   fi
 }
 
+# contains <path> <extended regex> <what>: the page's HTML has it.
+contains() {
+  local path="$1" pattern="$2" what="$3"
+  if curl "${base_opts[@]}" --connect-to "${host}:${port}:${address}:${port}"     "${scheme}://${host}:${port}${path}" | grep -Eq "$pattern"; then
+    echo "ok    ${host}${path} has ${what}"
+  else
+    echo "FAIL  ${host}${path} without ${what}"
+    failures=$((failures + 1))
+  fi
+}
+
 check 200 /api/health
 # The admin build (import map, assets) is the most fragile part of a standalone image.
 check 200 /admin/login
@@ -60,6 +74,13 @@ if [ "${SMOKE_CORE:-}" != 1 ]; then
   check 200 /sitemap.xml
   check 200 /robots.txt
   check 404 /tej-strony-nie-ma
+  # Google reads the icon at a fixed address (runda v2 §1.1).
+  check 200 /favicon.ico
+  if [ "${SMOKE_UMAMI:-1}" != 0 ]; then
+    # Statistics: the layout adds the tracker only with UMAMI_SCRIPT_URL and UMAMI_WEBSITE_ID set
+    # (docs/wdrozenia.md) — without them the site works, but Umami counts nothing.
+    contains / '<script[^>]*src="/_s/script\.js"[^>]*data-website-id="[0-9a-f-]{36}"' 'the Umami script'
+  fi
   if [ "$scheme" = https ]; then
     # Nginx closes the first-admin form for good (an empty `users` table would let anyone in).
     check 404 /admin/create-first-user
