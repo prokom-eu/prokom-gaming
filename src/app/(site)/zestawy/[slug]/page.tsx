@@ -34,10 +34,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: { absolute: buildTitle(build.name, RESOLUTION_LABELS[build.resolution], build.price) },
     description: build.why,
     alternates: { canonical: buildHref(build.slug) },
-    openGraph: {
-      ...OPEN_GRAPH,
-      ...(build.photo ? { images: [{ url: build.photo.src, alt: build.photo.alt }] } : {}),
-    },
+    // The picture is this segment's `opengraph-image` (scene, name, price — runda v2 §1.2).
+    openGraph: OPEN_GRAPH,
   }
 }
 
