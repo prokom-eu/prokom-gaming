@@ -10,6 +10,12 @@ Run by hand, only when a font, a weight or the character set changes (not part o
     python -m venv .fontvenv && .fontvenv/Scripts/python -m pip install fonttools brotli
     .fontvenv/Scripts/python scripts/subset-site-fonts.py <dir with the source .ttf> "src/app/(site)/fonts"
 
+Link previews (`--og`, runda v2 §1.2): `next/og` (Satori) reads only static TTF/OTF/WOFF — no
+woff2, no variable fonts — so the same subset is also saved as static TTF instances for the
+`opengraph-image` routes (`src/lib/og/`):
+
+    .fontvenv/Scripts/python scripts/subset-site-fonts.py --og <dir with the source .ttf> src/assets/og
+
 Sources: the variable fonts of github.com/google/fonts (OFL): `ofl/manrope/Manrope[wght].ttf`,
 `ofl/cormorantgaramond/CormorantGaramond[wght].ttf`, `…/CormorantGaramond-Italic[wght].ttf`,
 `ofl/cinzel/Cinzel[wght].ttf`. Keep the `*-OFL.txt` licences next to the results.
@@ -25,6 +31,12 @@ JOBS = [
     ('CormorantGaramond-Italic[wght].ttf', 'cormorant-italic.woff2', (500, 600)),
     ('Cinzel[wght].ttf', 'cinzel.woff2', (400, 700)),
 ]
+# Static instances for the link previews: (source, target, weight). Cinzel only for names (700).
+OG_JOBS = [
+    ('Cinzel[wght].ttf', 'cinzel-700.ttf', 700),
+    ('Manrope[wght].ttf', 'manrope-500.ttf', 500),
+    ('Manrope[wght].ttf', 'manrope-800.ttf', 800),
+]
 # Basic Latin, Latin-1 (NBSP, ó, «», ·, ×, é…), Polish letters, general punctuation,
 # euro, arrows, minus, ≈ ≤ ≥ and the narrow no-break space (prices, FPS), check mark.
 UNICODES = (
@@ -34,7 +46,31 @@ UNICODES = (
     + [0x2190, 0x2191, 0x2192, 0x2193, 0x2212, 0x2264, 0x2265, 0x2248, 0x202F, 0x2713, 0x2022, 0x2026]
 )
 
+def options(flavor: str | None) -> subset.Options:
+    opts = subset.Options()
+    opts.flavor = flavor
+    opts.layout_features = ['kern', 'liga', 'calt', 'ccmp', 'locl', 'mark', 'mkmk', 'lnum', 'pnum', 'tnum']
+    opts.name_IDs = [0, 1, 2, 3, 4, 5, 6, 13, 14]
+    opts.notdef_outline = True
+    return opts
+
+
+def og(src: str, out: str) -> None:
+    for name, target, weight in OG_JOBS:
+        font = TTFont(os.path.join(src, name), lazy=False)
+        sub = subset.Subsetter(options(None))
+        sub.populate(unicodes=UNICODES)
+        sub.subset(font)
+        font = instancer.instantiateVariableFont(font, {'wght': weight})
+        path = os.path.join(out, target)
+        font.save(path)
+        print(f'{target:24} {os.path.getsize(path)/1024:.1f} KB  wght {weight}')
+
+
 def main() -> None:
+    if sys.argv[1] == '--og':
+        og(sys.argv[2], sys.argv[3])
+        return
     src, out = sys.argv[1], sys.argv[2]
     for name, target, (lo, hi) in JOBS:
         font = TTFont(os.path.join(src, name), lazy=False)

@@ -56,7 +56,7 @@ Staging zawsze czyta `.env.staging` (na sztywno w nakładce) — nie może dosta
 | `IMAP_HOST`, `IMAP_USER`, `IMAP_PASSWORD` (`IMAP_PORT`, `IMAP_SENT_FOLDER`) | skrzynka Gaming | skrzynka Gaming | odbiór odpowiedzi (P4); staging i produkcja czytają tę samą skrzynkę — **na stagingu włączyć tylko na czas próby** (inaczej obie bazy przypinają te same maile) |
 | `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` | osobna para | osobna para | zmiana pary unieważnia subskrypcje (P4) |
 | `ANTHROPIC_API_KEY` | tak | tak | limit w konsoli Anthropic (ADR-G007 §4) |
-| `UMAMI_SCRIPT_URL`, `UMAMI_WEBSITE_ID` | `/_s/script.js`, strona „staging” | `/_s/script.js`, strona „produkcja” | produkcja **dopiero po akapicie o statystykach w polityce prywatności** (ADR-G009 pkt 5) |
+| `UMAMI_SCRIPT_URL`, `UMAMI_WEBSITE_ID` | `/_s/script.js`, strona „staging” | `/_s/script.js`, strona „produkcja” | **wymagane od R1** — pełny smoke sprawdza skrypt na głównej (bez nich wdrożenie się cofa). Produkcja: najpierw akapit „Statystyki” z `docs/prawne/polityka-projekt-v2.md` w panelu (ADR-G009 pkt 5, decyzja Krystiana 04.11) |
 | `UMAMI_URL`, `UMAMI_API_KEY` | `http://umami:3000`, klucz | `http://umami:3000`, klucz | statystyki w panelu (P8) |
 | `FEATURE_READY`, `FEATURE_VOUCHER` | `1` (demo dla szefa) | puste do decyzji [SZEF] | czytane przy każdym żądaniu — bez przebudowy obrazu |
 | `INQUIRY_RETENTION_MONTHS` | — | domyślnie 24 | |
@@ -64,6 +64,10 @@ Staging zawsze czyta `.env.staging` (na sztywno w nakładce) — nie może dosta
 | `POSTGRES_PASSWORD` | osobne | osobne | tylko hex (`openssl rand -hex 24`) — trafia do adresu bazy |
 | `APP_PORT`, `UMAMI_PORT` | 3201, 3211 | 3200, 3210 | |
 | `UMAMI_APP_SECRET` | osobny | osobny | `openssl rand -hex 32` |
+
+**Staging:** zmienne `UMAMI_*` w `.env.staging` muszą być **przed scaleniem** PR z R1 (wdrożenie stagingu rusza samo).
+
+**Umami na produkcji — kolejność (R1, 04.11.2026):** (1) panel produkcji → Polityka prywatności → wklej akapit „Statystyki” z `docs/prawne/polityka-projekt-v2.md` (napis „Projekt do weryfikacji…” zostaje do akceptacji prawnika); (2) panel Umami (tunel SSH) → strona „produkcja” → jej identyfikator; (3) `.env.prod`: `UMAMI_SCRIPT_URL=/_s/script.js`, `UMAMI_WEBSITE_ID=<id>`; (4) wdrożenie. Sprawdzenie: na głównej `<script src="/_s/script.js" data-website-id=…>`, w Umami widać wejście.
 
 **Nigdy na serwerze:** `UMAMI_FAKE=1`, `PRICE_CHECK_FAKE=1` (aplikacja odmówi startu), `SEED_ADMIN_*`, `PORT`, `MEDIA_DIR` (ustawia compose).
 

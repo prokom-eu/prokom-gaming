@@ -109,6 +109,24 @@ export function organizationJsonLd(siteUrl: string): object[] {
   ]
 }
 
+/**
+ * `WebSite` for the home page — Google takes the site name in search results from it
+ * (runda v2 §1.1). Linked to the brand of `organizationJsonLd` by `@id`.
+ */
+export function websiteJsonLd(siteUrl: string): object {
+  const home = new URL(routes.home, siteUrl).toString()
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    '@id': `${home}#witryna`,
+    name: SITE_NAME,
+    alternateName: `${SITE_NAME} Rabka-Zdrój`,
+    url: home,
+    inLanguage: 'pl-PL',
+    publisher: { '@id': `${home}#organizacja` },
+  }
+}
+
 /** Pages in the sitemap that are always on (spec. §23: no certificate, account or inquiry). */
 const STATIC_PAGES = [
   routes.home,
