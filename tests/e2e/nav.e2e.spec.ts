@@ -107,11 +107,19 @@ test.describe('desktop header', () => {
     await page.goto('/regulamin')
     const header = page.locator('header.nav')
     const toc = page.getByRole('navigation', { name: 'Spis treści' })
-    // Small steps: near the end of the page the panel is held up by its column, not the header.
-    await scrollUntilHidden(page, 500)
-    await page.mouse.wheel(0, -200)
+    // Down in small steps until the panel sticks (24 px, header hidden) — page length differs
+    // between databases — then a bit further, so a short move up keeps it stuck.
+    await expect
+      .poll(async () => {
+        await page.mouse.wheel(0, 200)
+        return (await toc.boundingBox())?.y ?? 999
+      })
+      .toBeLessThanOrEqual(25)
+    await page.mouse.wheel(0, 400)
+    await expect(header).toHaveAttribute('data-hidden', 'true')
+    await page.mouse.wheel(0, -100)
     await expect(header).toHaveAttribute('data-hidden', 'false')
-    await expect.poll(async () => (await toc.boundingBox())?.y).toBe(66 + 24)
+    await expect.poll(async () => Math.round((await toc.boundingBox())?.y ?? 0)).toBe(66 + 24)
 
     // A jump up to the first section brings the header back: the heading stays visible under it.
     const first = toc.getByRole('link').first()
