@@ -230,7 +230,8 @@
 /* ---------- sticky bar ---------- */
 .bp-bar {
   position: sticky;
-  top: 0;
+  top: var(--nav-offset);
+  transition: top 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
   z-index: 40;
   border-top: 1px solid color-mix(in srgb, var(--c) 40%, var(--line));
   border-bottom: 1px solid var(--line);
@@ -354,7 +355,8 @@
 }
 .bp-side {
   position: sticky;
-  top: 90px;
+  top: calc(90px + var(--nav-offset));
+  transition: top 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 .bp-price {
   padding: 28px;
@@ -507,7 +509,8 @@
 }
 .bp-plan__view {
   position: sticky;
-  top: 90px;
+  top: calc(90px + var(--nav-offset));
+  transition: top 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 .bp-plan__frame {
   position: relative;
@@ -874,7 +877,8 @@
 }
 .bp-tune__sum {
   position: sticky;
-  top: 90px;
+  top: calc(90px + var(--nav-offset));
+  transition: top 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
   padding: 28px;
   border: 1px solid color-mix(in srgb, var(--c) 40%, transparent);
   background:

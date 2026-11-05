@@ -7,3 +7,6 @@ export const PROMISES = [
   { icon: IconDoc, text: 'Metryka z wynikami tego egzemplarza' },
   { icon: IconShield, text: '2 lata gwarancji, kurier odbiera od Ciebie' },
 ]
+
+/** When we answer (spec. „Odpowiedź na zapytanie”) — the header's second line (NAWIGACJA.md §2.1). */
+export const RESPONSE_HOURS = 'codziennie 8–22'

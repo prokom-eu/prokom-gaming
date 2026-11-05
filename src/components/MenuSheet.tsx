@@ -1,10 +1,11 @@
 'use client'
 
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import type { CSSProperties, ReactNode } from 'react'
 
 import type { Features } from '@/lib/features'
-import { buildHref, routes } from '@/lib/nav'
+import { buildHref, isCurrent, routes } from '@/lib/nav'
 import type { MenuCreature } from '@/lib/site'
 
 import { BottomSheet } from './BottomSheet'
@@ -40,6 +41,9 @@ type Tile = { href: string; icon: ReactNode; title: string; note: string }
  */
 export function MenuSheet({ creatures, phone, features }: Props) {
   const { menuOpen, closeMenu, compareCount } = useShell()
+  const pathname = usePathname()
+  // The page you are on gets the gold pill, as in the header capsule (NAWIGACJA.md §6).
+  const current = (href: string) => (isCurrent(pathname, href) ? 'page' : undefined)
 
   const allTiles: Tile[] = [
     {
@@ -117,7 +121,7 @@ export function MenuSheet({ creatures, phone, features }: Props) {
         <ul className="menu__tiles">
           {tiles.map((t) => (
             <li key={t.href}>
-              <Link className="menu__tile" href={t.href}>
+              <Link className="menu__tile" href={t.href} aria-current={current(t.href)}>
                 {t.icon}
                 <b>{t.title}</b>
                 <small>{t.note}</small>
@@ -128,16 +132,24 @@ export function MenuSheet({ creatures, phone, features }: Props) {
 
         <ul className="menu__links">
           <li>
-            <Link href={routes.about}>O nas</Link>
+            <Link href={routes.about} aria-current={current(routes.about)}>
+              O nas
+            </Link>
           </li>
           <li>
-            <Link href={routes.contact}>Kontakt i dojazd</Link>
+            <Link href={routes.contact} aria-current={current(routes.contact)}>
+              Kontakt i dojazd
+            </Link>
           </li>
           <li>
-            <Link href={routes.terms}>Regulamin i zwroty</Link>
+            <Link href={routes.terms} aria-current={current(routes.terms)}>
+              Regulamin i zwroty
+            </Link>
           </li>
           <li>
-            <Link href={routes.privacy}>Prywatność i cookies</Link>
+            <Link href={routes.privacy} aria-current={current(routes.privacy)}>
+              Prywatność i cookies
+            </Link>
           </li>
         </ul>
 
