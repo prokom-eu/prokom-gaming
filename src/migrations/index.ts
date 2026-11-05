@@ -23,6 +23,7 @@ import * as migration_20261101_201708_p5_order_switches from './20261101_201708_
 import * as migration_20261101_210949_bez_zakopanego from './20261101_210949_bez_zakopanego'
 import * as migration_20261102_200229_p8_weekly_report from './20261102_200229_p8_weekly_report'
 import * as migration_20261104_211926_r2_highlight from './20261104_211926_r2_highlight'
+import * as migration_20261105_225049_media_case_box from './20261105_225049_media_case_box'
 
 export const migrations = [
   {
@@ -149,5 +150,10 @@ export const migrations = [
     up: migration_20261104_211926_r2_highlight.up,
     down: migration_20261104_211926_r2_highlight.down,
     name: '20261104_211926_r2_highlight',
+  },
+  {
+    up: migration_20261105_225049_media_case_box.up,
+    down: migration_20261105_225049_media_case_box.down,
+    name: '20261105_225049_media_case_box',
   },
 ]

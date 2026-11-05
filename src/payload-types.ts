@@ -251,6 +251,15 @@ export interface User {
 export interface Media {
   id: number;
   alt: string;
+  /**
+   * Liczony sam przy wgraniu pliku (ułamki szerokości i wysokości). Strona ustawia według niego komputer na postumencie.
+   */
+  box?: {
+    x?: number | null;
+    y?: number | null;
+    w?: number | null;
+    h?: number | null;
+  };
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -1474,6 +1483,14 @@ export interface UsersSelect<T extends boolean = true> {
  */
 export interface MediaSelect<T extends boolean = true> {
   alt?: T;
+  box?:
+    | T
+    | {
+        x?: T;
+        y?: T;
+        w?: T;
+        h?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   url?: T;
