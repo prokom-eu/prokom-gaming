@@ -11,6 +11,7 @@ import { SiteHeader } from '@/components/SiteHeader'
 import { analyticsScript, UMAMI_BEFORE_SEND, umamiBeforeSend } from '@/lib/analytics'
 import { getEnv } from '@/lib/env'
 import { features } from '@/lib/features'
+import { loadResponseHours } from '@/lib/responseHours.server'
 import { DESCRIPTIONS, isIndexable, OPEN_GRAPH, SITE_NAME } from '@/lib/seo'
 import { company, cookieBannerEnabled, menuCreatures } from '@/lib/site'
 
@@ -48,6 +49,7 @@ export default async function SiteLayout({ children }: { children: ReactNode }) 
   await connection()
   const flags = features()
   const stats = analyticsScript(getEnv())
+  const hours = await loadResponseHours()
   return (
     <html lang="pl" className={fontVariables}>
       <body>
@@ -55,7 +57,7 @@ export default async function SiteLayout({ children }: { children: ReactNode }) 
           Przejdź do treści
         </a>
         <ShellProvider>
-          <SiteHeader />
+          <SiteHeader hours={hours} />
           <main id="tresc">{children}</main>
           <SiteFooter features={flags} />
           <MobileTabBar />

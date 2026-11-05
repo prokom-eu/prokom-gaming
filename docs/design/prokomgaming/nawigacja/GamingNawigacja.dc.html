@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<title>PRO-KOM Gaming — nawigacja, boczna szyna, pasek przewijania</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&amp;family=Cinzel:wght@500;700&amp;family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&amp;family=Manrope:wght@400..800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.g{--noc:#07100e;--mech:#0c1613;--pf:#0c1512;--pt:#070c0a;--kosc:#ece4d0;--kosc2:#cdc3ab;--mgla:#9a9583;--line:rgba(236,228,208,.13);--grom:#f2c230;--grom2:#ffe08a;--on:#1a1305}
+.sv{fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.sec{font-family:'Cormorant Garamond',Georgia,serif;font-weight:600;font-size:32px;color:#ece4d0;letter-spacing:-.01em}
+.eye{font-family:Cinzel,serif;font-size:12px;letter-spacing:.22em;color:#f2c230}
+.sub{font-size:13.5px;color:#9a9583;line-height:1.55}
+/* logo */
+.lg{display:inline-flex;flex-direction:column;line-height:1}
+.lg b{font-family:Archivo,sans-serif;font-stretch:118%;font-weight:800;font-size:22px;letter-spacing:-.01em;color:#ece4d0}
+.lg b i{font-style:normal;color:#f2c230}
+.lg span{align-self:flex-end;margin-top:5px;padding-top:4px;border-top:2px solid #f2c230;font-size:9.5px;font-weight:800;letter-spacing:.32em;color:#cdc3ab}
+/* nowy nagłówek */
+.hd{display:flex;align-items:center;gap:18px;height:76px;padding:0 28px;box-sizing:border-box;position:relative}
+.hd.scr{height:66px;background:rgba(7,16,14,.8);backdrop-filter:blur(14px)}
+.hd.scr:after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:linear-gradient(90deg,transparent,rgba(242,194,48,.55) 50%,transparent)}
+.caps{display:flex;gap:2px;padding:5px;border-radius:999px;background:rgba(12,22,19,.62);border:1px solid rgba(236,228,208,.11);box-shadow:inset 0 1px 0 rgba(236,228,208,.05)}
+.lk{position:relative;display:inline-flex;align-items:center;height:36px;padding:0 14px;border-radius:999px;font:600 14px Manrope,sans-serif;color:#cdc3ab;white-space:nowrap;cursor:pointer;transition:color .2s,background .2s}
+.lk:hover{color:#ece4d0;background:rgba(236,228,208,.06)}
+.lk.on{color:#ffe08a;background:linear-gradient(180deg,rgba(242,194,48,.16),rgba(242,194,48,.07));box-shadow:inset 0 0 0 1px rgba(242,194,48,.38)}
+.lk.on:after{content:"";position:absolute;left:50%;bottom:-6px;width:5px;height:5px;margin-left:-2.5px;background:#f2c230;transform:rotate(45deg);box-shadow:0 0 10px rgba(242,194,48,.8)}
+.chip{display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 12px 0 10px;border-radius:999px;font:600 13px Manrope,sans-serif;color:#cdc3ab;white-space:nowrap}
+.chip:hover{color:#ece4d0}
+.chip em{font-style:normal;color:#9a9583;font-weight:500}
+.chip2{display:inline-flex;align-items:center;gap:9px;font:600 12.5px/1.25 Manrope,sans-serif;color:#cdc3ab;white-space:nowrap}
+.chip2 em{display:block;font-style:normal;font-weight:500;color:#9a9583}
+.ib{position:relative;width:42px;height:42px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#ece4d0;border:1px solid rgba(236,228,208,.16);background:rgba(12,22,19,.5);cursor:pointer;transition:border-color .2s,color .2s}
+.ib:hover{border-color:rgba(242,194,48,.6);color:#ffe08a}
+.bd{position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;padding:0 4px;box-sizing:border-box;border-radius:999px;background:#f2c230;color:#1a1305;font:800 11px Manrope,sans-serif;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px #07100e}
+.cta{position:relative;overflow:hidden;display:inline-flex;align-items:center;gap:9px;height:44px;padding:0 20px 0 22px;border-radius:999px;background:linear-gradient(180deg,#ffd75a,#f2c230 55%,#d9a91a);color:#1a1305;font:800 14.5px Manrope,sans-serif;white-space:nowrap;box-shadow:0 8px 24px -10px rgba(242,194,48,.7),inset 0 1px 0 rgba(255,255,255,.45);cursor:pointer}
+.cta:before{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.55),transparent);transform:skewX(-20deg);transition:left .6s}
+.cta:hover:before{left:120%}
+/* szyna */
+.rail{position:absolute;left:18px;top:92px;width:64px;padding:10px 8px;box-sizing:border-box;background:linear-gradient(180deg,#0c1512,#070c0a);border:1px solid rgba(236,228,208,.12);border-radius:20px;box-shadow:0 30px 60px -30px rgba(0,0,0,.9);overflow:hidden;transition:width .25s cubic-bezier(.2,.8,.2,1);z-index:5}
+.rail:hover,.rail.open{width:258px}
+.ri{position:relative;display:flex;align-items:center;gap:12px;height:40px;padding:0 0 0 12px;border-radius:12px;color:#9a9583;white-space:nowrap;font:600 13.5px Manrope,sans-serif;cursor:pointer;transition:color .2s,background .2s}
+.ri:hover{color:#ece4d0;background:rgba(236,228,208,.05)}
+.ri svg{flex:none;width:20px;height:20px}
+.ri .rn{margin-left:auto;margin-right:12px;font:500 11px Cinzel,serif;letter-spacing:.08em;color:#8a8574}
+.ri.on{color:#ffe08a;background:radial-gradient(120% 140% at 0% 50%,rgba(242,194,48,.18),rgba(242,194,48,0) 70%)}
+.ri.on:before{content:"";position:absolute;left:-8px;top:9px;bottom:9px;width:3px;border-radius:0 3px 3px 0;background:#f2c230;box-shadow:0 0 12px rgba(242,194,48,.9)}
+.ri.on .rn{color:#f2c230}
+.lbl{opacity:0;transition:opacity .15s}
+.rail:hover .lbl,.rail.open .lbl{opacity:1;transition-delay:.08s}
+.rs{display:flex;align-items:center;gap:12px;height:42px;padding:0 0 0 11px;border-radius:12px;color:#ffe08a;border:1px solid rgba(242,194,48,.42);background:linear-gradient(180deg,rgba(242,194,48,.12),rgba(242,194,48,.04));white-space:nowrap;font:700 13.5px Manrope,sans-serif;cursor:pointer;margin-bottom:8px}
+.rs svg{flex:none;width:20px;height:20px}
+.kbd{margin-left:auto;margin-right:10px;padding:2px 6px;border-radius:6px;border:1px solid rgba(242,194,48,.35);font:700 10.5px Manrope,sans-serif;color:#cdb56a}
+.cap{display:flex;align-items:center;gap:8px;height:22px;padding-left:12px;margin-top:8px;font:500 10px Cinzel,serif;letter-spacing:.2em;color:#8a8574;white-space:nowrap}
+.cap:before{content:"";width:16px;height:1px;background:rgba(236,228,208,.18);flex:none}
+.sep{height:1px;margin:8px 4px;background:linear-gradient(90deg,transparent,rgba(236,228,208,.16),transparent)}
+.rb{position:absolute;right:6px;top:50%;margin-top:-9px;min-width:18px;height:18px;padding:0 4px;box-sizing:border-box;border-radius:999px;background:#f2c230;color:#1a1305;font:800 10.5px Manrope,sans-serif;display:flex;align-items:center;justify-content:center}
+.rail:hover .rb,.rail.open .rb{position:static;margin:0 12px 0 auto}
+.ring{position:relative;width:20px;height:20px;flex:none}
+/* pasek przewijania (makieta) */
+.scroll{position:absolute;right:3px;top:4px;bottom:4px;width:12px;border-radius:12px;background:#07100e;box-shadow:inset 0 0 0 1px rgba(236,228,208,.06)}
+.thumb{position:absolute;left:2px;right:2px;border-radius:10px;background:linear-gradient(180deg,#ffe08a,#f2c230 45%,#b8860b);box-shadow:0 0 12px rgba(242,194,48,.45)}
+.card{border-radius:22px;background:linear-gradient(180deg,#0c1512,#070c0a);border:1px solid rgba(236,228,208,.1)}
+.note{display:flex;gap:12px;align-items:flex-start;padding:16px 18px;border-radius:16px;background:#0b1311;border:1px solid rgba(236,228,208,.1);color:#cdc3ab}
+.note b{display:block;font-size:14px;color:#ece4d0;margin-bottom:3px}
+.note span{font-size:13px;line-height:1.5;color:#9a9583}
+.num{width:28px;height:28px;border-radius:9px;flex:none;background:#f2c230;color:#1a1305;font:800 12px Manrope,sans-serif;display:flex;align-items:center;justify-content:center}
+/* paleta */
+.pal{width:640px;border-radius:22px;background:linear-gradient(180deg,#101b18,#090f0d);border:1px solid rgba(236,228,208,.14);box-shadow:0 40px 90px -30px #000,0 0 0 1px rgba(242,194,48,.08);overflow:hidden}
+.pi{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:12px;font:600 14px Manrope,sans-serif;color:#cdc3ab}
+.pi.on{background:rgba(242,194,48,.1);color:#ece4d0;box-shadow:inset 0 0 0 1px rgba(242,194,48,.3)}
+.pi small{margin-left:auto;font-weight:500;font-size:12px;color:#7a7668}
+.pg{padding:10px 14px 4px;font:500 10.5px Cinzel,serif;letter-spacing:.2em;color:#7a7668}
+/* tabbar */
+.tb{display:flex;height:66px;padding:0 6px;background:rgba(7,16,14,.86);border-top:1px solid rgba(236,228,208,.1)}
+.ti{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font:700 10.5px Manrope,sans-serif;color:#9a9583;position:relative}
+.ti.on{color:#ffe08a}
+.ti.on:before{content:"";position:absolute;top:0;left:28%;right:28%;height:2px;border-radius:0 0 2px 2px;background:#f2c230;box-shadow:0 0 10px rgba(242,194,48,.8)}
+.ti.mid .orb{width:46px;height:46px;margin-top:-18px;border-radius:50%;background:linear-gradient(180deg,#ffd75a,#d9a91a);color:#1a1305;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 4px #07100e,0 10px 24px -8px rgba(242,194,48,.8)}
+</style>
+</helmet>
+<div class="g" style="width: 1440px; box-sizing: border-box; background: radial-gradient(1200px 500px at 50% -10%, #12201b, #040706 60%); color: #ece4d0; font-family: Manrope, system-ui, sans-serif; padding-bottom: 90px">
+
+  <div style="padding: 52px 80px 30px; display: flex; justify-content: space-between; align-items: flex-end; gap: 40px">
+    <div style="display: flex; flex-direction: column; gap: 10px">
+      <span class="eye">10 · PRO-KOM GAMING</span>
+      <h2 style="margin: 0; font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 600; font-size: 50px; line-height: 1; letter-spacing: -0.01em">Nawigacja, boczna szyna i pasek przewijania</h2>
+      <p style="margin: 0; font-size: 16px; line-height: 1.55; color: #9a9583; max-width: 900px">Wszystkie pozycje obecnego nagłówka zostają w tej samej kolejności i z tymi samymi adresami — zmienia się tylko wygląd. Szyna i pasek przewijania działają jak w liniach PRO-KOM, ale w stylu marki Gaming: noc, kość, złoto, cyfry rzymskie jak w „Moc I”.</p>
+    </div>
+    <div style="display: flex; gap: 8px; font-size: 12.5px; font-weight: 700; color: #cdc3ab">
+      <span style="padding: 8px 12px; border-radius: 999px; border: 1px solid rgba(242,194,48,.4); color: #ffe08a">≥ 1400 px · szyna</span>
+      <span style="padding: 8px 12px; border-radius: 999px; border: 1px solid rgba(236,228,208,.18)">wszystkie strony</span>
+    </div>
+  </div>
+
+  <!-- 1. NAGŁÓWEK: przed / po -->
+  <div style="padding: 0 80px">
+    <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 14px"><span class="sec">1 · Nagłówek — teraz i po zmianie</span><span class="sub">prawdziwa szerokość 1440 px · te same pozycje: znak, 7 linków, „Odpowiadamy w godzinę”, Porównanie, Konto, „Dobierz komputer”</span></div>
+    <div style="display: flex; flex-direction: column; gap: 10px; margin: 0 -80px">
+      <div style="display: flex; flex-direction: column; gap: 6px"><span style="padding-left: 80px; font: 500 11px Cinzel, serif; letter-spacing: .2em; color: #7a7668">TERAZ</span>
+        <div class="card" style="height: 62px; display: flex; align-items: center; gap: 20px; padding: 0 24px; border-radius: 0; border-left: 0; border-right: 0; font-size: 12px; color: #cdc3ab">
+          <span class="lg" style="transform: scale(.82); transform-origin: left center"><b>PRO<i>–</i>KOM</b><span>GAMING</span></span>
+          <span>Zestawy</span><span>Konfigurator</span><span>Dobór pod grę</span><span>Porównaj</span><span>Dla rodziców</span><span>O nas</span><span>Kontakt</span>
+          <span style="margin-left: auto; font-size: 11px">◷ Odpowiadamy w godzinę</span>
+          <span class="ib" style="width: 30px; height: 30px; border: 0">▮<span class="bd" style="transform: scale(.8)">3</span></span><span class="ib" style="width: 30px; height: 30px; border: 0">◯</span>
+          <span style="height: 32px; padding: 0 16px; border-radius: 999px; background: #f2c230; color: #1a1305; font-weight: 800; display: flex; align-items: center">Dobierz komputer</span>
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 6px"><span style="padding-left: 80px; font: 500 11px Cinzel, serif; letter-spacing: .2em; color: #f2c230">PO</span>
+        <div class="card" style="border-radius: 0; border-left: 0; border-right: 0; overflow: hidden; background: linear-gradient(180deg,#0e1a16,#070c0a)">
+          <div class="hd scr" style="background: transparent">
+            <span class="lg"><b>PRO<i>–</i>KOM</b><span>GAMING</span></span>
+            <span style="flex: 1"></span>
+            <div class="caps">
+              <sc-for list="{{links}}" as="l" hint-placeholder-count="7"><span class="lk {{l.on}}">{{l.t}}</span></sc-for>
+            </div>
+            <span style="flex: 1"></span>
+            <span class="chip2"><svg class="sv" viewBox="0 0 24 24" style="width: 20px; height: 20px; color: #f2c230"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg><span>Odpowiadamy w godzinę<em>codziennie 8–22</em></span></span>
+            <span class="ib" title="Porównanie"><svg class="sv" viewBox="0 0 24 24" style="width: 18px; height: 18px"><path d="M6 19V11M12 19V5M18 19v-6"/></svg><span class="bd">3</span></span>
+            <span class="ib" title="Moje konto"><svg class="sv" viewBox="0 0 24 24" style="width: 18px; height: 18px"><circle cx="12" cy="8.5" r="3.5"/><path d="M5 19.5c1.2-3.3 3.8-5 7-5s5.8 1.7 7 5"/></svg></span>
+            <span class="cta">Dobierz komputer<svg class="sv" viewBox="0 0 24 24" style="width: 17px; height: 17px; stroke-width: 2.2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 16px">
+      <div class="note"><span class="num">1</span><span><b>Linki w „kapsule”</b>Siedem linków w jednej ciemnej pigułce na środku — porządek zamiast rozsypanych słów; 14 px zamiast ~12 px (czytelne).</span></div>
+      <div class="note"><span class="num">2</span><span><b>Gdzie jestem</b>Aktywna strona: złota pigułka z obwódką i romb pod spodem (jak w hero „✦ Zza Pieca ✦”). Hover: jaśniejsze tło.</span></div>
+      <div class="note"><span class="num">3</span><span><b>Czytelne akcje</b>„Odpowiadamy w godzinę / codziennie 8–22” w dwóch linijkach ze złotym zegarem (mieści się w 1440 px), okrągłe przyciski Porównanie (złoty licznik) i Konto, złoty przycisk z odblaskiem na hover.</span></div>
+      <div class="note"><span class="num">4</span><span><b>Przezroczysty → szkło</b>Nad hero nagłówek przezroczysty (76 px); po przewinięciu ciemne szkło z rozmyciem, 66 px i złota nitka u dołu.</span></div>
+    </div>
+  </div>
+
+  <!-- 2. DEMO NA ŻYWO -->
+  <div style="padding: 56px 80px 0">
+    <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 14px"><span class="sec">2 · Na żywo — najedź na szynę po lewej</span><span class="sub">strona główna po przewinięciu do „Szesnaście istot” · szyna rozwija się na hover / fokus · pasek przewijania w złocie</span></div>
+    <div style="position: relative; height: 840px; border-radius: 24px; overflow: hidden; border: 1px solid rgba(236,228,208,.12); background: radial-gradient(900px 420px at 60% 0%, #13221c, #050807 70%)">
+      <div class="hd scr" style="position: absolute; left: 0; right: 16px; top: 0; z-index: 6">
+        <span class="lg"><b>PRO<i>–</i>KOM</b><span>GAMING</span></span>
+        <span style="flex: 1"></span>
+        <div class="caps"><sc-for list="{{links}}" as="l" hint-placeholder-count="7"><span class="lk {{l.on}}">{{l.t}}</span></sc-for></div>
+        <span style="flex: 1"></span>
+        <span class="ib"><svg class="sv" viewBox="0 0 24 24" style="width: 18px; height: 18px"><path d="M6 19V11M12 19V5M18 19v-6"/></svg><span class="bd">3</span></span>
+        <span class="ib"><svg class="sv" viewBox="0 0 24 24" style="width: 18px; height: 18px"><circle cx="12" cy="8.5" r="3.5"/><path d="M5 19.5c1.2-3.3 3.8-5 7-5s5.8 1.7 7 5"/></svg></span>
+        <span class="cta">Dobierz komputer</span>
+      </div>
+
+      <div class="rail">
+        <div class="rs"><svg class="sv" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg><span class="lbl">Szukaj zestawu lub gry</span><span class="kbd lbl">Ctrl K</span></div>
+        <div class="cap"><span class="lbl">STRONA GŁÓWNA</span></div>
+        <sc-for list="{{rail}}" as="r" hint-placeholder-count="11">
+          <div class="ri {{r.on}}"><svg class="sv" viewBox="0 0 24 24"><path d="{{r.ic}}"/></svg><span class="lbl">{{r.t}}</span><span class="rn lbl">{{r.n}}</span></div>
+        </sc-for>
+        <div class="sep"></div>
+        <div class="ri" style="color: #cdc3ab"><svg class="sv" viewBox="0 0 24 24"><path d="M6 19V11M12 19V5M18 19v-6"/></svg><span class="lbl">Porównanie</span><span class="rb">3</span></div>
+        <div class="ri" style="color: #cdc3ab"><svg class="sv" viewBox="0 0 24 24"><path d="M4 6h16v12H4zM4 7l8 6 8-6"/></svg><span class="lbl">Zapytanie</span></div>
+        <div class="ri" style="color: #cdc3ab"><span class="ring"><svg viewBox="0 0 24 24" style="position: absolute; inset: 0; width: 20px; height: 20px; transform: rotate(-90deg)"><circle cx="12" cy="12" r="10" fill="none" stroke="rgba(236,228,208,.15)" stroke-width="2"/><circle cx="12" cy="12" r="10" fill="none" stroke="#f2c230" stroke-width="2" stroke-dasharray="62.8" stroke-dashoffset="44" stroke-linecap="round"/></svg><svg class="sv" viewBox="0 0 24 24" style="position: absolute; inset: 4px; width: 12px; height: 12px; stroke-width: 2.2"><path d="M12 19V6M6 11l6-6 6 6"/></svg></span><span class="lbl">Do góry</span><span class="rn lbl" style="color: #9a9583">30%</span></div>
+      </div>
+
+      <!-- treść strony (makieta) -->
+      <div style="position: absolute; left: 130px; right: 60px; top: 120px; display: flex; flex-direction: column; gap: 22px">
+        <div style="display: flex; justify-content: space-between; align-items: flex-end">
+          <div><div class="eye" style="font-size: 11px">III · ISTOTY</div><div style="font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: 54px; line-height: 1; margin-top: 10px">Szesnaście istot.<br><span style="color: #f2c230; font-style: italic">Każda gra po swojemu.</span></div></div>
+          <div style="display: flex; gap: 6px"><span style="padding: 8px 14px; border-radius: 999px; background: rgba(242,194,48,.14); color: #ffe08a; font-size: 13px; font-weight: 700; box-shadow: inset 0 0 0 1px rgba(242,194,48,.4)">Wszystkie</span><span style="padding: 8px 14px; border-radius: 999px; border: 1px solid rgba(236,228,208,.16); font-size: 13px; color: #cdc3ab">FullHD</span><span style="padding: 8px 14px; border-radius: 999px; border: 1px solid rgba(236,228,208,.16); font-size: 13px; color: #cdc3ab">2K</span><span style="padding: 8px 14px; border-radius: 999px; border: 1px solid rgba(236,228,208,.16); font-size: 13px; color: #cdc3ab">4K</span></div>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px">
+          <sc-for list="{{builds}}" as="b" hint-placeholder-count="8">
+            <div class="card" style="height: 262px; padding: 18px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden">
+              <div style="position: absolute; right: -40px; top: -40px; width: 180px; height: 180px; border-radius: 50%; background: radial-gradient({{b.c}}33, transparent 70%)"></div>
+              <div><div style="font: 500 10.5px Cinzel, serif; letter-spacing: .18em; color: {{b.c}}">{{b.moc}}</div><div style="font: 700 24px Cinzel, serif; margin-top: 8px; color: #ece4d0">{{b.n}}</div></div>
+              <div style="height: 88px; border-radius: 12px; background: linear-gradient(160deg, rgba(236,228,208,.06), rgba(236,228,208,.01)); border: 1px solid rgba(236,228,208,.07)"></div>
+              <div style="display: flex; justify-content: space-between; align-items: baseline"><span style="font-weight: 800; font-size: 17px">{{b.p}}</span><span style="font-size: 12px; color: #9a9583">{{b.fps}}</span></div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <div class="scroll"><div class="thumb" style="top: 27%; height: 11%"></div></div>
+      <div style="position: absolute; right: 26px; top: 420px; padding: 6px 10px; border-radius: 999px; background: #ece4d0; color: #07100e; font-size: 11.5px; font-weight: 700">pasek przewijania w złocie →</div>
+    </div>
+  </div>
+
+  <!-- 3. STANY SZYNY -->
+  <div style="padding: 56px 80px 0">
+    <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 14px"><span class="sec">3 · Szyna — zwinięta, rozwinięta, podstrona</span><span class="sub">64 → 258 px · na każdej stronie: sekcje strony głównej + „Na tej stronie” na podstronach</span></div>
+    <div style="display: grid; grid-template-columns: 120px 300px 300px 1fr; gap: 28px; align-items: start">
+      <div style="display: flex; flex-direction: column; gap: 10px; align-items: center">
+        <div style="position: relative; width: 64px; height: 600px"><div class="rail" style="top: 0; left: 0; pointer-events: none">
+          <div class="rs"><svg class="sv" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg></div>
+          <sc-for list="{{rail}}" as="r" hint-placeholder-count="11"><div class="ri {{r.on}}"><svg class="sv" viewBox="0 0 24 24"><path d="{{r.ic}}"/></svg></div></sc-for>
+          <div class="sep"></div>
+          <div class="ri"><svg class="sv" viewBox="0 0 24 24"><path d="M6 19V11M12 19V5M18 19v-6"/></svg><span class="rb">3</span></div>
+        </div></div>
+        <span class="sub" style="text-align: center">Zwinięta · 64 px</span>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 10px">
+        <div style="position: relative; height: 700px"><div class="rail open" style="top: 0; left: 0">
+          <div class="rs"><svg class="sv" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg><span class="lbl">Szukaj zestawu lub gry</span><span class="kbd lbl">Ctrl K</span></div>
+          <div class="cap"><span class="lbl">STRONA GŁÓWNA</span></div>
+          <sc-for list="{{rail}}" as="r" hint-placeholder-count="11"><div class="ri {{r.on}}"><svg class="sv" viewBox="0 0 24 24"><path d="{{r.ic}}"/></svg><span class="lbl">{{r.t}}</span><span class="rn lbl">{{r.n}}</span></div></sc-for>
+          <div class="sep"></div>
+          <div class="ri" style="color: #cdc3ab"><svg class="sv" viewBox="0 0 24 24"><path d="M6 19V11M12 19V5M18 19v-6"/></svg><span class="lbl">Porównanie</span><span class="rb">3</span></div>
+          <div class="ri" style="color: #cdc3ab"><svg class="sv" viewBox="0 0 24 24"><path d="M4 6h16v12H4zM4 7l8 6 8-6"/></svg><span class="lbl">Zapytanie</span></div>
+        </div></div>
+        <span class="sub">Rozwinięta · 258 px · strona główna</span>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 10px">
+        <div style="position: relative; height: 560px"><div class="rail open" style="top: 0; left: 0">
+          <div class="rs"><svg class="sv" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg><span class="lbl">Szukaj zestawu lub gry</span><span class="kbd lbl">Ctrl K</span></div>
+          <div class="cap" style="color: #c9a54a"><span class="lbl">NA TEJ STRONIE · WAMPIR</span></div>
+          <sc-for list="{{page}}" as="r" hint-placeholder-count="7"><div class="ri {{r.on}}"><svg class="sv" viewBox="0 0 24 24"><path d="{{r.ic}}"/></svg><span class="lbl">{{r.t}}</span></div></sc-for>
+          <div class="cap"><span class="lbl">STRONA GŁÓWNA</span></div>
+          <div class="ri"><svg class="sv" viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9H4zM10 20v-6h4v6"/></svg><span class="lbl">Sekcje strony głównej</span><span class="rn lbl">I–XI ▾</span></div>
+          <div class="cap"><span class="lbl">OSTATNIO OGLĄDANE</span></div>
+          <div style="display: flex; flex-wrap: wrap; gap: 5px; padding: 4px 6px 4px 10px" class="lbl">
+            <span style="padding: 5px 8px; border-radius: 9px; border: 1px solid rgba(224,50,43,.5); color: #ffb3ae; font: 700 11px Cinzel, serif">Wampir</span>
+            <span style="padding: 5px 8px; border-radius: 9px; border: 1px solid rgba(178,107,255,.5); color: #d9bfff; font: 700 11px Cinzel, serif">Kikimora</span>
+            <span style="padding: 5px 8px; border-radius: 9px; border: 1px solid rgba(192,199,209,.5); color: #dde2e8; font: 700 11px Cinzel, serif">Wilkołak</span>
+          </div>
+          <div class="sep"></div>
+          <div class="ri" style="color: #cdc3ab"><svg class="sv" viewBox="0 0 24 24"><path d="M6 19V11M12 19V5M18 19v-6"/></svg><span class="lbl">Porównanie</span><span class="rb">3</span></div>
+        </div></div>
+        <span class="sub">Podstrona (karta zestawu): „Na tej stronie”, sekcje główne zwinięte, ostatnio oglądane istoty</span>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 12px">
+        <sc-for list="{{railNotes}}" as="n" hint-placeholder-count="6">
+          <div class="note"><span class="num">{{n.k}}</span><span><b>{{n.t}}</b>{{n.d}}</span></div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. PALETA -->
+  <div style="padding: 56px 80px 0">
+    <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 14px"><span class="sec">4 · Szukaj (Ctrl K) — zestawy, gry, strony</span><span class="sub">dane już są w bazie: 16 istot, 33 gry, strony · wynik gry prowadzi do „Dobór pod grę”</span></div>
+    <div style="display: grid; grid-template-columns: 640px 1fr; gap: 40px; align-items: start">
+      <div class="pal">
+        <div style="display: flex; align-items: center; gap: 12px; padding: 18px 20px; border-bottom: 1px solid rgba(236,228,208,.1)">
+          <svg class="sv" viewBox="0 0 24 24" style="width: 22px; height: 22px; color: #f2c230"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg>
+          <span style="font-size: 18px; font-weight: 600">fortn<span style="display: inline-block; width: 2px; height: 20px; background: #f2c230; vertical-align: middle; margin-left: 1px"></span></span>
+          <span class="kbd" style="margin-left: auto">Esc</span>
+        </div>
+        <div style="padding: 8px">
+          <div class="pg">GRY</div>
+          <div class="pi on"><svg class="sv" viewBox="0 0 24 24" style="width: 18px; height: 18px; color: #f2c230"><path d="M7 9h10a4 4 0 0 1 4 4v1a3 3 0 0 1-5 2l-1-1H9l-1 1a3 3 0 0 1-5-2v-1a4 4 0 0 1 4-4zM8 12v3M6.5 13.5h3"/></svg>Fortnite — który zestaw wystarczy?<small>Dobór pod grę ↵</small></div>
+          <div class="pg">ZESTAWY POD FORTNITE</div>
+          <div class="pi"><span style="width: 8px; height: 8px; border-radius: 2px; transform: rotate(45deg); background: #e0a64b"></span><span style="font-family: Cinzel, serif; font-weight: 700">Skrzat</span><small>Moc I · FullHD · 4 990 zł</small></div>
+          <div class="pi"><span style="width: 8px; height: 8px; border-radius: 2px; transform: rotate(45deg); background: #c3f25b"></span><span style="font-family: Cinzel, serif; font-weight: 700">Bies</span><small>Moc II · FullHD · 6 710 zł</small></div>
+          <div class="pg">STRONY</div>
+          <div class="pi"><svg class="sv" viewBox="0 0 24 24" style="width: 18px; height: 18px"><path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6z"/></svg>Dla rodziców — komputer dla dziecka<small>/dla-rodzicow</small></div>
+        </div>
+        <div style="display: flex; gap: 16px; padding: 12px 20px; border-top: 1px solid rgba(236,228,208,.1); font-size: 12px; color: #7a7668"><span>↑↓ wybór</span><span>↵ otwórz</span><span>Esc zamknij</span><span style="margin-left: auto">Brak wyniku → „Zapytaj o zestaw”</span></div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 12px">
+        <div class="note"><span class="num">1</span><span><b>Zakres</b>Zestawy (nazwa, moc, rozdzielczość), gry (33 tytuły z bazy klatek), strony z menu i stopki. Bez nowych danych — wszystko jest już w Payload.</span></div>
+        <div class="note"><span class="num">2</span><span><b>Literówki i potoczne nazwy</b>„fortn”, „cs2”, „gta”, „4k”, „dla syna” — ten sam silnik co w liniach (lib wyszukiwarki z Biznesu, przeniesiony do Gaming jako kopia — osobne repo).</span></div>
+        <div class="note"><span class="num">3</span><span><b>Brak wyniku = zapytanie</b>„Nie mamy tego w bazie — zapytaj, a dobierzemy zestaw” → /zapytanie z wpisaną frazą.</span></div>
+        <div class="note"><span class="num">4</span><span><b>Też na telefonie</b>Lupa w nagłówku telefonu obok Porównania; paleta jako arkusz od dołu.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. PASEK PRZEWIJANIA -->
+  <div style="padding: 56px 80px 0">
+    <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 14px"><span class="sec">5 · Pasek przewijania po prawej</span><span class="sub">dziś domyślny szary pasek przeglądarki na czarnej stronie — po zmianie złoty uchwyt na nocnym torze</span></div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1.3fr; gap: 24px; align-items: stretch">
+      <div class="card" style="position: relative; height: 300px; padding: 22px; box-sizing: border-box">
+        <div class="eye" style="font-size: 10.5px; color: #7a7668">TERAZ</div>
+        <div style="position: absolute; right: 0; top: 0; bottom: 0; width: 16px; background: #f1f1f1"><div style="position: absolute; left: 4px; right: 4px; top: 30%; height: 22%; border-radius: 8px; background: #a8a8a8"></div></div>
+        <p class="sub" style="margin-top: 16px; max-width: 220px">Jasnoszary pasek systemu — jedyny jasny element na całej ciemnej stronie, odcina się i wygląda „niedokończenie”.</p>
+      </div>
+      <div class="card" style="position: relative; height: 300px; padding: 22px; box-sizing: border-box">
+        <div class="eye" style="font-size: 10.5px">PO</div>
+        <div class="scroll" style="right: 4px; top: 6px; bottom: 6px"><div class="thumb" style="top: 30%; height: 22%"></div></div>
+        <p class="sub" style="margin-top: 16px; max-width: 220px">Tor w kolorze nocy (#07100E), złoty uchwyt z delikatną poświatą; po najechaniu jaśniejszy (#FFE08A). Szerokość 12 px.</p>
+      </div>
+      <div class="card" style="padding: 22px 24px; box-sizing: border-box; font-family: ui-monospace, Menlo, monospace; font-size: 12.5px; line-height: 1.6; color: #cdc3ab; white-space: pre">/* globals.css — jak w liniach PRO-KOM */
+html::-webkit-scrollbar { width: 12px }
+html::-webkit-scrollbar-track { background: var(--noc) }
+html::-webkit-scrollbar-thumb {
+  border: 3px solid var(--noc); border-radius: 12px;
+  background: linear-gradient(var(--grom2), var(--grom) 45%, #b8860b)
+}
+html::-webkit-scrollbar-thumb:hover { background: var(--grom2) }
+/* Firefox — tylko tam, gdzie brak ::-webkit-scrollbar
+   (scrollbar-color w Chrome 121+ wyłącza style powyżej) */
+@supports not selector(::-webkit-scrollbar) {
+  html { scrollbar-color: var(--grom) var(--noc) }
+}</div>
+    </div>
+  </div>
+
+  <!-- 6. TELEFON -->
+  <div style="padding: 56px 80px 0">
+    <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 14px"><span class="sec">6 · Telefon i tablet — te same pozycje, nowy wygląd</span><span class="sub">bez szyny poniżej 1400 px · dolny pasek: Zestawy · Pod grę · Konfigurator · Zapytanie · Menu</span></div>
+    <div style="display: flex; gap: 40px; align-items: flex-start">
+      <sc-for list="{{phones}}" as="p" hint-placeholder-count="2">
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 10px">
+          <div style="width: 300px; height: 620px; border-radius: 44px; background: #000; padding: 10px; box-sizing: border-box; box-shadow: 0 40px 70px -30px #000, 0 0 0 1px #222">
+            <div style="position: relative; width: 100%; height: 100%; border-radius: 35px; overflow: hidden; background: radial-gradient(500px 300px at 50% 0%, #13221c, #050807 70%)">
+              <div style="height: 34px; display: flex; justify-content: center; align-items: center"><span style="width: 84px; height: 22px; border-radius: 12px; background: #000"></span></div>
+              <div style="display: flex; align-items: center; gap: 8px; padding: 6px 14px 12px; border-bottom: 1px solid rgba(242,194,48,.25); background: rgba(7,16,14,.7)">
+                <span class="lg" style="transform: scale(.8); transform-origin: left center"><b>PRO<i>–</i>KOM</b><span>GAMING</span></span>
+                <span style="flex: 1"></span>
+                <span class="ib" style="width: 36px; height: 36px"><svg class="sv" viewBox="0 0 24 24" style="width: 16px; height: 16px"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg></span>
+                <span class="ib" style="width: 36px; height: 36px"><svg class="sv" viewBox="0 0 24 24" style="width: 16px; height: 16px"><path d="M6 19V11M12 19V5M18 19v-6"/></svg><span class="bd" style="transform: scale(.85)">3</span></span>
+                <span class="ib" style="width: 36px; height: 36px"><svg class="sv" viewBox="0 0 24 24" style="width: 16px; height: 16px"><circle cx="12" cy="8.5" r="3.5"/><path d="M5 19.5c1.2-3.3 3.8-5 7-5s5.8 1.7 7 5"/></svg></span>
+              </div>
+              <div style="padding: 22px 18px 0">
+                <div class="eye" style="font-size: 10px">{{p.eye}}</div>
+                <div style="font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: 34px; line-height: 1.02; margin-top: 8px">{{p.h}}</div>
+                <div style="margin-top: 18px; height: 230px; border-radius: 18px; background: linear-gradient(160deg, rgba(236,228,208,.07), rgba(236,228,208,.01)); border: 1px solid rgba(236,228,208,.08)"></div>
+              </div>
+              <div class="tb" style="position: absolute; left: 0; right: 0; bottom: 0; padding-bottom: 10px; height: 76px">
+                <sc-for list="{{p.tabs}}" as="t" hint-placeholder-count="5">
+                  <div class="ti {{t.cls}}"><span class="orb"><svg class="sv" viewBox="0 0 24 24" style="width: 21px; height: 21px"><path d="{{t.ic}}"/></svg></span>{{t.t}}</div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+          <span class="sub" style="text-align: center; max-width: 280px">{{p.cap}}</span>
+        </div>
+      </sc-for>
+      <div style="flex: 1; display: flex; flex-direction: column; gap: 12px">
+        <div class="note"><span class="num">1</span><span><b>Środek = Konfigurator</b>Złota „kula” wystająca nad pasek — najważniejsza akcja pod kciukiem (dziś zwykła ikona).</span></div>
+        <div class="note"><span class="num">2</span><span><b>Aktywna zakładka</b>Złota kreska z poświatą u góry i złoty podpis; reszta w kolorze mgły.</span></div>
+        <div class="note"><span class="num">3</span><span><b>Nagłówek telefonu</b>Znak + Szukaj + Porównanie (licznik) + Konto, złota nitka u dołu; chowa się przy przewijaniu w dół jak dziś.</span></div>
+        <div class="note"><span class="num">4</span><span><b>Tablet i mniejsze laptopy</b>Od 1280 px pełny nagłówek; 1100–1279 — bez „Odpowiadamy w godzinę” (jest w menu i stopce); 761–1099 — znak, ikony, „Dobierz komputer” i hamburger (menu jak dziś, nowy wygląd).</span></div>
+        <div class="note"><span class="num">5</span><span><b>Dostępność</b>Kontrast ≥ AA (złoto na nocy 11,5:1, kość 15:1), cel dotyku ≥ 44 px, fokus złotą obwódką, prefers-reduced-motion bez animacji szyny i odblasku.</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":4300}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const labels = ['Zestawy', 'Konfigurator', 'Dobór pod grę', 'Porównaj', 'Dla rodziców', 'O nas', 'Kontakt'];
+    const links = labels.map((t, i) => ({ t, on: i === 0 ? 'on' : '' }));
+    const R = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI'];
+    const ic = {
+      start: 'M4 11l8-7 8 7v9H4zM10 20v-6h4v6',
+      warsztat: 'M14.5 6.5a4 4 0 0 0-5 5L4 17l3 3 5.5-5.5a4 4 0 0 0 5-5l-2.5 2.5-2-2z',
+      sciezki: 'M12 4v16M12 8c-3 0-5-1-7-3M12 13c3 0 5-1 7-3M12 18c-3 0-5-1-7-3',
+      istoty: 'M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.4 6.7 19.4l1.2-6L3.4 9.3l6-.7z',
+      kup: 'M5 7h14M5 12h14M5 17h8M18 15l2 2-4 4',
+      gry: 'M7 9h10a4 4 0 0 1 4 4v1a3 3 0 0 1-5 2l-1-1H9l-1 1a3 3 0 0 1-5-2v-1a4 4 0 0 1 4-4zM8 12v3M6.5 13.5h3M15.5 12.5h.01M17.5 14.5h.01',
+      metryka: 'M7 3h8l4 4v14H7zM15 3v4h4M10 12h6M10 16h4',
+      rodzice: 'M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6zM9.5 12l2 2 3.5-4',
+      porownaj: 'M6 19V11M12 19V5M18 19v-6',
+      wcenie: 'M4 9h16v4H4zM6 13v8h12v-8M12 9v12M12 9c-2-4-6-3-5 0M12 9c2-4 6-3 5 0',
+      pytania: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5V14M12 17h.01',
+      napisz: 'M4 6h16v12H4zM4 7l8 6 8-6'
+    };
+    const railDef = [
+      ['Start', 'start'], ['Od czego zaczynasz', 'sciezki'], ['Szesnaście istot', 'istoty'],
+      ['Jak kupić', 'kup'], ['W co grasz?', 'gry'], ['Metryka komputera', 'metryka'], ['Dla rodziców', 'rodzice'],
+      ['Porównaj istoty', 'porownaj'], ['W cenie', 'wcenie'], ['Zanim zapytasz', 'pytania'], ['Napisz, w co grasz', 'napisz']
+    ];
+    const rail = railDef.map((r, i) => ({ t: r[0], ic: ic[r[1]], n: R[i], on: i === 2 ? 'on' : '' }));
+    const page = [
+      ['Przegląd i cena', 'start'], ['Dlaczego Wampir', 'istoty'], ['Wnętrze', 'metryka'], ['Wydajność w grach', 'gry'],
+      ['Dostrój zestaw', 'sciezki'], ['Jak kupić', 'kup'], ['Inne istoty', 'porownaj']
+    ].map((r, i) => ({ t: r[0], ic: ic[r[1]], on: i === 3 ? 'on' : '' }));
+    const builds = [
+      { n: 'Skrzat', moc: 'MOC I · FULLHD', p: '4 990 zł', fps: 'CS2', c: '#e0a64b' },
+      { n: 'Licho', moc: 'MOC I · FULLHD', p: '5 950 zł', fps: 'Fortnite', c: '#7cf26b' },
+      { n: 'Bies', moc: 'MOC II · FULLHD', p: '6 710 zł', fps: 'Warzone', c: '#c3f25b' },
+      { n: 'Wodnik', moc: 'MOC II · FULLHD', p: '6 870 zł', fps: 'Valorant', c: '#7fb6ff' },
+      { n: 'Kikimora', moc: 'MOC IV · 2K', p: '9 220 zł', fps: 'Cyberpunk 2077', c: '#b26bff' },
+      { n: 'Baba Jaga', moc: 'MOC V · 2K', p: '11 650 zł', fps: 'Alan Wake 2', c: '#b26bff' },
+      { n: 'Wilkołak', moc: 'MOC VII · 4K', p: '14 440 zł', fps: 'Black Myth', c: '#c0c7d1' },
+      { n: 'Wampir', moc: 'MOC VII · 4K', p: '14 540 zł', fps: 'Cyberpunk 4K', c: '#e0322b' }
+    ];
+    const railNotes = [
+      { k: 1, t: 'Te same zasady co linie', d: 'Od 1400 px, po lewej, na każdej stronie. Zwinięta 64 px, rozwija się na hover i fokus do 258 px (250 ms), na dotyk — kliknięciem.' },
+      { k: 2, t: 'Sekcje strony głównej I–XI', d: '11 sekcji w kolejności strony głównej, numery rzymskie jak „Moc I–IX”. Z podstrony klik przenosi na główną do sekcji.' },
+      { k: 3, t: 'Gdzie jestem', d: 'Aktywna sekcja: złota kreska z poświatą, złota ikona i numer. Liczona z przewijania (IntersectionObserver), aria-current="location".' },
+      { k: 4, t: 'Na tej stronie', d: 'Karta zestawu, Konfigurator, Dobór pod grę, Dla rodziców i inne długie strony: własne sekcje nad sekcjami głównej (te wtedy zwinięte).' },
+      { k: 5, t: 'Akcje na dole', d: 'Porównanie ze złotym licznikiem, Zapytanie, „Do góry” z pierścieniem postępu strony. Bez telefonu w szynie (jak w liniach).' },
+      { k: 6, t: 'Ostatnio oglądane', d: 'Do 3 istot, zapis tylko w przeglądarce — za flagą w ustawieniach do opinii prawnika (jak w liniach). Domyślnie wyłączone.' }
+    ];
+    const T = {
+      zest: 'M8 3h8v18H8zM10.5 6.5h3M10.5 9h3M12 16a1.5 1.5 0 1 0 0 .01',
+      gry: ic.gry,
+      konf: 'M4 7h9M17 7h3M4 17h3M11 17h9M15 5v4M9 15v4',
+      zap: ic.napisz,
+      menu: 'M4 7h16M4 12h16M4 17h16'
+    };
+    const tabs = (on) => [
+      { t: 'Zestawy', ic: T.zest, cls: on === 0 ? 'on' : '' },
+      { t: 'Pod grę', ic: T.gry, cls: on === 1 ? 'on' : '' },
+      { t: 'Konfigurator', ic: T.konf, cls: 'mid' },
+      { t: 'Zapytanie', ic: T.zap, cls: on === 3 ? 'on' : '' },
+      { t: 'Menu', ic: T.menu, cls: '' }
+    ];
+    const phones = [
+      { eye: 'III · ISTOTY', h: 'Szesnaście istot. Każda gra po swojemu.', tabs: tabs(0), cap: 'Zestawy — aktywna zakładka u góry złotą kreską' },
+      { eye: 'DOBÓR POD GRĘ', h: 'W co grasz? Dobierzemy moc.', tabs: tabs(1), cap: 'Pod grę — Konfigurator zawsze jako złota kula na środku' }
+    ];
+    return { links, rail, page, builds, railNotes, phones };
+  }
+}
+</script>
+</body>
+</html>

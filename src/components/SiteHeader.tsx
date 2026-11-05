@@ -2,37 +2,32 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { headerLinks, isCurrent, routes } from '@/lib/nav'
+import { NAV_SCROLL_START, navScrollAt, navScrollState } from '@/lib/navScroll'
 import { plural } from '@/lib/pl'
 
-import { IconBars, IconClock, IconUser } from './icons'
+import { IconArrow, IconBars, IconClock, IconUser } from './icons'
 import { Logo } from './Logo'
 import { useShell } from './shell/ShellProvider'
 import { ButtonLink } from './ui/Button'
 
-// Scroll this far before the phone header hides; smaller jitters are ignored.
-const HIDE_AFTER = 80
-const JITTER = 4
-
-/** Phone header hides on scroll down and returns on scroll up (ADR-G003 §4). */
-function useHideOnScroll() {
-  const [state, setState] = useState({ hidden: false, top: true })
-  const last = useRef(0)
+/**
+ * The header follows the scroll on every width (ADR-G012 pkt 2, decision 05.11): glass from
+ * 80 px, hidden while scrolling down, back on the way up.
+ */
+function useNavScroll() {
+  const [state, setState] = useState(NAV_SCROLL_START)
 
   useEffect(() => {
     let frame = 0
     const onScroll = () => {
       cancelAnimationFrame(frame)
-      frame = requestAnimationFrame(() => {
-        const y = window.scrollY
-        const delta = y - last.current
-        if (Math.abs(delta) < JITTER) return
-        last.current = y
-        setState({ hidden: delta > 0 && y > HIDE_AFTER, top: y < 8 })
-      })
+      frame = requestAnimationFrame(() => setState((s) => navScrollState(s, window.scrollY)))
     }
+    // A reload in the middle of the page starts as visible glass, not hidden.
+    frame = requestAnimationFrame(() => setState(navScrollAt(window.scrollY)))
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => {
       cancelAnimationFrame(frame)
@@ -44,14 +39,16 @@ function useHideOnScroll() {
 }
 
 /**
- * Site header (spec. §3). Desktop: mark, 7 links, comparison and account icons, "Dobierz
- * komputer". Tablet (761–1000): the same with a hamburger opening the menu panel. Phone: mark,
- * comparison and account only — the rest is in the tab bar. Hiding is CSS-only below 761 px.
+ * Site header (NAWIGACJA.md §2, §6). Desktop: mark, the 7 links in a capsule, „Odpowiadamy w
+ * godzinę”, comparison and account, „Dobierz komputer”. 761–1199: the same without the capsule,
+ * with a hamburger opening the menu panel. Phone: mark, comparison and account — the rest is in
+ * the tab bar. Widths are CSS-only.
  */
-export function SiteHeader() {
+/** `hours`: „codziennie 8–22” from the panel settings (lib/responseHours.server.ts). */
+export function SiteHeader({ hours }: { hours: string }) {
   const pathname = usePathname()
   const { compareCount, openMenu, menuOpen } = useShell()
-  const [{ hidden, top }, show] = useHideOnScroll()
+  const [{ top, scrolled, hidden }, show] = useNavScroll()
 
   const compareLabel =
     compareCount > 0
@@ -63,11 +60,12 @@ export function SiteHeader() {
       className="nav"
       data-hidden={hidden && !menuOpen}
       data-top={top}
+      data-scrolled={scrolled}
       // A keyboard user tabbing into a hidden header gets it back.
       onFocus={show}
     >
       <Logo />
-      <nav aria-label="Główne">
+      <nav className="nav__caps" aria-label="Główne">
         <ul>
           {headerLinks.map(({ href, label }) => (
             <li key={href}>
@@ -78,10 +76,11 @@ export function SiteHeader() {
           ))}
         </ul>
       </nav>
-      <span className="nav__sp" />
       <Link className="nav__phone" href={routes.inquiry}>
-        <IconClock size={16} />
-        Odpowiadamy w godzinę
+        <IconClock size={20} />
+        <span>
+          Odpowiadamy w godzinę <em>{hours}</em>
+        </span>
       </Link>
       <Link className="ico" href={routes.compare} aria-label={compareLabel}>
         <IconBars size={18} />
@@ -94,7 +93,10 @@ export function SiteHeader() {
       <Link className="ico" href={routes.account} aria-label="Moje konto">
         <IconUser size={18} />
       </Link>
-      <ButtonLink href={routes.configurator}>Dobierz komputer</ButtonLink>
+      <ButtonLink className="nav__cta" href={routes.configurator}>
+        Dobierz komputer
+        <IconArrow size={17} strokeWidth={2.2} />
+      </ButtonLink>
       <button
         type="button"
         className="burg"
