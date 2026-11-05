@@ -48,7 +48,11 @@ prod="docker compose --env-file .env.prod -f docker/compose.prod.yml"
    ssh -N -L 3201:127.0.0.1:3201 prokom-vps
    ```
    → `http://localhost:3201/admin/create-first-user` (hasło ≥ 12 znaków, menedżer haseł „prokom-gaming panel staging”). Potem tunel zamknij (Ctrl+C).
-8. **Umami:** tunel `ssh -N -L 3211:127.0.0.1:3211 prokom-vps` → `http://localhost:3211`, logowanie domyślne z dokumentacji Umami (`admin` / `umami`) → **od razu zmiana hasła** (menedżer haseł „Umami staging”) → Settings → Websites → „Add website” `staging.prokomgaming.pl` → identyfikator do `UMAMI_WEBSITE_ID`; Settings → API keys → klucz do `UMAMI_API_KEY`; `UMAMI_URL=http://umami:3000`, `UMAMI_SCRIPT_URL=/_s/script.js` → `$staging up -d app`. Sprawdzenie: panel → Ustawienia → „Statystyki strony” = połączone; wejście na stronę widać w Umami.
+8. **Umami** (każdy stos ma **osobne** Umami — staging port 3211, produkcja 3210; strona, konto i klucz z jednego nie działają w drugim):
+   - tunel `ssh -N -L 3211:127.0.0.1:3211 prokom-vps` → `http://localhost:3211`, logowanie domyślne z dokumentacji Umami (`admin` / `umami`) → **od razu zmiana hasła** (Profile → Change password; menedżer haseł „Umami Gaming staging”);
+   - Settings → Websites → „Add website” (`staging.prokomgaming.pl`) → skopiuj **Website ID**; Profile → API keys → „Create key” (klucz nie trafia do czatu);
+   - zapis na serwerze: `ssh -t prokom-vps '~/bin/gaming-umami staging'` (skrypt `scripts/server/umami-setup.sh`, instalacja jak w jego nagłówku): Website ID widoczny, klucz wpisywany niewidocznie; dopisuje `UMAMI_URL`, `UMAMI_WEBSITE_ID`, `UMAMI_API_KEY`, `UMAMI_SCRIPT_URL=/_s/script.js`, restartuje aplikację i sprawdza klucz (`pasują (200)`; 401 = Website ID albo klucz z innego Umami).
+   - Sprawdzenie: smoke („has the Umami script”), panel → Ustawienia → „Statystyki strony” = połączone; wejście na stronę widać w Umami. Ustawione 5.11.2026.
 9. **Bramka i klucz pipeline'u** (środowisko GitHub `staging` w repo `prokom-gaming`, wdrożenia tylko z `develop`):
    ```bash
    install -m 700 /srv/prokom/prokom-gaming/scripts/server/deploy-gate.sh ~/bin/prokom-gaming-deploy-gate
@@ -109,7 +113,7 @@ Każde scalenie do `develop`: „Image” → „Deploy staging” → bramka �
 **Pierwsze wdrożenie (raz):**
 1. DNS: `@` i `www` → IP (`docs/dns.md`).
 2. Certyfikat `prokom-gaming-prod` (`-d prokomgaming.pl -d www.prokomgaming.pl`) jak w §1.4; `GAMING_PROD_HOST=prokomgaming.pl` w `.env.proxy`; proxy z nakładką `docker/compose.proxy.gaming-prod.yml` (`prokom-web`) — od tej chwili zawsze z nią.
-3. `.env.prod` (osobne sekrety, osobna para VAPID, `SITE_ENV=production`, `APP_IMAGE_TAG` = SHA ze stagingu), `$prod up -d`, dane startowe (§2, decyzja z `docs/wdrozenia.md`), pierwszy admin tunelem na port 3200, Umami produkcji (§1.8 z portem 3210 i stroną `prokomgaming.pl`; `UMAMI_SCRIPT_URL` dopiero po akapicie w polityce prywatności).
+3. `.env.prod` (osobne sekrety, osobna para VAPID, `SITE_ENV=production`, `APP_IMAGE_TAG` = SHA ze stagingu), `$prod up -d`, dane startowe (§2, decyzja z `docs/wdrozenia.md`), pierwszy admin tunelem na port 3200, Umami produkcji (§1.8 z portem 3210, stroną `prokomgaming.pl` i `gaming-umami prod`; skrypt śledzący także na produkcji — runda v2 §1.3, akapit o statystykach w projekcie polityki dla prawnika; bez Umami smoke produkcji nie przejdzie). Ustawione 5.11.2026.
 4. Bramka: druga linia w `authorized_keys` z `… prokom-gaming-deploy-gate prod` i osobnym kluczem `github-gaming-production`; środowisko GitHub `production` (tylko `develop`) z `PRODUCTION_SSH_KEY`, `PRODUCTION_SSH_TARGET`, `PRODUCTION_SSH_KNOWN_HOSTS`.
 5. Cron: `15 3 * * * cd /srv/prokom/prokom-gaming && scripts/backup.sh prod >> ../backups/backup.log 2>&1`; heartbeat `BACKUP_HEARTBEAT_URL_PROD`; monitor Better Stack `https://prokomgaming.pl/api/health`; Search Console (sitemap).
 
