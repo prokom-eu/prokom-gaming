@@ -1,16 +1,19 @@
 # STAN — prokom-gaming
 
-Ostatnia aktualizacja: 04.11.2026, noc (R2 — „Wyróżnik” zamiast „Z podań”; przed PR).
+Ostatnia aktualizacja: 05.11.2026, wieczór (GN-1 — nagłówek w nowym wyglądzie; przed PR).
 
 ## W toku
-- **Gałąź:** `feat/r2-wyroznik` (od `origin/develop` po R1 #74). Plan rundy: `docs/zadania/gaming-runda-v2.md`, spec `runda-v2/ZMIANY.md` §2, ADR-G013 pkt 1.
-- **Zrobione:** grupa `highlight { title ≤ 48, body ≤ 240 }` w `builds` (wymagana), migracja `20261104_211926_r2_highlight` (dodaje kolumny, 16 tekstów z §2 po slugu, `myth`/`short`/`legend`/`legendSource` bez NOT NULL — dane zostają, ukryte w panelu), seed `builds.json` z tymi samymi tekstami (test `src/seed/highlight.test.ts`); karta zestawu: blok „Wyróżnik” w miejscu „Z podań” (bez linku źródła); `/zestawy`: tytuł wyróżnika pod imieniem; podgląd edytora w panelu: „Wyróżnik” zamiast „Krótko”; `tmp/` w `.gitignore` (zrzuty przed/po).
-- **Decyzje Krystiana 04.11:** limit tytułu 48 (Strzyga 41 znaków; §2 mówiło 40); `short` ukryte jak `myth`. Karty na głównej i „Inne istoty” bez zmian — pokazują przydomek i `heroTitle`/`heroText`, nie podania. Fakty tabeli §2 zgodne z seedem (części, klatki CS2/Valorant/CoD dla „powyżej 144”).
-- **Sprawdzone lokalnie:** lint, typecheck, 971 testów; e2e `highlight`, `build-page`, `builds-list` (1440 i 414), `panel-builds`, `a11y` (62/62); zrzuty przed/po w `tmp/zrzuty-przed/r2`, `tmp/zrzuty-po/r2`.
-- **Następny krok:** `/przeglad` → `/pr` → staging (migracja!) → Krystian: 3 karty z „Wyróżnikiem”, w panelu tekst edytowalny → produkcja (migracja tylko dodaje kolumny; kopię robi `deploy.sh`). Potem **GN-1** (`docs/zadania/gaming-nawigacja.md` §2, zrzuty „przed” po R2).
-- **R1 (scalone #74):** na stagingu i produkcji `UMAMI_*` muszą być w `.env.*` (smoke); akapit „Statystyki” w panelu produkcji przed zmiennymi; Search Console; projekt polityki do prawnika.
+- **Gałąź:** `feat/gn1-naglowek` (od `origin/develop` po #76). Pakiet: `docs/zadania/gaming-nawigacja.md` §2 GN-1, spec `docs/design/prokomgaming/nawigacja/NAWIGACJA.md` §0–§3, §6–§8, ADR-G012, plansza 10 (sekcje 1, 5, 6). Pakiet nawigacji i zadanie maili zacommitowane w tym PR.
+- **Decyzja Krystiana 05.11:** nagłówek przyklejony także na komputerze (chowa się w dół, wraca w górę, szkło 66 px od 80 px).
+- **Zrobione:** tokeny nawigacji w `tokens.css` (w tym `--rail-*` dla GN-2); `lib/navScroll.ts` (stan nagłówka z przewinięcia, test); `SiteHeader` — kapsuła z linkami, pigułka i romb aktywnej strony, „Odpowiadamy w godzinę / codziennie 8–22” (`RESPONSE_HOURS` w `components/promises.ts`), okrągłe Porównanie i Konto, złoty „Dobierz komputer” z odblaskiem; `.nav` fixed od 761 px (strony bez sceny: `padding-top` na `body`), jasny wariant „Dla rodziców” (po przewinięciu pełne ciemne tło, nie szkło — jasne nagłówki przebijały); `--nav-offset` — paski `.bp-bar`, `.bl-filters`, `.cmp-bar` i panele boczne karty zestawu zjeżdżają pod widoczny nagłówek; złoty pasek przewijania (Firefox przez `@supports`); telefon: przyciski 36 px (dotyk 44), dolny pasek ze złotą kulą 46 px i złotą kreską; `MenuSheet` oznacza bieżącą stronę (`aria-current`, złota pigułka).
+- **Odstępstwo od spec §2.3 (pomiar):** pełny nagłówek ma ~1432 px treści przy odstępach ze spec — poniżej 1440 odstępy 14 px i linki 12 px; „Odpowiadamy w godzinę” od **1400 px** (spec: 1280 — ~1384 px treści się tam nie mieści); kapsuła od 1200, hamburger 761–1199 (jak spec). Kula Konfiguratora jak na planszy (`margin-top: -18px`, wystaje ok. 9 px).
+- **Sprawdzone lokalnie:** lint, typecheck, 977 testów, `build`; e2e `nav` (nowy: 1440/1400/1399/1200/1199/1100/414, chowanie, pasek ceny pod nagłówkiem, fokus, „Dla rodziców”, kula, menu), `shell`, `build-page`, `builds-list`, `compare`, `home`, `home-sections`, `content-pages`, `configurator`, `a11y` (198/198, 1440 i 414); Lighthouse mobile (`next start`): główna 87, `/zestawy` 89, Wampir 90, konfigurator 94, dobór 90 — dostępność i dobre praktyki 100, CLS ≤ 0,005 (SEO 66–69 tylko przez lokalne `noindex`). Zrzuty `tmp/zrzuty-przed/gn1` i `tmp/zrzuty-po/gn1`. Bez Firefoksa (nie ma go w Playwright) — pasek przewijania w Firefoksie sprawdza Krystian na stagingu.
+- **Następny krok:** `/przeglad` → `/pr` → staging → Krystian: nagłówek na głównej (nad sceną i po przewinięciu), „Dla rodziców”, karta zestawu, telefon (kula), pasek przewijania w Chrome i Firefoksie → produkcja. Potem **R3** (`docs/zadania/gaming-runda-v2.md`).
 
-## Pomysły na później (R1–R2)
+## Pomysły na później (R1–R2, GN-1)
+- **`backdrop-filter` nie działa nigdzie na stronie** (GN-1): Lightning CSS z pary `backdrop-filter` → `-webkit-backdrop-filter` zostawia tylko ostatnią (z prefiksem), a Chrome jej nie zna. W nagłówku i dolnym pasku poprawione (`-webkit-` najpierw); zostały `.bp-bar`, `.cmp-bar`, `.bl-quick`, arkusze i inne — poprawka zmieni ich wygląd (rozmycie), więc osobno, ze zrzutami.
+- Menu z hamburgera (761–1199 px i telefon) nie ma pozycji „Konfigurator” ani „Dobór pod grę” z nagłówka (Konfigurator jest pod „Dobierz komputer”) — do decyzji przy GN-2/GN-3 (spec: treść menu bez zmian).
+- „codziennie 8–22” wpisane na sztywno w stopce, menu, kontakcie, hero, `Journey`, `InquirySummary` i mailach — przy porządkach podpiąć pod `RESPONSE_HOURS`.
 - Teksty `why`, `gift`, `motto` zestawów nawiązują do istot („Tak jak Licho nie śpi…”) — nie są podaniami, zostały (R2 poza zakresem); do przejrzenia przy porządkach treści. Usunięcie kolumn `myth`/`short`/`legend*` — runda porządków.
 - Pamięć podręczna obrazków podglądu zestawów i gier (dziś każde żądanie czyta ofertę i rysuje, 0,15–0,3 s) — np. cache do następnej publikacji cen; świadomie bez, żeby nie pokazać starej ceny.
 - Podglądy `bon`/`gotowe` odpowiadają 200 także przy wyłączonej stronie (nic nie wycieka).
@@ -263,6 +266,7 @@ Ostatnia aktualizacja: 04.11.2026, noc (R2 — „Wyróżnik” zamiast „Z pod
 - **Pozycja usunięta z oferty zostawia otwarty wpis `price-history`** (jest w partii N, nie ma jej w N+1, `writeBatch` jej nie zamyka). Dziś nieszkodliwe — części z zestawu nie da się usunąć — ale przed liczeniem „najniższej ceny z 30 dni” zamykać wpisy pozycji, których nie ma w nowej partii.
 
 ## Zrobione
+- 05.11.2026 — **R1 (favicon, podglądy linków, Umami, projekt polityki)** i **R2 („Wyróżnik” zamiast „Z podań”)** scalone (#74, #75) i wdrożone na staging i produkcję (`7c9fc7d`); Umami działa na obu; skrypt ustawień Umami i runbook (#76). Search Console i polityka do prawnika — Krystian.
 - 02.11.2026 — **P8 (statystyki, wyszukiwarka, raport tygodniowy)** scalone do `develop` (#67). Prawdziwy telefon i Lighthouse panelu nadal do zrobienia.
 - 02.11.2026 — **G15 (SEO, Umami, wydajność, marka PRO-KOM w stopce)** scalone do `develop` (#66). Prawdziwy telefon nadal do zrobienia.
 - 01.11.2026 — **P7 (sprawdzanie cen przez Claude + Ceneo)** scalone do `develop` (#56–#60, #62, #63; ADR-G007, ADR-G011). Przebieg na prawdziwym kluczu: 73/94 pozycji z ceną. Panel wyśrodkowany na szerokim ekranie (#61). Prawdziwy telefon i Lighthouse nadal do zrobienia.
