@@ -3,7 +3,12 @@ import { expect, test, type Page } from '@playwright/test'
 // GN-1 (ADR-G012, NAWIGACJA.md §2, §6): header in the new look on every width, fixed and hiding
 // on desktop too (decision 05.11), sticky bars under it, the phone tab bar with the gold orb.
 
-/** Right edge of the right-most visible control in the header — nothing may run off screen. */
+/**
+ * Right edge of the right-most visible control in the header — nothing may run off screen. The
+ * header pads 28 px; fonts render a few px wider on Linux (CI) than on Windows, so the check
+ * keeps at least 16 px instead of the full padding.
+ */
+const EDGE = 16
 const headerRight = (page: Page) =>
   page.evaluate(() =>
     Math.max(
@@ -54,7 +59,7 @@ test.describe('desktop header', () => {
       page.getByRole('link', { name: 'Odpowiadamy w godzinę codziennie 8–22' }),
     ).toBeVisible()
     await expect(page.locator('header.nav')).toHaveCSS('height', '76px')
-    expect(await headerRight(page)).toBeLessThanOrEqual(1440 - 28)
+    expect(await headerRight(page)).toBeLessThanOrEqual(1440 - EDGE)
   })
 
   for (const { width, phone, caps } of [
@@ -74,7 +79,7 @@ test.describe('desktop header', () => {
       const burger = page.getByRole('button', { name: 'Otwórz menu' })
       await (caps ? expect(burger).toBeHidden() : expect(burger).toBeVisible())
       await expect(page.getByRole('link', { name: 'Dobierz komputer' })).toBeVisible()
-      expect(await headerRight(page)).toBeLessThanOrEqual(width - 28)
+      expect(await headerRight(page)).toBeLessThanOrEqual(width - EDGE)
     })
   }
 
@@ -102,7 +107,8 @@ test.describe('desktop header', () => {
     await page.goto('/regulamin')
     const header = page.locator('header.nav')
     const toc = page.getByRole('navigation', { name: 'Spis treści' })
-    await scrollUntilHidden(page, 2400)
+    // Small steps: near the end of the page the panel is held up by its column, not the header.
+    await scrollUntilHidden(page, 500)
     await page.mouse.wheel(0, -200)
     await expect(header).toHaveAttribute('data-hidden', 'false')
     await expect.poll(async () => (await toc.boundingBox())?.y).toBe(66 + 24)

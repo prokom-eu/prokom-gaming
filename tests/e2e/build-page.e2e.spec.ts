@@ -137,7 +137,18 @@ test('the sticky bar stays in view (desktop: top; phone: above the tab bar)', as
       })
       .toBe(0)
   } else {
-    await expect.poll(async () => Math.round((await barBox(page))?.y ?? -1)).toBe(0)
+    // Right under the header while it is shown (GN-1), at the top when it has slid away.
+    await expect
+      .poll(async () => {
+        const top = await page.evaluate(() => {
+          const nav = document.querySelector('header.nav')
+          return nav?.getAttribute('data-hidden') === 'true'
+            ? 0
+            : nav?.getBoundingClientRect().bottom
+        })
+        return Math.round((await barBox(page))?.y ?? -1) - Math.round(top ?? 0)
+      })
+      .toBe(0)
   }
 })
 
