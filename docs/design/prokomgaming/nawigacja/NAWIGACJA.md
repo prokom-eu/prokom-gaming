@@ -83,10 +83,12 @@ Plansza §1. Wysokość 76 px, padding poziomy 28 px. Układ (flex, `gap: 18px`)
 
 | Szerokość | Nagłówek |
 |---|---|
-| ≥ 1280 px | pełny (jak wyżej) |
-| 1200–1279 px | bez „Odpowiadamy w godzinę” (jest w menu i stopce) |
+| ≥ 1400 px | pełny (jak wyżej); poniżej 1440 px odstęp 14 px i linki kapsuły z wcięciem 12 px |
+| 1200–1399 px | bez „Odpowiadamy w godzinę” (jest w menu i stopce) |
 | 761–1199 px | znak · Porównanie · Konto · „Dobierz komputer” · hamburger (menu z `MenuSheet`); dziś hamburger działa do 1000 px, a nowa kapsuła potrzebuje ok. 1200 px |
 | ≤ 760 px | telefon (§6) |
+
+> **Zmiana po pomiarze w GN-1 (05.11.2026):** pierwotnie pełny nagłówek od 1280 px. Treść pełnego nagłówka ma ok. 1432 px przy odstępach ze specyfikacji i ok. 1384 px po zagęszczeniu, więc „Odpowiadamy w godzinę” mieści się dopiero od 1400 px. GN-3: lupa w nagłówku (1200–1399 px) doda 42 px — sprawdzić 1200 px.
 
 Dostępność: link „Przejdź do treści” bez zmian, fokus widoczny `outline:2px solid var(--grom); outline-offset:3px` na każdym elemencie, cele dotyku ≥ 44 px (link 36 px wysokości + odstęp kapsuły — sprawdzić w axe; jeśli za mało, `min-height:44px` na `<a>` z ujemnym marginesem).
 

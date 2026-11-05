@@ -5,12 +5,11 @@ import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 import { headerLinks, isCurrent, routes } from '@/lib/nav'
-import { NAV_SCROLL_START, navScrollState } from '@/lib/navScroll'
+import { NAV_SCROLL_START, navScrollAt, navScrollState } from '@/lib/navScroll'
 import { plural } from '@/lib/pl'
 
 import { IconArrow, IconBars, IconClock, IconUser } from './icons'
 import { Logo } from './Logo'
-import { RESPONSE_HOURS } from './promises'
 import { useShell } from './shell/ShellProvider'
 import { ButtonLink } from './ui/Button'
 
@@ -27,8 +26,8 @@ function useNavScroll() {
       cancelAnimationFrame(frame)
       frame = requestAnimationFrame(() => setState((s) => navScrollState(s, window.scrollY)))
     }
-    // A reload in the middle of the page starts in the right state.
-    onScroll()
+    // A reload in the middle of the page starts as visible glass, not hidden.
+    frame = requestAnimationFrame(() => setState(navScrollAt(window.scrollY)))
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => {
       cancelAnimationFrame(frame)
@@ -45,7 +44,8 @@ function useNavScroll() {
  * with a hamburger opening the menu panel. Phone: mark, comparison and account — the rest is in
  * the tab bar. Widths are CSS-only.
  */
-export function SiteHeader() {
+/** `hours`: „codziennie 8–22” from the panel settings (lib/responseHours.server.ts). */
+export function SiteHeader({ hours }: { hours: string }) {
   const pathname = usePathname()
   const { compareCount, openMenu, menuOpen } = useShell()
   const [{ top, scrolled, hidden }, show] = useNavScroll()
@@ -79,7 +79,7 @@ export function SiteHeader() {
       <Link className="nav__phone" href={routes.inquiry}>
         <IconClock size={20} />
         <span>
-          Odpowiadamy w godzinę <em>{RESPONSE_HOURS}</em>
+          Odpowiadamy w godzinę <em>{hours}</em>
         </span>
       </Link>
       <Link className="ico" href={routes.compare} aria-label={compareLabel}>

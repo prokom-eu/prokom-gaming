@@ -72,8 +72,6 @@
   --lead: #c4bba5; /* tekst pod nagłówkiem */
   --banner-text: #b4ab95; /* tekst banera cookies */
   --muted: #a49e8a; /* podpisy w menu (ceny, opisy kontaktu) */
-  --tab-off: #8f8a79; /* nieaktywna karta dolnego paska */
-  --nphone: #bdb39b; /* „Odpowiadamy w godzinę” w nagłówku */
   --foot-head: #ddd4bf; /* nagłówki kolumn stopki */
   --foot-text: #8d8a7c; /* opis i pasek prawny stopki */
   /* tła */
@@ -82,8 +80,6 @@
   --sheet-from: #0e1915; /* arkusz menu (gradient do --panel-to) */
   --scene-bg: #030505; /* tło kontenera sceny */
   --scene-fade: #050807; /* dolne wygaszenie sceny */
-  --tabbar-bg: rgba(6, 10, 9, 0.9);
-  --tabbar-ring: #060a09; /* obwódka złotego koła „Konfigurator” */
   --banner-bg: rgba(7, 12, 10, 0.96);
   --backdrop: rgba(2, 4, 3, 0.62); /* tło pod arkuszem */
   --shadow: #000;

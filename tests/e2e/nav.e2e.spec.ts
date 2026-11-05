@@ -13,6 +13,30 @@ const headerRight = (page: Page) =>
     ),
   )
 
+/**
+ * Scrolls down until the header hides. A wheel turn right after `goto` can land before React
+ * attaches the scroll listener (the first reading then shows the header on purpose — a reload in
+ * the middle of the page), so keep turning until the header reacts.
+ */
+async function scrollUntilHidden(page: Page, step: number) {
+  await expect
+    .poll(async () => {
+      await page.mouse.wheel(0, step)
+      return page.locator('header.nav').getAttribute('data-hidden')
+    })
+    .toBe('true')
+  // Let the last scroll frames land, so the next step starts from a still page.
+  let last = -1
+  await expect
+    .poll(async () => {
+      const y = await page.evaluate(() => window.scrollY)
+      const still = y === last
+      last = y
+      return still
+    })
+    .toBe(true)
+}
+
 test.describe('desktop header', () => {
   test.skip(({ isMobile }) => isMobile, 'phone tested below')
 
@@ -60,8 +84,7 @@ test.describe('desktop header', () => {
     await page.goto('/zestawy/wampir')
     const header = page.locator('header.nav')
     await expect(header).toHaveAttribute('data-top', 'true')
-    await page.mouse.wheel(0, 1600)
-    await expect(header).toHaveAttribute('data-hidden', 'true')
+    await scrollUntilHidden(page, 1600)
     await expect(header).not.toBeInViewport()
     await expect.poll(async () => (await page.locator('.bp-bar').boundingBox())?.y).toBe(0)
 
@@ -74,11 +97,29 @@ test.describe('desktop header', () => {
     await expect.poll(async () => (await page.locator('.bp-bar').boundingBox())?.y).toBe(66)
   })
 
+  test('sticky side panels and anchor jumps stay below the header', async ({ page }) => {
+    // Table of contents of a legal page: sticky at 24 px + the header while it is shown.
+    await page.goto('/regulamin')
+    const header = page.locator('header.nav')
+    const toc = page.getByRole('navigation', { name: 'Spis treści' })
+    await scrollUntilHidden(page, 2400)
+    await page.mouse.wheel(0, -200)
+    await expect(header).toHaveAttribute('data-hidden', 'false')
+    await expect.poll(async () => (await toc.boundingBox())?.y).toBe(66 + 24)
+
+    // A jump up to the first section brings the header back: the heading stays visible under it.
+    const first = toc.getByRole('link').first()
+    const id = ((await first.getAttribute('href')) ?? '').slice(1)
+    await first.click()
+    await expect
+      .poll(async () => (await page.locator(`[id="${id}"]`).boundingBox())?.y ?? 0)
+      .toBeGreaterThanOrEqual(76)
+  })
+
   test('a keyboard user tabbing into the hidden header gets it back', async ({ page }) => {
     await page.goto('/zestawy/wampir')
     const header = page.locator('header.nav')
-    await page.mouse.wheel(0, 1600)
-    await expect(header).toHaveAttribute('data-hidden', 'true')
+    await scrollUntilHidden(page, 1600)
     await header.getByRole('link', { name: 'Moje konto' }).focus()
     await expect(header).toHaveAttribute('data-hidden', 'false')
   })
@@ -91,7 +132,7 @@ test.describe('desktop header', () => {
     })
     // --par-nav #3a3226 over the light section.
     await expect(link).toHaveCSS('color', 'rgb(58, 50, 38)')
-    await page.mouse.wheel(0, 900)
+    await scrollUntilHidden(page, 900)
     await page.mouse.wheel(0, -200)
     await expect(header).toHaveAttribute('data-top', 'false')
     // --nav-link #cdc3ab on the solid dark header.

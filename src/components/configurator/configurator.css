@@ -840,7 +840,8 @@
 /* ---------- preview (side) ---------- */
 .cf-side {
   position: sticky;
-  top: 90px;
+  top: calc(90px + var(--nav-offset));
+  transition: top 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 .cf-sb {
   padding: 0 0 20px;

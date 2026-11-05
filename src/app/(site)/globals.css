@@ -370,14 +370,27 @@ a {
   padding: 0 28px;
   background: linear-gradient(180deg, var(--nav-solid-from), var(--nav-solid-to));
   border-bottom: 1px solid var(--line);
+  /* Same timing as the sticky bars that follow it (top 0.3s): no overlap while both move. */
   transition:
     transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1),
-    height 0.2s,
+    height 0.3s cubic-bezier(0.2, 0.8, 0.2, 1),
     background-color 0.2s;
 }
 /* A page without a scene keeps its content below the header. */
 body:not(:has([data-scene-top])) {
   padding-top: var(--nav-h);
+}
+@media print {
+  body:not(:has([data-scene-top])) {
+    padding-top: 0;
+  }
+}
+/* Anchor jumps and keyboard focus scroll to below the header (WCAG 2.4.11): a jump up brings the
+   header back over the target. The phone keeps its own rules (header in the flow). */
+@media (min-width: 761px) {
+  html {
+    scroll-padding-top: calc(var(--nav-h) + 16px);
+  }
 }
 /* A page that starts with a scene marks it with [data-scene-top]: the header floats over it. */
 body:has([data-scene-top]) .nav[data-top='true'] {

@@ -33,3 +33,8 @@ export function navScrollState(prev: NavScroll, y: number): NavScroll {
     hidden: delta > 0 && y > SCROLLED_FROM,
   }
 }
+
+/** State for a page opened (or reloaded) at `y`: never hidden — nobody scrolled down yet. */
+export function navScrollAt(y: number): NavScroll {
+  return { y, top: y < TOP_UNDER, scrolled: y >= SCROLLED_FROM, hidden: false }
+}

@@ -13,7 +13,8 @@
 }
 .kt-menu {
   position: sticky;
-  top: 90px;
+  top: calc(90px + var(--nav-offset));
+  transition: top 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
   padding: 20px;
   border: 1px solid var(--line);
   background: linear-gradient(180deg, var(--panel-from), var(--panel-to));

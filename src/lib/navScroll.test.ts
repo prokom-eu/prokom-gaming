@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { NAV_SCROLL_START, navScrollState, type NavScroll } from './navScroll'
+import { NAV_SCROLL_START, navScrollAt, navScrollState, type NavScroll } from './navScroll'
 
 /** Feeds a sequence of scroll positions, like successive animation frames. */
 const run = (...ys: number[]): NavScroll => ys.reduce(navScrollState, NAV_SCROLL_START)
@@ -32,5 +32,10 @@ describe('navScrollState', () => {
 
   it('back at the top: transparent again and never hidden', () => {
     expect(run(900, 0)).toEqual({ y: 0, top: true, scrolled: false, hidden: false })
+  })
+
+  it('a reload in the middle of the page starts as visible glass', () => {
+    expect(navScrollAt(1200)).toEqual({ y: 1200, top: false, scrolled: true, hidden: false })
+    expect(navScrollState(navScrollAt(1200), 1300)).toMatchObject({ hidden: true })
   })
 })
