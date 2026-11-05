@@ -2,34 +2,70 @@
 
 Spec rundy: `docs/design/prokomgaming/runda-v2/ZMIANY.md` · sceny: `runda-v2/SCENY-BRIEF.md` · uwagi Krystiana (zrzuty): `runda-v2/uwagi-krystiana/` · decyzja: `docs/decyzje/ADR-G013-runda-wizualna-v2.md`.
 Nawigacja: `docs/zadania/gaming-nawigacja.md` (GN-1, GN-2, GN-3 — prompty tam, tu tylko miejsce w kolejności).
-Strona działa na produkcji: **każda sesja = osobny PR → staging → Krystian sprawdza → produkcja.** Nie zbieramy kilku sesji w jedno wdrożenie.
+Strona działa na produkcji: **każdy PR → staging → Krystian sprawdza → produkcja.** Nie zbieramy kilku PR-ów w jedno wdrożenie.
+
+**Zmiana 05.11.2026 (decyzja Krystiana):** po GN-1 pozostałe sesje są połączone w 4 większe (A–D). Jedna sesja = jeden plan i jedna decyzja o wyglądzie, ale **dwa PR-y po kolei** (np. A1, A2) — każdy da się przejrzeć (`/przeglad`) i cofnąć osobno. Prompty R3–R9 i GN-2/GN-3 zostają jako składniki (§4, `gaming-nawigacja.md` §2).
 
 ## 1. Kolejność
-| # | Sesja | Co | Wieczory | Gałąź |
-|---|---|---|---|---|
-| 1 | **R1** | logo w Google (favicon), obrazki podglądu linków, Umami na produkcji, projekt polityki dla prawnika | 0,5 | `fix/r1-favicon-og-umami` |
-| 2 | **R2** | „Z podań” → „Wyróżnik” (16 tekstów), krótkie opisy kart bez podań | 0,5 | `feat/r2-wyroznik` |
-| 3 | **GN-1** | nagłówek, pasek przewijania, dolny pasek telefonu (pakiet nawigacji) | 0,5 | `feat/gn1-naglowek` |
-| 4 | **R3** | hero: imię zawsze nad komputerem + jakość scen kodem (warstwy, światło, ruch) | 1 | `feat/r3-hero` |
-| 5 | **R5** | miniatury zestawów: komputer na środku, większy | 0,5 | `feat/r5-miniatury` |
-| 6 | **R6** | strona główna: dla rodzica, porównanie, „W cenie”, „Napisz, w co grasz” | 1,5 | `feat/r6-sekcje-glownej` |
-| 7 | **R7** | „Dla rodziców” od nowa | 1 | `feat/r7-dla-rodzicow` |
-| 8 | **R8** | „Kontakt” od nowa | 0,5 | `feat/r8-kontakt` |
-| 9 | **GN-2** | boczna szyna (po R6 — stałe `id` sekcji) | 0,75 | `feat/gn2-szyna` |
-| 10 | **GN-3** | wyszukiwarka Ctrl K | 0,5 | `feat/gn3-szukaj` |
-| 11 | **R4** | nowe sceny 16 istot — gdy Krystian ma grafiki (`SCENY-BRIEF.md`) | 0,5 | `feat/r4-sceny` |
-| 12 | **R9** | przegląd całości: zrzuty, Lighthouse, telefon, poprawki | 0,5 | `fix/r9-przeglad` |
-| | | **Razem** | **ok. 8,25** | |
+| # | Sesja | Składniki (PR-y) | Co | Wieczory | Gałęzie |
+|---|---|---|---|---|---|
+| 1 | **R1** ✓ | — | logo w Google, podglądy linków, Umami, projekt polityki (#74) | 0,5 | — |
+| 2 | **R2** ✓ | — | „Z podań” → „Wyróżnik” (#75) | 0,5 | — |
+| 3 | **GN-1** ✓ | — | nagłówek, pasek przewijania, dolny pasek telefonu (#77) | 0,5 | — |
+| 4 | **A — komputer na scenie** | A1 = R3, A2 = R5 | hero (imię nad komputerem, sceny kodem) + miniatury zestawów (komputer na środku); wspólne boxy obudów | 1,5 | `feat/a1-hero`, `feat/a2-miniatury` |
+| 5 | **B — strona główna** | B1 = R6, B2 = GN-2 | 4 sekcje głównej + boczna szyna (korzysta z `id` sekcji z B1) | 2,25 | `feat/b1-sekcje-glownej`, `feat/b2-szyna` |
+| 6 | **C — strony dla klienta** | C1 = R7, C2 = R8 | „Dla rodziców” i „Kontakt” od nowa, wspólne bloki (dowody, kontakt, FAQ) | 1,5 | `feat/c1-dla-rodzicow`, `feat/c2-kontakt` |
+| 7 | **D — wyszukiwarka i domknięcie** | D1 = GN-3, D2 = R9 | Ctrl K na gotowym nagłówku i szynie + przegląd całej rundy | 1 | `feat/d1-szukaj`, `fix/d2-przeglad` |
+| — | **R4** | — | nowe sceny 16 istot — gdy Krystian ma grafiki (`SCENY-BRIEF.md`); najlepiej po A | 0,5 | `feat/r4-sceny` |
+| | | | **Razem (A–D + R4)** | **ok. 6,75** | |
 
-R4 może wejść w dowolnym momencie po R3 — zależy tylko od grafik. Poza kodem równolegle: prawnik (regulamin, polityka), generowanie scen, Search Console.
+Sesja może trwać kilka wieczorów — ciągłość niesie `docs/STAN.md` („Następny krok” na koniec każdego wieczoru). Poza kodem równolegle: prawnik (regulamin, polityka), generowanie scen, Search Console.
 
 ## 2. Zasady dla każdej sesji (dopisz do promptu, jeśli Claude Code ich nie widzi)
-- Start: `git fetch`, gałąź od `origin/develop`, `docs/STAN.md` „W toku”.
-- Najpierw zrzuty „przed” do `tmp/zrzuty-przed/<sesja>/` (1440, 1280, 390; hero też 1920), potem plan w trybie planowania do akceptacji Krystiana. Sesje z wyglądem (R3, R5, R6, R7, R8): **w planie 2 warianty** (zrzuty szkicu w przeglądarce) do wyboru.
+- Start: `git fetch`, gałąź pierwszego PR-u od `origin/develop`, `docs/STAN.md` „W toku”.
+- Najpierw zrzuty „przed” do `tmp/zrzuty-przed/<sesja>/` (1440, 1280, 390; hero też 1920) dla obu składników, potem **jeden plan** w trybie planowania do akceptacji Krystiana — z podziałem na dwa PR-y. Sesje z wyglądem (A, B1, C): **w planie 2 warianty** (zrzuty szkicu w przeglądarce) do wyboru.
+- **Dwa PR-y po kolei:** pierwszy PR → `/przeglad` → `/pr`; drugi składnik na gałęzi od pierwszej. Po scaleniu pierwszego (squash): `git rebase --onto origin/develop <gałąź-1> <gałąź-2>`, testy, `/przeglad`, `/pr`. Staging i sprawdzenie Krystiana po każdym PR-ze (§4); produkcja może objąć oba naraz, gdy oba przeszły staging.
 - Wygląd tylko z `tokens.css`, kroje Cinzel/Manrope, skill frontend-design z zastrzeżeniem z CLAUDE.md (wzorzec marki wygrywa). Liczby z danych, nie z tekstu.
-- Koniec: lint, typecheck, testy, build, e2e zmienionego obszaru, axe, Lighthouse 5 stron z G15 bez spadku, zrzuty „po” w PR, `/przeglad`, `/koniec-sesji`, `/pr`. Po scaleniu i stagingu Krystian sprawdza (lista w §4) i dopiero wtedy produkcja.
+- Koniec każdego PR-u: lint, typecheck, testy, build, e2e zmienionego obszaru, axe, Lighthouse 5 stron z G15 bez spadku (pomiar develop i gałęzi na tym samym komputerze), zrzuty „po” w PR, `/przeglad`, `/pr`. Koniec sesji: `/koniec-sesji`.
 
-## 3. Prompty
+## 3. Prompty sesji (start)
+
+### A — komputer na scenie (A1 = R3, A2 = R5)
+```
+/zadanie A — komputer na scenie: hero (R3) i miniatury zestawów (R5)
+Przeczytaj docs/zadania/gaming-runda-v2.md §2 i prompty składowe R3 i R5 (§4). Gałąź feat/a1-hero od origin/develop.
+Zrzuty „przed” dla obu składników, potem jeden plan w trybie planowania do mojej akceptacji: 2 warianty układu hero i 2 warianty wielkości komputera w miniaturach, podział na PR A1 (R3: boxy obudów, hero, sceny kodem) i A2 (R5: miniatury na boxach z A1).
+Wykonaj A1 → /przeglad → /pr; potem A2 na feat/a2-miniatury (od A1, po scaleniu A1 rebase na develop) → /przeglad → /pr.
+DoD każdego PR-u: lint, typecheck, testy, build, CI, Lighthouse bez spadku; STAN.
+```
+
+### B — strona główna (B1 = R6, B2 = GN-2)
+```
+/zadanie B — strona główna: sekcje (R6) i boczna szyna (GN-2)
+Przeczytaj docs/zadania/gaming-runda-v2.md §2, prompt R6 (§4) i GN-2 (docs/zadania/gaming-nawigacja.md §2). Gałąź feat/b1-sekcje-glownej od origin/develop.
+Jeden plan: 2 warianty każdej z 4 sekcji + teksty §4 do akceptacji; w B1 od razu docelowe id sekcji wg NAWIGACJA.md §4.2 (tabela I–XI), w B2 szyna i „Na tej stronie” z prawdziwych sekcji.
+Wykonaj B1 → /przeglad → /pr; potem B2 na feat/b2-szyna → /przeglad → /pr.
+DoD każdego PR-u: lint, typecheck, testy, build, CI, Lighthouse bez spadku; prawdziwy telefon; STAN.
+```
+
+### C — strony dla klienta (C1 = R7, C2 = R8)
+```
+/zadanie C — „Dla rodziców” (R7) i „Kontakt” (R8) od nowa
+Przeczytaj docs/zadania/gaming-runda-v2.md §2 i prompty R7 i R8 (§4). Gałąź feat/c1-dla-rodzicow od origin/develop.
+Jeden plan: 2 warianty wyglądu dla każdej strony, pełne teksty §5 i §6 do akceptacji przed kodem; wspólne bloki (dowody firmy, kontakt) jako komponenty użyte na obu stronach.
+Wykonaj C1 → /przeglad → /pr; potem C2 na feat/c2-kontakt → /przeglad → /pr.
+DoD każdego PR-u: lint, typecheck, testy, build, CI, Lighthouse bez spadku; prawdziwy telefon; STAN.
+```
+
+### D — wyszukiwarka i domknięcie (D1 = GN-3, D2 = R9)
+```
+/zadanie D — wyszukiwarka Ctrl K (GN-3) i przegląd rundy (R9)
+Przeczytaj docs/zadania/gaming-runda-v2.md §2, GN-3 (docs/zadania/gaming-nawigacja.md §2) i prompt R9 (§4). Gałąź feat/d1-szukaj od origin/develop.
+Plan D1 w trybie planowania do mojej akceptacji (lupa w nagłówku 1200–1399 px: sprawdź, czy 1200 px się mieści — NAWIGACJA.md §2.3). Po scaleniu D1: D2 na fix/d2-przeglad od origin/develop (kryteria ZMIANY.md §8 na stagingu z wyszukiwarką).
+DoD każdego PR-u: lint, typecheck, testy, build, CI; /przeglad; STAN; /pr.
+```
+
+## 4. Prompty składowe (zakres PR-ów; R1, R2, GN-1 — zrobione)
 
 ### R1 — favicon, og:image, Umami, polityka
 ```
@@ -127,7 +163,7 @@ DoD: lint, typecheck, testy, build, CI, Lighthouse bez spadku; prawdziwy telefon
 ```
 
 ### GN-2, GN-3
-Prompty: `docs/zadania/gaming-nawigacja.md` §2 (bez zmian). GN-2 po R6 — tabela sekcji szyny z aktualnych `id`.
+Prompty: `docs/zadania/gaming-nawigacja.md` §2 (bez zmian). GN-2 = B2 (po B1 — `id` sekcji z B1), GN-3 = D1.
 
 ### R4 — nowe sceny (gdy są grafiki)
 ```
@@ -152,10 +188,11 @@ Przeczytaj: runda-v2/ZMIANY.md §8 (kryteria), STAN.
 DoD: lint, typecheck, testy, build, CI; /przeglad; STAN; /pr.
 ```
 
-## 4. Krystian po każdej sesji (staging, ok. 10 min)
+## 5. Krystian po każdym PR-ze (staging, ok. 10 min)
 - **R1:** `prokomgaming.pl/favicon.ico` się otwiera; link do strony głównej i do Wampira wklejony na Messengerze pokazuje obrazek; w Umami widać Twoje wejście. Po produkcji: Search Console → „Poproś o zindeksowanie” strony głównej. Projekt polityki → prawnik.
 - **R2:** 3 dowolne karty — jest „Wyróżnik”, nie ma „Z podań”; w panelu tekst wyróżnika edytowalny.
-- **R3:** hero 16 istot na komputerze i telefonie — imię nigdzie nie chowa się za komputerem; sceny ładniejsze, nic nie zwalnia.
-- **R5:** „Wszystkie zestawy” — komputery na środku postumentów.
-- **R6–R8:** sekcje i strony na komputerze i prawdziwym telefonie; telefon i e-mail klikają się.
+- **A1 (R3):** hero 16 istot na komputerze i telefonie — imię nigdzie nie chowa się za komputerem; sceny ładniejsze, nic nie zwalnia.
+- **A2 (R5):** „Wszystkie zestawy” — komputery na środku postumentów.
+- **B1, C1, C2 (R6–R8):** sekcje i strony na komputerze i prawdziwym telefonie; telefon i e-mail klikają się.
+- **B2 (GN-2), D1 (GN-3):** listy w `gaming-nawigacja.md` §3.
 - **R4:** każda istota stara/nowa — akceptujesz albo wskazujesz sceny do ponownego wygenerowania.
