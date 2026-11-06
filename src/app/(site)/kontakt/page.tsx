@@ -11,7 +11,7 @@ import { ButtonLink } from '@/components/ui/Button'
 import { getEnv } from '@/lib/env'
 import { issueFormToken } from '@/lib/inquiry/spam'
 import { routes } from '@/lib/nav'
-import { company } from '@/lib/site'
+import { company, registers } from '@/lib/site'
 
 import '@/components/content/content.css'
 import '@/components/inquiry/inquiry.css'
@@ -26,16 +26,19 @@ export const metadata: Metadata = {
 const mapsHref = (query: string) =>
   `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`
 
+// One shop (01.11.2026). Address from the company data (`lib/site.ts`), not a literal.
 const STORES = [
   {
     key: 'rabka',
     title: 'Sklep w Rabce-Zdroju',
-    address: 'ul. Orkana 16B, 34-700 Rabka-Zdrój',
-    pin: 'PRO-KOM, Orkana 16B',
+    address: company.address,
+    pin: `PRO-KOM, ${company.postal.street.replace(/^ul\. /, '')}`,
     text: 'Tu składamy i testujemy komputery. Zobaczysz egzemplarz na żywo i odbierzesz zamówienie.',
-    maps: mapsHref('PRO-KOM Orkana 16B Rabka-Zdrój'),
+    maps: mapsHref(`${company.name}, ${company.address}`),
   },
 ] as const
+
+const external = { target: '_blank', rel: 'noopener noreferrer' } as const
 
 // Board-only questions of the contact page (not the `faq` collection: they do not appear on
 // `/pytania` in this wording).
@@ -58,7 +61,10 @@ const QUESTIONS = [
   },
 ] as const
 
-/** „Kontakt” (spec. §18, boards Kontakt / Kontakt-telefon). */
+/**
+ * „Kontakt” (spec. §18, runda v2 §6): three equal ways in (the inquiry in gold), the shop with a
+ * static map and „Prowadź”, the short question (logic unchanged), owners, company data.
+ */
 export default async function ContactPage() {
   // The form token is signed per request (ADR-G005): the page must not be static.
   await connection()
@@ -70,8 +76,8 @@ export default async function ContactPage() {
       <PageHeader
         scene="licho"
         size="tall"
-        title="Napisz, zadzwoń albo wpadnij do sklepu"
-        lead="Na pytania o komputery odpisujemy codziennie od 8 do 22, zwykle w ciągu godziny. Odpisuje człowiek, który zna każdy nasz zestaw."
+        title="Porozmawiajmy o Twoim komputerze"
+        lead="Odpowiadamy codziennie 8–22, zwykle w godzinę. Odpisuje człowiek, który zna każdy nasz zestaw."
       />
 
       <section className="ct-channels" aria-label="Jak się z nami skontaktować">
@@ -89,23 +95,28 @@ export default async function ContactPage() {
             <span className="ct-channel__icon">
               <IconPhone size={24} strokeWidth={1.6} />
             </span>
-            <h2 className="h">Zadzwoń</h2>
+            <h2 className="h">Telefon</h2>
             {/* TODO(krystian): Gaming phone and its hours [SZEF] — until then the shop number
                 only, without the board's placeholders (spec. §27.7). */}
-            <p>{company.phone}</p>
+            <a className="ct-channel__big" href={company.phoneHref}>
+              {company.phone}
+            </a>
+            <p>Wolisz porozmawiać o wyborze albo o zamówieniu? Zadzwoń.</p>
             <ButtonLink href={company.phoneHref} variant="ghost">
-              Zadzwoń teraz
+              Zadzwoń
             </ButtonLink>
           </article>
           <article className="ct-channel">
             <span className="ct-channel__icon">
               <IconDoc size={24} strokeWidth={1.6} />
             </span>
-            <h2 className="h">Napisz e-mail</h2>
-            <p>{company.email}</p>
+            <h2 className="h">E-mail</h2>
+            <a className="ct-channel__big" href={`mailto:${company.email}`}>
+              {company.email}
+            </a>
             <small>Odpisujemy codziennie 8–22</small>
             <ButtonLink href={`mailto:${company.email}`} variant="ghost">
-              Napisz e-mail
+              Napisz
             </ButtonLink>
           </article>
         </div>
@@ -157,7 +168,7 @@ export default async function ContactPage() {
         <div className="wrap ct-ask">
           <div>
             <h2 id="ct-ask" className="h ct-h2">
-              Krótkie pytanie?
+              Pytanie, które nie jest wyceną?
             </h2>
             <p className="ct-p">
               Jeśli nie chodzi o wycenę, napisz tutaj. Na wycenę lepiej wysłać{' '}
@@ -179,6 +190,9 @@ export default async function ContactPage() {
                 <Link className="lnk ct-gold" href={routes.certificate}>
                   Sprawdź metrykę
                 </Link>
+                <a className="lnk ct-gold" href={company.phoneHref}>
+                  Zadzwoń do serwisu: {company.phone}
+                </a>
               </div>
             </div>
             <div className="ct-owner__faq">
@@ -193,6 +207,44 @@ export default async function ContactPage() {
               ))}
             </div>
           </div>
+        </div>
+      </section>
+
+      <section className="ct-firm" aria-labelledby="ct-firm-h">
+        <div className="wrap ct-firm__in">
+          <h2 id="ct-firm-h" className="h">
+            Dane firmy
+          </h2>
+          <dl>
+            <div>
+              <dt>Firma</dt>
+              <dd>{company.name}</dd>
+            </div>
+            <div>
+              <dt>NIP</dt>
+              <dd>{company.nip}</dd>
+            </div>
+            <div>
+              <dt>Adres</dt>
+              <dd>{company.address}</dd>
+            </div>
+            <div>
+              <dt>E-mail</dt>
+              <dd>
+                <a className="lnk" href={`mailto:${company.email}`}>
+                  {company.email}
+                </a>
+              </dd>
+            </div>
+          </dl>
+          <p className="ct-firm__links">
+            <a className="lnk ct-gold" href={registers.ceidg} {...external}>
+              Sprawdź w CEIDG
+            </a>
+            <a className="lnk ct-gold" href={registers.vatList} {...external}>
+              Sprawdź na białej liście VAT
+            </a>
+          </p>
         </div>
       </section>
     </>
