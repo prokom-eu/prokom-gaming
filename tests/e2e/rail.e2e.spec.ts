@@ -45,11 +45,17 @@ test('home: 11 sections, hover opens, a click jumps, the active one follows the 
   // Only one active entry at a time.
   await expect(rail(page).locator('[aria-current="location"]')).toHaveCount(1)
 
-  // Back to top: the ring appears after scrolling and brings the page up.
+  // After a mouse click the rail closes once the mouse leaves (focus alone does not hold it).
+  await page.mouse.move(900, 500)
+  await expect(rail(page)).toHaveAttribute('data-open', 'false')
+
+  // Back to top: the ring appears after scrolling and brings the page up; focus stays in the rail.
   await rail(page)
     .getByRole('button', { name: /Do góry/ })
-    .click()
+    .focus()
+  await page.keyboard.press('Enter')
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBeLessThan(5)
+  await expect(rail(page).getByRole('link', { name: 'Dobierz komputer' })).toBeFocused()
 })
 
 test('keyboard: focus opens the rail, Esc closes it, arrows move between entries', async ({
@@ -86,6 +92,14 @@ test('build page: „Na tej stronie” jumps to its sections, home sections fold
   await rail(page).getByRole('link', { name: 'Co jest w środku' }).click()
   await expect(page).toHaveURL(/#wnetrze$/)
   await expect(page.locator('#wnetrze')).toBeInViewport()
+  // The section heading lands below the header and the sticky price bar, not under them.
+  await expect
+    .poll(async () => {
+      const bar = await page.locator('.bp-bar').boundingBox()
+      const heading = await page.locator('#wnetrze h2').boundingBox()
+      return heading!.y - (bar!.y + bar!.height)
+    })
+    .toBeGreaterThanOrEqual(0)
 
   await expect(rail(page).locator('a[href^="/#"]')).toHaveCount(0)
   const fold = rail(page).getByRole('button', { name: /Sekcje strony głównej/ })

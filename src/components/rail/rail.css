@@ -17,7 +17,19 @@
   border-radius: 20px;
   background: linear-gradient(180deg, var(--panel-from), var(--panel-to));
   box-shadow: 0 30px 60px -30px var(--shadow);
-  transition: width 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition:
+    width 0.25s cubic-bezier(0.2, 0.8, 0.2, 1),
+    top 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+/* Build page: under its sticky price bar (~90 px, the same offset as its side panels). */
+body:has(.bp-bar) .rail {
+  top: calc(var(--nav-offset) + 106px);
+}
+.rail__group {
+  display: contents;
+}
+.rail__group[hidden] {
+  display: none;
 }
 .rail[data-open='true'] {
   width: var(--rail-w-open);

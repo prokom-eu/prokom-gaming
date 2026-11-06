@@ -99,7 +99,7 @@ function RailPanel({
         .filter((el): el is HTMLElement => el !== null)
       const tops = els.map((el) => el.getBoundingClientRect().top)
       const index = activeIndex(tops, window.innerHeight * 0.4)
-      setM({
+      const next: Measure = {
         present: new Set(els.map((el) => el.id)),
         active: index >= 0 ? els[index].id : null,
         progress: scrollProgress(
@@ -108,7 +108,9 @@ function RailPanel({
           window.innerHeight,
         ),
         down: window.scrollY >= window.innerHeight * 0.3,
-      })
+      }
+      // Most scroll frames change nothing the rail shows: keep the old state, no re-render.
+      setM((prev) => (sameMeasure(prev, next) ? prev : next))
     }
     const schedule = () => {
       if (!frame) frame = requestAnimationFrame(measure)
@@ -155,6 +157,9 @@ function RailPanel({
 
   const toTop = () => {
     const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    // The button disappears at the top: hand focus to the first entry, so the keyboard keeps its
+    // place instead of falling back to the page start.
+    nav.current?.querySelector<HTMLElement>('.rail__cta')?.focus({ preventScroll: true })
     window.scrollTo({ top: 0, behavior: calm ? 'auto' : 'smooth' })
   }
 
@@ -168,7 +173,8 @@ function RailPanel({
       aria-label="Sekcje strony"
       onMouseEnter={() => later(true, OPEN_DELAY)}
       onMouseLeave={() => {
-        if (!nav.current?.contains(document.activeElement)) later(false, CLOSE_DELAY)
+        // A mouse click leaves focus on the link: stay open only for keyboard focus.
+        if (!nav.current?.querySelector(':focus-visible')) later(false, CLOSE_DELAY)
       }}
       onFocus={() => later(true, OPEN_DELAY)}
       onBlur={(event) => {
@@ -206,19 +212,24 @@ function RailPanel({
         <p className="rail__cap">
           <span className="rail__lbl">Strona główna</span>
         </p>
-        {group && groupSections.length > 0 ? (
+        {group ? (
           <>
             <button
               type="button"
               className="rail__item"
               aria-expanded={homeListOpen}
+              aria-controls="rail-home-sections"
               onClick={() => setHomeListOpen((v) => !v)}
             >
               <RailSvg icon="start" />
               <span className="rail__lbl">Sekcje strony głównej</span>
-              <span className="rail__num rail__lbl">{homeListOpen ? 'I–XI ▴' : 'I–XI ▾'}</span>
+              <span className="rail__num rail__lbl">
+                I–XI <span aria-hidden="true">{homeListOpen ? '▴' : '▾'}</span>
+              </span>
             </button>
-            {homeListOpen && <HomeLinks prefix="/" active={null} />}
+            <div id="rail-home-sections" className="rail__group" hidden={!homeListOpen}>
+              {homeListOpen && <HomeLinks prefix="/" active={null} />}
+            </div>
           </>
         ) : (
           <HomeLinks prefix={isHome ? '' : '/'} active={isHome ? m.active : null} />
@@ -275,6 +286,16 @@ function RailPanel({
   )
 }
 
+function sameMeasure(a: Measure, b: Measure): boolean {
+  return (
+    a.active === b.active &&
+    a.progress === b.progress &&
+    a.down === b.down &&
+    a.present.size === b.present.size &&
+    [...a.present].every((id) => b.present.has(id))
+  )
+}
+
 function HomeLinks({ prefix, active }: { prefix: string; active: string | null }) {
   return HOME_SECTIONS.map((s) => (
     <RailLink
@@ -301,16 +322,26 @@ function RailLink({
   roman?: string
   active: boolean
 }) {
-  return (
+  const inner = (
+    <>
+      <RailSvg icon={icon} />
+      <span className="rail__lbl">{label}</span>
+      {roman && <span className="rail__num rail__lbl">{roman}</span>}
+    </>
+  )
+  // Another page (`/#id`): client navigation; the same page (`#id`): a plain anchor jump.
+  return href.startsWith('/') ? (
+    <Link className="rail__item" href={href}>
+      {inner}
+    </Link>
+  ) : (
     <a
       className="rail__item"
       href={href}
       aria-current={active ? 'location' : undefined}
       data-active={active || undefined}
     >
-      <RailSvg icon={icon} />
-      <span className="rail__lbl">{label}</span>
-      {roman && <span className="rail__num rail__lbl">{roman}</span>}
+      {inner}
     </a>
   )
 }
