@@ -58,6 +58,22 @@ export const BUILD_SECTIONS: readonly RailSection[] = [
   { id: 'pytania-o-zestaw', label: 'Pytania', icon: 'pytania' },
 ]
 
+/** „O nas”: its H2 headings carry these ids already. */
+export const ABOUT_SECTIONS: readonly RailSection[] = [
+  { id: 'ab-history', label: 'Dwadzieścia dwa lata', icon: 'start' },
+  { id: 'ab-values', label: 'W co wierzymy', icon: 'rodzice' },
+  { id: 'ab-lines', label: 'Nie tylko gaming', icon: 'sciezki' },
+  { id: 'ab-company', label: 'Dane firmy', icon: 'metryka' },
+  { id: 'ab-final', label: 'Sklep i kontakt', icon: 'napisz' },
+]
+
+/** „Komputer do {gry}”: the picks, every power level, requirements and questions. */
+export const GAME_SECTIONS: readonly RailSection[] = [
+  { id: 'gm-picks', label: 'Polecane zestawy', icon: 'istoty' },
+  { id: 'gm-tiers', label: 'Każdy poziom mocy', icon: 'porownaj' },
+  { id: 'gm-more', label: 'Wymagania i pytania', icon: 'pytania' },
+]
+
 export type PageGroup = { title: string; sections: readonly RailSection[] }
 
 /** Where the rail is not shown at all (NAWIGACJA §4): the printable certificate and the account. */
@@ -76,6 +92,13 @@ export function pageGroup(pathname: string, names: ReadonlyMap<string, string>):
     if (!name) return null
     return { title: `Na tej stronie · ${name}`, sections: BUILD_SECTIONS }
   }
+  if (/^\/o-nas\/?$/.test(pathname))
+    return { title: 'Na tej stronie · O nas', sections: ABOUT_SECTIONS }
+  if (/^\/komputer-do\/[a-z0-9-]+\/?$/.test(pathname)) {
+    return { title: 'Na tej stronie', sections: GAME_SECTIONS }
+  }
+  // „Dobór pod grę” (one section), „Pytania” (own group tabs) and guides (own table of contents)
+  // have no group (NAWIGACJA §4.4: at least three sections). TODO: „Dla rodziców” after C1 (#82).
   return null
 }
 

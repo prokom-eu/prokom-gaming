@@ -56,7 +56,7 @@ export default async function GamePage({ params }: Props) {
       />
       <GameResults data={data} game={game} />
 
-      <section className="gm-more" aria-label="Wymagania i pytania">
+      <section className="gm-more" id="gm-more" aria-label="Wymagania i pytania">
         <div className="wrap">
           <div className={requirements ? 'gm-info' : 'gm-info gm-info--faq'}>
             {requirements && <RequirementsBox requirements={requirements} className="gm-box" />}
