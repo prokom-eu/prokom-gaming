@@ -1,0 +1,192 @@
+/* Search dialog (NAWIGACJA §5.3, plansza 10 sekcja 4). Colours from tokens.css (ADR-G003). */
+.sd {
+  width: min(640px, calc(100vw - 32px));
+  max-width: none;
+  max-height: calc(100vh - 36vh);
+  margin: 18vh auto 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--kosc);
+  overflow: visible;
+}
+.sd::backdrop {
+  background: color-mix(in srgb, var(--smola) 70%, transparent);
+  backdrop-filter: blur(4px);
+}
+.sd__panel {
+  display: flex;
+  flex-direction: column;
+  max-height: inherit;
+  border: 1px solid color-mix(in srgb, var(--kosc) 14%, transparent);
+  border-radius: 22px;
+  background: linear-gradient(180deg, var(--sheet-from), var(--panel-to));
+  box-shadow:
+    0 40px 90px -30px var(--shadow),
+    0 0 0 1px color-mix(in srgb, var(--grom) 8%, transparent);
+  overflow: hidden;
+}
+.sd__field {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--line);
+}
+.sd__lupa {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: var(--grom);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+}
+.sd__field input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: none;
+  color: var(--kosc);
+  caret-color: var(--grom);
+  font: inherit;
+  font-size: 18px;
+  font-weight: 600;
+  outline: none;
+}
+.sd__field input::placeholder {
+  color: var(--mgla);
+}
+.sd__field input::-webkit-search-cancel-button {
+  display: none;
+}
+.sd__esc {
+  flex: none;
+  min-width: 44px;
+  min-height: 32px;
+  padding: 4px 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: none;
+  color: var(--mgla);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.sd__esc:focus-visible {
+  outline: 2px solid var(--grom);
+}
+.sd__body {
+  min-height: 0;
+  padding: 8px 10px 10px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--grom) transparent;
+}
+.sd__state {
+  margin: 10px 12px;
+  font-size: 14px;
+  color: var(--mgla);
+}
+.sd__list,
+.sd__list ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.sd__group {
+  margin: 12px 12px 6px;
+  font-family: var(--font-name);
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--rail-num);
+}
+.sd__opt {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--nav-link);
+}
+.sd__opt[aria-selected='true'] {
+  border-color: color-mix(in srgb, var(--grom) 30%, transparent);
+  background: color-mix(in srgb, var(--grom) 10%, transparent);
+  color: var(--kosc);
+}
+/* A diamond: in the creature's colour for a build, gold for games and pages. */
+.sd__dot {
+  width: 9px;
+  height: 9px;
+  transform: rotate(45deg);
+  border: 1px solid color-mix(in srgb, var(--grom) 70%, transparent);
+}
+.sd__dot--build {
+  border-color: var(--c);
+  background: var(--c);
+  box-shadow: 0 0 8px var(--c);
+}
+.sd__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sd__name.nm {
+  font-size: 15px;
+  font-weight: 700;
+}
+.sd__note {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--mgla);
+  white-space: nowrap;
+}
+.sd__keys {
+  margin: 0;
+  padding: 10px 18px;
+  border-top: 1px solid var(--line);
+  font-size: 12px;
+  color: var(--mgla);
+}
+.sd__keys kbd {
+  padding: 1px 6px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  font: inherit;
+  font-weight: 700;
+}
+
+/* Phone: a sheet over the whole height, the field at the top (keyboard opens at once). */
+@media (max-width: 760px) {
+  .sd {
+    width: 100vw;
+    height: 100dvh;
+    max-height: none;
+    margin: 0;
+  }
+  .sd__panel {
+    height: 100%;
+    max-height: none;
+    border-radius: 0;
+    border: 0;
+  }
+  .sd__opt {
+    grid-template-columns: auto minmax(0, 1fr);
+    row-gap: 2px;
+  }
+  .sd__note {
+    grid-column: 2;
+    white-space: normal;
+  }
+  .sd__keys {
+    display: none;
+  }
+}

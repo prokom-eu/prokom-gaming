@@ -85,8 +85,25 @@ body:has(.bp-bar) .rail {
   font-weight: 700;
   white-space: nowrap;
 }
+.rail__cta {
+  width: 100%;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
 .rail__cta:hover {
   border-color: var(--grom);
+}
+.rail__kbd {
+  margin-left: auto;
+  margin-right: 10px;
+  padding: 2px 6px;
+  border: 1px solid color-mix(in srgb, var(--grom) 35%, transparent);
+  border-radius: 6px;
+  font: inherit;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: color-mix(in srgb, var(--grom) 70%, var(--kosc));
 }
 
 .rail__cap {

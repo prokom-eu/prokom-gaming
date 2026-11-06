@@ -34,6 +34,12 @@ export const IconClock = (p: IconProps) => (
     <path d="M12 7v5l3 2" />
   </Icon>
 )
+export const IconSearch = (p: IconProps) => (
+  <Icon {...p}>
+    <circle cx="11" cy="11" r="6.5" />
+    <path d="M20 20l-4.2-4.2" />
+  </Icon>
+)
 export const IconBars = (p: IconProps) => (
   <Icon {...p}>
     <path d="M6 20V10M12 20V4M18 20v-7" />

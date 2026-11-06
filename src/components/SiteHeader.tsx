@@ -8,7 +8,7 @@ import { headerLinks, isCurrent, routes } from '@/lib/nav'
 import { NAV_SCROLL_START, navScrollAt, navScrollState } from '@/lib/navScroll'
 import { plural } from '@/lib/pl'
 
-import { IconArrow, IconBars, IconClock, IconUser } from './icons'
+import { IconArrow, IconBars, IconClock, IconSearch, IconUser } from './icons'
 import { Logo } from './Logo'
 import { useShell } from './shell/ShellProvider'
 import { ButtonLink } from './ui/Button'
@@ -47,7 +47,7 @@ function useNavScroll() {
 /** `hours`: „codziennie 8–22” from the panel settings (lib/responseHours.server.ts). */
 export function SiteHeader({ hours }: { hours: string }) {
   const pathname = usePathname()
-  const { compareCount, openMenu, menuOpen } = useShell()
+  const { compareCount, openMenu, menuOpen, openSearch } = useShell()
   const [{ top, scrolled, hidden }, show] = useNavScroll()
 
   const compareLabel =
@@ -82,6 +82,10 @@ export function SiteHeader({ hours }: { hours: string }) {
           Odpowiadamy w godzinę <em>{hours}</em>
         </span>
       </Link>
+      {/* Search up to 1399 px; from 1400 the side rail has it (NAWIGACJA §5). */}
+      <button type="button" className="ico nav__search" onClick={openSearch} aria-label="Szukaj">
+        <IconSearch size={18} />
+      </button>
       <Link className="ico" href={routes.compare} aria-label={compareLabel}>
         <IconBars size={18} />
         {compareCount > 0 && (
