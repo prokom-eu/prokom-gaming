@@ -90,7 +90,7 @@ const TESTS = [
 /** „Od zapytania do Twojego biurka” + „Zanim wyjedzie z Rabki” (spec. §6 pt 8, board `.tr7`). */
 export function Journey() {
   return (
-    <section className="bp-journey" aria-labelledby="bp-journey-h">
+    <section className="bp-journey" id="od-zapytania" aria-labelledby="bp-journey-h">
       <div className="wrap">
         <div className="bp-sh">
           <h2 id="bp-journey-h" className="h">
