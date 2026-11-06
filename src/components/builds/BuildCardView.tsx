@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 
+import { CasePhoto } from '@/components/CasePhoto'
 import { IconArrow } from '@/components/icons'
 import { SourceLabel } from '@/components/SourceLabel'
 import type { BuildCard } from '@/lib/builds'
@@ -29,8 +30,8 @@ export function BuildCardView({ card, eager = false }: { card: BuildCard; eager?
         />
         {card.photo && (
           <span className="bl-card__photo">
-            {/* Drawn at most ~125 px wide (75 px on a phone): a 256 px 2x variant, not 384. */}
-            <Image src={card.photo.src} alt="" width={125} height={142} />
+            {/* The file is drawn at most ~190 px wide (~110 px on a phone). */}
+            <CasePhoto photo={card.photo} drawnWidth={190} eager={eager} />
           </span>
         )}
       </span>

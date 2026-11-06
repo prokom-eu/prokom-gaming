@@ -4,6 +4,7 @@
  * rates (ADR-G004) — it only picks which builds to recommend from the stored numbers.
  * `lib/games.server.ts` reads the database.
  */
+import type { CasePhoto } from './caseBox'
 import {
   fpsFor,
   RESOLUTION_LABELS,
@@ -124,7 +125,7 @@ export type PickCard = {
   tierRoman: string
   tierLabel: string
   price: number | null
-  photo: { src: string; alt: string } | null
+  photo: CasePhoto | null
 }
 
 export function pickCards(hero: HeroData): Record<string, PickCard> {

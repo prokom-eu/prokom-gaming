@@ -959,7 +959,7 @@
     font-size: 36px;
   }
   .hm-card__view {
-    height: 210px;
+    --view-h: 210px;
   }
   .hm-card__sigil .sigil {
     width: 34px !important;

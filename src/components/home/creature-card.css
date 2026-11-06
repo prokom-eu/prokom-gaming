@@ -23,9 +23,11 @@
     0 30px 60px -30px color-mix(in srgb, var(--c) 60%, transparent);
 }
 .hm-card__view {
+  --view-h: 330px;
   position: relative;
   display: block;
-  height: 330px;
+  height: var(--view-h);
+  container-type: inline-size;
   overflow: hidden;
 }
 .hm-card__scene {
@@ -55,19 +57,15 @@
     linear-gradient(180deg, color-mix(in srgb, var(--card-fade) 60%, transparent), transparent 30%);
 }
 .hm-card__photo {
+  /* Standing on the pedestal (the same in all 16 card scenes, moved to the middle above): top
+     face at ~26.5% of the scene height. The case takes ~75% of the view, capped so it never
+     touches the top edge (sigil, tier) nor gets wider than the card (runda v2 §3.3). */
+  --case-base: calc(var(--view-h) * 0.265);
+  --case-h-max: min(var(--view-h) * 0.75, var(--view-h) * 0.735 - 12px);
+  --case-w-max: 86cqw;
   position: absolute;
-  left: 0;
-  right: 0;
-  /* Standing on the pedestal: its top edge is at ~74% of the scene height. */
-  bottom: 25.5%;
-  height: 60%;
+  inset: 0;
   transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
-}
-.hm-card__photo img {
-  display: block;
-  width: auto;
-  height: 100%;
-  margin: 0 auto;
 }
 .hm-card:hover .hm-card__photo {
   transform: translateY(-6px) scale(1.03);

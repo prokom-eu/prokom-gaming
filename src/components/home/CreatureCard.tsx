@@ -1,8 +1,10 @@
 import Image from 'next/image'
 import Link from 'next/link'
 
+import { CasePhoto } from '@/components/CasePhoto'
 import { Sigil } from '@/components/Sigil'
 import { SourceLabel } from '@/components/SourceLabel'
+import type { CasePhoto as CasePhotoData } from '@/lib/caseBox'
 import { fpsText, RESOLUTION_LABELS, type FpsKind, type GameScale } from '@/lib/fps'
 import { HERO_GAMES, type HeroBuild } from '@/lib/home'
 import { zl } from '@/lib/pricing/format'
@@ -23,7 +25,7 @@ export type CreatureCardData = {
   tierRoman: string
   tierLabel: string
   price: number | null
-  photo: { src: string; alt: string } | null
+  photo: CasePhotoData | null
 }
 
 /** The number in the card's footer: „Cyberpunk 2077, 2K”, „126 FPS” and its source. */
@@ -64,15 +66,8 @@ export function CreatureCardView({
         <span className="hm-card__glow" />
         {card.photo && (
           <span className="hm-card__photo">
-            <Image
-              src={card.photo.src}
-              alt=""
-              // Drawn ~175 px wide (60% of the 330 px view, `height: 100%`): 180 gives a 384 px
-              // 2x variant instead of 640 px (Lighthouse G15). Same aspect as before (240×273).
-              width={180}
-              height={205}
-              loading={eager ? 'eager' : 'lazy'}
-            />
+            {/* The file is drawn at most ~220 px wide: 190 gives a 384 px 2x variant (G15). */}
+            <CasePhoto photo={card.photo} drawnWidth={190} eager={eager} />
           </span>
         )}
         <span className="hm-card__sigil">
