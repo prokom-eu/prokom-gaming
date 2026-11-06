@@ -114,6 +114,19 @@ test('build page: „Na tej stronie” jumps to its sections, home sections fold
   )
 })
 
+test('„O nas” and a game page have their own „Na tej stronie”', async ({ page }) => {
+  await page.goto('/o-nas')
+  await expect(rail(page).getByText('Na tej stronie · O nas')).toBeAttached()
+  await rail(page).hover()
+  await rail(page).getByRole('link', { name: 'Dane firmy' }).click()
+  await expect(page).toHaveURL(/#ab-company$/)
+  await expect(page.locator('#ab-company')).toBeInViewport()
+
+  await page.goto('/komputer-do/fortnite')
+  await expect(rail(page).getByText('Na tej stronie', { exact: true })).toBeAttached()
+  await expect(rail(page).locator('a[href^="#gm-"]')).toHaveCount(3)
+})
+
 test('the open rail passes axe', async ({ page }) => {
   await page.goto('/')
   await rail(page).hover()
