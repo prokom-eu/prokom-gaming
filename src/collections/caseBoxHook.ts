@@ -16,7 +16,8 @@ export const stampCaseBox: CollectionBeforeChangeHook = async ({ data, req }) =>
     return { ...data, box: box ?? { x: null, y: null, w: null, h: null } }
   } catch (error) {
     // A file sharp cannot read still uploads; the page then treats the whole file as the case.
+    // The old box is cleared: after a replaced file it would describe the previous picture.
     req.payload.logger.warn({ ...errorFields(error) }, 'Media: case box not measured')
-    return data
+    return { ...data, box: { x: null, y: null, w: null, h: null } }
   }
 }

@@ -56,9 +56,9 @@ describe('stampCaseBox (media)', () => {
     })
   })
 
-  it('lets an unreadable file upload and logs a warning without the file name', async () => {
+  it('lets an unreadable file upload, clears the old box and logs a warning without the file name', async () => {
     const { result, warn } = call({ alt: 'x' }, { data: Buffer.from('not an image') })
-    expect(await result).toEqual({ alt: 'x' })
+    expect(await result).toEqual({ alt: 'x', box: { x: null, y: null, w: null, h: null } })
     expect(warn).toHaveBeenCalledOnce()
   })
 })

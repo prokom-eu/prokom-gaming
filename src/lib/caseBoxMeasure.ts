@@ -1,5 +1,7 @@
 // No `server-only` marker: the Payload CLI runs this in a migration (backfill of `media.box`),
 // where the marker cannot load. sharp is native, so it can never end up in a browser bundle anyway.
+// Also used by migration 20261105_225049_media_case_box: a change here (e.g. ALPHA_MIN) changes
+// what that migration measures on a fresh database — change with care.
 
 import sharp from 'sharp'
 

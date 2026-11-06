@@ -2,6 +2,8 @@ import path from 'path'
 import sharp from 'sharp'
 import { describe, expect, it } from 'vitest'
 
+import optionsSeed from '../../seed/prokomgaming/options.json' with { type: 'json' }
+
 import { caseBoxOf, casePhotoOf, caseVars } from './caseBox'
 import { measureCaseBox } from './caseBoxMeasure'
 
@@ -59,8 +61,21 @@ describe('measureCaseBox', () => {
   })
 
   it('measures every case photo of the seed (the photos the site starts with)', async () => {
+    const cases = optionsSeed.items.filter((o) => o.type === 'case' && o.image)
+    expect(cases.length).toBeGreaterThan(0)
+    for (const option of cases) {
+      const box = await measureCaseBox(path.resolve('seed/prokomgaming/media', option.image!))
+      // A photo without transparency would put the whole file on the stand (margin included).
+      expect(box, option.code).not.toBeNull()
+      expect(box!.w, option.code).toBeGreaterThan(0.5)
+      expect(box!.h, option.code).toBeGreaterThan(0.5)
+      expect(box!.x + box!.w, option.code).toBeLessThanOrEqual(1)
+      expect(box!.y + box!.h, option.code).toBeLessThanOrEqual(1)
+    }
+  })
+
+  it('finds the transparent margin of a typical photo', async () => {
     const box = await measureCaseBox(path.resolve('seed/prokomgaming/media/options/SIG3A.webp'))
-    expect(box).not.toBeNull()
     // ~33 px margin on a 787×900 file.
     expect(box!.x).toBeGreaterThan(0.03)
     expect(box!.x + box!.w).toBeLessThan(0.97)
