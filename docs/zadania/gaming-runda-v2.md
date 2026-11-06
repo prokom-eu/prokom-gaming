@@ -12,11 +12,11 @@ Strona działa na produkcji: **każdy PR → staging → Krystian sprawdza → p
 | 1 | **R1** ✓ | — | logo w Google, podglądy linków, Umami, projekt polityki (#74) | 0,5 | — |
 | 2 | **R2** ✓ | — | „Z podań” → „Wyróżnik” (#75) | 0,5 | — |
 | 3 | **GN-1** ✓ | — | nagłówek, pasek przewijania, dolny pasek telefonu (#77) | 0,5 | — |
-| 4 | **A — komputer na scenie** | A1 = R3, A2 = R5 | hero (imię nad komputerem, sceny kodem) + miniatury zestawów (komputer na środku); wspólne boxy obudów | 1,5 | `feat/a1-hero`, `feat/a2-miniatury` |
+| 4 | **A — komputer na scenie** | R3 + R5 w jednym PR (decyzja 06.11) | hero (imię nad komputerem) + miniatury zestawów (komputer na środku); boxy obudów w `media.box` | 1,5 | `feat/r3-r5-komputer-na-scenie` |
 | 5 | **B — strona główna** | B1 = R6, B2 = GN-2 | 4 sekcje głównej + boczna szyna (korzysta z `id` sekcji z B1) | 2,25 | `feat/b1-sekcje-glownej`, `feat/b2-szyna` |
 | 6 | **C — strony dla klienta** | C1 = R7, C2 = R8 | „Dla rodziców” i „Kontakt” od nowa, wspólne bloki (dowody, kontakt, FAQ) | 1,5 | `feat/c1-dla-rodzicow`, `feat/c2-kontakt` |
 | 7 | **D — wyszukiwarka i domknięcie** | D1 = GN-3, D2 = R9 | Ctrl K na gotowym nagłówku i szynie + przegląd całej rundy | 1 | `feat/d1-szukaj`, `fix/d2-przeglad` |
-| — | **R4** | — | nowe sceny 16 istot — gdy Krystian ma grafiki (`SCENY-BRIEF.md`); najlepiej po A | 0,5 | `feat/r4-sceny` |
+| — | **R4** | — | nowe sceny 16 istot — gdy Krystian ma grafiki (`SCENY-BRIEF.md`); najlepiej po A; **plus sceny kodem z §3.2** (przeniesione z R3, decyzja 06.11) | 0,5–1 | `feat/r4-sceny` |
 | | | | **Razem (A–D + R4)** | **ok. 6,75** | |
 
 Sesja może trwać kilka wieczorów — ciągłość niesie `docs/STAN.md` („Następny krok” na koniec każdego wieczoru). Poza kodem równolegle: prawnik (regulamin, polityka), generowanie scen, Search Console.
@@ -31,6 +31,7 @@ Sesja może trwać kilka wieczorów — ciągłość niesie `docs/STAN.md` („N
 ## 3. Prompty sesji (start)
 
 ### A — komputer na scenie (A1 = R3, A2 = R5)
+**Zmiana 06.11 (decyzje Krystiana, ADR-G013 „Aktualizacja 06.11”):** jeden PR `feat/r3-r5-komputer-na-scenie`; box obudowy jako pole `media.box` liczone hakiem przy wgraniu (zamiast `scripts/media/case-boxes.mjs` z prompta R3 pkt 1); sceny kodem (R3 pkt 4) przeniesione do R4.
 ```
 /zadanie A — komputer na scenie: hero (R3) i miniatury zestawów (R5)
 Przeczytaj docs/zadania/gaming-runda-v2.md §2 i prompty składowe R3 i R5 (§4). Gałąź feat/a1-hero od origin/develop.
