@@ -1272,9 +1272,18 @@
   .hm-par__how ol {
     grid-template-columns: 1fr;
   }
-  /* Touch targets ≥ 44 px (the register and directions links stand close together). */
+  /* Touch targets ≥ 44 px (the register and directions links stand close together), with the
+     underline kept at the text: a larger, invisible hit area around each link. */
+  .hm-par__cards .hm-par__links {
+    gap: 14px 16px;
+  }
   .hm-par__cards .hm-par__links .lnk {
-    min-height: 44px;
+    position: relative;
+  }
+  .hm-par__cards .hm-par__links .lnk::after {
+    content: '';
+    position: absolute;
+    inset: -12px -4px;
   }
   .hm-par .hm-cta .btn {
     width: 100%;
