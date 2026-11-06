@@ -1,0 +1,324 @@
+'use client'
+
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  type KeyboardEvent,
+  type MouseEvent,
+} from 'react'
+
+import { useShell } from '@/components/shell/ShellProvider'
+import { routes } from '@/lib/nav'
+
+import {
+  activeIndex,
+  HOME_SECTIONS,
+  pageGroup,
+  RAIL_ICONS,
+  railHidden,
+  RING,
+  ringOffset,
+  scrollProgress,
+  type RailIcon,
+  type RailSection,
+} from './railConfig'
+import './rail.css'
+
+/** The rail exists from this width up (NAWIGACJA §4); below it is not rendered at all. */
+const WIDE = '(min-width: 1400px)'
+const OPEN_DELAY = 120
+/** One empty list for pages without a group (a fresh `[]` would re-run the measuring effect). */
+const NONE: readonly RailSection[] = []
+const CLOSE_DELAY = 250
+
+function subscribeWide(onChange: () => void) {
+  const mq = window.matchMedia(WIDE)
+  mq.addEventListener('change', onChange)
+  return () => mq.removeEventListener('change', onChange)
+}
+
+/**
+ * Side rail (NAWIGACJA §4, plansza 10 sekcje 2–3): fixed at the left from 1400 px, 64 px wide,
+ * opening to 258 px on hover or keyboard focus. Lists the home sections I–XI (the active one
+ * marked), „Na tej stronie” on a build page, and the actions: comparison, inquiry, back to top.
+ * Not on the certificate (print) or the account pages.
+ */
+export function SiteRail({ creatures }: { creatures: readonly { slug: string; name: string }[] }) {
+  const pathname = usePathname()
+  // Server and hydration render nothing; the rail appears right after, only on a wide window.
+  const wide = useSyncExternalStore(
+    subscribeWide,
+    () => window.matchMedia(WIDE).matches,
+    () => false,
+  )
+  if (!wide || railHidden(pathname)) return null
+  return <RailPanel key={pathname} pathname={pathname} creatures={creatures} />
+}
+
+type Measure = { present: Set<string>; active: string | null; progress: number; down: boolean }
+
+function RailPanel({
+  pathname,
+  creatures,
+}: {
+  pathname: string
+  creatures: readonly { slug: string; name: string }[]
+}) {
+  const { compareCount } = useShell()
+  const isHome = pathname === routes.home
+  const names = useMemo(() => new Map(creatures.map((c) => [c.slug, c.name])), [creatures])
+  const group = pageGroup(pathname, names)
+  // The sections whose position decides the active entry: the home sections on the home page,
+  // the page's own group elsewhere (home entries are then plain links, never active).
+  const tracked: readonly RailSection[] = isHome ? HOME_SECTIONS : (group?.sections ?? NONE)
+
+  const [open, setOpen] = useState(false)
+  const [homeListOpen, setHomeListOpen] = useState(false)
+  const [m, setM] = useState<Measure>({
+    present: new Set(),
+    active: null,
+    progress: 0,
+    down: false,
+  })
+  const nav = useRef<HTMLElement>(null)
+  const timer = useRef(0)
+
+  // Positions are read in an animation frame (on scroll, resize and once after mount): which
+  // sections the page really has, the active one, and how far the page is scrolled.
+  useEffect(() => {
+    let frame = 0
+    const measure = () => {
+      frame = 0
+      const els = tracked
+        .map((s) => document.getElementById(s.id))
+        .filter((el): el is HTMLElement => el !== null)
+      const tops = els.map((el) => el.getBoundingClientRect().top)
+      const index = activeIndex(tops, window.innerHeight * 0.4)
+      setM({
+        present: new Set(els.map((el) => el.id)),
+        active: index >= 0 ? els[index].id : null,
+        progress: scrollProgress(
+          window.scrollY,
+          document.documentElement.scrollHeight,
+          window.innerHeight,
+        ),
+        down: window.scrollY >= window.innerHeight * 0.3,
+      })
+    }
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(measure)
+    }
+    schedule()
+    window.addEventListener('scroll', schedule, { passive: true })
+    window.addEventListener('resize', schedule)
+    return () => {
+      cancelAnimationFrame(frame)
+      window.removeEventListener('scroll', schedule)
+      window.removeEventListener('resize', schedule)
+    }
+  }, [tracked])
+
+  useEffect(() => () => window.clearTimeout(timer.current), [])
+
+  const later = (value: boolean, delay: number) => {
+    window.clearTimeout(timer.current)
+    timer.current = window.setTimeout(() => setOpen(value), delay)
+  }
+
+  const onKeyDown = (event: KeyboardEvent<HTMLElement>) => {
+    if (event.key === 'Escape') {
+      window.clearTimeout(timer.current)
+      setOpen(false)
+      return
+    }
+    if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return
+    const items = [...(nav.current?.querySelectorAll<HTMLElement>('a, button') ?? [])]
+    const index = items.indexOf(document.activeElement as HTMLElement)
+    if (index < 0) return
+    event.preventDefault()
+    const next = (index + (event.key === 'ArrowDown' ? 1 : -1) + items.length) % items.length
+    items[next]?.focus()
+  }
+
+  // A touch screen has no hover: the first tap opens the rail, the next one follows the link.
+  const onClickCapture = (event: MouseEvent<HTMLElement>) => {
+    if (open || !window.matchMedia('(hover: none)').matches) return
+    event.preventDefault()
+    event.stopPropagation()
+    setOpen(true)
+  }
+
+  const toTop = () => {
+    const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    window.scrollTo({ top: 0, behavior: calm ? 'auto' : 'smooth' })
+  }
+
+  const groupSections = group?.sections.filter((s) => m.present.has(s.id)) ?? []
+
+  return (
+    <nav
+      ref={nav}
+      className="rail"
+      data-open={open}
+      aria-label="Sekcje strony"
+      onMouseEnter={() => later(true, OPEN_DELAY)}
+      onMouseLeave={() => {
+        if (!nav.current?.contains(document.activeElement)) later(false, CLOSE_DELAY)
+      }}
+      onFocus={() => later(true, OPEN_DELAY)}
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+          later(false, CLOSE_DELAY)
+        }
+      }}
+      onKeyDown={onKeyDown}
+      onClickCapture={onClickCapture}
+    >
+      {/* Until the search (GN-3) takes this place: the main call to action. */}
+      <Link className="rail__cta" href={routes.configurator}>
+        <RailSvg icon="dobierz" />
+        <span className="rail__lbl">Dobierz komputer</span>
+      </Link>
+
+      <div className="rail__scroll">
+        {group && groupSections.length > 0 && (
+          <>
+            <p className="rail__cap rail__cap--page">
+              <span className="rail__lbl">{group.title}</span>
+            </p>
+            {groupSections.map((s) => (
+              <RailLink
+                key={s.id}
+                href={`#${s.id}`}
+                icon={s.icon}
+                label={s.label}
+                active={m.active === s.id}
+              />
+            ))}
+          </>
+        )}
+
+        <p className="rail__cap">
+          <span className="rail__lbl">Strona główna</span>
+        </p>
+        {group && groupSections.length > 0 ? (
+          <>
+            <button
+              type="button"
+              className="rail__item"
+              aria-expanded={homeListOpen}
+              onClick={() => setHomeListOpen((v) => !v)}
+            >
+              <RailSvg icon="start" />
+              <span className="rail__lbl">Sekcje strony głównej</span>
+              <span className="rail__num rail__lbl">{homeListOpen ? 'I–XI ▴' : 'I–XI ▾'}</span>
+            </button>
+            {homeListOpen && <HomeLinks prefix="/" active={null} />}
+          </>
+        ) : (
+          <HomeLinks prefix={isHome ? '' : '/'} active={isHome ? m.active : null} />
+        )}
+
+        <span className="rail__sep" aria-hidden="true" />
+
+        <Link
+          className="rail__item rail__item--action"
+          href={routes.compare}
+          aria-label={compareCount > 0 ? `Porównanie, ${compareCount} w porównaniu` : 'Porównanie'}
+        >
+          <RailSvg icon="porownaj" />
+          <span className="rail__lbl">Porównanie</span>
+          {compareCount > 0 && (
+            <span className="rail__badge" aria-hidden="true">
+              {compareCount}
+            </span>
+          )}
+        </Link>
+        <Link className="rail__item rail__item--action" href={routes.inquiry}>
+          <RailSvg icon="napisz" />
+          <span className="rail__lbl">Zapytanie</span>
+        </Link>
+        {m.down && (
+          <button
+            type="button"
+            className="rail__item rail__item--action"
+            onClick={toTop}
+            aria-label={`Do góry, przewinięto ${m.progress}%`}
+          >
+            <span className="rail__ring" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <circle className="rail__ring-track" cx="12" cy="12" r="10" />
+                <circle
+                  className="rail__ring-bar"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  strokeDasharray={RING}
+                  strokeDashoffset={ringOffset(m.progress)}
+                />
+              </svg>
+              <svg className="rail__ring-arrow" viewBox="0 0 24 24">
+                <path d="M12 16V8M8.5 11.5L12 8l3.5 3.5" />
+              </svg>
+            </span>
+            <span className="rail__lbl">Do góry</span>
+            <span className="rail__num rail__lbl">{m.progress}%</span>
+          </button>
+        )}
+      </div>
+    </nav>
+  )
+}
+
+function HomeLinks({ prefix, active }: { prefix: string; active: string | null }) {
+  return HOME_SECTIONS.map((s) => (
+    <RailLink
+      key={s.id}
+      href={`${prefix}#${s.id}`}
+      icon={s.icon}
+      label={s.label}
+      roman={s.roman}
+      active={active === s.id}
+    />
+  ))
+}
+
+function RailLink({
+  href,
+  icon,
+  label,
+  roman,
+  active,
+}: {
+  href: string
+  icon: RailIcon
+  label: string
+  roman?: string
+  active: boolean
+}) {
+  return (
+    <a
+      className="rail__item"
+      href={href}
+      aria-current={active ? 'location' : undefined}
+      data-active={active || undefined}
+    >
+      <RailSvg icon={icon} />
+      <span className="rail__lbl">{label}</span>
+      {roman && <span className="rail__num rail__lbl">{roman}</span>}
+    </a>
+  )
+}
+
+function RailSvg({ icon }: { icon: RailIcon }) {
+  return (
+    <svg className="rail__ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d={RAIL_ICONS[icon]} />
+    </svg>
+  )
+}

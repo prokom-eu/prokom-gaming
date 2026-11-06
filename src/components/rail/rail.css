@@ -1,0 +1,242 @@
+/* Side rail (NAWIGACJA §4, plansza 10 sekcje 2–3). Only rendered from 1400 px (SiteRail checks the
+   width), so no media query is needed here. Colours from tokens.css (ADR-G003). Above the page,
+   under the header (header 30, rail 25, menu sheet and dialogs higher). */
+.rail {
+  position: fixed;
+  z-index: 25;
+  left: 18px;
+  top: max(92px, calc(var(--nav-h) + 16px));
+  display: flex;
+  flex-direction: column;
+  width: var(--rail-w);
+  max-height: calc(100vh - 120px);
+  padding: 10px 8px;
+  box-sizing: border-box;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: linear-gradient(180deg, var(--panel-from), var(--panel-to));
+  box-shadow: 0 30px 60px -30px var(--shadow);
+  transition: width 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.rail[data-open='true'] {
+  width: var(--rail-w-open);
+}
+/* The middle scrolls inside when the window is short (thin gold bar). */
+.rail__scroll {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--grom) transparent;
+}
+.rail__lbl {
+  opacity: 0;
+  white-space: nowrap;
+  transition: opacity 0.15s;
+}
+.rail[data-open='true'] .rail__lbl {
+  opacity: 1;
+  transition-delay: 0.08s;
+}
+.rail__ico {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Main call to action at the top (the search takes this place in GN-3). */
+.rail__cta {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 12px;
+  height: 42px;
+  margin-bottom: 8px;
+  padding-left: 11px;
+  border: 1px solid color-mix(in srgb, var(--grom) 42%, transparent);
+  border-radius: 12px;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--grom) 12%, transparent),
+    color-mix(in srgb, var(--grom) 4%, transparent)
+  );
+  color: var(--grom2);
+  font-size: 13.5px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.rail__cta:hover {
+  border-color: var(--grom);
+}
+
+.rail__cap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 22px;
+  margin: 8px 0 2px;
+  padding-left: 12px;
+  font-family: var(--font-name);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--rail-num);
+  white-space: nowrap;
+}
+.rail__cap::before {
+  content: '';
+  flex: none;
+  width: 16px;
+  height: 1px;
+  background: color-mix(in srgb, var(--kosc) 18%, transparent);
+}
+.rail__cap--page {
+  color: color-mix(in srgb, var(--grom) 75%, var(--rail-num));
+}
+
+.rail__item {
+  position: relative;
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  height: 40px;
+  padding: 0 0 0 12px;
+  border: 0;
+  border-radius: 12px;
+  background: none;
+  color: var(--mgla);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    color 0.2s,
+    background 0.2s;
+}
+.rail__item:hover {
+  color: var(--kosc);
+  background: color-mix(in srgb, var(--kosc) 5%, transparent);
+}
+.rail__item:focus-visible,
+.rail__cta:focus-visible {
+  outline: 2px solid var(--grom);
+  outline-offset: -2px;
+}
+.rail__item--action {
+  color: var(--nav-link);
+}
+.rail__num {
+  margin-left: auto;
+  margin-right: 12px;
+  font-family: var(--font-name);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--rail-num);
+}
+/* Active section: gold text, a glow from the left and a gold line on the panel's edge. */
+.rail__item[data-active] {
+  color: var(--grom2);
+  background: radial-gradient(
+    120% 140% at 0% 50%,
+    color-mix(in srgb, var(--grom) 18%, transparent),
+    transparent 70%
+  );
+}
+.rail__item[data-active]::before {
+  content: '';
+  position: absolute;
+  left: -8px;
+  top: 9px;
+  bottom: 9px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--grom);
+  box-shadow: 0 0 12px var(--nav-on-glow);
+}
+.rail__item[data-active] .rail__num {
+  color: var(--grom);
+}
+.rail__sep {
+  flex: none;
+  height: 1px;
+  margin: 8px 4px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--kosc) 16%, transparent),
+    transparent
+  );
+}
+/* Comparison counter: on the icon when closed, at the right edge when open. */
+.rail__badge {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  margin-top: -9px;
+  padding: 0 4px;
+  box-sizing: border-box;
+  border-radius: 999px;
+  background: var(--grom);
+  color: var(--on-grom);
+  font-size: 10.5px;
+  font-weight: 800;
+}
+.rail[data-open='true'] .rail__badge {
+  position: static;
+  margin: 0 12px 0 auto;
+}
+.rail__ring {
+  position: relative;
+  flex: none;
+  width: 20px;
+  height: 20px;
+}
+.rail__ring svg {
+  position: absolute;
+  inset: 0;
+  width: 20px;
+  height: 20px;
+  fill: none;
+}
+.rail__ring svg:first-child {
+  transform: rotate(-90deg);
+}
+.rail__ring-track {
+  stroke: color-mix(in srgb, var(--kosc) 15%, transparent);
+  stroke-width: 2;
+}
+.rail__ring-bar {
+  stroke: var(--grom);
+  stroke-width: 2;
+}
+.rail__ring-arrow {
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rail,
+  .rail__lbl,
+  .rail__item {
+    transition: none;
+  }
+}
