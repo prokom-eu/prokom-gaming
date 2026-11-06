@@ -14,7 +14,7 @@ const SECTIONS = [
   'W co grasz?',
   'Zanim komputer wyjedzie z Rabki',
   'Kupujesz komputer dla dziecka?',
-  'Baba Jaga czy Wampir?',
+  'Ile klatek kupujesz za dopłatę?',
   'W cenie każdego komputera',
   'Zanim zapytasz',
   'Napisz, w co grasz',
@@ -52,7 +52,7 @@ test('16 creature cards in price order, every FPS number with its source', async
 
 test('the games panel switches game and resolution', async ({ page }) => {
   await page.goto('/')
-  const chips = page.getByRole('group', { name: 'Gra' })
+  const chips = page.getByRole('group', { name: 'Gra', exact: true })
   const panel = page.locator('.hm-games__panel')
   await expect(chips.getByRole('button')).toHaveCount(33)
   await expect(chips.getByRole('button', { name: 'Cyberpunk 2077' })).toHaveAttribute(
@@ -102,18 +102,93 @@ test('paths, cards and games scroll sideways on a phone', async ({ page, isMobil
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(414)
 })
 
-test('the comparator preview: three creatures, every number with its source', async ({ page }) => {
+test('the comparison: three creatures, each step pricier and ≥ 15% more frames', async ({
+  page,
+}) => {
   await page.goto('/')
   const chart = page.locator('.hm-cmp__chart')
-  await expect(chart.locator('strong')).toHaveText(['Kikimora', 'Baba Jaga', 'Wampir'])
-  await expect(chart.locator('b')).toHaveText([/^\d+ FPS$/, /^\d+ FPS$/, /^\d+ FPS$/])
-  await expect(chart.locator('.src')).toHaveCount(3)
-  await expect(chart.locator('em').nth(2)).toHaveText(/^\+\d+% klatek$/)
-  await expect(chart.locator('figcaption')).toContainText('Cyberpunk 2077, 2K')
+  await chart.scrollIntoViewIfNeeded()
+  const check = async (caption: RegExp) => {
+    await expect(chart.locator('figcaption')).toContainText(caption)
+    await expect(chart.locator('li')).toHaveCount(3)
+    await expect(chart.locator('.src')).toHaveCount(3)
+    const fps = (await chart.locator('b').allTextContents()).map((t) =>
+      Number(t.replace(/\D/g, '')),
+    )
+    const prices = (await chart.locator('.hm-cmp__price').allTextContents()).map((t) =>
+      Number(t.replace(/\D/g, '')),
+    )
+    for (let i = 1; i < 3; i++) {
+      expect(fps[i] / fps[i - 1]).toBeGreaterThanOrEqual(1.15)
+      expect(prices[i]).toBeGreaterThan(prices[i - 1])
+    }
+    const steps = await chart.locator('em').allTextContents()
+    expect(steps[0]).toBe('punkt wyjścia')
+    for (const step of steps.slice(1)) expect(step).toMatch(/^\+[\d\s]+zł → \+\d+% klatek$/)
+    expect(steps.join(' ')).not.toContain('+0%')
+  }
+  await check(/Cyberpunk 2077, 2K/)
+  // Switching game and resolution, without a reload.
+  await chart.getByRole('button', { name: 'Counter-Strike 2' }).click()
+  await chart.getByRole('radio', { name: 'FullHD' }).click()
+  await check(/Counter-Strike 2, FullHD/)
+  await chart.getByRole('button', { name: 'Fortnite' }).click()
+  await chart.getByRole('radio', { name: '4K' }).click()
+  await check(/Fortnite, 4K/)
   await expect(page.getByRole('link', { name: 'Otwórz porównywarkę' })).toHaveAttribute(
     'href',
     '/porownaj',
   )
+})
+
+test('for parents: proof links to the public registers, the phone and three steps', async ({
+  page,
+}) => {
+  await page.goto('/')
+  const par = page.locator('#dla-rodzicow-sekcja')
+  await expect(par.getByRole('link', { name: 'Sprawdź w CEIDG' })).toHaveAttribute(
+    'href',
+    /ceidg\.gov\.pl/,
+  )
+  await expect(par.getByRole('link', { name: 'Sprawdź na białej liście VAT' })).toHaveAttribute(
+    'href',
+    /podatki\.gov\.pl/,
+  )
+  await expect(par.getByRole('link', { name: /Zadzwoń: \+48 883 200 151/ })).toHaveAttribute(
+    'href',
+    'tel:+48883200151',
+  )
+  await expect(par.getByRole('link', { name: 'Prowadź do sklepu' })).toHaveAttribute(
+    'href',
+    /google\.com\/maps\/dir/,
+  )
+  await expect(par.locator('.hm-par__cards li')).toHaveCount(4)
+  await expect(par.locator('.hm-par__how li')).toHaveCount(3)
+})
+
+test('in the price: ten cards, each with an icon', async ({ page }) => {
+  await page.goto('/')
+  const items = page.locator('#w-cenie .hm-inc__list li')
+  await expect(items).toHaveCount(10)
+  await expect(page.locator('#w-cenie .hm-inc__icon svg')).toHaveCount(10)
+})
+
+test('sections carry the anchors of the side rail (NAWIGACJA §4.2), in order', async ({ page }) => {
+  await page.goto('/')
+  const ids = await page.locator('main section[id]').evaluateAll((els) => els.map((e) => e.id))
+  expect(ids).toEqual([
+    'start',
+    'od-czego-zaczynasz',
+    'istoty',
+    'jak-kupic',
+    'w-co-grasz',
+    'metryka',
+    'dla-rodzicow-sekcja',
+    'porownaj-istoty',
+    'w-cenie',
+    'pytania',
+    'napisz',
+  ])
 })
 
 test('six home questions, the first open, the others open with the keyboard', async ({ page }) => {
@@ -142,6 +217,11 @@ test('closing call: 16 sigils and both buttons, no placeholders in the sections'
     'href',
     '/kontakt',
   )
+  // Three quick ways into a game, and no empty picture over the sigils (runda v2 §4.4).
+  const quick = page.getByRole('list', { name: 'Szybko do gry' }).getByRole('link')
+  await expect(quick).toHaveText(['Gram w CS2', 'Gram w Fortnite', 'Gram w Minecraft'])
+  await expect(quick.first()).toHaveAttribute('href', '/komputer-do/counter-strike-2')
+  await expect(page.locator('.hm-fin img')).toHaveCount(0)
   // No board placeholders like "[imię serwisanta]" or "[liczba]" and no instalment offer.
   const text = (await page.locator('.hm-sec').allTextContents()).join(' ')
   expect(text).not.toMatch(/\[[^\]]+\]/)

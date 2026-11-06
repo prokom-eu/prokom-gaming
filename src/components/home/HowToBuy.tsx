@@ -26,7 +26,7 @@ const STEPS = [
 
 export function HowToBuy() {
   return (
-    <section className="hm-sec hm-buy" aria-labelledby="buy-title">
+    <section className="hm-sec hm-buy" id="jak-kupic" aria-labelledby="buy-title">
       <div className="wrap">
         <div className="hm-head hm-head--row">
           <h2 id="buy-title" className="h">
