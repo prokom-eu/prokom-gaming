@@ -129,7 +129,7 @@ export function InTheBox() {
 /** „Gwarancja i opieka” + „Co, jeśli…” (spec. §6 pt 10, board `.gw7`). */
 export function Care() {
   return (
-    <section className="bp-care" aria-labelledby="bp-care-h">
+    <section className="bp-care" id="gwarancja" aria-labelledby="bp-care-h">
       <div className="wrap">
         <div className="bp-sh">
           <h2 id="bp-care-h" className="h">
