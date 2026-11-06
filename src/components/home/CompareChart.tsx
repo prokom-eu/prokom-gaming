@@ -19,19 +19,21 @@ export function CompareChart({ data }: { data: CompareData }) {
   const initial = data.views[data.initial]
   const [game, setGame] = useState(initial.game)
   const [resolution, setResolution] = useState<Resolution>(initial.resolution)
-  const [shown, setShown] = useState(false)
   const chart = useRef<HTMLElement>(null)
 
+  // The growth is presentation only, so it lives on the element, not in state. The server HTML
+  // draws full bars: without JavaScript nothing is lost.
   useEffect(() => {
     const el = chart.current
-    if (!el || typeof IntersectionObserver === 'undefined') {
-      setShown(true)
-      return
-    }
+    if (!el || typeof IntersectionObserver === 'undefined') return
+    // Already on screen: no growth (it would flash). Below the fold: hide, then grow into view.
+    if (el.getBoundingClientRect().top < window.innerHeight) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    el.dataset.shown = 'false'
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry?.isIntersecting) {
-          setShown(true)
+          el.dataset.shown = 'true'
           observer.disconnect()
         }
       },
@@ -52,7 +54,7 @@ export function CompareChart({ data }: { data: CompareData }) {
     data.views.find((v) => v.game === game && v.resolution === shownResolution) ?? initial
 
   return (
-    <figure ref={chart} className="hm-cmp__chart" data-shown={shown}>
+    <figure ref={chart} className="hm-cmp__chart">
       <div className="hm-cmp__controls">
         <div className="hm-cmp__games" role="group" aria-label="Gra do porównania">
           {games.map(([slug, name]) => (
@@ -78,7 +80,7 @@ export function CompareChart({ data }: { data: CompareData }) {
           onChange={setResolution}
         />
       </div>
-      <ul aria-live="polite">
+      <ul>
         {view.cards.map((card) => (
           <li key={card.slug} style={{ ['--c' as string]: `var(--c-${card.slug})` }}>
             <span className="hm-cmp__stage" aria-hidden="true">
@@ -102,7 +104,8 @@ export function CompareChart({ data }: { data: CompareData }) {
           </li>
         ))}
       </ul>
-      <figcaption>
+      {/* Read out after a switch: which game, monitor and setting the bars now show. */}
+      <figcaption aria-live="polite">
         {view.gameName}, {RESOLUTION_LABELS[view.resolution]}, {view.setting}. Każda kolejna istota
         daje co najmniej 15% więcej klatek od poprzedniej.
       </figcaption>

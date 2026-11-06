@@ -784,7 +784,6 @@
   border-radius: 3px 3px 0 0;
   background: linear-gradient(180deg, var(--c), color-mix(in srgb, var(--c) 22%, transparent));
   box-shadow: 0 0 28px color-mix(in srgb, var(--c) 55%, transparent);
-  transform: scaleY(0);
   transform-origin: 50% 100%;
   transition:
     transform 1s cubic-bezier(0.2, 0.7, 0.2, 1),
@@ -796,8 +795,8 @@
 .hm-cmp__chart li:nth-child(3) .hm-cmp__bar s {
   transition-delay: 0.24s, 0s;
 }
-.hm-cmp__chart[data-shown='true'] .hm-cmp__bar s {
-  transform: scaleY(1);
+.hm-cmp__chart[data-shown='false'] .hm-cmp__bar s {
+  transform: scaleY(0);
 }
 .hm-cmp__chart b {
   margin-top: 10px;
@@ -1272,6 +1271,10 @@
   .hm-par__cards,
   .hm-par__how ol {
     grid-template-columns: 1fr;
+  }
+  /* Touch targets ≥ 44 px (the register and directions links stand close together). */
+  .hm-par__cards .hm-par__links .lnk {
+    min-height: 44px;
   }
   .hm-par .hm-cta .btn {
     width: 100%;
