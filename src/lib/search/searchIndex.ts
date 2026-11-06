@@ -104,8 +104,14 @@ export function buildSearchIndex(input: {
     games: input.games.map((g) => ({
       slug: g.slug,
       name: g.name,
-      smooth: byPrice
-        .filter((b) => (fpsFor(input.table, b.slug, g.slug, 'fullhd')?.fps ?? 0) >= SMOOTH_FPS)
+      // As „Dobór pod grę” (`pickThree`): priced builds only, by price then power.
+      smooth: input.hero.builds
+        .filter(
+          (b) =>
+            b.price !== null &&
+            (fpsFor(input.table, b.slug, g.slug, 'fullhd')?.fps ?? 0) >= SMOOTH_FPS,
+        )
+        .sort((a, b) => a.price! - b.price! || a.tier - b.tier)
         .slice(0, 5)
         .map((b) => b.slug),
     })),

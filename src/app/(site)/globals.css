@@ -522,9 +522,10 @@ body:has([data-scene-top]) .nav[data-top='true'] {
     border-color 0.2s,
     color 0.2s;
 }
-/* The header's search: up to 1399 px only — from 1400 the side rail has it (NAWIGACJA §5). */
+/* The header's search: hidden where the side rail (≥ 1400 px) has it — but not on pages without
+   the rail (/konto, /metryka), where the magnifier stays the way in (NAWIGACJA §5). */
 @media (min-width: 1400px) {
-  .nav__search {
+  .nav__search:not(.nav__search--always) {
     display: none;
   }
 }

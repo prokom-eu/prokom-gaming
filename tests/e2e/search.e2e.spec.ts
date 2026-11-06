@@ -28,7 +28,8 @@ test.describe('desktop', () => {
     await expect(dialog(page).getByRole('option').first()).toContainText('Fortnite')
     await expect(dialog(page).getByText('Zestawy pod Fortnite')).toBeVisible()
     await page.keyboard.press('Enter')
-    await expect(page).toHaveURL(/\/komputer-do\/fortnite$/)
+    // `next dev` compiles the game page on its first visit: give the navigation time.
+    await expect(page).toHaveURL(/\/komputer-do\/fortnite$/, { timeout: 30_000 })
     await expect(dialog(page)).toHaveCount(0)
   })
 
@@ -92,6 +93,15 @@ test.describe('desktop', () => {
     await expect(dialog(page)).toBeVisible()
     await field(page).fill('kikimra')
     await expect(dialog(page).getByRole('option').first()).toContainText('Kikimora')
+  })
+
+  test('1440 px without the rail (account pages): the magnifier stays in the header', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 900 })
+    await page.goto('/konto/logowanie')
+    await expect(page.getByRole('navigation', { name: 'Sekcje strony' })).toHaveCount(0)
+    await expect(page.getByRole('banner').getByRole('button', { name: 'Szukaj' })).toBeVisible()
   })
 
   test('the open dialog passes axe', async ({ page }) => {

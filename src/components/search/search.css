@@ -177,6 +177,9 @@
     max-height: none;
     border-radius: 0;
     border: 0;
+    /* The page uses viewport-fit=cover: keep the field clear of the notch and the home bar. */
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
   }
   .sd__opt {
     grid-template-columns: auto minmax(0, 1fr);

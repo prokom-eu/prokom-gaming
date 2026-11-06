@@ -8,6 +8,7 @@ import { headerLinks, isCurrent, routes } from '@/lib/nav'
 import { NAV_SCROLL_START, navScrollAt, navScrollState } from '@/lib/navScroll'
 import { plural } from '@/lib/pl'
 
+import { railHidden } from './rail/railConfig'
 import { IconArrow, IconBars, IconClock, IconSearch, IconUser } from './icons'
 import { Logo } from './Logo'
 import { useShell } from './shell/ShellProvider'
@@ -83,7 +84,14 @@ export function SiteHeader({ hours }: { hours: string }) {
         </span>
       </Link>
       {/* Search up to 1399 px; from 1400 the side rail has it (NAWIGACJA §5). */}
-      <button type="button" className="ico nav__search" onClick={openSearch} aria-label="Szukaj">
+      <button
+        type="button"
+        // Pages without the rail keep the magnifier on wide screens too (known from the path, so
+        // the server HTML is already right — no jump when the rail loads).
+        className={railHidden(pathname) ? 'ico nav__search nav__search--always' : 'ico nav__search'}
+        onClick={openSearch}
+        aria-label="Szukaj"
+      >
         <IconSearch size={18} />
       </button>
       <Link className="ico" href={routes.compare} aria-label={compareLabel}>
