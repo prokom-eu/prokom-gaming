@@ -20,3 +20,8 @@ Strona działa na produkcji od 03.11.2026. Audyt działającej strony i przeglą
 - ok. 8,25 wieczoru pracy (bez generowania grafik i bez prawnika).
 - Nowy plik danych z boxami obudów — przy każdym nowym zdjęciu obudowy trzeba uruchomić skrypt (opis w README wzorca i w imporcie opcji).
 - Teksty „Wyróżnik” są edytowalne w panelu; przy zmianie części zestawu trzeba je przejrzeć (dopisek do edytora zestawu w panelu — przypomnienie przy zmianie przepisu).
+
+## Aktualizacja 06.11.2026 (sesja A, decyzje Krystiana)
+- **Boxy obudów zamiast pliku danych i skryptu:** pole `media.box` (ułamki pliku) liczone hakiem `beforeChange` przy wgraniu lub podmianie zdjęcia w panelu (`src/collections/caseBoxHook.ts`), dla istniejących plików — migracja `20261105_225049_media_case_box`. Skryptu `scripts/media/case-boxes.mjs` nie ma; punkt „trzeba uruchomić skrypt” z „Konsekwencji” jest nieaktualny.
+- **Sesja A w jednym PR** (R3 + R5 razem, wyjątek od pkt 7 i od podziału A1/A2).
+- **Sceny kodem (runda v2 §3.2) przesunięte z R3 do R4** — robione razem z nowymi grafikami, żeby nie stroić dwa razy.

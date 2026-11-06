@@ -3,6 +3,7 @@
  * hero's client component gets — public labels, sell prices and FPS numbers, never a cost or an
  * internal model (ADR-G002 §8.7). `lib/home.server.ts` reads the database and calls `buildHero()`.
  */
+import type { CasePhoto } from './caseBox'
 import {
   barPercent,
   fpsFor,
@@ -93,7 +94,7 @@ export type HeroBuild = {
   disk: string | null
   /** Sell price from the newest published batch; `null` when it has none. */
   price: number | null
-  photo: { src: string; alt: string } | null
+  photo: CasePhoto | null
   /** FPS on the card, in the order of `HERO_GAMES`, at the level's resolution. */
   fps: (HeroFps | null)[]
   material: Material
@@ -152,7 +153,7 @@ export type HeroLevelInput = {
 export type HeroOptionInput = {
   code: string
   publicLabel: string
-  photo: { src: string; alt: string } | null
+  photo: CasePhoto | null
 }
 
 export function buildHero(input: {
@@ -396,7 +397,7 @@ export type CompareCard = {
   name: string
   tierRoman: string
   tierLabel: string
-  photo: { src: string; alt: string } | null
+  photo: CasePhoto | null
   fps: number
   kind: FpsKind
   /** Bar height in % of the best of the three. */

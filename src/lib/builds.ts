@@ -3,6 +3,7 @@
  * prices and stored FPS only (ADR-G002 §8.7). `lib/offer.server.ts` reads the database;
  * `buildCards()` shapes the cards, the rest are the filter rules and their URL form.
  */
+import type { CasePhoto } from './caseBox'
 import { RESOLUTION_LABELS, type FpsKind, type Resolution } from './fps'
 import { bestiaryOrder, HERO_GAMES, TIER_HINTS, type HeroData } from './home'
 import { plural } from './pl'
@@ -76,7 +77,7 @@ export type BuildCard = {
   fpsLabel: string
   fps: { fps: number; kind: FpsKind } | null
   price: number | null
-  photo: { src: string; alt: string } | null
+  photo: CasePhoto | null
   facets: BuildFacets
 }
 

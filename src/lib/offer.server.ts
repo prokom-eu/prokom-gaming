@@ -3,6 +3,7 @@ import 'server-only'
 import config from '@payload-config'
 import { getPayload } from 'payload'
 
+import { casePhotoOf } from './caseBox'
 import type { CardExtras } from './builds'
 import { loadFpsTable } from './fps.server'
 import { buildHero, type HeroData, type HeroLevelInput } from './home'
@@ -84,7 +85,9 @@ export async function loadOffer(payload: Payload): Promise<OfferData> {
       collection: 'options',
       select: { code: true, publicLabel: true, image: true },
       // `url` is computed from `filename`, so both are selected.
-      populate: { media: { url: true, filename: true, alt: true } },
+      populate: {
+        media: { url: true, filename: true, alt: true, width: true, height: true, box: true },
+      },
       overrideAccess: false,
       depth: 1,
       pagination: false,
@@ -166,7 +169,7 @@ export async function loadOffer(payload: Payload): Promise<OfferData> {
       return {
         code: o.code,
         publicLabel: o.publicLabel,
-        photo: image?.url ? { src: image.url, alt: image.alt } : null,
+        photo: casePhotoOf(image),
       }
     }),
     snapshot,

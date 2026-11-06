@@ -12,6 +12,7 @@ import {
   type MouseEvent,
 } from 'react'
 
+import { CasePhoto } from '@/components/CasePhoto'
 import { IconClock, IconRosette, IconShield, IconShop } from '@/components/icons'
 import { ButtonLink } from '@/components/ui/Button'
 import { HERO_DEFAULT, HERO_INTERVAL_MS, rotationOf, type HeroData } from '@/lib/home'
@@ -223,14 +224,12 @@ export function Hero({ data }: { data: HeroData }) {
                 // Own colour: while fading out, the previous creature's photo keeps its own glow.
                 style={{ ['--c' as string]: `var(--c-${b.slug})` }}
               >
-                <Image
-                  src={b.photo.src}
+                <CasePhoto
+                  photo={b.photo}
                   alt={b.photo.alt}
-                  fill
                   sizes="(max-width: 1023px) 80vw, 36vw"
-                  loading={slug === first ? 'eager' : 'lazy'}
                   // The photo is the LCP element on a phone (Lighthouse, G7); the scene is backdrop.
-                  fetchPriority={slug === first ? 'high' : undefined}
+                  priority={slug === first}
                 />
               </div>
             )
