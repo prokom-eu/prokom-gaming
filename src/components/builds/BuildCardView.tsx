@@ -31,7 +31,8 @@ export function BuildCardView({ card, eager = false }: { card: BuildCard; eager?
         {card.photo && (
           <span className="bl-card__photo">
             {/* The file is drawn at most ~190 px wide (~110 px on a phone). */}
-            <CasePhoto photo={card.photo} drawnWidth={190} eager={eager} />
+            {/* Lazy, as before: the scene above is the LCP element, the photo must not compete. */}
+            <CasePhoto photo={card.photo} drawnWidth={190} />
           </span>
         )}
       </span>
