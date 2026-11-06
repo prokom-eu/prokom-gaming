@@ -14,7 +14,7 @@ const MAILPIT =
 
 const PAGES = [
   { path: '/pytania', h1: 'Pytania i odpowiedzi' },
-  { path: '/kontakt', h1: 'Napisz, zadzwoń albo wpadnij do sklepu' },
+  { path: '/kontakt', h1: 'Porozmawiajmy o Twoim komputerze' },
   { path: '/dla-rodzicow', h1: 'Komputer dla dziecka bez stresu i bez żargonu' },
   { path: '/o-nas', h1: 'Składamy komputery w Rabce-Zdroju od 2004 roku' },
   { path: '/regulamin', h1: 'Regulamin i zwroty' },
@@ -87,7 +87,7 @@ async function subjectsTo(request: APIRequestContext, address: string): Promise<
   return ((await res.json()) as { messages: { Subject: string }[] }).messages.map((m) => m.Subject)
 }
 
-test('/kontakt: „Krótkie pytanie?” → board messages, then a contact record, number, 2 e-mails', async ({
+test('/kontakt: „Pytanie, które nie jest wyceną?” → board messages, then a contact record, number, 2 e-mails', async ({
   page,
   request,
 }, testInfo) => {
