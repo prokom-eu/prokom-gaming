@@ -426,10 +426,20 @@
   .pr-cta .btn {
     width: 100%;
   }
-  /* Touch targets ≥ 44 px for the register and directions links. */
+  /* Touch targets ≥ 44 px with the underline kept at the text: a larger, invisible hit area. */
   .pr-links .lnk,
   .pr-q__card > .lnk,
   .pr-bands__picks .lnk {
-    min-height: 44px;
+    position: relative;
+  }
+  .pr-links .lnk::after,
+  .pr-q__card > .lnk::after,
+  .pr-bands__picks .lnk::after {
+    content: '';
+    position: absolute;
+    inset: -12px -4px;
+  }
+  .pr-proof .pr-links {
+    gap: 14px 16px;
   }
 }
