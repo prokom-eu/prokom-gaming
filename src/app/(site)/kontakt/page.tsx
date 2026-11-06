@@ -18,8 +18,7 @@ import '@/components/inquiry/inquiry.css'
 
 export const metadata: Metadata = {
   title: 'Kontakt',
-  description:
-    'Zapytanie o komputer, telefon i e-mail PRO-KOM Gaming. Sklep w Rabce-Zdroju, ul. Orkana 16B. Odpisujemy codziennie od 8 do 22.',
+  description: `Zapytanie o komputer, telefon i e-mail PRO-KOM Gaming. Sklep w Rabce-Zdroju, ${company.postal.street}. Odpisujemy codziennie od 8 do 22.`,
   alternates: { canonical: routes.contact },
 }
 
@@ -171,7 +170,7 @@ export default async function ContactPage() {
               Pytanie, które nie jest wyceną?
             </h2>
             <p className="ct-p">
-              Jeśli nie chodzi o wycenę, napisz tutaj. Na wycenę lepiej wysłać{' '}
+              Napisz tutaj. Na wycenę lepiej wysłać{' '}
               <Link href={routes.inquiry}>zapytanie o komputer</Link>.
             </p>
             <ContactForm token={token} />
@@ -239,10 +238,11 @@ export default async function ContactPage() {
           </dl>
           <p className="ct-firm__links">
             <a className="lnk ct-gold" href={registers.ceidg} {...external}>
-              Sprawdź w CEIDG
+              Sprawdź w CEIDG<span className="sr-only"> (otwiera się w nowej karcie)</span>
             </a>
             <a className="lnk ct-gold" href={registers.vatList} {...external}>
               Sprawdź na białej liście VAT
+              <span className="sr-only"> (otwiera się w nowej karcie)</span>
             </a>
           </p>
         </div>

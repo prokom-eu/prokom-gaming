@@ -634,10 +634,19 @@
   .ct-firm dl {
     grid-template-columns: 1fr;
   }
-  .ct-firm__links .lnk,
+  /* Touch targets ≥ 44 px without moving the underline away from the text: a larger, invisible
+     hit area around the link. */
+  .ct-firm .lnk,
   .ct-owner__actions .lnk,
   .ct-store__go {
-    min-height: 44px;
+    position: relative;
+  }
+  .ct-firm .lnk::after,
+  .ct-owner__actions .lnk::after,
+  .ct-store__go::after {
+    content: '';
+    position: absolute;
+    inset: -12px -4px;
   }
 }
 
