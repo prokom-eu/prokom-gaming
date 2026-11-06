@@ -1,0 +1,432 @@
+/* „Dla rodziców” (runda v2 §5): the light version of the brand — bone, gold, night only as an
+   accent (the closing call). Lots of air, line icons in a seal-like ring, no gaming ornaments.
+   Colours only from tokens.css (ADR-G003). */
+
+.pr-hero,
+.pr-sec {
+  color: var(--par-ink);
+  background: var(--par-bg);
+}
+.pr-sec--paper {
+  background: var(--par-steps-bg);
+}
+.pr-hero {
+  position: relative;
+  padding: 160px 0 100px;
+  background:
+    radial-gradient(80% 90% at 0 0, var(--par-hero-light), transparent 60%),
+    radial-gradient(70% 80% at 100% 100%, var(--par-hero-shade), transparent 70%), var(--par-bg);
+}
+.pr-hero__grid {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: 70px;
+  align-items: center;
+}
+.pr-kicker {
+  margin: 0 0 14px;
+  font-family: var(--font-name);
+  font-size: 13px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--par-logo-sub);
+}
+.pr-hero h1 {
+  margin: 0;
+  font-size: 66px;
+  line-height: 1.05;
+  color: var(--par-head);
+}
+.pr-lead {
+  max-width: 620px;
+  margin: 22px 0 0;
+  font-size: 18.5px;
+  line-height: 1.65;
+  color: var(--par-text);
+}
+.pr-lead--small {
+  font-size: 16.5px;
+}
+.pr-cta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  margin-top: 32px;
+}
+.pr-cta--center {
+  justify-content: center;
+}
+.pr-btn-dark.btn,
+.pr-btn-dark.btn:hover {
+  background: var(--par-btn);
+  color: var(--par-btn-text);
+  box-shadow: none;
+}
+.pr-btn-line.btn,
+.pr-btn-line.btn:hover {
+  gap: 8px;
+  background: transparent;
+  color: var(--par-head);
+  border: 1.5px solid var(--par-line);
+  box-shadow: none;
+}
+.pr-btn-line.btn:hover {
+  border-color: var(--par-rule);
+}
+/* Three facts at a glance: big numbers on a paper card. */
+.pr-facts {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.pr-facts li {
+  display: grid;
+  grid-template-columns: 132px 1fr;
+  align-items: baseline;
+  gap: 16px;
+  padding: 22px 26px;
+  border: 1px solid var(--par-card-line);
+  border-left: 3px solid var(--par-rule);
+  border-radius: 4px;
+  background: var(--par-card);
+  box-shadow: 0 24px 48px -32px var(--par-card-shadow);
+}
+.pr-facts b {
+  font-family: var(--font-name);
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--par-head);
+}
+.pr-facts span {
+  font-size: 15.5px;
+  color: var(--par-text);
+}
+
+.pr-sec {
+  padding: 110px 0;
+}
+.pr-sec h2.h {
+  margin: 0;
+  font-size: 48px;
+  color: var(--par-head);
+}
+.pr-sec h3 {
+  margin: 14px 0 0;
+  font-size: 19px;
+  font-weight: 800;
+  line-height: 1.3;
+  color: var(--par-head);
+}
+.pr-sec p {
+  margin: 8px 0 0;
+  font-size: 15.5px;
+  line-height: 1.6;
+  color: var(--par-text);
+}
+.pr-sec .lnk,
+.pr-final .pr-note .lnk {
+  color: var(--par-head);
+  border-color: var(--par-line);
+}
+.pr-ico {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 1px solid var(--par-rule);
+  box-shadow: inset 0 0 0 4px var(--par-card);
+  color: var(--par-head);
+  background: var(--par-ico-bg);
+}
+
+/* The four questions: the price card spans the first row. */
+.pr-q {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin-top: 40px;
+}
+.pr-q__card {
+  display: flex;
+  flex-direction: column;
+  padding: 26px 28px;
+  border: 1px solid var(--par-card-line);
+  border-top: 2px solid var(--par-rule);
+  border-radius: 4px;
+  background: var(--par-card);
+}
+.pr-q__card h3 {
+  margin: 0;
+  font-family: var(--font-head);
+  font-size: 26px;
+  font-weight: 500;
+}
+.pr-q__card > .lnk {
+  align-self: flex-start;
+  margin-top: auto;
+  padding-top: 12px;
+  font-size: 14.5px;
+}
+.pr-q__card--wide {
+  grid-column: 1 / -1;
+}
+.pr-bands {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.pr-bands li {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 18px 20px;
+  border: 1px solid var(--par-card-line);
+  border-radius: 4px;
+  background: var(--par-bg);
+}
+.pr-bands__what {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--par-text);
+}
+.pr-bands__price {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--par-head);
+}
+.pr-bands__picks {
+  font-size: 15px;
+  color: var(--par-text);
+}
+.pr-bands__picks .lnk {
+  font-size: 15px;
+}
+.pr-sec .pr-note,
+.pr-final .pr-note {
+  margin-top: 16px;
+  font-size: 14px;
+  color: var(--par-text);
+}
+
+/* Proof cards. */
+.pr-proof {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  margin: 40px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.pr-proof li {
+  display: flex;
+  flex-direction: column;
+  padding: 26px 24px;
+  border: 1px solid var(--par-card-line);
+  border-radius: 4px;
+  background: var(--par-card);
+  box-shadow: 0 24px 48px -36px var(--par-card-shadow);
+}
+.pr-proof .pr-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin-top: auto;
+  padding-top: 14px;
+  font-size: 14.5px;
+  font-weight: 700;
+}
+
+/* Buying in four steps, on a line. */
+.pr-steps {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 28px;
+  margin: 46px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.pr-steps::before {
+  content: '';
+  position: absolute;
+  left: 23px;
+  right: 23px;
+  top: 23px;
+  height: 1px;
+  background: linear-gradient(90deg, var(--par-rule), var(--par-card-line));
+}
+.pr-steps li {
+  position: relative;
+}
+.pr-steps .pr-ico {
+  position: relative;
+  background: var(--par-bg);
+}
+
+/* Glossary. */
+.pr-words {
+  display: grid;
+  grid-template-columns: 0.8fr 1.4fr;
+  gap: 70px;
+}
+.pr-words dl {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px 40px;
+  margin: 0;
+}
+.pr-words dt {
+  padding-top: 14px;
+  border-top: 2px solid var(--par-rule);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--par-head);
+}
+.pr-words dd {
+  margin: 8px 0 0;
+  font-size: 15.5px;
+  line-height: 1.6;
+  color: var(--par-text);
+}
+
+/* Questions on paper: the shared accordion with light colours. */
+.pr-faq {
+  display: grid;
+  grid-template-columns: 0.8fr 1.4fr;
+  gap: 70px;
+}
+.pr-qa.ct-qa {
+  border-color: var(--par-card-line);
+}
+.pr-qa summary {
+  color: var(--par-head);
+}
+.pr-qa summary i::before,
+.pr-qa summary i::after {
+  background: var(--par-rule);
+}
+.pr-qa summary:focus-visible {
+  outline-color: var(--par-head);
+}
+.pr-qa p {
+  color: var(--par-text);
+}
+
+/* The closing call: night as the one dark accent of the page. */
+.pr-final {
+  padding: 110px 0;
+  text-align: center;
+  background: radial-gradient(60% 80% at 50% 0%, var(--fin-glow), transparent 70%), var(--smola);
+}
+.pr-final__in {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.pr-final h2.h {
+  margin: 0;
+  font-size: 58px;
+  color: var(--kosc);
+}
+.pr-final .pr-lead {
+  max-width: 680px;
+  color: var(--sec-text);
+}
+.pr-final .pr-btn-dark.btn {
+  background: var(--gold-grad);
+  color: var(--on-grom);
+}
+.pr-final .pr-btn-line.btn {
+  color: var(--kosc);
+  border-color: var(--line);
+}
+.pr-final .pr-btn-line.btn:hover {
+  border-color: var(--grom);
+}
+.pr-final .pr-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--mgla);
+}
+.pr-final .pr-note .lnk {
+  color: var(--kosc);
+  border-color: var(--line);
+}
+
+@media (max-width: 1000px) {
+  .pr-hero {
+    padding: 120px 0 64px;
+  }
+  .pr-hero__grid,
+  .pr-words,
+  .pr-faq {
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+  .pr-hero h1 {
+    font-size: 42px;
+  }
+  .pr-sec,
+  .pr-final {
+    padding: 72px 0;
+  }
+  .pr-sec h2.h,
+  .pr-final h2.h {
+    font-size: 36px;
+  }
+  .pr-q,
+  .pr-bands,
+  .pr-proof {
+    grid-template-columns: 1fr;
+  }
+  .pr-steps {
+    grid-template-columns: 1fr;
+    gap: 22px;
+  }
+  .pr-steps::before {
+    left: 23px;
+    right: auto;
+    top: 23px;
+    bottom: 23px;
+    width: 1px;
+    height: auto;
+    background: linear-gradient(180deg, var(--par-rule), var(--par-card-line));
+  }
+  .pr-steps li {
+    padding-left: 64px;
+  }
+  .pr-steps .pr-ico {
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
+  .pr-steps h3 {
+    margin-top: 10px;
+  }
+  .pr-words dl {
+    grid-template-columns: 1fr;
+  }
+  .pr-facts li {
+    grid-template-columns: 110px 1fr;
+    padding: 18px 20px;
+  }
+}
+@media (max-width: 640px) {
+  .pr-cta .btn {
+    width: 100%;
+  }
+  /* Touch targets ≥ 44 px for the register and directions links. */
+  .pr-links .lnk,
+  .pr-q__card > .lnk {
+    min-height: 44px;
+  }
+}
