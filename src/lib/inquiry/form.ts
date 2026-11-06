@@ -231,7 +231,7 @@ export function initialState(params: URLSearchParams, data: Pick<FormData, 'buil
  * them the form returns to the saved draft.
  */
 export function hasComputer(params: URLSearchParams): boolean {
-  return ['k', 'z', 'zestaw', 'tryb'].some((key) => params.has(key))
+  return ['k', 'z', 'zestaw'].some((key) => params.has(key)) || params.get('tryb') === 'dobor'
 }
 
 /**

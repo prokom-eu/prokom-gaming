@@ -109,6 +109,22 @@ test('„Opisz, w co gra dziecko” opens the inquiry on „Pomóżcie mi dobra�
   )
 })
 
+test('the link keeps a computer saved earlier in the inquiry', async ({ page }) => {
+  // A build page's inquiry saves the computer (the counter in the shell)…
+  await page.goto('/zapytanie?zestaw=wampir')
+  await expect
+    .poll(() => page.evaluate(() => localStorage.getItem('pkg:inquiry')))
+    .toContain('zestaw=wampir')
+  // …and „Opisz, w co gra dziecko” must not wipe it.
+  await page.goto('/zapytanie?tryb=dobor&dla=dziecko')
+  await expect(page.getByRole('button', { name: 'Pomóżcie mi dobrać' })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  )
+  await page.waitForTimeout(500)
+  expect(await page.evaluate(() => localStorage.getItem('pkg:inquiry'))).toContain('zestaw=wampir')
+})
+
 test('no page-wide sideways scroll on a phone', async ({ page, isMobile }) => {
   test.skip(!isMobile, 'phone layout')
   await page.goto('/dla-rodzicow')

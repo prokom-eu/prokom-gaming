@@ -93,8 +93,13 @@ export function InquiryForm({
 
   // The picked computer feeds the counter in the shell (and a return visit).
   const draft = JSON.stringify(draftOf(state))
+  // Opened as „Pomóżcie mi dobrać” from a link („Dla rodziców”): a computer saved earlier stays
+  // saved until the visitor picks one here — the link alone must not wipe it.
+  const keepSaved = useRef(fromLink && initial.mode === 'advice')
   useEffect(() => {
     if (restoring.current) return
+    if (keepSaved.current && draft === '[]') return
+    keepSaved.current = false
     if (readItem(storageKeys.inquiry) !== draft && writeItem(storageKeys.inquiry, draft)) {
       notifyStorage()
     }

@@ -81,7 +81,7 @@ export function BeforeShipping({
   inWorkshop?: number
 }) {
   return (
-    <section className="hm-sec hm-proc" aria-labelledby="proc-title">
+    <section className="hm-sec hm-proc" id="metryka" aria-labelledby="proc-title">
       <div className="wrap hm-proc__grid">
         <div>
           <h2 id="proc-title" className="h">

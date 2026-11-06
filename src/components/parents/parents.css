@@ -174,6 +174,8 @@
 }
 .pr-q__card--wide {
   grid-column: 1 / -1;
+  /* About the height with prices, so the streamed card does not push the page. */
+  min-height: 300px;
 }
 .pr-bands {
   display: grid;
@@ -426,7 +428,8 @@
   }
   /* Touch targets ≥ 44 px for the register and directions links. */
   .pr-links .lnk,
-  .pr-q__card > .lnk {
+  .pr-q__card > .lnk,
+  .pr-bands__picks .lnk {
     min-height: 44px;
   }
 }

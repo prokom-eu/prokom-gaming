@@ -119,6 +119,7 @@ describe('initialState: entry from the address', () => {
   it('the computer parameters', () => {
     expect(hasComputer(new URLSearchParams('zestaw=wampir'))).toBe(true)
     expect(hasComputer(new URLSearchParams('tryb=dobor'))).toBe(true)
+    expect(hasComputer(new URLSearchParams('tryb=cos'))).toBe(false)
     expect(hasComputer(new URLSearchParams('swiatlo=lod&inne=x'))).toBe(false)
   })
 

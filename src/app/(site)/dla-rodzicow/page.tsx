@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { connection } from 'next/server'
+import { Suspense } from 'react'
 
 import { BreadcrumbJsonLd } from '@/components/BreadcrumbJsonLd'
 import {
@@ -121,18 +122,7 @@ const QUESTIONS = [
  * of a parent (prices from the published batch), proof the company is real, buying in four steps,
  * a glossary, questions and the closing call. No scene, no gaming ornaments.
  */
-export default async function ParentsPage() {
-  // Prices come from the database per request (as the other offer pages); without it the page
-  // still stands, only the price card says to ask.
-  await connection()
-  const hero: HeroData = await loadPublicOffer()
-    .then((offer) => offer.hero)
-    .catch((error: unknown) => {
-      log.error({ ...errorFields(error) }, 'parents page offer failed')
-      return EMPTY_HERO
-    })
-  const bands = budgetBands(hero.builds)
-
+export default function ParentsPage() {
   return (
     <>
       <BreadcrumbJsonLd crumbs={[{ name: 'Dla rodziców', path: routes.parents }]} />
@@ -192,48 +182,10 @@ export default async function ParentsPage() {
             Cztery pytania, które zadaje każdy rodzic
           </h2>
           <div className="pr-q">
-            <article className="pr-q__card pr-q__card--wide">
-              <h3>Ile trzeba wydać?</h3>
-              {bands.length > 0 ? (
-                <>
-                  <p>Zależy od gier i monitora. Najtańsze zestawy, które do nich wystarczą:</p>
-                  <ul className="pr-bands">
-                    {bands.map((band) => (
-                      <li key={band.title}>
-                        <span className="pr-bands__what">{band.title}</span>
-                        <b className="pr-bands__price">od {zl(band.from)}</b>
-                        <span className="pr-bands__picks">
-                          {band.picks.map((pick, i) => (
-                            <span key={pick.slug}>
-                              {i > 0 && ' albo '}
-                              <Link
-                                className="lnk nm"
-                                href={buildHref(pick.slug)}
-                                style={{ ['--c' as string]: `var(--c-${pick.slug})` }}
-                              >
-                                {pick.name}
-                              </Link>
-                            </span>
-                          ))}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                  <p className="pr-note">
-                    Ceny z montażem, Windows 11 i wysyłką
-                    {hero.pricedAt ? `, z ${dateText(hero.pricedAt)}` : ''}. Nie wiesz, którą grę
-                    wybrać?{' '}
-                    <Link className="lnk" href={routes.gamePicker}>
-                      Sprawdź konkretną grę
-                    </Link>
-                    .
-                  </p>
-                </>
-              ) : (
-                // TODO(krystian): text when prices are unavailable (not on the board).
-                <p>Napisz, w co gra dziecko, a w ofercie podamy dokładną cenę i termin.</p>
-              )}
-            </article>
+            {/* Prices stream in: the rest of the page is sent before the offer is read. */}
+            <Suspense fallback={<BudgetCardFallback />}>
+              <BudgetCard />
+            </Suspense>
             <article className="pr-q__card">
               <h3>Czy to nie za mocny komputer?</h3>
               <p>
@@ -402,12 +354,80 @@ export default async function ParentsPage() {
           </div>
           <p className="pr-note">
             <IconBook size={16} />{' '}
-            <Link className="lnk" href="/poradniki/rodzice">
+            <Link className="lnk" href={`${routes.guides}/rodzice`}>
               Przeczytaj poradnik dla rodziców
             </Link>
           </p>
         </div>
       </section>
     </>
+  )
+}
+
+/**
+ * „Ile trzeba wydać?” with the published prices (runda v2 §5 pt 2). Read per request; without the
+ * database the card says to ask instead of showing numbers.
+ */
+async function BudgetCard() {
+  await connection()
+  const hero: HeroData = await loadPublicOffer()
+    .then((offer) => offer.hero)
+    .catch((error: unknown) => {
+      log.error({ ...errorFields(error) }, 'parents page offer failed')
+      return EMPTY_HERO
+    })
+  const bands = budgetBands(hero.builds)
+  return (
+    <article className="pr-q__card pr-q__card--wide">
+      <h3>Ile trzeba wydać?</h3>
+      {bands.length > 0 ? (
+        <>
+          <p>Zależy od gier i monitora. Najtańsze zestawy, które do nich wystarczą:</p>
+          <ul className="pr-bands">
+            {bands.map((band) => (
+              <li key={band.title}>
+                <span className="pr-bands__what">{band.title}</span>
+                <b className="pr-bands__price">od {zl(band.from)}</b>
+                <span className="pr-bands__picks">
+                  {band.picks.map((pick, i) => (
+                    <span key={pick.slug}>
+                      {i > 0 && ' albo '}
+                      <Link
+                        className="lnk nm"
+                        href={buildHref(pick.slug)}
+                        style={{ ['--c' as string]: `var(--c-${pick.slug})` }}
+                      >
+                        {pick.name}
+                      </Link>
+                    </span>
+                  ))}
+                </span>
+              </li>
+            ))}
+          </ul>
+          <p className="pr-note">
+            Ceny z montażem, Windows 11 i wysyłką
+            {hero.pricedAt ? `, z ${dateText(hero.pricedAt)}` : ''}. Nie wiesz, którą grę wybrać?{' '}
+            <Link className="lnk" href={routes.gamePicker}>
+              Sprawdź konkretną grę
+            </Link>
+            .
+          </p>
+        </>
+      ) : (
+        // TODO(krystian): text when prices are unavailable (not on the board).
+        <p>Napisz, w co gra dziecko, a w ofercie podamy dokładną cenę i termin.</p>
+      )}
+    </article>
+  )
+}
+
+/** Same box while the prices load, so nothing jumps when they arrive. */
+function BudgetCardFallback() {
+  return (
+    <article className="pr-q__card pr-q__card--wide" aria-busy="true">
+      <h3>Ile trzeba wydać?</h3>
+      <p>Zależy od gier i monitora. Sprawdzamy aktualne ceny…</p>
+    </article>
   )
 }
