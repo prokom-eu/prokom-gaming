@@ -43,7 +43,17 @@ export const seedLevels: HeroLevelInput[] = seed.levels.map((l) => ({
 export const seedOptions: HeroOptionInput[] = seed.options.map((o) => ({
   code: o.code,
   publicLabel: o.publicLabel,
-  photo: o.image ? { src: `/api/media/file/${o.code}.webp`, alt: o.publicLabel } : null,
+  // Unit tests do not read the files: a typical case photo size, no box (the page then uses the
+  // whole file). The real size and box come from `media` (e2e and the site).
+  photo: o.image
+    ? {
+        src: `/api/media/file/${o.code}.webp`,
+        alt: o.publicLabel,
+        width: 787,
+        height: 900,
+        box: null,
+      }
+    : null,
 }))
 
 export const seedSnapshot = snapshotFromRows(

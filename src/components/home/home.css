@@ -112,10 +112,12 @@
 }
 
 /* ---------- hero: name over the scene ---------- */
+/* Runda v2 §3.1 (variant A, Krystian 06.11): the whole name above the computer — set higher and at
+   75% of the board's size, with the case's top kept ≥ 12 px under the letters (e2e `case-stage`). */
 .hero__title {
   position: absolute;
   z-index: 3;
-  top: calc(var(--u) * 100);
+  top: calc(var(--u) * 84);
   left: calc(50% - var(--u) * 660);
   width: calc(var(--u) * 1440);
   display: flex;
@@ -146,7 +148,6 @@
   display: flex;
   align-items: center;
   gap: calc(var(--u) * 16);
-  margin-top: calc(var(--u) * 2);
   font-family: var(--font-head);
   font-style: italic;
   font-size: max(20px, calc(var(--u) * 34));
@@ -175,9 +176,9 @@
 /* Material: shine band, a highlight line, grain, then the creature's gradient (board `.ttl-n`). */
 .hero__name {
   display: block;
-  margin-top: calc(var(--u) * 6);
+  margin-top: calc(var(--u) * 2);
   font-family: var(--font-name);
-  font-size: calc(var(--u) * var(--fs));
+  font-size: calc(var(--u) * var(--fs) * 0.75);
   font-weight: 700;
   line-height: 0.92;
   letter-spacing: 0.04em;
@@ -320,11 +321,12 @@
   filter: blur(14px);
 }
 .hero__photo {
+  /* The case's own height, its feet on the stand's top (`CasePhoto`). */
+  --case-h-max: calc(var(--u) * 430);
+  --case-w-max: calc(var(--u) * 500);
+  --case-base: calc(var(--u) * 14);
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: calc(var(--u) * -8);
-  height: calc(var(--u) * 490);
+  inset: 0;
   opacity: 0;
   visibility: hidden;
   transition:
@@ -348,8 +350,6 @@
   }
 }
 .hero__photo img {
-  object-fit: contain;
-  object-position: 50% 100%;
   filter: drop-shadow(0 0 28px color-mix(in srgb, var(--c) 40%, transparent));
   -webkit-box-reflect: below calc(var(--u) * -10)
     linear-gradient(transparent 74%, color-mix(in srgb, var(--white) 16%, transparent));
@@ -876,12 +876,14 @@
     inset: auto;
     width: 100%;
     height: min(86vw, 440px);
-    margin-top: -24px;
+    /* Tucked under the title, but the case stays ≥ 12 px below the name (runda v2 §3.1). */
+    margin-top: -10px;
     transform: none;
   }
   .hero__photo {
-    bottom: 6px;
-    height: min(80vw, 410px);
+    --case-h-max: min(74vw, 380px);
+    --case-w-max: 88vw;
+    --case-base: 14px;
   }
   .hero__halo {
     width: min(88vw, 460px);

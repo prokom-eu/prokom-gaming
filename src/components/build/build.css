@@ -48,10 +48,12 @@
 .bp-crumbs b {
   color: var(--kosc);
 }
+/* Runda v2 §3.1 (variant A, Krystian 06.11): the whole name above the computer — higher and at
+   72% of the board's size; the case's top stays ≥ 12 px under the letters (e2e `case-stage`). */
 .bp-title {
   position: absolute;
   z-index: 2;
-  top: 118px;
+  top: 108px;
   left: 0;
   right: 0;
   display: flex;
@@ -98,7 +100,7 @@
    by `data-material`, clipped to the letters. */
 .bp-title__name {
   margin: 6px 0 0;
-  font-size: calc(var(--fs) * 1px);
+  font-size: calc(var(--fs) * 0.72px);
   line-height: 0.9;
   letter-spacing: 0.02em;
   text-transform: uppercase;
@@ -136,14 +138,12 @@
   );
 }
 .bp-stage__photo {
+  /* The case's own height, its feet near the stage's bottom (`CasePhoto`). */
+  --case-h-max: 418px;
+  --case-w-max: 500px;
+  --case-base: 18px;
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 4px;
-  width: auto;
-  height: 486px;
-  margin: 0 auto;
-  object-fit: contain;
+  inset: 0;
 }
 .bp-k {
   display: block;
@@ -1321,7 +1321,9 @@
     margin-top: -10px;
   }
   .bp-stage__photo {
-    height: min(78vw, 380px);
+    --case-h-max: min(72vw, 352px);
+    --case-w-max: 88vw;
+    --case-base: 16px;
   }
   .bp-stage__halo {
     left: 50%;

@@ -1,0 +1,26 @@
+/* A case on its stand (`CasePhoto`). The parent sets where and how big:
+   --case-cx    centre of the stand (from the left edge)       default 50%
+   --case-base  height of the stand's top above the bottom     default 0
+   --case-h-max height of the case itself                       required
+   --case-w-max width cap for wide cases                        default: no cap
+   The component sets the box of the case in its file (--bx --by --bw --bh, fractions) and the
+   case's own aspect (--case-ar). The anchor is a zero-size point: centre of the stand, on its top. */
+.case {
+  --case-h: min(var(--case-h-max), var(--case-w-max, 100000px) / var(--case-ar));
+  position: absolute;
+  left: var(--case-cx, 50%);
+  bottom: var(--case-base, 0px);
+  width: 0;
+  height: 0;
+}
+.case__img {
+  position: absolute;
+  left: 0;
+  /* The whole file is drawn so that the case gets --case-h; its transparent margin below the
+     feet hangs under the anchor, and it is shifted so the case's centre sits on the anchor. */
+  bottom: calc(var(--case-h) / var(--bh) * (var(--by) + var(--bh) - 1));
+  width: auto;
+  max-width: none;
+  height: calc(var(--case-h) / var(--bh));
+  transform: translateX(calc(-100% * (var(--bx) + var(--bw) / 2)));
+}

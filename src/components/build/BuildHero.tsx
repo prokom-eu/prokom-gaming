@@ -1,7 +1,7 @@
-import Image from 'next/image'
 import Link from 'next/link'
 import type { CSSProperties } from 'react'
 
+import { CasePhoto } from '@/components/CasePhoto'
 import { IconArrow } from '@/components/icons'
 import { Scene } from '@/components/Scene'
 import { Sigil } from '@/components/Sigil'
@@ -54,16 +54,9 @@ export function BuildHero({ data }: { data: BuildPageData }) {
       <div className="bp-stage" aria-hidden="true">
         <span className="bp-stage__halo" />
         {build.photo && (
-          <Image
-            className="bp-stage__photo"
-            src={build.photo.src}
-            alt=""
-            width={444}
-            height={505}
-            sizes="(max-width: 1000px) 320px, 430px"
-            loading="eager"
-            fetchPriority="high"
-          />
+          <span className="bp-stage__photo">
+            <CasePhoto photo={build.photo} sizes="(max-width: 1000px) 320px, 430px" priority />
+          </span>
         )}
       </div>
 
