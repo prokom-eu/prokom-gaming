@@ -34,7 +34,8 @@ export function RailPanel({
   pathname: string
   creatures: readonly { slug: string; name: string }[]
 }) {
-  const { compareCount } = useShell()
+  const { compareCount, openSearch } = useShell()
+  const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform)
   const isHome = pathname === routes.home
   const names = useMemo(() => new Map(creatures.map((c) => [c.slug, c.name])), [creatures])
   const group = pageGroup(pathname, names)
@@ -150,11 +151,14 @@ export function RailPanel({
       onKeyDown={onKeyDown}
       onClickCapture={onClickCapture}
     >
-      {/* Until the search (GN-3) takes this place: the main call to action. */}
-      <Link className="rail__cta" href={routes.configurator}>
-        <RailSvg icon="dobierz" />
-        <span className="rail__lbl">Dobierz komputer</span>
-      </Link>
+      {/* Search at the top of the rail (NAWIGACJA §4.2 pt 1). */}
+      <button type="button" className="rail__cta" onClick={openSearch}>
+        <RailSvg icon="szukaj" />
+        <span className="rail__lbl">Szukaj zestawu lub gry</span>
+        <kbd className="rail__kbd rail__lbl" aria-hidden="true">
+          {isMac ? '⌘K' : 'Ctrl K'}
+        </kbd>
+      </button>
 
       <div className="rail__scroll">
         {group && groupSections.length > 0 && (
