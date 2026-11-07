@@ -7,6 +7,8 @@ import { MenuSheet } from '@/components/MenuSheet'
 import { MobileTabBar } from '@/components/MobileTabBar'
 import { ShellProvider } from '@/components/shell/ShellProvider'
 import { SiteFooter } from '@/components/SiteFooter'
+import { SiteRail } from '@/components/rail/SiteRail'
+import { SearchHost } from '@/components/search/SearchHost'
 import { SiteHeader } from '@/components/SiteHeader'
 import { analyticsScript, UMAMI_BEFORE_SEND, umamiBeforeSend } from '@/lib/analytics'
 import { getEnv } from '@/lib/env'
@@ -58,6 +60,8 @@ export default async function SiteLayout({ children }: { children: ReactNode }) 
         </a>
         <ShellProvider>
           <SiteHeader hours={hours} />
+          <SiteRail creatures={menuCreatures} />
+          <SearchHost />
           <main id="tresc">{children}</main>
           <SiteFooter features={flags} />
           <MobileTabBar />

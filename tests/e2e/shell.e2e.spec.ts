@@ -50,7 +50,9 @@ test.describe('desktop and tablet', () => {
     ]) {
       await expect(nav.getByRole('link', { name: label, exact: true })).toBeVisible()
     }
-    await expect(page.getByRole('link', { name: 'Dobierz komputer' })).toBeVisible()
+    await expect(
+      page.getByRole('banner').getByRole('link', { name: 'Dobierz komputer' }),
+    ).toBeVisible()
     await expect(page.getByRole('navigation', { name: 'Nawigacja główna' })).toBeHidden()
     await expect(page.getByRole('button', { name: 'Otwórz menu' })).toBeHidden()
   })
@@ -243,7 +245,9 @@ test.describe('counters from localStorage', () => {
       localStorage.setItem('pkg:inquiry', JSON.stringify([{ build: 'wampir' }]))
     })
     await page.reload()
-    await expect(page.getByRole('link', { name: 'Porównanie, 2 zestawy' })).toBeVisible()
+    await expect(
+      page.getByRole('banner').getByRole('link', { name: 'Porównanie, 2 zestawy' }),
+    ).toBeVisible()
     if (isPhone(testInfo.project.name)) {
       await expect(
         page
@@ -254,7 +258,9 @@ test.describe('counters from localStorage', () => {
 
     await page.evaluate(() => localStorage.setItem('pkg:compare', '{broken'))
     await page.reload()
-    await expect(page.getByRole('link', { name: 'Porównanie', exact: true })).toBeVisible()
+    await expect(
+      page.getByRole('banner').getByRole('link', { name: 'Porównanie', exact: true }),
+    ).toBeVisible()
   })
 })
 
