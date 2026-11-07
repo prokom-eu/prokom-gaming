@@ -1,6 +1,6 @@
 # STAN — prokom-gaming
 
-Ostatnia aktualizacja: 06.11.2026, ok. 4:15 (praca nocna bez Krystiana: A scalone w #79; B1 #80, B2 #81, C1 #82, C2 #83, D1 — osobne PR-y do przejrzenia rano).
+Ostatnia aktualizacja: 07.11.2026 (A scalone w #79, B1 w #80; D1 #84 scalone do gałęzi B2 — #81 zawiera teraz B2 + D1; C1 #82, C2 #83, GN-2b #85 otwarte).
 
 ## W toku
 - **Noc 05/06.11 — Krystian dał pełną zgodę na pracę według planu i rekomendacji Claude do 7:00, bez pytań; każdy etap = osobny PR do `develop` do przejrzenia rano.**
