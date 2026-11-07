@@ -7,7 +7,7 @@ import type { HomeQuestion } from '@/lib/home'
 export function HomeFaq({ questions }: { questions: HomeQuestion[] }) {
   if (questions.length === 0) return null
   return (
-    <section className="hm-sec hm-faq" aria-labelledby="faq-title">
+    <section className="hm-sec hm-faq" id="pytania" aria-labelledby="faq-title">
       <div className="wrap hm-faq__in">
         <h2 id="faq-title" className="h">
           Zanim zapytasz

@@ -1,7 +1,7 @@
 import type { ReactNode, SVGProps } from 'react'
 
 // Line icons from the boards (24×24, stroke = currentColor). Decorative: the parent carries the label.
-type IconProps = Omit<SVGProps<SVGSVGElement>, 'children'> & { size?: number }
+export type IconProps = Omit<SVGProps<SVGSVGElement>, 'children'> & { size?: number }
 
 function Icon({
   size = 22,

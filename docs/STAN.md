@@ -1,6 +1,6 @@
 # STAN — prokom-gaming
 
-Ostatnia aktualizacja: 06.11.2026, noc (praca nocna bez Krystiana: A scalone w #79; B1 #80, B2 #81, C1 #82, C2 — osobne PR-y do przejrzenia rano).
+Ostatnia aktualizacja: 07.11.2026 (A scalone w #79, B1 w #80; ta gałąź: C2 „Kontakt” #83).
 
 ## W toku
 - **Noc 05/06.11 — Krystian dał pełną zgodę na pracę według planu i rekomendacji Claude do 7:00, bez pytań; każdy etap = osobny PR do `develop`.** PR-y rano: **#80 B1** (sekcje głównej), **#81 B2** (szyna, baza `feat/b1-sekcje-glownej`), **#82 C1** („Dla rodziców”), **C2** (ta gałąź, „Kontakt”). Każda gałąź ma w STAN tylko swój wpis — przy scalaniu kolejnych PR-ów w `docs/STAN.md` zostaw wszystkie wpisy (konflikt tylko w tym pliku).
@@ -9,7 +9,14 @@ Ostatnia aktualizacja: 06.11.2026, noc (praca nocna bez Krystiana: A scalone w #
 - **Decyzje (rekomendacje Claude):** jeden wariant; wspólny komponent „dowodów firmy” z C1 nie wydzielony — C1 i C2 to osobne gałęzie od `develop`; do zrobienia po scaleniu obu (Pomysły na później).
 - **Otwarte `TODO(krystian)` (bez zmian):** numer telefonu Gaming i jego godziny [SZEF]; godziny otwarcia sklepu [SZEF] — do tego czasu tylko adres.
 - **Sprawdzone lokalnie:** lint, typecheck, 1000 testów, `format:check`; e2e `contact` (nowy), `content-pages`, `a11y` na 1440 i 414 — zielone. Zrzuty `tmp/zrzuty-przed/c2`, `tmp/zrzuty-po/c2` (1440, 1100, 414). Przegląd `recenzent` — poprawione (opis strony z danych firmy, cele dotyku bez przesuwania podkreślenia, „otwiera się w nowej karcie” dla czytników, e-mail w danych firmy).
-- **Następny krok:** Krystian rano: scalić #80 → #81 → #82 → C2 (każdy po zielonym CI), potem staging i telefon. Dalej sesja D (GN-3 wyszukiwarka, R9 przegląd) i GN-2b.
+- **Następny krok:** Krystian: scalić C2 (#83) po zielonym CI, potem staging i telefon. Dalej sesja D (GN-3 wyszukiwarka, R9 przegląd) i GN-2b.
+
+## Uwagi na później (B1, scalone w #80)
+- **Gałąź:** `feat/b1-sekcje-glownej` (od `origin/develop` po #79). Sesja B1 = R6 (`docs/zadania/gaming-runda-v2.md`, runda v2 §4.1–§4.4), id sekcji wg `NAWIGACJA.md` §4.2.
+- **Decyzje (rekomendacje Claude, w zastępstwie wyboru wariantów):** jeden wariant na sekcję, bez zrzutów wariantów; porównanie pod nowym tytułem „Ile klatek kupujesz za dopłatę?” (stały tytuł „Baba Jaga czy Wampir?” przestał pasować, bo trójka idzie z danych); w „W cenie” zostaje 10 pozycji z planszy (bez nowych obietnic, §4.3 wymienia 7 jako przykład); ikona koperty w karcie „Odpisuje człowiek” zamiast zdjęcia (bez zgód na zdjęcia osób).
+- **Zrobione:** reguła `pickCompareTrio` w `lib/home.ts` (w środku najtańsza istota do danego monitora, niżej najmocniejsza tańsza ≥ 15% słabsza, wyżej najtańsza droższa ≥ 15% mocniejsza; tylko te same ustawienia testu) — 3 gry × 3 rozdzielczości (9 widoków na seedzie, np. Cyberpunk 2K: Licho → Strzyga → Zmora); `CompareChart` (przełącznik bez przeładowania, „+X zł → +Y% klatek”, słupy rosną raz przy wejściu w widok, bez JS pełne, `prefers-reduced-motion` statycznie, komputer na postumencie przez `CasePhoto`); „Kupujesz komputer dla dziecka?” — 4 karty dowodów z ikonami, linki CEIDG i biała lista (`lib/site.ts` `registers`, wyszukiwarki — NIP trzeba wpisać), „Zadzwoń”, „Prowadź do sklepu” (zwykły link do map), pasek 3 kroków; „W cenie” — 10 kart z ikonami; „Napisz, w co grasz” — usunięty pusty dąb (`public/home/final-tree.svg`), 16 pieczęci w łuku na nocnym niebie z CSS, szybkie wejścia CS2/Fortnite/Minecraft; `id` 11 sekcji I–XI. `scroll-margin-top` niepotrzebny: od 761 px kotwice omija globalne `scroll-padding-top` z GN-1, na telefonie nagłówek jest w przepływie.
+- **Sprawdzone lokalnie:** lint, typecheck, 1003 testy, `format:check`, `build`; e2e `home-sections` (nowe: porównanie z przełącznikiem, dowody dla rodzica, karty „W cenie”, kotwice), `home`, `a11y`, `shell` na 1440 i 414 — zielone; Lighthouse mobile głównej (`next start`, 3 przebiegi) 88/88/89 (develop tego samego dnia 87–90). Zrzuty `tmp/zrzuty-po/b1`.
+- **Przegląd (`recenzent`, 06.11) — poprawione:** cele dotyku linków rejestrów i mapy ≥ 44 px na telefonie; słupy pełne bez JS (ukrywane dopiero po hydratacji, gdy wykres jest poniżej ekranu); `aria-live` tylko na podpisie wykresu. **Świadomie bez zmian:** godziny „8–22” na sztywno (jak w innych miejscach — „Pomysły na później”); slugi szybkich wejść do gier na sztywno (są w seedzie).
 
 ## Uwagi na później (A — R3 + R5, scalone w #79)
 - **Gałąź:** `feat/r3-r5-komputer-na-scenie` (od `origin/develop` po #77). Zadanie „A” = R3 (§3.1) + R5 (§3.3) z `docs/zadania/gaming-runda-v2.md`, `runda-v2/ZMIANY.md`; uwagi `01`, `02`.
@@ -18,15 +25,16 @@ Ostatnia aktualizacja: 06.11.2026, noc (praca nocna bez Krystiana: A scalone w #
 - **Pomiar (dev, 06.11):** odstęp liter od obudowy — przed: do −49 px (główna) i −78 px (karta); po: główna ≥ 17 px (1440), karta ≥ 23 px, telefon ≥ 20 px, tablet 800 ≥ 17 px (najciaśniej Żmij i Baba Jaga — ogonek J). Miniatury: środek obudowy − środek postumentu ≤ 0,4 px; wysokość obudowy wychodzi 69–70% sceny (1440), 62–68% (390) — górny margines 10–12 px nie pozwala na więcej (tak jak na szkicu „75%”). Obudowy w hero mają teraz równą wysokość (wcześniej plik z marginesem albo bez → 327–353 px; teraz 310 px przy 1440).
 - **Sprawdzone lokalnie:** lint, typecheck, 1000 testów (nowe: `caseBox.test.ts` — w tym każde z 24 zdjęć obudów w seedzie ma box, `caseBoxHook.test.ts`), `format:check`, `build`; e2e `case-stage` (nowy, 14 testów: 16 istot × 1920/1440/1280/1100/390 na głównej i kartach zestawów + miniatury 1440/390) i sąsiednie `home`, `home-sections`, `build-page`, `builds-list`, `game-pages`, `a11y` na 1440 i 414 (124 zielone). Lighthouse mobile (`next start`, ten sam komputer, mediana 3 przebiegów, develop → gałąź): `/zestawy` **90 → 88** (LCP 3,6 → 3,7 s — głównie wyższa scena kart, mniejsze zdjęcie dawało ≤ 1 pkt), Wampir 90 → 92, główna 87–90 / 87–90, konfigurator 92–93 / 92, dobór 88 / 88–89; dostępność i dobre praktyki 100. Zrzuty `tmp/zrzuty-przed/a`, `tmp/zrzuty-po/a`, warianty `tmp/warianty/a`, Lighthouse `tmp/lh/compare-a.txt`.
 - **Przegląd (`recenzent`, 06.11) — poprawione:** test, że każda obudowa z seeda ma box; hak czyści stary box, gdy podmienionego pliku nie da się odczytać; komentarz w `caseBoxMeasure.ts` (używa go migracja); hover karty rośnie od stóp obudowy; dopiski w ADR-G013 („Aktualizacja 06.11”) i w `gaming-runda-v2.md`. **Świadomie bez zmian:** `casePhotoOf` wymaga `width`/`height` (Payload zapisuje je zawsze dla obrazów); kadrowanie zdjęcia w panelu bez testu — sprawdza Krystian na stagingu.
-- **Następny krok:** PR → staging → Krystian: hero 16 istot na komputerze i prawdziwym telefonie, „Wszystkie zestawy” i „Szesnaście istot”, podmiana (i kadrowanie) zdjęcia obudowy w panelu — czy komputer stoi dobrze → produkcja (migracja uruchomi się sama przy starcie, mierzy pliki z wolumenu). Potem sesja **B** (`docs/zadania/gaming-runda-v2.md`).
 
 ## Uwagi na później (GN-1, wdrożone w #77)
 - **Decyzja Krystiana 05.11:** nagłówek przyklejony także na komputerze (chowa się w dół, wraca w górę, szkło 66 px od 80 px).
 - **Odstępstwo od spec §2.3 (pomiar):** poniżej 1440 odstępy 14 px i linki 12 px; „Odpowiadamy w godzinę” od 1400 px (spec: 1280); kapsuła od 1200, hamburger 761–1199. **Świadomie bez zmian:** linki kapsuły 36 px (axe bez uwag).
 - Pasek przewijania w Firefoksie — bez testu w Playwright (sprawdzany ręcznie).
 
-## Pomysły na później (R1–R2, GN-1, A, C2)
+## Pomysły na później (R1–R2, GN-1, A, C2, B1)
 - Po scaleniu C1 i C2: wspólny komponent „dowody firmy” (firma, NIP, rejestry, sklep) dla „Dla rodziców”, „Kontaktu” i sekcji rodzica na głównej.
+- Linki „Sprawdź w CEIDG / na białej liście” prowadzą do pustych wyszukiwarek — sprawdzić, czy da się podać NIP w adresie (np. biznes.gov.pl) i podmienić w `lib/site.ts` `registers`.
+- Szybkie wejścia do gier w „Napisz, w co grasz” mają slugi na sztywno — gdy gra zniknie z panelu, link da 404; ewentualnie brać 3 najpopularniejsze z `games`.
 - **Sceny kodem (runda v2 §3.2)** — warstwy, mgła, winieta, świetliki, gradacja: wydzielone z R3 (decyzja 06.11), zrobić razem z R4 (nowe grafiki), żeby nie stroić dwa razy.
 - Miniatury prawdziwie 75% wymagałyby sceny ~270 px (dziś 250) albo niższego postumentu w grafikach `*-card.webp` — przy R4.
 - `PickCard` (dobór pod grę) i konfigurator/konto pokazują zdjęcie obudowy po staremu (cały plik) — przy porządkach przejść na `CasePhoto`.

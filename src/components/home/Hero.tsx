@@ -132,7 +132,7 @@ export function Hero({ data }: { data: HeroData }) {
   // No offer to show (empty database or a failed read): the text, heading and buttons still stand.
   if (!build) {
     return (
-      <section className="hero hero--empty" data-scene-top>
+      <section className="hero hero--empty" id="start" data-scene-top>
         <div className="hero__frame">
           <HeroCopy />
         </div>
@@ -146,6 +146,7 @@ export function Hero({ data }: { data: HeroData }) {
     <section
       ref={section}
       className="hero"
+      id="start"
       data-scene-top
       data-material={build.material}
       style={

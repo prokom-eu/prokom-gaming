@@ -32,7 +32,7 @@ const PATHS = [
 
 export function StartPaths() {
   return (
-    <section className="hm-sec hm-paths" aria-labelledby="paths-title">
+    <section className="hm-sec hm-paths" id="od-czego-zaczynasz" aria-labelledby="paths-title">
       <div className="wrap">
         <div className="hm-head hm-head--center">
           <h2 id="paths-title" className="h">
