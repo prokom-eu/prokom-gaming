@@ -3,12 +3,13 @@ import { describe, expect, it } from 'vitest'
 import pricingExpected from '../../tests/fixtures/pricing-expected.json'
 import { fpsSeed } from '../seed/fps'
 import { seed } from '../seed/offer'
-import { buildFpsTable, fpsFor } from './fps'
+import { buildFpsTable, fpsFor, type Resolution } from './fps'
 import {
   bestiaryOrder,
   buildHero,
+  COMPARE_MIN_STEP,
+  compareStepText,
   compareTeaser,
-  gainText,
   dateText,
   gamesPanel,
   HERO_DEFAULT,
@@ -21,6 +22,8 @@ import {
   rotationOf,
   siblingsText,
   TIER_HINTS,
+  pickCompareTrio,
+  type HeroBuild,
   type PanelGame,
 } from './home'
 import { zl } from './pricing/format'
@@ -284,41 +287,92 @@ describe('home sections', () => {
     }
   })
 
-  it('compares Kikimora, Baba Jaga and Wampir in Cyberpunk 2077 at 2K', () => {
+  it('compares three creatures per game and resolution, Cyberpunk 2077 at 2K first', () => {
     const data = compareTeaser(fullHero, panelGames, fullTable)!
-    const stored = (slug: string) => fpsFor(fullTable, slug, 'cyberpunk-2077', 'qhd')!.fps
-    expect(data.game).toBe('Cyberpunk 2077')
-    expect(data.setting).toBeTruthy()
-    expect(data.cards.map((c) => c.name)).toEqual(['Kikimora', 'Baba Jaga', 'Wampir'])
-    expect(data.cards.map((c) => c.fps)).toEqual(['kikimora', 'baba-jaga', 'wampir'].map(stored))
-    expect(data.cards[0].gain).toBeNull()
-    const k = stored('kikimora')
-    expect(data.cards[2].gain).toBe(Math.round((stored('wampir') / k - 1) * 100))
-    expect(Math.max(...data.cards.map((c) => c.percent))).toBe(100)
+    expect(data.views.length).toBe(9)
+    const first = data.views[data.initial]
+    expect([first.game, first.resolution]).toEqual(['cyberpunk-2077', 'qhd'])
+    expect(first.gameName).toBe('Cyberpunk 2077')
+    expect(first.setting).toBeTruthy()
   })
 
-  it('shows no comparison when a creature has no number', () => {
-    const table = { ...fullTable }
-    for (const key of Object.keys(table))
-      if (key.startsWith('baba-jaga|cyberpunk-2077|qhd')) delete table[key]
-    expect(compareTeaser(fullHero, panelGames, table)).toBeNull()
+  it('every step up costs more and gives at least 15% more frames — never „+0%”', () => {
+    const data = compareTeaser(fullHero, panelGames, fullTable)!
+    for (const view of data.views) {
+      const label = `${view.game} ${view.resolution}`
+      expect(view.cards, label).toHaveLength(3)
+      expect(view.cards[0].step, label).toBeNull()
+      for (let i = 1; i < 3; i++) {
+        const [prev, card] = [view.cards[i - 1], view.cards[i]]
+        expect(card.fps / prev.fps, label).toBeGreaterThanOrEqual(COMPARE_MIN_STEP)
+        expect(card.step, label).toEqual({
+          price: card.price - prev.price,
+          gain: Math.round((card.fps / prev.fps - 1) * 100),
+        })
+        expect(card.step!.price, label).toBeGreaterThan(0)
+        expect(card.step!.gain, label).toBeGreaterThanOrEqual(15)
+      }
+      // The numbers are the stored ones (ADR-G004), the best bar is full.
+      for (const card of view.cards) {
+        expect(card.fps).toBe(fpsFor(fullTable, card.slug, view.game, view.resolution)!.fps)
+      }
+      expect(Math.max(...view.cards.map((c) => c.percent))).toBe(100)
+    }
   })
 
-  it('writes the gain with its sign, also when it is negative', () => {
-    expect(gainText(20)).toBe('+20% klatek')
-    expect(gainText(0)).toBe('+0% klatek')
-    expect(gainText(-5)).toBe('−5% klatek')
+  it('puts in the middle a creature made for that monitor', () => {
+    const data = compareTeaser(fullHero, panelGames, fullTable)!
+    const resolutionOf = new Map(fullHero.builds.map((b) => [b.slug, b.resolution]))
+    for (const view of data.views) {
+      expect(resolutionOf.get(view.cards[1].slug), `${view.game} ${view.resolution}`).toBe(
+        view.resolution,
+      )
+    }
+  })
+
+  it('picks the trio by the rule: strongest cheaper ≥15% below, cheapest pricier ≥15% above', () => {
+    const b = (slug: string, price: number, resolution: Resolution) =>
+      ({ ...fullHero.builds[0], slug, price, resolution }) as HeroBuild & { price: number }
+    const row = (slug: string, price: number, fps: number, resolution: Resolution = 'qhd') => ({
+      build: b(slug, price, resolution),
+      fps,
+      kind: 'm' as const,
+      setting: 'ultra',
+    })
+    const rows = [
+      row('a', 4000, 50, 'fullhd'),
+      row('b', 5000, 60, 'fullhd'),
+      row('c', 7000, 100),
+      row('d', 8000, 108),
+      row('e', 9000, 120, 'uhd'),
+      row('f', 9500, 130, 'uhd'),
+    ]
+    expect(pickCompareTrio(rows, 'qhd')!.map((r) => r.build.slug)).toEqual(['b', 'c', 'e'])
+    // Nothing 15% apart: no comparison rather than a „+0%” one.
+    expect(
+      pickCompareTrio([row('x', 1, 100), row('y', 2, 105), row('z', 3, 110)], 'qhd'),
+    ).toBeNull()
+  })
+
+  it('compares only results with the same test setting', () => {
     const table = structuredClone(fullTable)
-    const key = Object.keys(table).find((k) => k === 'wampir|cyberpunk-2077|qhd')!
-    table[key] = { ...table[key], fps: 50 }
-    const data = compareTeaser(fullHero, panelGames, table)!
-    expect(data.cards[2].gain).toBeLessThan(0)
+    for (const key of Object.keys(table)) {
+      if (key.endsWith('|cyberpunk-2077|qhd') && !key.startsWith('perun'))
+        table[key] = { ...table[key], setting: 'inne ustawienia' }
+    }
+    const view = compareTeaser(fullHero, panelGames, table)!.views.find(
+      (v) => v.game === 'cyberpunk-2077' && v.resolution === 'qhd',
+    )!
+    expect(view.setting).toBe('inne ustawienia')
+    expect(view.cards.map((c) => c.slug)).not.toContain('perun')
   })
 
-  it('shows no comparison when the three results have different settings', () => {
-    const table = structuredClone(fullTable)
-    const key = 'wampir|cyberpunk-2077|qhd'
-    table[key] = { ...table[key], setting: 'inne ustawienia' }
-    expect(compareTeaser(fullHero, panelGames, table)).toBeNull()
+  it('writes the step as extra price and extra frames', () => {
+    expect(compareStepText({ price: 1960, gain: 60 })).toBe(`+${zl(1960)} → +60% klatek`)
+  })
+
+  it('shows no comparison without prices', () => {
+    const hero = { ...fullHero, builds: fullHero.builds.map((b) => ({ ...b, price: null })) }
+    expect(compareTeaser(hero, panelGames, fullTable)).toBeNull()
   })
 })

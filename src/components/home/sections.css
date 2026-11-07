@@ -509,7 +509,7 @@
   margin-top: 32px;
 }
 
-/* ---------- 9. Kupujesz komputer dla dziecka? (light) ---------- */
+/* ---------- 9. Kupujesz komputer dla dziecka? (light; runda v2 §4.1) ---------- */
 .hm-par {
   color: var(--par-ink);
   background-color: var(--par-bg);
@@ -519,8 +519,9 @@
 }
 .hm-par__grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 0.9fr 1.1fr;
   gap: 70px;
+  align-items: center;
 }
 .hm-sec.hm-par h2.h {
   font-size: 58px;
@@ -535,46 +536,163 @@
   color: var(--paper);
   box-shadow: none;
 }
+.hm-par__call,
+.hm-par__call:hover {
+  gap: 8px;
+  background: transparent;
+  color: var(--par-head);
+  border: 1.5px solid var(--par-line);
+  box-shadow: none;
+}
+.hm-par__call:hover {
+  border-color: var(--par-rule);
+}
 .hm-par .lnk {
   color: var(--par-head);
   border-color: var(--par-line);
 }
-.hm-par__list {
+.hm-par__cards {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 34px 40px;
+  gap: 16px;
   margin: 0;
   padding: 0;
   list-style: none;
 }
-.hm-par__list h3 {
-  margin: 0;
-  padding-top: 16px;
+.hm-par__cards li {
+  display: flex;
+  flex-direction: column;
+  padding: 22px 22px 20px;
+  border: 1px solid var(--paper-line);
   border-top: 2px solid var(--par-rule);
-  font-size: 18px;
+  border-radius: 4px;
+  background: var(--paper-light);
+}
+.hm-par__icon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid var(--par-rule);
+  color: var(--par-head);
+  background: var(--par-bg);
+}
+.hm-par__cards h3 {
+  margin: 14px 0 0;
+  font-size: 17px;
   font-weight: 800;
+  line-height: 1.3;
   color: var(--par-head);
 }
-.hm-par__list p {
-  margin: 10px 0 0;
-  font-size: 15.5px;
+.hm-par__cards p {
+  margin: 8px 0 0;
+  font-size: 14.5px;
   line-height: 1.6;
   color: var(--par-text);
 }
+.hm-par__cards .hm-par__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin-top: auto;
+  padding-top: 12px;
+  font-size: 14px;
+  font-weight: 700;
+}
+.hm-par__how {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 30px;
+  align-items: center;
+  margin-top: 56px;
+  padding-top: 30px;
+  border-top: 1px solid var(--paper-line);
+}
+.hm-par__how h3 {
+  margin: 0;
+  font-family: var(--font-head);
+  font-size: 26px;
+  font-weight: 500;
+  color: var(--par-head);
+}
+.hm-par__how ol {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+}
+.hm-par__how li {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  counter-increment: step;
+  font-size: 15.5px;
+  font-weight: 700;
+  color: var(--par-head);
+}
+.hm-par__how li::before {
+  content: counter(step);
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--par-btn);
+  color: var(--paper);
+  font-size: 13px;
+}
+.hm-par__how svg {
+  flex: none;
+  color: var(--par-rule);
+}
+.hm-par__how small {
+  display: block;
+  margin-top: 2px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--par-text);
+}
 
-/* ---------- 10. Baba Jaga czy Wampir? ---------- */
+/* ---------- 10. Ile klatek kupujesz za dopłatę? (runda v2 §4.2) ---------- */
+.hm-cmp {
+  background:
+    radial-gradient(
+      60% 70% at 78% 60%,
+      color-mix(in srgb, var(--grom) 7%, transparent),
+      transparent 70%
+    ),
+    var(--sec-a);
+}
 .hm-cmp__grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 70px;
+  grid-template-columns: 0.8fr 1.2fr;
+  gap: 60px;
   align-items: center;
 }
 .hm-cmp__chart {
   margin: 0;
 }
+.hm-cmp__controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 26px;
+}
+.hm-cmp__games {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
 .hm-cmp__chart ul {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 18px;
   align-items: end;
   margin: 0;
@@ -587,101 +705,176 @@
   align-items: center;
   text-align: center;
 }
-.hm-cmp__photo {
-  display: flex;
-  justify-content: center;
-  align-items: flex-end;
+/* The computer on a small glowing stand above its bar (`CasePhoto`). */
+.hm-cmp__stage {
+  --case-h-max: 150px;
+  --case-w-max: 82cqw;
+  --case-base: 20px;
+  position: relative;
   width: 100%;
-  height: 180px;
-  filter: drop-shadow(0 0 20px color-mix(in srgb, var(--c) 50%, transparent));
+  height: 190px;
+  container-type: inline-size;
 }
-.hm-cmp__photo img {
-  width: auto;
-  height: 100%;
+.hm-cmp__stage::after {
+  content: '';
+  position: absolute;
+  left: 18%;
+  right: 18%;
+  bottom: 10px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--c) 70%, transparent);
+  background: color-mix(in srgb, var(--c) 14%, var(--scene-fade));
+  box-shadow: 0 0 22px color-mix(in srgb, var(--c) 45%, transparent);
+}
+.hm-cmp__stage .case {
+  z-index: 1;
+}
+.hm-cmp__stage img {
+  filter: drop-shadow(0 0 18px color-mix(in srgb, var(--c) 45%, transparent));
+}
+.hm-cmp__glow {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 90%;
+  aspect-ratio: 1;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--c) 28%, transparent),
+    transparent
+  );
 }
 .hm-cmp__sigil {
-  margin-top: 8px;
+  margin-top: 10px;
   color: var(--c);
   filter: drop-shadow(0 0 6px var(--c));
 }
 .hm-cmp__chart strong {
-  margin-top: 6px;
+  margin-top: 4px;
   font-size: 21px;
   color: var(--kosc);
 }
 .hm-cmp__tier {
-  margin: 4px 0 10px;
+  margin-top: 2px;
   font-size: 13px;
   color: var(--note);
+}
+.hm-cmp__price {
+  margin: 6px 0 12px;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--kosc);
 }
 .hm-cmp__bar {
   display: flex;
   align-items: flex-end;
   width: 64px;
-  height: 160px;
-  background: repeating-linear-gradient(180deg, var(--fps-track) 0 1px, transparent 1px 55px);
+  height: 170px;
+  background: repeating-linear-gradient(180deg, var(--fps-track) 0 1px, transparent 1px 42px);
   border-bottom: 1px solid var(--line);
 }
+/* Bars grow once when the chart comes into view; a switch changes their height smoothly. */
 .hm-cmp__bar s {
   display: block;
   width: 100%;
-  background: linear-gradient(180deg, var(--c), color-mix(in srgb, var(--c) 25%, transparent));
-  box-shadow: 0 0 24px color-mix(in srgb, var(--c) 50%, transparent);
+  height: var(--h);
+  border-radius: 3px 3px 0 0;
+  background: linear-gradient(180deg, var(--c), color-mix(in srgb, var(--c) 22%, transparent));
+  box-shadow: 0 0 28px color-mix(in srgb, var(--c) 55%, transparent);
+  transform-origin: 50% 100%;
+  transition:
+    transform 1s cubic-bezier(0.2, 0.7, 0.2, 1),
+    height 0.5s ease;
+}
+.hm-cmp__chart li:nth-child(2) .hm-cmp__bar s {
+  transition-delay: 0.12s, 0s;
+}
+.hm-cmp__chart li:nth-child(3) .hm-cmp__bar s {
+  transition-delay: 0.24s, 0s;
+}
+.hm-cmp__chart[data-shown='false'] .hm-cmp__bar s {
+  transform: scaleY(0);
 }
 .hm-cmp__chart b {
   margin-top: 10px;
-  font-size: 17px;
+  font-size: 18px;
   color: var(--kosc);
-}
-.hm-cmp__chart em {
-  min-height: 18px;
-  font-style: normal;
-  font-size: 13px;
-  font-weight: 700;
-  color: color-mix(in srgb, var(--c) 70%, var(--white));
 }
 .hm-cmp__chart .src {
   margin-top: 4px;
   font-size: 11px;
 }
+.hm-cmp__chart em {
+  min-height: 36px;
+  margin-top: 8px;
+  font-style: normal;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.4;
+  color: color-mix(in srgb, var(--c) 70%, var(--white));
+}
+.hm-cmp__chart li:first-child em {
+  font-weight: 500;
+  color: var(--mgla);
+}
 .hm-cmp__chart figcaption {
-  margin-top: 16px;
+  margin-top: 18px;
   text-align: center;
   font-size: 12.5px;
+  line-height: 1.5;
   color: var(--mgla);
 }
 
-/* ---------- 11. W cenie każdego komputera ---------- */
+/* ---------- 11. W cenie każdego komputera (runda v2 §4.3) ---------- */
 .hm-inc {
   background: linear-gradient(180deg, var(--sec-a), var(--sec-e));
 }
 .hm-inc__list {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 0 30px;
+  gap: 14px;
   margin: 44px 0 0;
   padding: 0;
   list-style: none;
-  border-top: 1px solid color-mix(in srgb, var(--grom) 30%, transparent);
 }
 .hm-inc__list li {
   display: flex;
-  gap: 12px;
-  padding: 22px 0;
-  border-bottom: 1px solid var(--line);
+  flex-direction: column;
+  padding: 22px 20px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: linear-gradient(180deg, var(--panel-from), transparent);
+  transition:
+    border-color 0.3s,
+    transform 0.3s;
 }
-.hm-inc__list svg {
-  flex: none;
+.hm-inc__list li:hover {
+  border-color: color-mix(in srgb, var(--grom) 45%, transparent);
+  transform: translateY(-3px);
+}
+.hm-inc__icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--grom) 45%, transparent);
   color: var(--grom);
+  background: color-mix(in srgb, var(--grom) 8%, transparent);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--grom) 18%, transparent);
 }
 .hm-inc__list b {
   display: block;
-  font-size: 15.5px;
+  margin-top: 14px;
+  font-size: 16px;
   color: var(--kosc);
 }
-.hm-inc__list span {
+.hm-inc__list li > span:last-child {
   display: block;
-  margin-top: 4px;
+  margin-top: 6px;
   font-size: 13.5px;
   line-height: 1.5;
   color: var(--mgla);
@@ -757,39 +950,82 @@
   color: var(--sec-text);
 }
 
-/* ---------- 13. Napisz, w co grasz ---------- */
+/* ---------- 13. Napisz, w co grasz (runda v2 §4.4) ---------- */
 .hm-sec.hm-fin {
   position: relative;
-  height: 760px;
-  padding: 0;
+  padding: 120px 0 110px;
   overflow: hidden;
   background: var(--smola);
 }
-.hm-fin__bg {
-  object-fit: cover;
-  object-position: center bottom;
+/* Night sky in CSS: a few stars, a warm haze over the arc and one slow flash. */
+.hm-fin__sky {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(1px 1px at 12% 22%, var(--kosc) 50%, transparent 51%),
+    radial-gradient(1px 1px at 27% 64%, var(--mgla) 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 41% 14%, var(--kosc) 50%, transparent 51%),
+    radial-gradient(1px 1px at 63% 30%, var(--mgla) 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 78% 12%, var(--kosc) 50%, transparent 51%),
+    radial-gradient(1px 1px at 88% 52%, var(--mgla) 50%, transparent 51%),
+    radial-gradient(1px 1px at 6% 78%, var(--mgla) 50%, transparent 51%),
+    radial-gradient(1px 1px at 94% 84%, var(--kosc) 50%, transparent 51%),
+    radial-gradient(55% 45% at 50% 30%, var(--fin-glow), transparent 70%),
+    linear-gradient(180deg, var(--sec-e), var(--smola) 70%);
+}
+.hm-fin__sky::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 6%;
+  width: 520px;
+  height: 260px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--grom) 22%, transparent),
+    transparent
+  );
+  opacity: 0.4;
+  animation: hm-flash 9s ease-in-out infinite;
+}
+@keyframes hm-flash {
+  45%,
+  55% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.9;
+  }
 }
 .hm-fin__in {
+  position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
-  height: 100%;
-  padding-top: 120px;
   text-align: center;
 }
+/* 16 sigils on an arc: each turned by --a around a point --r below the arc's top. */
 .hm-fin__sigils {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin: 0 0 34px;
+  --r: 440px;
+  position: relative;
+  width: 100%;
+  height: 230px;
+  margin: 0 0 18px;
   padding: 0;
   list-style: none;
 }
 .hm-fin__sigils li {
+  position: absolute;
+  left: 50%;
+  top: var(--r);
+  margin: -23px 0 0 -23px;
   color: var(--c);
-  opacity: 0.55;
-  filter: drop-shadow(0 0 8px var(--c));
+  opacity: 0.6;
+  filter: drop-shadow(0 0 10px var(--c));
+  transform: rotate(var(--a)) translateY(calc(var(--r) * -1)) rotate(calc(var(--a) * -1));
   animation: hm-glow 6s ease-in-out infinite;
 }
 .hm-fin__sigils li:nth-child(2n) {
@@ -817,6 +1053,15 @@
 }
 .hm-fin .hm-cta {
   justify-content: center;
+}
+.hm-fin__quick {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin: 26px 0 0;
+  padding: 0;
+  list-style: none;
 }
 
 /* ---------- tablet and phone ---------- */
@@ -895,30 +1140,26 @@
   .hm-sec.hm-par h2.h {
     font-size: 40px;
   }
-  .hm-par__list {
+  .hm-par__how {
     grid-template-columns: 1fr;
+    gap: 16px;
   }
   .hm-cmp__chart ul {
     gap: 10px;
   }
   .hm-inc__list {
     grid-template-columns: 1fr 1fr;
-    gap: 0 12px;
+    gap: 10px;
   }
   .hm-sec.hm-fin {
-    height: auto;
     padding: 90px 0;
-  }
-  .hm-fin__in {
-    padding-top: 30px;
   }
   .hm-sec.hm-fin h2.h {
     font-size: 52px;
   }
   .hm-fin__sigils {
-    flex-wrap: wrap;
-    max-width: 460px;
-    margin-inline: auto;
+    --r: 360px;
+    height: 190px;
   }
 }
 
@@ -1027,14 +1268,68 @@
   .hm-sec.hm-par h2.h {
     font-size: 36px;
   }
-  .hm-cmp__photo {
+  .hm-par__cards,
+  .hm-par__how ol {
+    grid-template-columns: 1fr;
+  }
+  /* Touch targets ≥ 44 px (the register and directions links stand close together), with the
+     underline kept at the text: a larger, invisible hit area around each link. */
+  .hm-par__cards .hm-par__links {
+    gap: 14px 16px;
+  }
+  .hm-par__cards .hm-par__links .lnk {
+    position: relative;
+  }
+  .hm-par__cards .hm-par__links .lnk::after {
+    content: '';
+    position: absolute;
+    inset: -12px -4px;
+  }
+  .hm-par .hm-cta .btn {
+    width: 100%;
+  }
+  .hm-cmp__stage {
+    --case-h-max: 96px;
+    --case-base: 16px;
+    height: 128px;
+  }
+  .hm-cmp__bar {
+    width: 46px;
     height: 120px;
   }
   .hm-cmp__chart strong {
     font-size: 16px;
   }
+  /* Narrow columns: a tier label may take two lines — keep the stands and bars level. */
+  .hm-cmp__tier {
+    min-height: 2.9em;
+    line-height: 1.45;
+  }
+  .hm-cmp__price {
+    font-size: 14px;
+  }
+  .hm-cmp__chart em {
+    font-size: 11.5px;
+  }
+  .hm-inc__list li {
+    padding: 16px 14px;
+  }
   .hm-sec.hm-fin h2.h {
     font-size: 42px;
+  }
+  /* Phone: no arc — two rows of eight, no empty space above the heading. */
+  .hm-fin__sigils {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 10px 4px;
+    height: auto;
+    max-width: 360px;
+    margin: 0 auto 26px;
+  }
+  .hm-fin__sigils li {
+    position: static;
+    margin: 0;
+    transform: none;
   }
   .hm-fin__sigils .sigil {
     width: 34px !important;
@@ -1043,8 +1338,19 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hm-fin__sigils li {
+  .hm-fin__sigils li,
+  .hm-fin__sky::after {
     animation: none;
+  }
+  .hm-cmp__bar s {
+    transform: none;
+    transition: none;
+  }
+  .hm-inc__list li {
+    transition: none;
+  }
+  .hm-inc__list li:hover {
+    transform: none;
   }
   .hm-faq summary i::after {
     transition: none;

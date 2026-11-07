@@ -5,7 +5,7 @@ import { GamesPanel } from './GamesPanel'
 /** "W co grasz?" (spec. §4 pt 6). Without data (empty database) only the text stays. */
 export function Games({ panel }: { panel: GamesPanelData | null }) {
   return (
-    <section className="hm-sec hm-games" aria-labelledby="games-title">
+    <section className="hm-sec hm-games" id="w-co-grasz" aria-labelledby="games-title">
       <div className="wrap hm-games__grid">
         <div className="hm-games__intro">
           <h2 id="games-title" className="h">
