@@ -673,8 +673,9 @@ body:has([data-nav-light]) .nav:not([data-top='false']) .nav__caps a[aria-curren
   .nav {
     gap: 10px;
   }
+  /* 9 px, not 10: Linux fonts in CI are a little wider (1200 px was 1.4 px over). */
   .nav__caps a {
-    padding: 0 10px;
+    padding: 0 9px;
   }
 }
 @media (max-width: 1199px) {
