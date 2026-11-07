@@ -21,6 +21,7 @@ import {
   IconQuestion,
   IconShield,
   IconUser,
+  IconSearch,
 } from './icons'
 import { Logo } from './Logo'
 import { useShell } from './shell/ShellProvider'
@@ -40,7 +41,7 @@ type Tile = { href: string; icon: ReactNode; title: string; note: string }
  * from the right on a tablet. 16 creatures, 8 tiles, 4 links and the contact card.
  */
 export function MenuSheet({ creatures, phone, features }: Props) {
-  const { menuOpen, closeMenu, compareCount } = useShell()
+  const { menuOpen, closeMenu, compareCount, openSearch } = useShell()
   const pathname = usePathname()
   // The page you are on gets the gold pill, as in the header capsule (NAWIGACJA.md §6).
   const current = (href: string) => (isCurrent(pathname, href) ? 'page' : undefined)
@@ -94,6 +95,11 @@ export function MenuSheet({ creatures, phone, features }: Props) {
           if (event.target instanceof Element && event.target.closest('a')) closeMenu()
         }}
       >
+        {/* Search from the menu (NAWIGACJA §5): looks like a field, opens the search sheet. */}
+        <button type="button" className="menu__search" onClick={openSearch}>
+          <IconSearch size={18} />
+          <span>Szukaj istoty, gry albo strony…</span>
+        </button>
         <section aria-labelledby="menu-builds">
           <div className="menu__sec">
             <h2 id="menu-builds">Zestawy</h2>

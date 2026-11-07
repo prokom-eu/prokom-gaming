@@ -55,14 +55,16 @@ test('home: 11 sections, hover opens, a click jumps, the active one follows the 
     .focus()
   await page.keyboard.press('Enter')
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBeLessThan(5)
-  await expect(rail(page).getByRole('link', { name: 'Dobierz komputer' })).toBeFocused()
+  await expect(rail(page).getByRole('button', { name: /Szukaj zestawu lub gry/ })).toBeFocused()
 })
 
 test('keyboard: focus opens the rail, Esc closes it, arrows move between entries', async ({
   page,
 }) => {
   await page.goto('/')
-  await rail(page).getByRole('link', { name: 'Dobierz komputer' }).focus()
+  await rail(page)
+    .getByRole('button', { name: /Szukaj zestawu lub gry/ })
+    .focus()
   await expect(rail(page)).toHaveAttribute('data-open', 'true')
   await page.keyboard.press('ArrowDown')
   await expect(rail(page).getByRole('link', { name: /Start/ })).toBeFocused()

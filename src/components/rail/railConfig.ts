@@ -20,6 +20,7 @@ export const RAIL_ICONS = {
     'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5V14M12 17h.01',
   napisz: 'M4 6h16v12H4zM4 7l8 6 8-6',
   dobierz: 'M4 7h10M18 7h2M4 17h4M12 17h8M14 4v6M8 14v6',
+  szukaj: 'M11 17.5a6.5 6.5 0 1 0 0-13 6.5 6.5 0 0 0 0 13zM20 20l-4.2-4.2',
 } as const
 
 export type RailIcon = keyof typeof RAIL_ICONS
