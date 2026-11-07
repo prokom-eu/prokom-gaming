@@ -15,6 +15,7 @@ import {
   type GameScale,
   type Resolution,
 } from './fps'
+import { zl } from './pricing/format'
 import { priceFromSnapshot, type PriceSnapshot } from './pricing/snapshot'
 import type { Config } from './pricing/types'
 
@@ -386,10 +387,16 @@ export type MetricSample = {
   rows: { name: string; text: string; percent: number; kind: FpsKind }[]
 }
 
-/** The three creatures of "Baba Jaga czy Wampir?" (board Main `.cmp`), in this order. */
-export const COMPARE_BUILDS = ['kikimora', 'baba-jaga', 'wampir'] as const
-export const COMPARE_GAME = 'cyberpunk-2077'
-export const COMPARE_RESOLUTION: Resolution = 'qhd'
+/**
+ * „Ile klatek kupujesz za dopłatę?” (runda v2 §4.2): three games × three resolutions, each with
+ * three creatures picked from the data (never hard-coded), so every step up gives a visible jump.
+ */
+export const COMPARE_GAMES = ['cyberpunk-2077', 'counter-strike-2', 'fortnite'] as const
+export const COMPARE_RESOLUTIONS: readonly Resolution[] = ['fullhd', 'qhd', 'uhd']
+/** Shown first: the heavy game at 2K (board Main). */
+export const COMPARE_DEFAULT = { game: 'cyberpunk-2077', resolution: 'qhd' as Resolution }
+/** Each creature gives at least this many more frames than the previous one (+15%). */
+export const COMPARE_MIN_STEP = 1.15
 
 export type CompareCard = {
   slug: string
@@ -398,64 +405,127 @@ export type CompareCard = {
   tierRoman: string
   tierLabel: string
   photo: CasePhoto | null
+  price: number
   fps: number
   kind: FpsKind
   /** Bar height in % of the best of the three. */
   percent: number
-  /** "+20% klatek" against the first creature (may be negative); `null` for the first. */
-  gain: number | null
+  /** Against the previous creature: „+1 960 zł → +60% klatek”; `null` for the first. */
+  step: { price: number; gain: number } | null
 }
 
-export type CompareData = { cards: CompareCard[]; game: string; setting: string | null }
+/** One view of the comparison: a game at a resolution. */
+export type CompareView = {
+  game: string
+  gameName: string
+  resolution: Resolution
+  setting: string
+  cards: CompareCard[]
+}
+
+/** Every view that has an honest trio; the switcher offers only these. */
+export type CompareData = { views: CompareView[]; initial: number }
+
+type CompareRow = {
+  build: HeroBuild & { price: number }
+  fps: number
+  kind: FpsKind
+  setting: string
+}
 
 /**
- * "Baba Jaga czy Wampir?": stored FPS of the three creatures in one game and resolution, and how
- * many more frames each gives than the first (board Main). Without a number for any of them the
- * teaser has nothing honest to show: `null`.
+ * The rule (runda v2 §4.2). The middle creature is the cheapest one made for this monitor
+ * (its level's target resolution) that has both neighbours; below it the strongest cheaper one at
+ * least 15% weaker, above it the cheapest pricier one at least 15% stronger. Ties go to the lower
+ * price. Only results with the same test setting are compared (ADR-G004). `null` = no trio.
  */
+export function pickCompareTrio(
+  rows: readonly CompareRow[],
+  resolution: Resolution,
+): CompareRow[] | null {
+  const settings = new Map<string, number>()
+  for (const r of rows) settings.set(r.setting, (settings.get(r.setting) ?? 0) + 1)
+  const setting = [...settings].sort((a, b) => b[1] - a[1])[0]?.[0]
+  const same = rows.filter((r) => r.setting === setting)
+  const byPrice = [...same].sort((a, b) => a.build.price - b.build.price)
+  const below = (mid: CompareRow) =>
+    byPrice
+      .filter((r) => r.build.price < mid.build.price && r.fps * COMPARE_MIN_STEP <= mid.fps)
+      .sort((a, b) => b.fps - a.fps || a.build.price - b.build.price)[0]
+  const above = (mid: CompareRow) =>
+    byPrice.find((r) => r.build.price > mid.build.price && r.fps >= mid.fps * COMPARE_MIN_STEP)
+  const middles = [
+    ...byPrice.filter((r) => r.build.resolution === resolution),
+    ...byPrice.filter((r) => r.build.resolution !== resolution),
+  ]
+  for (const mid of middles) {
+    const a = below(mid)
+    const c = above(mid)
+    if (a && c) return [a, mid, c]
+  }
+  return null
+}
+
+/** The comparison views from the stored FPS and published prices; `null` when none is honest. */
 export function compareTeaser(
   hero: HeroData,
   games: readonly PanelGame[],
   table: FpsTable,
 ): CompareData | null {
-  const game = games.find((g) => g.slug === COMPARE_GAME)
-  if (!game) return null
-  const rows: { build: HeroBuild; fps: number; kind: FpsKind; setting: string }[] = []
-  for (const slug of COMPARE_BUILDS) {
-    const build = hero.builds.find((b) => b.slug === slug)
-    const r = build && fpsFor(table, slug, COMPARE_GAME, COMPARE_RESOLUTION)
-    if (!build || !r) return null
-    rows.push({ build, fps: r.fps, kind: r.kind, setting: r.setting })
+  const priced = hero.builds.filter((b): b is HeroBuild & { price: number } => b.price !== null)
+  const views: CompareView[] = []
+  for (const slug of COMPARE_GAMES) {
+    const game = games.find((g) => g.slug === slug)
+    if (!game) continue
+    for (const resolution of COMPARE_RESOLUTIONS) {
+      const rows: CompareRow[] = []
+      for (const build of priced) {
+        const r = fpsFor(table, build.slug, slug, resolution)
+        if (r) rows.push({ build, fps: r.fps, kind: r.kind, setting: r.setting })
+      }
+      const trio = pickCompareTrio(rows, resolution)
+      if (!trio) continue
+      const best = Math.max(...trio.map((r) => r.fps))
+      views.push({
+        game: slug,
+        gameName: game.name,
+        resolution,
+        setting: trio[0].setting,
+        cards: trio.map((r, i) => ({
+          slug: r.build.slug,
+          key: r.build.key,
+          name: r.build.name,
+          tierRoman: r.build.tierRoman,
+          tierLabel: r.build.tierLabel,
+          photo: r.build.photo,
+          price: r.build.price,
+          fps: r.fps,
+          kind: r.kind,
+          percent: Math.round((r.fps / best) * 100),
+          step:
+            i === 0
+              ? null
+              : {
+                  price: r.build.price - trio[i - 1].build.price,
+                  gain: Math.round((r.fps / trio[i - 1].fps - 1) * 100),
+                },
+        })),
+      })
+    }
   }
-  // "+X% klatek" only compares like with like: three results with different test settings
-  // under one caption would mislead (ADR-G004) — then no chart at all.
-  if (new Set(rows.map((r) => r.setting)).size > 1) return null
-  const best = Math.max(...rows.map((r) => r.fps))
-  const first = rows[0].fps
-  return {
-    game: game.name,
-    setting: rows[0].setting,
-    cards: rows.map((r, i) => ({
-      slug: r.build.slug,
-      key: r.build.key,
-      name: r.build.name,
-      tierRoman: r.build.tierRoman,
-      tierLabel: r.build.tierLabel,
-      photo: r.build.photo,
-      fps: r.fps,
-      kind: r.kind,
-      percent: Math.round((r.fps / best) * 100),
-      gain: i === 0 ? null : Math.round((r.fps / first - 1) * 100),
-    })),
-  }
+  if (views.length === 0) return null
+  const initial = views.findIndex(
+    (v) => v.game === COMPARE_DEFAULT.game && v.resolution === COMPARE_DEFAULT.resolution,
+  )
+  return { views, initial: Math.max(initial, 0) }
 }
 
 /** A question of "Zanim zapytasz" (collection `faq`, group "Na stronie głównej"). */
 export type HomeQuestion = { id: number; question: string; answer: string }
 
-/** "+20% klatek", "+0% klatek", "−5% klatek" (typographic minus). */
-export function gainText(gain: number): string {
-  return `${gain < 0 ? '−' : '+'}${Math.abs(gain)}% klatek`
+/** „+1 960 zł → +60% klatek”: what the next creature costs more and gives more (runda v2 §4.2). */
+export function compareStepText(step: { price: number; gain: number }): string {
+  return `+${zl(step.price)} → +${step.gain}% klatek`
 }
 
 /** Everything the home page reads from the database. */
