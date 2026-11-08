@@ -90,6 +90,12 @@ Testy: brak „Kolor światła”/„Światło:” w konfiguratorze, karcie, for
 - przejście strona → strona: View Transitions (obudowa z listy na kartę zestawu, nagłówek zostaje na miejscu),
 - fokus klawiatury: złota obwódka z krótkim rozbłyskiem.
 
+**Ładowanie (E3, Krystian 08.11):** gdy coś ładuje się dłużej, strona pokazuje ładny stan zamiast pustki albo „wskakiwania”:
+- wolne przejście między stronami (`loading.tsx`): pieczęć istoty zapala się konturem i „oddycha” w kolorze istoty (albo złota poza kartą zestawu), pokazana dopiero po ok. 300 ms, żeby szybkie przejścia nie migały,
+- sceny i zdjęcia obudów: płynne wyłonienie po wczytaniu (zanikanie + lekkie wyostrzenie), bez wpływu na LCP (pierwsza scena i zdjęcie hero bez tego),
+- przyciski formularzy (zapytanie, konto): stan „wysyłam…” z animacją i zablokowanym ponownym kliknięciem,
+- reduced-motion: statyczny stan bez pulsowania.
+
 ### 2.4 Sceny rysowane kodem — głębia ruchem (E2)
 Sceny po R4 są rysowane kodem (decyzja 08.11) i są płaskie — pliki mają ok. 50 KB, to sylwetki na gradientach. Bez zmiany decyzji można dodać im głębi:
 - rozdzielenie każdej sceny na 3–4 plany (niebo, dalekie sylwetki, bliskie sylwetki, pierwszy plan) jako osobne warstwy SVG/obrazy → paralaksa myszą i przy przewijaniu,

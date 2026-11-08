@@ -54,11 +54,13 @@ test.describe('accessibility (axe)', () => {
       expect(response?.status()).toBe(status)
       // Entrance animations first (e.g. the FAQ fading in from opacity 0): mid-fade, axe measures
       // a blended colour and reports contrast that no reader sees. On `next start` the page is
-      // ready before the 0.4 s fade ends (G15). Endless ones (pulses) are skipped.
+      // ready before the 0.4 s fade ends (G15). Endless ones (pulses) are skipped, and so are the
+      // scroll-driven ones (scene planes, E2): they follow the scroll, never „finish” in time.
       await page.evaluate(() =>
         Promise.all(
           document
             .getAnimations()
+            .filter((a) => a.timeline instanceof DocumentTimeline)
             .filter((a) => a.effect?.getTiming().iterations !== Infinity)
             .map((a) => a.finished.catch(() => undefined)),
         ),

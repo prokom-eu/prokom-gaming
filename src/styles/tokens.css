@@ -532,3 +532,24 @@
   /* szyna (GN-2) */
   --rail-num: #8a8574; /* liczby rzymskie (5,2:1 na --noc) */
 }
+
+/* Ruch (runda v3 PREMIUM §2.1, ADR-G014): czasy, krzywe i kaskada wspólne dla całej strony.
+   `--motion-scale` mnoży odległości wjazdów i uniesień (wariant intensywności). Przy
+   `prefers-reduced-motion: reduce` globals.css sprowadza wszystko do stanu końcowego. */
+:root {
+  --dur-1: 120ms; /* drobne: kolor, obwódka */
+  --dur-2: 240ms; /* hover, wciśnięcie */
+  --dur-3: 480ms; /* wejście elementu */
+  --dur-4: 900ms; /* wejście sceny, przejście istoty */
+  --ease-enter: cubic-bezier(0.16, 1, 0.3, 1); /* wysuw: szybki start, miękkie lądowanie */
+  --ease-exit: cubic-bezier(0.7, 0, 0.84, 0); /* wyjście: powolny start, szybki koniec */
+  --stagger: 50ms; /* opóźnienie kolejnych elementów kaskady (max 6, src/lib/motion.ts) */
+  --motion-scale: 1; /* wariant „spokojny” (Krystian 08.11, nagrania E2) */
+  /* warstwa ruchu scen (SceneFx, PREMIUM §2.4): mgła, śnieg, żar, błysk burzy, odbicie wody */
+  --fx-mist: rgba(200, 210, 205, 0.16);
+  --fx-snow: rgba(240, 246, 255, 0.85);
+  --fx-ember: #ffd27a;
+  --fx-ember-glow: #ff9a3c;
+  --fx-flash: rgba(220, 230, 255, 0.55);
+  --fx-water: rgba(255, 255, 255, 0.18);
+}

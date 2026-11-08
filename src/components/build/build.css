@@ -105,14 +105,27 @@
   letter-spacing: 0.02em;
   text-transform: uppercase;
   white-space: nowrap;
-  background: linear-gradient(180deg, var(--m1) 0%, var(--m2) 30%, var(--m3) 58%, var(--m4) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
   color: transparent;
   -webkit-text-stroke: 0.9px color-mix(in srgb, var(--m1) 45%, transparent);
   filter: drop-shadow(0 2.5px 0 var(--m4)) drop-shadow(0 3px 0 var(--shadow))
     drop-shadow(0 0 36px color-mix(in srgb, var(--c) 50%, transparent))
     drop-shadow(0 16px 22px color-mix(in srgb, var(--shadow) 70%, transparent));
+}
+/* The material sits on each letter (components/motion/Letters): top-to-bottom gradient, so it
+   looks the same as on the whole word; a sheen band crosses the letters once at the entry. */
+.bp-title__name .ch {
+  display: inline-block;
+  background:
+    linear-gradient(
+        105deg,
+        transparent 42%,
+        color-mix(in srgb, var(--white) 75%, transparent) 50%,
+        transparent 58%
+      )
+      160% 0 / 260% 100% no-repeat,
+    linear-gradient(180deg, var(--m1) 0%, var(--m2) 30%, var(--m3) 58%, var(--m4) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
 }
 .bp-stage {
   position: absolute;
@@ -144,6 +157,162 @@
   --case-base: 18px;
   position: absolute;
   inset: 0;
+}
+/* ---------- hero: entry and rest (runda v3 PREMIUM §2.3) ----------
+   Like the home hero: once, from the first paint, CSS only, transform and opacity. The scene is
+   the LCP element here, so it is never transparent — the black above it lifts instead. Crumbs,
+   „Wyróżnik” and „W grach” do not move. Mouse parallax (components/motion/MouseParallax) moves
+   the scene 4 px, the fireflies 8, the name 6 and the computer 10. */
+.bp-hero .scene {
+  transform: translate(calc(var(--mx, 0) * -4px), calc(var(--my, 0) * -2px));
+  transition: transform var(--dur-4) var(--ease-enter);
+}
+/* Room for the parallax at the edges: only where the parallax runs. */
+@media (min-width: 1024px) {
+  .bp-hero .scene {
+    inset: -8px;
+  }
+}
+.bp-hero .fireflies {
+  transform: translate(calc(var(--mx, 0) * -8px), calc(var(--my, 0) * -4px));
+  transition: transform var(--dur-4) var(--ease-enter);
+}
+.bp-title {
+  transform: translate(calc(var(--mx, 0) * -6px), calc(var(--my, 0) * -3px));
+  transition: transform var(--dur-4) var(--ease-enter);
+}
+.bp-stage {
+  transform: translate(calc(var(--mx, 0) * -10px), calc(var(--my, 0) * -5px));
+  transition: transform var(--dur-4) var(--ease-enter);
+}
+.bp-hero > .scene-fx {
+  z-index: 1;
+}
+.bp-hero__horizon {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 50% 24% at 50% 70%,
+    color-mix(in srgb, var(--c) 30%, transparent),
+    transparent 70%
+  );
+  opacity: 0.7;
+  animation: bp-horizon 8s ease-in-out infinite;
+}
+@keyframes bp-horizon {
+  50% {
+    opacity: 1;
+  }
+}
+.bp-stage__halo {
+  animation: bp-breathe 8s ease-in-out infinite;
+}
+@keyframes bp-breathe {
+  50% {
+    opacity: 0.7;
+  }
+}
+.bp-hero__dawn {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: var(--scene-bg);
+  opacity: 0;
+}
+/* Above the dawn: the name and the computer come out of the dark on their own. */
+.bp-title,
+.bp-stage {
+  z-index: 3;
+}
+.bp-stage__photo::after {
+  content: '';
+  position: absolute;
+  inset: 18% 22% 22%;
+  border-radius: 40%;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--c) 55%, transparent),
+    transparent
+  );
+  mix-blend-mode: screen;
+  opacity: 0;
+  pointer-events: none;
+}
+.bp-hero--intro .bp-hero__dawn {
+  animation: intro-dawn var(--dur-3) var(--ease-exit) both;
+}
+/* `scale`, not `transform`: the scene keeps its mouse parallax, its planes their scroll drift. */
+.bp-hero--intro .scene {
+  animation: intro-zoom 1.2s var(--ease-enter) both;
+}
+.bp-hero--intro .bp-hero__horizon {
+  animation:
+    intro-fade var(--dur-4) var(--ease-enter) 100ms both,
+    bp-horizon 8s ease-in-out 1.2s infinite;
+}
+.bp-hero--intro .bp-title__kick,
+.bp-hero--intro .bp-title__epithet {
+  animation: intro-rise var(--dur-3) var(--ease-enter) 200ms both;
+}
+.bp-hero--intro .bp-title__epithet i {
+  animation: intro-draw var(--dur-3) var(--ease-enter) 350ms both;
+}
+.bp-hero--intro .bp-title__name .ch {
+  /* The page heading: readable by 700 ms (PREMIUM §2.1) — from 100 ms, 30 ms apart, max 8 steps. */
+  animation:
+    intro-letter calc(var(--dur-2) * 1.5) var(--ease-enter) calc(100ms + min(var(--ch), 8) * 30ms)
+      both,
+    bp-shine var(--dur-4) ease calc(800ms + var(--ch) * 40ms) both;
+}
+.bp-hero--intro .bp-stage__photo {
+  animation: intro-settle var(--dur-4) var(--ease-enter) 250ms both;
+}
+.bp-hero--intro .bp-stage__photo::after {
+  animation: intro-pulse var(--dur-4) ease-in-out 800ms both;
+}
+.bp-hero--intro .bp-stage__halo {
+  animation:
+    bp-flare var(--dur-4) var(--ease-enter) 600ms both,
+    bp-breathe 8s ease-in-out 1.5s infinite;
+}
+.bp-hero--intro .bp-hl__sigil {
+  animation: bp-sigil var(--dur-4) var(--ease-enter) 300ms both;
+}
+@keyframes bp-shine {
+  from {
+    background-position:
+      160% 0,
+      0 0;
+  }
+  to {
+    background-position:
+      -60% 0,
+      0 0;
+  }
+}
+@keyframes bp-flare {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  55% {
+    opacity: 1;
+    transform: scale(1.12);
+  }
+}
+/* The sigil lights up: from a faint outline to its full glow. */
+@keyframes bp-sigil {
+  from {
+    opacity: 0.25;
+    transform: scale(0.85);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
 }
 .bp-k {
   display: block;
@@ -1472,6 +1641,19 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  /* The hero stands still in its end state: no entry, breathing or parallax (ADR-G014). */
+  .bp-hero *,
+  .bp-hero *::before,
+  .bp-hero *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  .bp-hero .scene,
+  .bp-hero .fireflies,
+  .bp-title,
+  .bp-stage {
+    transform: none !important;
+  }
   .bp-draw .pt,
   .bp-draw__marks circle,
   .bp-part,

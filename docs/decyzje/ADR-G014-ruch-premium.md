@@ -18,3 +18,7 @@ Po rundzie v2 strona jest kompletna i spójna, ale statyczna — Krystian ocenia
 - Nowa zależność (GSAP) do aktualizowania razem z resztą (dependabot); przy podnoszeniu wersji przejść e2e hero i porównania.
 - Każdy nowy element z ruchem musi mieć wariant reduced-motion i test.
 - Walidacja zdjęć obudów w panelu chroni przed kolejnymi uciętymi zdjęciami.
+
+## Uzupełnienie (Krystian, 08.11.2026, plan E2)
+- **E2 bez GSAP:** wejście hero, zmiana istoty, karty i sceny pokrywa CSS (klatki kluczowe, `@property`, animacje sterowane przewijaniem) i View Transitions; GSAP nie jest zależnością. Pkt 2 decyzji dalej dopuszcza GSAP tam, gdzie potrzebna oś czasu — wraca do oceny w E3 (porównanie). Konsekwencja o dependabocie dotyczy GSAP dopiero, gdy zostanie dodany.
+- Wariant intensywności ruchu: **spokojny** (`--motion-scale: 1`), wybrany na nagraniach.

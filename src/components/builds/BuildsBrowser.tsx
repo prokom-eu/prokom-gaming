@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, type ReactNode } from 'react'
+import { flushSync } from 'react-dom'
 
 import { BottomSheet } from '@/components/BottomSheet'
 import { IconSliders } from '@/components/icons'
@@ -18,6 +19,7 @@ import {
   type BuildFacets,
   type BuildFilters,
 } from '@/lib/builds'
+import { prefersReducedMotion } from '@/lib/motion'
 
 export type BrowserItem = { slug: string; facets: BuildFacets; card: ReactNode }
 
@@ -47,7 +49,14 @@ export function BuildsBrowser({ items, initial }: Props) {
   const inSheet = sheetFilterCount(filters)
 
   function update(next: BuildFilters) {
-    setFilters(next)
+    // Cards that stay glide to their new places, the others fade out (FLIP by the browser,
+    // runda v3 PREMIUM §2.3). Without View Transitions, with reduced motion or under the open
+    // phone sheet (a dialog in the top layer): the list simply changes.
+    if (!document.startViewTransition || sheetOpen || prefersReducedMotion()) {
+      setFilters(next)
+    } else {
+      document.startViewTransition(() => flushSync(() => setFilters(next)))
+    }
     window.history.replaceState(null, '', `${window.location.pathname}${filtersQuery(next)}`)
   }
 
@@ -118,6 +127,7 @@ export function BuildsBrowser({ items, initial }: Props) {
         <div className="bl-filters cut">
           {groups('d')}
           <p className="bl-count" aria-hidden="true">
+            {/* Its own transition group: the old number rolls up, the new one comes from below. */}
             <b>{count}</b> {buildsWord(count)}
           </p>
         </div>
@@ -125,7 +135,9 @@ export function BuildsBrowser({ items, initial }: Props) {
         {count > 0 ? (
           <ul className="bl-grid">
             {shown.map((item) => (
-              <li key={item.slug}>{item.card}</li>
+              <li key={item.slug} data-reveal="" style={{ viewTransitionName: `bl-${item.slug}` }}>
+                {item.card}
+              </li>
             ))}
           </ul>
         ) : (

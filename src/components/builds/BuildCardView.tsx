@@ -15,7 +15,10 @@ import { zl } from '@/lib/pricing/format'
  */
 export function BuildCardView({ card, eager = false }: { card: BuildCard; eager?: boolean }) {
   return (
-    <article className="bl-card cut" style={{ ['--c' as string]: `var(--c-${card.slug})` }}>
+    <article
+      className="bl-card card-sweep cut"
+      style={{ ['--c' as string]: `var(--c-${card.slug})` }}
+    >
       <span className="bl-card__art" aria-hidden="true">
         <Image
           className="bl-card__scene"

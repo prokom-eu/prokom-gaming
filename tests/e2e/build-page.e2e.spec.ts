@@ -27,7 +27,8 @@ const SECTIONS = [
 
 test('Wampir: name, sections in spec order, structured data', async ({ page }) => {
   await page.goto('/zestawy/wampir')
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Wampir')
+  // The name is split into letters for the entry (Letters): read by its accessible name.
+  await expect(page.getByRole('heading', { level: 1 })).toHaveAccessibleName('Wampir')
   // Without spaces: „Co znajdziesz<br>w pudełku” has none between the lines in its text.
   const squash = (text: string) => text.replace(/\s+/g, '')
   const headings = await page.locator('main h2').allTextContents()

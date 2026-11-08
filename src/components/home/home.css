@@ -3,9 +3,18 @@
    only from tokens.css (ADR-G003 §2). */
 
 /* ---------- hero: frame ---------- */
+/* The creature's colour as a registered property: on a switch the whole scene's light (halo,
+   horizon, name glow, pedestal) glides to the new colour instead of jumping (runda v3 §2.3). */
+@property --hero-c {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
+}
 .hero {
   --mx: 0;
   --my: 0;
+  --c: var(--hero-c);
+  transition: --hero-c var(--dur-4) ease;
   position: relative;
   overflow: hidden;
   isolation: isolate;
@@ -35,8 +44,10 @@
   width: calc(var(--u) * 4320);
   height: calc(var(--u) * 1600);
   pointer-events: none;
-  transform: translate(calc(var(--mx) * -8px), calc(var(--my) * -5px));
-  transition: transform 0.6s ease-out;
+  /* Mouse parallax on three planes, at most 12 px (runda v3 PREMIUM §2.3): scene 4, fireflies 8,
+     foreground 12; the name and the computer between them. */
+  transform: translate(calc(var(--mx) * -4px), calc(var(--my) * -2px));
+  transition: transform var(--dur-4) var(--ease-enter);
 }
 .hero__scene,
 .hero__fg {
@@ -59,14 +70,18 @@
 .hero__scene img {
   object-fit: cover;
 }
+/* A hidden scene keeps nothing moving (its mist and particles). */
+.hero__scene[data-on='false'] .scene-fx {
+  display: none;
+}
 /* Foreground 2880×2000 = the frame in 2×, wider by 200 units each side (board `.fg6`). */
 .hero__fgs {
   position: absolute;
   inset: 0 calc(var(--u) * -200);
   z-index: 6;
   pointer-events: none;
-  transform: translate(calc(var(--mx) * -56px), calc(var(--my) * -20px));
-  transition: transform 0.6s ease-out;
+  transform: translate(calc(var(--mx) * -12px), calc(var(--my) * -6px));
+  transition: transform var(--dur-4) var(--ease-enter);
 }
 .hero__fg img {
   object-fit: cover;
@@ -74,8 +89,8 @@
 }
 /* Fireflies move with the scene when the mouse moves (parallax of the middle layer). */
 .hero .fireflies {
-  transform: translate(calc(var(--mx) * -20px), calc(var(--my) * -10px));
-  transition: transform 0.6s ease-out;
+  transform: translate(calc(var(--mx) * -8px), calc(var(--my) * -4px));
+  transition: transform var(--dur-4) var(--ease-enter);
 }
 .hero__veil {
   position: absolute;
@@ -130,8 +145,8 @@
   align-items: center;
   text-align: center;
   pointer-events: none;
-  transform: translate(calc(var(--mx) * -14px), calc(var(--my) * -8px));
-  transition: transform 0.6s ease-out;
+  transform: translate(calc(var(--mx) * -6px), calc(var(--my) * -3px));
+  transition: transform var(--dur-4) var(--ease-enter);
 }
 .hero__realm {
   display: flex;
@@ -189,6 +204,22 @@
   letter-spacing: 0.04em;
   text-transform: uppercase;
   white-space: nowrap;
+  color: transparent;
+  -webkit-text-stroke: max(0.6px, calc(var(--u) * 0.9))
+    color-mix(in srgb, var(--m1) 45%, transparent);
+  filter: drop-shadow(0 calc(var(--u) * 2.5) 0 var(--m4))
+    drop-shadow(0 calc(var(--u) * 2.5) 0 color-mix(in srgb, var(--m4) 60%, var(--shadow)))
+    drop-shadow(0 calc(var(--u) * 3) 0 var(--shadow))
+    drop-shadow(0 0 calc(var(--u) * 36) color-mix(in srgb, var(--c) 50%, transparent))
+    drop-shadow(
+      0 calc(var(--u) * 16) calc(var(--u) * 22) color-mix(in srgb, var(--shadow) 70%, transparent)
+    );
+}
+/* The material sits on each letter (components/motion/Letters): the gradient runs top to bottom,
+   so letter by letter it looks the same as on the whole word, and the sheen can cross the letters
+   one after another. */
+.hero__name .ch {
+  display: inline-block;
   background:
     linear-gradient(
         105deg,
@@ -208,19 +239,25 @@
   background-blend-mode: normal, screen, overlay, normal;
   -webkit-background-clip: text;
   background-clip: text;
-  color: transparent;
-  -webkit-text-stroke: max(0.6px, calc(var(--u) * 0.9))
-    color-mix(in srgb, var(--m1) 45%, transparent);
-  filter: drop-shadow(0 calc(var(--u) * 2.5) 0 var(--m4))
-    drop-shadow(0 calc(var(--u) * 2.5) 0 color-mix(in srgb, var(--m4) 60%, var(--shadow)))
-    drop-shadow(0 calc(var(--u) * 3) 0 var(--shadow))
-    drop-shadow(0 0 calc(var(--u) * 36) color-mix(in srgb, var(--c) 50%, transparent))
-    drop-shadow(
-      0 calc(var(--u) * 16) calc(var(--u) * 22) color-mix(in srgb, var(--shadow) 70%, transparent)
-    );
 }
-.hero__title.is-new > * {
-  animation: hero-in 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+/* A switch to another creature: the old name rises and fades (Hero `is-gone`), the new one comes
+   up letter by letter (`is-new`). */
+.hero__title.is-gone {
+  animation: hero-gone var(--dur-3) var(--ease-exit) forwards;
+}
+@keyframes hero-gone {
+  to {
+    opacity: 0;
+    transform: translateY(calc(-24px * var(--motion-scale)));
+  }
+}
+.hero__title.is-new > :not(.hero__name) {
+  animation: hero-in var(--dur-4) var(--ease-enter) both;
+}
+.hero__title.is-new .ch {
+  animation:
+    hero-in var(--dur-4) var(--ease-enter) calc(var(--ch) * 40ms) both,
+    hero-shine var(--dur-4) ease calc(var(--dur-3) + var(--ch) * 40ms) both;
 }
 .hero__title.is-new .hero__epithet {
   animation-delay: 0.08s;
@@ -228,16 +265,10 @@
 .hero__title.is-new .hero__realm {
   animation-delay: 0.14s;
 }
-.hero__title.is-new .hero__name {
-  animation:
-    hero-in 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both,
-    hero-shine 1.8s ease 0.45s both;
-}
 @keyframes hero-in {
   from {
     opacity: 0;
-    transform: translateY(30px) scale(0.96);
-    filter: blur(10px);
+    transform: translateY(calc(24px * var(--motion-scale)));
   }
 }
 @keyframes hero-shine {
@@ -266,8 +297,8 @@
   width: calc(var(--u) * 520);
   height: calc(var(--u) * 500);
   pointer-events: none;
-  transform: translate(calc(var(--mx) * -22px), calc(var(--my) * -10px));
-  transition: transform 0.6s ease-out;
+  transform: translate(calc(var(--mx) * -10px), calc(var(--my) * -5px));
+  transition: transform var(--dur-4) var(--ease-enter);
 }
 .hero__halo {
   position: absolute;
@@ -282,7 +313,8 @@
     color-mix(in srgb, var(--c) 40%, transparent),
     transparent
   );
-  animation: hero-pulse 4.6s ease-in-out infinite;
+  /* Rest: the stand's light breathes (8 s, runda v3 PREMIUM §2.3). */
+  animation: hero-pulse 8s ease-in-out infinite;
 }
 @keyframes hero-pulse {
   50% {
@@ -345,13 +377,21 @@
     opacity 0.9s ease,
     visibility 0s;
 }
+/* The computer that leaves sinks down while it fades; the new one rises (hero-photo-in). */
+.hero__photo[data-on='false'] {
+  transform: translateY(calc(32px * var(--motion-scale)));
+  transition:
+    opacity var(--dur-3) var(--ease-exit),
+    transform var(--dur-3) var(--ease-exit),
+    visibility 0s linear var(--dur-3);
+}
 .hero__photo[data-new='true'] {
-  animation: hero-photo-in 1s cubic-bezier(0.2, 0.7, 0.2, 1);
+  animation: hero-photo-in var(--dur-4) var(--ease-enter);
 }
 @keyframes hero-photo-in {
   from {
     opacity: 0;
-    transform: translateY(24px) scale(0.97);
+    transform: translateY(calc(32px * var(--motion-scale)));
   }
 }
 .hero__photo img {
@@ -766,6 +806,7 @@
   opacity: 1;
 }
 .hero-tiers__medal {
+  position: relative;
   display: block;
   border-radius: 50%;
   background: var(--scene-fade);
@@ -778,6 +819,51 @@
   display: block;
   width: calc(var(--u) * 54) !important;
   height: calc(var(--u) * 54) !important;
+}
+.hero-tiers__ring {
+  position: absolute;
+  inset: calc(var(--u) * -6);
+  width: calc(100% + var(--u) * 12);
+  height: calc(100% + var(--u) * 12);
+  rotate: -90deg;
+  overflow: visible;
+  pointer-events: none;
+}
+.hero-tiers__ring circle {
+  fill: none;
+  stroke: var(--tc);
+  stroke-dasharray: 100;
+}
+.hero-tiers__ring-base {
+  stroke-width: 1;
+  opacity: 0.45;
+}
+/* The run of the autoswitch: hidden unless the hero rotates, frozen while it is paused. */
+.hero-tiers__ring-run {
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-dashoffset: 100;
+  opacity: 0;
+}
+.hero[data-rotating='true'] .hero-tiers__ring-run {
+  opacity: 1;
+  animation: ring-run var(--hero-interval) linear both;
+}
+.hero[data-paused='true'] .hero-tiers__ring-run {
+  animation-play-state: paused;
+}
+.hero--intro .hero-tiers__ring-base {
+  animation: ring-draw var(--dur-4) var(--ease-enter) 300ms both;
+}
+@keyframes ring-run {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes ring-draw {
+  from {
+    stroke-dashoffset: 100;
+  }
 }
 .hero-tiers__item[aria-pressed='true'] .hero-tiers__medal {
   transform: scale(1.12);
@@ -1058,11 +1144,111 @@
   }
 }
 
+/* ---------- hero: entry (runda v3 PREMIUM §2.3, ~1,2 s, once, from the first paint) ----------
+   CSS alone, so it needs no JavaScript and never waits for it. Only transform and opacity move;
+   every keyframe gives the `from` state, the element's own style is the end — with reduced
+   motion (no animation) everything simply stands in place. The text on the left and its
+   buttons do not move at all: readable and clickable from the first frame. The photo (LCP on a
+   phone) only slides, it is never transparent. */
+.hero__horizon {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 60% 26% at 58% 64%,
+    color-mix(in srgb, var(--c) 34%, transparent),
+    transparent 70%
+  );
+  opacity: 0.7;
+  animation: hero-horizon 8s ease-in-out infinite;
+}
+@keyframes hero-horizon {
+  50% {
+    opacity: 1;
+  }
+}
+.hero__dawn {
+  position: absolute;
+  inset: 0 calc(var(--u) * -200);
+  /* Over the scene, its light and the veil (z 2, later in the DOM); under the name (3), the
+     computer (4, the LCP photo on a phone — never covered) and the text. */
+  z-index: 2;
+  pointer-events: none;
+  background: var(--scene-bg);
+  opacity: 0;
+}
+.hero--intro .hero__dawn {
+  animation: intro-dawn var(--dur-3) var(--ease-exit) both;
+}
+.hero--intro .hero__horizon {
+  animation:
+    intro-fade var(--dur-4) var(--ease-enter) 100ms both,
+    hero-horizon 8s ease-in-out 1.2s infinite;
+}
+.hero--intro .hero__scene[data-on='true'] {
+  animation: intro-scene 1.2s var(--ease-enter) both;
+}
+.hero--intro .hero__realm,
+.hero--intro .hero__epithet {
+  animation: intro-rise var(--dur-3) var(--ease-enter) 200ms both;
+}
+.hero--intro .hero__flourish {
+  animation: intro-draw var(--dur-3) var(--ease-enter) 350ms both;
+}
+.hero--intro .hero__name .ch {
+  /* Readable by 700 ms (PREMIUM §2.1): from 100 ms, 30 ms apart, the 9th letter on with the 8th. */
+  animation:
+    intro-letter calc(var(--dur-2) * 1.5) var(--ease-enter) calc(100ms + min(var(--ch), 8) * 30ms)
+      both,
+    hero-shine var(--dur-4) ease calc(800ms + var(--ch) * 40ms) both;
+}
+.hero--intro .hero__photo[data-on='true'] {
+  animation: intro-settle var(--dur-4) var(--ease-enter) 250ms both;
+}
+/* The fans pulse once in the creature's colour: a soft light over the case, not a new photo. */
+.hero__photo::after {
+  content: '';
+  position: absolute;
+  inset: 18% 22% 22%;
+  border-radius: 40%;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--c) 55%, transparent),
+    transparent
+  );
+  mix-blend-mode: screen;
+  opacity: 0;
+  pointer-events: none;
+}
+.hero--intro .hero__photo[data-on='true']::after {
+  animation: intro-pulse var(--dur-4) ease-in-out 800ms both;
+}
+.hero--intro .hero__halo {
+  animation:
+    intro-flare var(--dur-4) var(--ease-enter) 600ms both,
+    hero-pulse 8s ease-in-out 1.5s infinite;
+}
+.hero--intro .hero-card {
+  animation: intro-slide var(--dur-3) var(--ease-enter) 200ms both;
+}
+@keyframes intro-flare {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.6);
+  }
+  55% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.12);
+  }
+}
+
 /* ---------- reduced motion: no scene animation, parallax or transitions (ADR-G003 §5) ---------- */
 @media (prefers-reduced-motion: reduce) {
   .workshop__live {
     animation: none;
   }
+  .hero,
   .hero *,
   .hero *::before,
   .hero *::after {

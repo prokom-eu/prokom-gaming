@@ -48,7 +48,7 @@ export function Bestiary({ hero, games }: { hero: HeroData; games: readonly Pane
         {cards.length > 0 && (
           <ul className="hm-best__grid">
             {cards.map((build) => (
-              <li key={build.slug}>
+              <li key={build.slug} data-reveal="">
                 <CreatureCard build={build} game={cyberpunk} />
               </li>
             ))}
