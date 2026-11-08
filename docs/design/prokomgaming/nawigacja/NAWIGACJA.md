@@ -19,7 +19,7 @@ Wzór działania: szyna i wyszukiwarka linii PRO-KOM w `prokom-web` (`docs/desig
 Zmienia się wygląd. Dochodzą trzy nowe elementy: **boczna szyna** (≥ 1400 px), **wyszukiwarka** (Ctrl K) i **pasek przewijania w kolorach marki**.
 
 Nie zmieniamy:
-- treści stron ani sekcji (sekcja „Teraz w warsztacie” zostaje na stronie głównej, tylko nie ma jej w szynie),
+- treści stron ani sekcji (sekcja „Teraz w warsztacie” nie ma jej w szynie — od 08.11 nie ma jej też na stronie, ADR-G015),
 - danych w Payload (jedyny wyjątek to pole flagi „Ostatnio oglądane”, §4.5),
 - stopki,
 - panelu `/admin`.
@@ -145,7 +145,7 @@ Plansza §2 (na żywo) i §3 (stany). Komponent `src/components/rail/SiteRail.ts
 | X | Zanim zapytasz | `HomeFaq` | `pytania` | `pytania` |
 | XI | Napisz, w co grasz | `FinalCta` | `napisz` | `napisz` |
 
-`WorkshopStrip` („Teraz w warsztacie”) **nie jest** w szynie (decyzja Krystiana 03.11) i zostaje na stronie bez zmian. Identyfikatory `id` dopisujemy do istniejących `<section>` w komponentach. Nie mogą się dublować z identyfikatorami w treści: sprawdzić `grep 'id="'`. Każda sekcja dostaje `scroll-margin-top: calc(var(--nav-h-scrolled) + 16px)`.
+`WorkshopStrip` („Teraz w warsztacie”) **nie jest** w szynie (decyzja Krystiana 03.11); od 08.11 usunięty ze strony na stałe (ADR-G015). Identyfikatory `id` dopisujemy do istniejących `<section>` w komponentach. Nie mogą się dublować z identyfikatorami w treści: sprawdzić `grep 'id="'`. Każda sekcja dostaje `scroll-margin-top: calc(var(--nav-h-scrolled) + 16px)`.
 
 4. **Kreska**, a pod nią **akcje**:
    - **Porównanie**: ikona słupków, złoty licznik `compareCount` z `useShell()`. W stanie zwiniętym licznik siedzi na ikonie, w rozwiniętym przy prawej krawędzi. Prowadzi do `routes.compare`.

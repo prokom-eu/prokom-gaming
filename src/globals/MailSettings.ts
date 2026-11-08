@@ -41,8 +41,8 @@ const minutes = (name: string, label: string, defaultValue: number): NumberField
 
 /**
  * Inquiries and mail (panel spec §13, ADR-G008): reply hours of the promise on the site, the
- * reply time shown on the list, the SLA alarm, the signature for {podpis} and the two order
- * switches (stage e-mail, workshop strip on the home page — P5). The sender is the
+ * reply time shown on the list, the SLA alarm, the signature for {podpis} and the order switch
+ * (stage e-mail — P5; the workshop strip switch went with the strip, ADR-G015). The sender is the
  * Gaming mailbox from env (`MAIL_FROM_ADDRESS`) — not editable here.
  */
 export const MailSettings: GlobalConfig = {

@@ -42,7 +42,7 @@ DoD: lint, typecheck, testy, build, CI; /przeglad; STAN; /pr.
 Gałąź feat/gn2-szyna od origin/develop (po scaleniu GN-1).
 Przeczytaj: NAWIGACJA.md §4 i §8, plansza GamingNawigacja.dc.html (sekcje 2 i 3 — ikony w obiekcie ic.*), komponenty strony głównej (src/components/home/*), strony z „Na tej stronie” (zestawy/[slug], konfigurator, dobor-pod-gre, komputer-do/[gra], dla-rodzicow, o-nas, pytania, poradniki), ShellProvider (compareCount).
 Plan w trybie planowania do mojej akceptacji — w planie tabela „Na tej stronie”: dla każdej strony prawdziwe sekcje i nagłówki z kodu (nie z tabeli spec, jeśli się różnią).
-1. id + scroll-margin-top w 11 sekcjach strony głównej wg spec §4.2 (WorkshopStrip bez id w szynie — zostaje na stronie bez zmian). Sprawdź duplikaty id.
+1. id + scroll-margin-top w 11 sekcjach strony głównej wg spec §4.2 (WorkshopStrip bez id w szynie; od 08.11 usunięty ze strony — ADR-G015). Sprawdź duplikaty id.
 2. components/rail/: SiteRail (fixed, 64 → 258 px, hover/focus-within/dotyk, Esc), useActiveSection (IntersectionObserver), railConfig (sekcje główne + „Na tej stronie”), pierścień „Do góry”, licznik Porównania. Bez renderu poniżej 1400 px (nie tylko display:none). Wyłączona na /metryka/* i /konto/*.
 3. Na podstronach: grupa „Na tej stronie · {nazwa}”, sekcje główne zwinięte do „Sekcje strony głównej I–XI ▾”, linki /#id.
 4. „Ostatnio oglądane”: flaga site-settings.navigation.recentlyViewed (domyślnie wyłączona; migracja tylko jeśli grupy nie ma), localStorage pkg:recent (try/catch, same slugi, max 3).

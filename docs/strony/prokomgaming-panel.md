@@ -105,7 +105,7 @@ Trzy kolumny (zrzut `Zapytania-1440`): lista · wątek · klient i konfiguracja.
 - **Bez danych z wizyt na stronie** (Umami nie łączy wizyt z osobą — i tak ma zostać).
 
 ## 7. Zamówienia i warsztat (`/admin/zamowienia`)
-- Tablica 7 etapów z `orders.stage` (G14; etykiety: Oferta przyjęta, Opłacone, Części, Montaż, Testy, Metryka, Wysłane). Karta: pieczęć, zestaw, numer `Z-RRRR-NNNN`, klient (imię), cena, termin, czas w etapie, ostatnia notatka. Kliknięcie → panel szczegółów: etap, termin, napis na tablicy strony („<Zestaw>: <etap>”), **lista kontrolna serwisu**, Klient, Metryka, „Przesuń do: <następny etap>”.
+- Tablica 7 etapów z `orders.stage` (G14; etykiety: Oferta przyjęta, Opłacone, Części, Montaż, Testy, Metryka, Wysłane). Karta: pieczęć, zestaw, numer `Z-RRRR-NNNN`, klient (imię), cena, termin, czas w etapie, ostatnia notatka. Kliknięcie → panel szczegółów: etap, termin, ~~napis na tablicy strony~~ (bez — taśmy na stronie nie ma, ADR-G015), **lista kontrolna serwisu**, Klient, Metryka, „Przesuń do: <następny etap>”.
 - Nowe pola `orders` (**dodawane w G14** — dopisek panelu, bez osobnej migracji w P5): `dueDate`, `checklist` (tablica `{ key, done, doneAt, doneBy }`; klucze i teksty z planszy, stała `CK`), `workshopNote`. Przesunięcie dopisuje `stageHistory` i — gdy włączone w ustawieniach — wysyła klientowi e-mail z nowym etapem (szablon w `reply-templates`, rodzaj `stage`).
 - Rola `serwis` (G14) widzi tablicę, egzemplarze i zgłoszenia, **bez cen zakupu i marż**.
 

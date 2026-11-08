@@ -413,7 +413,7 @@ async function seedStock(payload: Payload): Promise<void> {
 }
 
 /**
- * Sample units and orders (G14): the workshop strip, `/metryka/<code>` and the account have data
+ * Sample units and orders (G14): the panel board, `/metryka/<code>` and the account have data
  * locally and in CI. Units are matched by their fixed code, orders by e-mail + build. Stages are
  * reset to the seed values on every run.
  */
