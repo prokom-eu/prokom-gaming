@@ -41,6 +41,7 @@ E3 — ruch: sekcje, liczby, konfigurator, mikrointerakcje, przejścia stron (PR
 3. Mikrointerakcje: przyciski, licznik porównania/zapytania z lotem ikony, arkusze na telefonie, fokus.
 4. View Transitions: lista → karta zestawu (obudowa), sprawdź sposób włączenia w Next 16; bez obsługi w przeglądarce — zwykłe przejście.
 5. „Dla rodziców” i „Kontakt” — tylko spokojne wejścia i hover.
+6. Stany ładowania (Krystian 08.11, PREMIUM §2.3 „Ładowanie”): wolne przejście między stronami (`loading.tsx`), sceny i zdjęcia wyłaniają się zamiast „wskakiwać”, przyciski formularzy „wysyłam…”.
 
 Każdy PR: testy z PREMIUM §3 dla swojego zakresu, reduced-motion e2e, Lighthouse 5 stron z G15 bez spadku, nagrania „po” w PR, prawdziwy Android przed scaleniem E2 i E3; lint, typecheck, testy, build, CI; /przeglad; STAN; /pr.
 Nie zmieniaj: cen i lib/pricing, treści poza tymi z PREMIUM, kolejności sekcji, adresów.
