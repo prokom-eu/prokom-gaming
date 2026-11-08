@@ -67,7 +67,13 @@
   display: inline-block;
   font-size: 20px;
   color: var(--kosc);
+}
+/* Named only while a filter change runs (BuildsBrowser sets data-vt on <html>). */
+:root[data-vt='filter'] .bl-count b {
   view-transition-name: bl-count;
+}
+:root[data-vt='filter'] .bl-grid > li {
+  view-transition-name: var(--vt);
 }
 
 .bl-grid {

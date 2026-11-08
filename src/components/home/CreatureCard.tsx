@@ -2,6 +2,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import { CasePhoto } from '@/components/CasePhoto'
+import { FadeImage } from '@/components/motion/FadeImage'
+import { SharedCase } from '@/components/motion/SharedCase'
 import { Sigil } from '@/components/Sigil'
 import { SourceLabel } from '@/components/SourceLabel'
 import type { CasePhoto as CasePhotoData } from '@/lib/caseBox'
@@ -45,6 +47,8 @@ export function CreatureCardView({
   /** Above the fold (the first card of a game page): loaded at once, the scene first. */
   eager?: boolean
 }) {
+  // A lazy scene emerges once loaded (runda v3 PREMIUM §2.3); an eager one may be the LCP.
+  const SceneImg = eager ? Image : FadeImage
   return (
     <Link
       href={`/zestawy/${card.slug}`}
@@ -54,7 +58,7 @@ export function CreatureCardView({
       <span className="hm-card__view" aria-hidden="true">
         {/* Fixed sizes (scene cropped by CSS, photo standing on the pedestal): a srcset of 1x/2x
             instead of every device width keeps 32 images from bloating the page HTML. */}
-        <Image
+        <SceneImg
           className="hm-card__scene"
           src={`/scenes/${card.key}-card.webp`}
           alt=""
@@ -67,7 +71,9 @@ export function CreatureCardView({
         {card.photo && (
           <span className="hm-card__photo">
             {/* The case is at most ~231 px tall (330 px view); its file width follows from the box. */}
-            <CasePhoto photo={card.photo} caseHeight={231} eager={eager} />
+            <SharedCase slug={card.slug}>
+              <CasePhoto photo={card.photo} caseHeight={231} eager={eager} />
+            </SharedCase>
           </span>
         )}
         <span className="hm-card__sigil">
