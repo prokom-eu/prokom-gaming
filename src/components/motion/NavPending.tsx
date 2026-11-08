@@ -11,8 +11,11 @@ const SHOW_AFTER = 300
 /** A navigation that never ends (offline, a server error page) must not leave it on screen. */
 const GIVE_UP_AFTER = 10_000
 
-/** `from`: the path the visitor is leaving — the sigil belongs to that page only. */
-type Pending = { from: string; creature: MenuCreature | null }
+/**
+ * `from`: the path the visitor is leaving — the sigil belongs to that page only. `visible`: set
+ * after 300 ms; before that only the (empty) live region is there, ready to announce.
+ */
+type Pending = { from: string; creature: MenuCreature | null; visible: boolean }
 
 /**
  * A slow page change (PREMIUM §2.3 „Ładowanie”): after 300 ms the sigil of the creature you are
@@ -36,8 +39,14 @@ export function NavPending({ creatures }: { creatures: readonly MenuCreature[] }
       window.clearTimeout(giveUp)
       const slug = /^\/zestawy\/([^/]+)$/.exec(path)?.[1]
       const creature = creatures.find((c) => c.slug === slug) ?? null
-      // `pathname` is the page being left (this effect belongs to it).
-      timer = window.setTimeout(() => setPending({ from: pathname, creature }), SHOW_AFTER)
+      // `pathname` is the page being left (this effect belongs to it). The live region comes at
+      // once (empty), its text after 300 ms — a region that appears with its text is often not
+      // announced; one that stays in the DOM would sit on every page.
+      setPending({ from: pathname, creature, visible: false })
+      timer = window.setTimeout(
+        () => setPending({ from: pathname, creature, visible: true }),
+        SHOW_AFTER,
+      )
       giveUp = window.setTimeout(() => setPending(null), GIVE_UP_AFTER)
     }
     const onClick = (event: MouseEvent) => {
@@ -81,12 +90,12 @@ export function NavPending({ creatures }: { creatures: readonly MenuCreature[] }
 
   // A View Transition holds back the effects of the new page (and so the cleanup of the timer)
   // until its snapshot is taken: a timer firing in that gap sets state for the page already left.
-  const shown = pending !== null && pending.from === pathname
-  const creature = shown ? pending.creature : null
+  if (!pending || pending.from !== pathname) return null
+  const shown = pending.visible
+  const creature = pending.creature
   return (
     <>
-      {/* Always in the DOM, so screen readers announce the text when it appears. No role: pages
-          keep their own single status message (forms, the configurator). */}
+      {/* Only during a navigation (pages keep their own single status message). */}
       <span className="sr-only nav-pending__live" aria-live="polite">
         {shown ? 'Wczytuję stronę…' : ''}
       </span>

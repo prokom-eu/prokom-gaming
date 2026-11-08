@@ -287,23 +287,38 @@ test('a gold button leans towards the cursor, at most 4 px', async ({ page, isMo
   expect(await pullX()).toBeLessThanOrEqual(4)
 })
 
-test('every finite animation on the home page ends (none stuck in an unrendered section)', async ({
+test('home sections: every finite animation ends (none stuck in an unrendered section)', async ({
   page,
 }) => {
   await page.goto('/')
-  const ended = await page.evaluate(() =>
-    Promise.race([
-      Promise.all(
-        document
-          .getAnimations()
-          .filter((a) => a.timeline instanceof DocumentTimeline)
-          .filter((a) => a.effect?.getTiming().iterations !== Infinity)
-          .map((a) => a.finished.catch(() => undefined)),
-      ).then(() => true),
-      new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 15_000)),
-    ]),
-  )
-  expect(ended).toBe(true)
+  // The sections below the hero only (the hero keeps changing creatures on its own timer).
+  const stuck = await page.evaluate(async () => {
+    const running = document
+      .getAnimations()
+      .filter((a) => a.timeline instanceof DocumentTimeline)
+      .filter((a) => a.effect?.getTiming().iterations !== Infinity)
+      .filter((a) => {
+        const target = (a.effect as KeyframeEffect | null)?.target
+        return target instanceof Element && target.closest('.hm-sec') !== null
+      })
+    await Promise.race([
+      Promise.all(running.map((a) => a.finished.catch(() => undefined))),
+      new Promise((resolve) => setTimeout(resolve, 15_000)),
+    ])
+    return running
+      .filter((a) => a.playState === 'running' || a.playState === 'paused')
+      .map((a) => {
+        const name =
+          a instanceof CSSAnimation
+            ? a.animationName
+            : a instanceof CSSTransition
+              ? a.transitionProperty
+              : a.id
+        const target = (a.effect as KeyframeEffect | null)?.target
+        return `${name} on ${target instanceof Element ? target.className : '?'}`
+      })
+  })
+  expect(stuck).toEqual([])
 })
 
 test('the counting property leaves the comparison tables alone (their own --n)', async ({
