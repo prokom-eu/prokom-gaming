@@ -29,7 +29,6 @@ src/
     (site)/...               # publiczne strony (mapa: spec. §2)
     (payload)/admin/...      # panel
     api/inquiry/             # przyjmowanie zapytań (kontrakt jak ADR-003 w prokom-web, ADR-G005)
-    api/warsztat/            # publiczna taśma warsztatu: nazwa zestawu, kolor, etap (ADR-G005)
     api/konto/               # konto klienta: rejestracja, zgłoszenie, zapisane konfiguracje, dane (ADR-G005)
     api/health/              # zdrowie aplikacji (wdrożenie czeka na 200)
   collections/  globals/

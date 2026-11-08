@@ -1,4 +1,4 @@
-/* Home page — hero and workshop strip (G7). Geometry from board Main (`.hero6`): one unit `--u` =
+/* Home page — hero (G7). Geometry from board Main (`.hero6`): one unit `--u` =
    1 px of the 1440×1000 reference frame, scaled by the hero's own size (container units). Colours
    only from tokens.css (ADR-G003 §2). */
 
@@ -1042,60 +1042,8 @@
   }
 }
 
-/* ---------- workshop strip ---------- */
-.workshop {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  align-items: center;
-  gap: 24px;
-  min-height: 64px;
-  padding: 0 40px;
-  border-top: 1px solid color-mix(in srgb, var(--grom) 25%, transparent);
-  border-bottom: 1px solid var(--line);
-  background: var(--tick-bg);
-}
-.workshop__title {
-  margin: 0;
-  font-family: var(--font-text);
-  font-size: 14px;
-  font-weight: 800;
-  color: var(--kosc);
-  white-space: nowrap;
-}
-.workshop__list {
-  display: flex;
-  gap: 44px;
-  margin: 0;
-  padding: 0;
-  overflow-x: auto;
-  list-style: none;
-  scrollbar-width: none;
-  counter-reset: stage;
-}
-.workshop__list::-webkit-scrollbar {
-  display: none;
-}
-.workshop__list li {
-  counter-increment: stage;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 14px;
-  color: var(--tick-text);
-  white-space: nowrap;
-}
-.workshop__list li::before {
-  content: counter(stage);
-  font-family: var(--font-name);
-  font-weight: 700;
-  color: var(--grom);
-}
-/* Live orders (G14): sigil in the creature colour, build name, stage (board Main `.tk`). */
-.workshop__title {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
+/* „W warsztacie teraz” in „Zanim wyjedzie” (BeforeShipping): the live dot. The strip of orders
+   under the hero is gone for good (ADR-G015). */
 .workshop__live {
   width: 9px;
   height: 9px;
@@ -1107,32 +1055,6 @@
 @keyframes workshop-pulse {
   50% {
     opacity: 0.45;
-  }
-}
-.workshop__list--live li::before {
-  content: none;
-}
-.workshop__list--live li {
-  color: var(--tick-text);
-}
-.workshop__list--live b {
-  color: var(--kosc);
-}
-.workshop__sigil {
-  flex: none;
-  color: var(--c);
-}
-@media (max-width: 1023px) {
-  .workshop {
-    grid-template-columns: 1fr;
-    gap: 8px;
-    padding: 12px 18px;
-  }
-  /* Wrapped, not scrolled: a scrolling list without focusable items is out of keyboard reach. */
-  .workshop__list {
-    flex-wrap: wrap;
-    gap: 6px 24px;
-    overflow: visible;
   }
 }
 

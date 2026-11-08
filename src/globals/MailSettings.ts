@@ -41,8 +41,8 @@ const minutes = (name: string, label: string, defaultValue: number): NumberField
 
 /**
  * Inquiries and mail (panel spec §13, ADR-G008): reply hours of the promise on the site, the
- * reply time shown on the list, the SLA alarm, the signature for {podpis} and the two order
- * switches (stage e-mail, workshop strip on the home page — P5). The sender is the
+ * reply time shown on the list, the SLA alarm, the signature for {podpis} and the order switch
+ * (stage e-mail — P5; the workshop strip switch went with the strip, ADR-G015). The sender is the
  * Gaming mailbox from env (`MAIL_FROM_ADDRESS`) — not editable here.
  */
 export const MailSettings: GlobalConfig = {
@@ -80,22 +80,12 @@ export const MailSettings: GlobalConfig = {
     },
     // Section „Zamówienia i klienci” of the board Ustawienia (panel spec §13, decided in P5:
     // here, beside the other mail settings). Switched in the panel view.
+    // The strip of orders on the home page and its switch are gone for good (ADR-G015).
     {
-      type: 'row',
-      fields: [
-        {
-          name: 'stageEmail',
-          label: 'E-mail do klienta przy zmianie etapu',
-          type: 'checkbox',
-          defaultValue: true,
-        },
-        {
-          name: 'workshopStrip',
-          label: 'Pokazuj zamówienia na tablicy warsztatu',
-          type: 'checkbox',
-          defaultValue: true,
-        },
-      ],
+      name: 'stageEmail',
+      label: 'E-mail do klienta przy zmianie etapu',
+      type: 'checkbox',
+      defaultValue: true,
     },
   ],
 }

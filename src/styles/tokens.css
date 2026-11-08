@@ -95,8 +95,8 @@
 }
 
 /* ---------------------------------------------------------------------------------------------
-   Uzupełnienie (G7): hero strony głównej i taśma — wartości wpisane wprost w planszy Main
-   (`.hero6`, `.card6`, `.strip6`, `.tick5`).
+   Uzupełnienie (G7): hero strony głównej — wartości wpisane wprost w planszy Main
+   (`.hero6`, `.card6`, `.strip6`).
    --------------------------------------------------------------------------------------------- */
 :root {
   --white: #fff; /* blask i jasne końce materiałów */
@@ -126,8 +126,6 @@
     #ff7a1a,
     #f2c230
   );
-  --tick-bg: #050907; /* taśma „Teraz w warsztacie” */
-  --tick-text: #bdb39b;
   --live: #5bc23e; /* kropka „na żywo” (plansza Main, `.live`) */
 }
 

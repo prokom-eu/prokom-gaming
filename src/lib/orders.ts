@@ -1,5 +1,5 @@
 // Orders and their stages (ADR-G005, panel spec §7). Pure — shared by the collection, the
-// workshop strip on the home page, the account and the certificate pages.
+// workshop board, the account and the certificate pages.
 
 /** Prefix of the order number (`Z-2026-0007`, panel spec §7). */
 export const ORDER_NUMBER_PREFIX = 'Z'
@@ -93,22 +93,6 @@ export const CUSTOMER_STAGE_TEXT: Record<OrderStage, string> = {
   delivered: 'komputer jest u Ciebie. Miłego grania!',
 }
 
-/**
- * What the workshop strip on the home page says (board Main, `.tk`). Board phrases where they fit;
- * TODO(krystian): `paid` and `shipped` are drafts.
- */
-export const WORKSHOP_STAGE_TEXT: Partial<Record<OrderStage, string>> = {
-  paid: 'czeka na części',
-  parts: 'części zamówione',
-  assembly: 'montaż i układanie kabli',
-  test: 'test obciążeniowy',
-  metric_ready: 'metryka gotowa, jutro wysyłka',
-  shipped: 'w drodze do klienta',
-}
-
-/** Stages shown on the strip: paid and in the workshop, plus recently shipped. */
-export const WORKSHOP_STAGES = Object.keys(WORKSHOP_STAGE_TEXT) as OrderStage[]
-
 /** Paid and not shipped yet: the computers physically in the workshop. */
 export const IN_WORKSHOP_STAGES: OrderStage[] = [
   'paid',
@@ -117,49 +101,6 @@ export const IN_WORKSHOP_STAGES: OrderStage[] = [
   'test',
   'metric_ready',
 ]
-
-/** A shipped order stays on the strip this long, then drops off even if never marked delivered. */
-export const WORKSHOP_SHIPPED_DAYS = 3
-
-/** Most items on the strip. */
-export const WORKSHOP_LIMIT = 12
-
-/** One strip item — the only order data that is public (ADR-G005): build name, colour, stage. */
-export type WorkshopItem = {
-  name: string
-  /** Build slug: the creature colour token `--c-<slug>`. */
-  slug: string
-  /** Creature file key: the sigil. */
-  key: string
-  stage: OrderStage
-  text: string
-}
-
-type WorkshopBuild = { name: string; slug: string; key: string }
-
-type WorkshopSource = {
-  stage: OrderStage
-  stageChangedAt: string | Date | null | undefined
-  build: WorkshopBuild | null
-}
-
-/** Pure selection of strip items from orders sorted newest first. */
-export function workshopItems(orders: readonly WorkshopSource[], now: Date): WorkshopItem[] {
-  const shippedSince = now.getTime() - WORKSHOP_SHIPPED_DAYS * 24 * 60 * 60 * 1000
-  const items: WorkshopItem[] = []
-  for (const order of orders) {
-    const text = WORKSHOP_STAGE_TEXT[order.stage]
-    if (!text || !order.build) continue
-    if (order.stage === 'shipped') {
-      const changed = order.stageChangedAt ? new Date(order.stageChangedAt).getTime() : 0
-      if (changed < shippedSince) continue
-    }
-    const { name, slug, key } = order.build
-    items.push({ name, slug, key, stage: order.stage, text })
-    if (items.length >= WORKSHOP_LIMIT) break
-  }
-  return items
-}
 
 /** Service checklist on an order (panel spec §7): keys and texts 1:1 from the board constant `CK`. */
 export const CHECKLIST_ITEMS = [
@@ -187,11 +128,6 @@ export function stageLabel(stage: OrderStage): string {
 export function nextStage(stage: OrderStage): OrderStage | null {
   const i = BOARD_STAGES.indexOf(stage)
   return i < 0 || i === BOARD_STAGES.length - 1 ? null : (BOARD_STAGES[i + 1] ?? null)
-}
-
-/** „Na tablicy na stronie” in the order panel (board Zamowienia): „Skrzat: Testy”. */
-export function boardStripText(buildName: string | null, stage: OrderStage): string | null {
-  return buildName ? `${buildName}: ${stageLabel(stage)}` : null
 }
 
 /**
