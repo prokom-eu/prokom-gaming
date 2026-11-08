@@ -146,7 +146,7 @@ export function AddOption({
   type: OptionType
   title: string
   onClose: () => void
-  onAdded: (label: string) => void
+  onAdded: (label: string, photoWarning?: string) => void
   approveHref: string
 }) {
   const [values, setValues] = useState<Record<string, string>>(() => initial(type))
@@ -206,7 +206,7 @@ export function AddOption({
       }
       try {
         const outcome = await addOption(form)
-        if (outcome.ok) onAdded(values.publicLabel ?? outcome.code)
+        if (outcome.ok) onAdded(values.publicLabel ?? outcome.code, outcome.photoWarning)
         else setErrors(outcome.messages)
       } catch {
         // TODO(krystian): message not on the board.

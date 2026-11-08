@@ -1,10 +1,10 @@
 import type { Access, CollectionConfig, Condition } from 'payload'
-
 import { number, select } from 'payload/shared'
 
 import { adminField, adminOnly, isAdmin } from '../access/panel'
 import { GROUP_OFFER, RAM_TYPES, requiredFor, requiredWhen } from './shared'
 import type { Option } from '../payload-types'
+import { CASE_PHOTO_HINT } from '../lib/caseBox'
 import { queueAlarmOnCostChange } from './marginAlarmHook'
 import { blockDeactivateWhenUsed, blockDeleteWhenUsed } from './usage'
 import { COST_LABEL, COST_SOURCES, stampOptionCost } from './costStamp'
@@ -128,7 +128,11 @@ export const Options: CollectionConfig = {
       label: 'Zdjęcie',
       type: 'upload',
       relationTo: 'media',
-      admin: { condition: forTypes('case', 'cooler') },
+      admin: {
+        condition: forTypes('case', 'cooler'),
+        // Runda v3 §1.2: a cut or small case photo shows on the Pulpit and in „Opcje”.
+        description: `${CASE_PHOTO_HINT} Ucięte lub za małe zdjęcia obudów pokazują Pulpit i lista Opcji.`,
+      },
     },
     { name: 'description', label: 'Opis', type: 'text' },
     // Case

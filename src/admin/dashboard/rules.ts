@@ -10,7 +10,7 @@ import type { IconName } from '../ui/icons'
  * The price report rules (unavailable parts, unread report) since P7.
  */
 
-export type TodoKind = 'inquiries' | 'queue' | 'order' | 'unavailable' | 'report'
+export type TodoKind = 'inquiries' | 'queue' | 'order' | 'unavailable' | 'report' | 'photos'
 
 export type TodoItem = {
   kind: TodoKind
@@ -58,6 +58,8 @@ export type TodoInput = {
     /** Items of builds without a usable offer: name and builds. */
     unavailable: readonly { title: string; builds: readonly string[] }[]
   } | null
+  /** Runda v3 §1.2: active cases whose photo is cut or too small — option codes. */
+  casePhotos?: readonly string[]
 }
 
 /** Orders due within this many working days count (spec §3.3). */
@@ -248,6 +250,21 @@ function reportItems(input: TodoInput): TodoItem[] {
   return out
 }
 
+// TODO(krystian): wording (not on the board).
+function photosItem(input: TodoInput): TodoItem | null {
+  const codes = input.casePhotos ?? []
+  if (codes.length === 0) return null
+  return {
+    kind: 'photos',
+    key: 'photos',
+    urgent: false,
+    icon: 'alert',
+    title: `${codes.length} ${plural(codes.length, ['zdjęcie obudowy', 'zdjęcia obudów', 'zdjęć obudów'])} do wymiany`,
+    note: `Ucięte lub za małe: ${codes.join(', ')}. Całe zdjęcie z przezroczystym tłem, min. 900 px wysokości.`,
+    action: { label: 'Opcje', path: '/opcje' },
+  }
+}
+
 /** The whole list: urgent first, then inquiries, the queue, the report and orders by due date. */
 export function todoList(input: TodoInput, now: Date): TodoItem[] {
   const items = [
@@ -255,6 +272,7 @@ export function todoList(input: TodoInput, now: Date): TodoItem[] {
     queueItem(input),
     ...reportItems(input),
     ...orderItems(input, now),
+    photosItem(input),
   ].filter((i): i is TodoItem => i !== null)
   // Stable sort: the order above stays within the urgent and the rest.
   return items.sort((a, b) => Number(b.urgent) - Number(a.urgent))

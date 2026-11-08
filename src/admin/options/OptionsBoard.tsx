@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useState, useTransition } from 'react'
 
+import { CASE_PHOTO_HINT, CASE_PHOTO_WARNING } from '../../lib/caseBox'
 import { zl } from '../../lib/pricing/format'
 import { Alert } from '../ui/Alert'
 import { Card } from '../ui/Card'
@@ -91,6 +92,11 @@ export function OptionsBoard({ rows, approveHref }: { rows: OptionRow[]; approve
           <span>
             <b>{r.label}</b>
             {r.internalModel ? <small>{r.internalModel}</small> : null}
+            {r.photoIssues.length > 0 ? (
+              <span className={styles.photoWarn} title={CASE_PHOTO_HINT}>
+                <Chip tone="warn">{CASE_PHOTO_WARNING}</Chip>
+              </span>
+            ) : null}
           </span>
         </span>
       ),
@@ -239,13 +245,13 @@ export function OptionsBoard({ rows, approveHref }: { rows: OptionRow[]; approve
           type={tab}
           title={current.addTitle!}
           onClose={() => setAdding(false)}
-          onAdded={(label) => {
+          onAdded={(label, photoWarning) => {
             setAdding(false)
             // TODO(krystian): message not on the board.
             setMessage({
               tone: 'ok',
               title: `Dodano: ${label}`,
-              text: 'Czeka w „Do zatwierdzenia” jako nowa cena; do konfiguratora włączysz ją po publikacji.',
+              text: `Czeka w „Do zatwierdzenia” jako nowa cena; do konfiguratora włączysz ją po publikacji.${photoWarning ? ` Uwaga: ${photoWarning}` : ''}`,
             })
             router.refresh()
           }}

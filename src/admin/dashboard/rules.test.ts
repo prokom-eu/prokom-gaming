@@ -211,3 +211,20 @@ describe('todoList — price report (P7)', () => {
     )
   })
 })
+
+describe('case photos to replace (runda v3 §1.2)', () => {
+  it('lists the codes, after the other items, with a link to the options', () => {
+    const [item] = todoList({ ...base, casePhotos: ['EXO', 'LB500'] }, now)
+    expect(item).toMatchObject({
+      kind: 'photos',
+      urgent: false,
+      title: '2 zdjęcia obudów do wymiany',
+      action: { label: 'Opcje', path: '/opcje' },
+    })
+    expect(item!.note).toContain('EXO, LB500')
+  })
+
+  it('says nothing when every photo is fine', () => {
+    expect(todoList({ ...base, casePhotos: [] }, now)).toEqual([])
+  })
+})

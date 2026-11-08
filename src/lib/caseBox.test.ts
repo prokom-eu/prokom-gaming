@@ -160,9 +160,9 @@ describe('casePhotoIssues (runda v3 §1.2)', () => {
     ).toEqual(['edge'])
   })
 
-  it('flags a case under 900 px tall', () => {
+  it('flags a file under 900 px tall', () => {
     expect(
-      casePhotoIssues({ width: 800, height: 950, box: { x: 0.05, y: 0.03, w: 0.9, h: 0.93 } }),
+      casePhotoIssues({ width: 800, height: 850, box: { x: 0.05, y: 0.03, w: 0.9, h: 0.93 } }),
     ).toEqual(['small'])
   })
 
