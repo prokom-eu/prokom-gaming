@@ -189,3 +189,21 @@ test('the page carries no cost or internal model', async ({ page, playwright, ba
   expect(response?.status()).toBe(200)
   expectNoHiddenOffer(await response!.text(), internalModels)
 })
+
+// Runda v2 §3.2 / ADR-G003 §5: one animated layer of fireflies, only on a desktop width with
+// motion allowed.
+test('fireflies: shown on a desktop with motion, hidden on a phone or with reduced motion', async ({
+  page,
+  isMobile,
+}) => {
+  await page.goto('/zestawy/wampir')
+  const layer = page.locator('.bp-hero .fireflies')
+  await expect(layer).toBeAttached()
+  if (isMobile) {
+    await expect(layer).toBeHidden()
+    return
+  }
+  await expect(layer).toBeVisible()
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await expect(layer).toBeHidden()
+})

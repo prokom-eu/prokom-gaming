@@ -72,6 +72,11 @@
   object-fit: cover;
   object-position: 50% 100%;
 }
+/* Fireflies move with the scene when the mouse moves (parallax of the middle layer). */
+.hero .fireflies {
+  transform: translate(calc(var(--mx) * -20px), calc(var(--my) * -10px));
+  transition: transform 0.6s ease-out;
+}
 .hero__veil {
   position: absolute;
   inset: 0 0 0 calc(var(--u) * -1000);
