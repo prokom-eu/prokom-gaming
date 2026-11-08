@@ -11,7 +11,8 @@ const SHOW_AFTER = 300
 /** A navigation that never ends (offline, a server error page) must not leave it on screen. */
 const GIVE_UP_AFTER = 10_000
 
-type Pending = { creature: MenuCreature | null }
+/** `from`: the path the visitor is leaving — the sigil belongs to that page only. */
+type Pending = { from: string; creature: MenuCreature | null }
 
 /**
  * A slow page change (PREMIUM §2.3 „Ładowanie”): after 300 ms the sigil of the creature you are
@@ -35,7 +36,8 @@ export function NavPending({ creatures }: { creatures: readonly MenuCreature[] }
       window.clearTimeout(giveUp)
       const slug = /^\/zestawy\/([^/]+)$/.exec(path)?.[1]
       const creature = creatures.find((c) => c.slug === slug) ?? null
-      timer = window.setTimeout(() => setPending({ creature }), SHOW_AFTER)
+      // `pathname` is the page being left (this effect belongs to it).
+      timer = window.setTimeout(() => setPending({ from: pathname, creature }), SHOW_AFTER)
       giveUp = window.setTimeout(() => setPending(null), GIVE_UP_AFTER)
     }
     const onClick = (event: MouseEvent) => {
@@ -46,14 +48,19 @@ export function NavPending({ creatures }: { creatures: readonly MenuCreature[] }
       if (
         !(link instanceof HTMLAnchorElement) ||
         (link.target && link.target !== '_self') ||
-        link.hasAttribute('download')
+        link.hasAttribute('download') ||
+        // A link that only opens its menu on the first tap (the rail on a touch screen).
+        (link.closest('[data-nav-hold]') && window.matchMedia('(hover: none)').matches)
       )
         return
       const url = new URL(link.href)
       if (url.origin !== window.location.origin || url.pathname === window.location.pathname) return
       start(url.pathname)
     }
-    const onPop = () => start(window.location.pathname)
+    // Back/Forward to another path; a hash link (skip link, rail sections) fires popstate too.
+    const onPop = () => {
+      if (window.location.pathname !== pathname) start(window.location.pathname)
+    }
     window.addEventListener('click', onClick, true)
     window.addEventListener('popstate', onPop)
     return () => {
@@ -72,18 +79,31 @@ export function NavPending({ creatures }: { creatures: readonly MenuCreature[] }
     setPending(null)
   }
 
-  if (!pending) return null
-  const { creature } = pending
+  // A View Transition holds back the effects of the new page (and so the cleanup of the timer)
+  // until its snapshot is taken: a timer firing in that gap sets state for the page already left.
+  const shown = pending !== null && pending.from === pathname
+  const creature = shown ? pending.creature : null
   return (
-    <div
-      className="nav-pending"
-      role="status"
-      style={creature ? ({ '--c': `var(--c-${creature.slug})` } as CSSProperties) : undefined}
-    >
-      <span className="nav-pending__mark" aria-hidden="true">
-        {creature ? <Sigil id={creature.id} size={64} /> : <span className="nav-pending__ring" />}
+    <>
+      {/* Always in the DOM, so screen readers announce the text when it appears. No role: pages
+          keep their own single status message (forms, the configurator). */}
+      <span className="sr-only nav-pending__live" aria-live="polite">
+        {shown ? 'Wczytuję stronę…' : ''}
       </span>
-      <span className="sr-only">Wczytuję stronę…</span>
-    </div>
+      {shown && (
+        <div
+          className="nav-pending"
+          style={creature ? ({ '--c': `var(--c-${creature.slug})` } as CSSProperties) : undefined}
+        >
+          <span className="nav-pending__mark" aria-hidden="true">
+            {creature ? (
+              <Sigil id={creature.id} size={64} />
+            ) : (
+              <span className="nav-pending__ring" />
+            )}
+          </span>
+        </div>
+      )}
+    </>
   )
 }

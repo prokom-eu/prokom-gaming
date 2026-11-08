@@ -3,7 +3,7 @@ import type { CSSProperties } from 'react'
 /**
  * A number that counts up when its block enters the view and rolls to a new value when it
  * changes (runda v3 PREMIUM §2.3: frame counts, comparison). CSS only: the visible digits are a
- * CSS counter driven by a registered integer (`--n`, globals.css), so no script runs per frame.
+ * CSS counter driven by a registered integer (`--count-n`, globals.css), so no script runs per frame.
  * The real number stays in the DOM (read by screen readers, copied, checked by tests); the
  * counter is in an aria-hidden span. Reduced motion: the end value at once.
  *

@@ -112,6 +112,13 @@ a {
     opacity: 0;
     translate: 0 calc(16px * var(--motion-scale));
   }
+  /* Hiding is instant (only the entry moves): an element is set to wait right after hydration,
+     often in a section the browser does not render yet (content-visibility), where a running
+     hide transition would never end. The !important covers the transitions of its insides. */
+  [data-reveal='wait'],
+  [data-reveal='wait'] * {
+    transition: none !important;
+  }
   /* Section headings: the lines rise out of their own lower edge (PREMIUM §2.3). */
   .h[data-reveal] {
     /* An explicit end (clip-path does not animate to `none`), wide enough for glows. */
@@ -126,22 +133,22 @@ a {
     clip-path: inset(100% -1em -1em);
   }
 }
-/* Counting numbers (components/motion/Count): the digits on screen are a counter of `--n`, a
+/* Counting numbers (components/motion/Count): the digits on screen are a counter of `--count-n`, a
    registered integer, so a transition counts through every value. The DOM number is for screen
    readers and copying; the counter sits in an aria-hidden span. Width reserved, digits tabular. */
-@property --n {
+@property --count-n {
   syntax: '<integer>';
   inherits: false;
   initial-value: 0;
 }
 .count {
-  --n: var(--to);
+  --count-n: var(--to);
   display: inline-block;
   min-width: calc(var(--digits, 1) * 1ch);
   text-align: right;
   font-variant-numeric: tabular-nums;
-  counter-reset: n var(--n);
-  transition: --n var(--dur-4) var(--ease-enter);
+  counter-reset: n var(--count-n);
+  transition: --count-n var(--dur-4) var(--ease-enter);
 }
 .count__d::before {
   content: counter(n);
@@ -156,7 +163,9 @@ a {
 }
 /* Before the block's entry: from zero; the source label comes after the number. */
 :is([data-reveal='wait'], [data-shown='false']) .count {
-  --n: 0;
+  --count-n: 0;
+  /* Set to wait right after hydration: drop to zero at once, never count down. */
+  transition: none;
 }
 @media (prefers-reduced-motion: no-preference) {
   [data-reveal] .src,
@@ -167,11 +176,12 @@ a {
     opacity: 0;
   }
 }
-/* A rolling price (components/motion/RollNumber): the digits on screen come from `data-v`. */
+/* A rolling price (components/motion/RollNumber): the digits on screen come from `data-v` of an
+   aria-hidden span (generated content is read out otherwise). */
 .roll {
   font-variant-numeric: tabular-nums;
 }
-.roll::before {
+.roll__d::before {
   content: attr(data-v);
 }
 .roll.is-flash {
@@ -184,13 +194,17 @@ a {
   }
 }
 /* An image that emerges once loaded (components/motion/FadeImage). */
+/* An animation, not a transition: the image keeps its own hover transitions (card scenes). */
 @media (prefers-reduced-motion: no-preference) {
-  img[data-fade] {
-    transition:
-      opacity var(--dur-3) var(--ease-enter),
-      filter var(--dur-3) var(--ease-enter);
-  }
   img[data-fade='wait'] {
+    opacity: 0;
+  }
+  img[data-fade='in'] {
+    animation: fade-in var(--dur-3) var(--ease-enter);
+  }
+}
+@keyframes fade-in {
+  from {
     opacity: 0;
     filter: blur(6px);
   }
@@ -207,6 +221,10 @@ a {
 }
 .rail {
   view-transition-name: site-rail;
+}
+/* The transition overlay must not swallow a click: it goes through to the page underneath. */
+::view-transition {
+  pointer-events: none;
 }
 ::view-transition-group(root) {
   animation-duration: var(--dur-2);
@@ -523,7 +541,7 @@ a {
     scale var(--dur-1),
     translate var(--dur-2) var(--ease-enter);
   /* Pulled towards the cursor, at most 4 px (components/motion/Magnetic, desktop only). */
-  translate: var(--mx, 0) var(--my, 0);
+  translate: var(--mag-x, 0) var(--mag-y, 0);
 }
 .btn:active {
   scale: 0.98;
@@ -547,6 +565,10 @@ a {
   }
   .btn:not(.btn--ghost, .pr-btn-line, .pr-btn-dark, .hm-par__btn, .hm-par__call):hover::before {
     left: 120%;
+  }
+  /* „Dla rodziców” is a trust page: no sheen on any of its buttons. */
+  :where(.pr-hero, .pr-sec, .pr-final) .btn:hover::before {
+    left: -60%;
   }
 }
 /* Sending a form (runda v3 PREMIUM §2.3 „Ładowanie”): „Wysyłam…”, the button disabled, and a
@@ -981,7 +1003,7 @@ button.ico {
   pointer-events: none;
 }
 
-/* „Dobierz komputer”: gold gradient, sheen on hover */
+/* „Dobierz komputer”: gold gradient; its hover sheen is the one of every gold .btn */
 .nav .nav__cta {
   position: relative;
   overflow: hidden;
@@ -994,26 +1016,6 @@ button.ico {
   box-shadow:
     0 8px 24px -10px var(--gold-cta-shadow),
     inset 0 1px 0 var(--gold-cta-inset);
-}
-.nav .nav__cta::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -60%;
-  width: 40%;
-  height: 100%;
-  background: linear-gradient(100deg, transparent, var(--gold-sheen), transparent);
-  transform: skewX(-20deg);
-  transition: left 0.6s;
-  pointer-events: none;
-}
-.nav .nav__cta:hover::before {
-  left: 120%;
-}
-@media (prefers-reduced-motion: reduce) {
-  .nav .nav__cta::before {
-    display: none;
-  }
 }
 
 .burg {

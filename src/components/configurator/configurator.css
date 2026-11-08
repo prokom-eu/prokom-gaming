@@ -864,7 +864,16 @@
   max-height: 210px;
   object-fit: contain;
   filter: drop-shadow(0 16px 22px color-mix(in srgb, var(--shadow) 60%, transparent));
-  animation: cf-hov 6s ease-in-out infinite;
+  /* A new case dissolves in, even from the cache (keyed by photo in Preview); then it floats. */
+  animation:
+    cf-case-in var(--dur-3) var(--ease-enter),
+    cf-hov 6s ease-in-out infinite;
+}
+@keyframes cf-case-in {
+  from {
+    opacity: 0;
+    scale: 0.96;
+  }
 }
 @keyframes cf-hov {
   50% {
@@ -1044,10 +1053,10 @@
 /* A new step enters from the side it came from: forward from the right, back from the left;
    on a phone from below (PREMIUM §2.3). The old step leaves at once — an exit would delay the
    click that asked for the new one (§2.1 pt 2). */
-.cf-step {
+.cf-pane[data-dir] {
   animation: cf-step-in var(--dur-3) var(--ease-enter);
 }
-.cf-step[data-dir='back'] {
+.cf-pane[data-dir='back'] {
   --from: -1;
 }
 @keyframes cf-step-in {
@@ -1155,7 +1164,7 @@
   .cf-steps::after {
     display: none;
   }
-  .cf-step {
+  .cf-pane[data-dir] {
     animation-name: cf-step-up;
   }
   .cf {

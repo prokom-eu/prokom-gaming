@@ -50,6 +50,9 @@ const WCAG = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']
 test.describe('accessibility (axe)', () => {
   for (const { path, status } of PAGES) {
     test(path, async ({ page }) => {
+      // axe checks what a reader ends up seeing: with reduced motion nothing waits hidden for
+      // its entry below the fold (runda v3 E3 reveals sections, numbers and icons on scroll).
+      await page.emulateMedia({ reducedMotion: 'reduce' })
       const response = await page.goto(path)
       expect(response?.status()).toBe(status)
       // Entrance animations first (e.g. the FAQ fading in from opacity 0): mid-fade, axe measures

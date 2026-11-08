@@ -91,10 +91,6 @@
 
 /* Filtering (BuildsBrowser, View Transitions): the cards that stay move to their places, the
    ones that leave fade and shrink, new ones grow in; the count rolls its digits. */
-/* The transition overlay must not swallow a click: it goes through to the new list underneath. */
-::view-transition {
-  pointer-events: none;
-}
 ::view-transition-group(*.bl-card) {
   animation-duration: var(--dur-3);
   animation-timing-function: var(--ease-enter);

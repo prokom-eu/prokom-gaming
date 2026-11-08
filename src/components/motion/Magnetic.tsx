@@ -9,7 +9,7 @@ const PULL = 4
 
 /**
  * Buttons lean slightly towards the cursor (PREMIUM §2.3, desktop with a mouse only). One
- * listener for the whole site, so no button needs a client wrapper: it writes `--mx`/`--my`,
+ * listener for the whole site, so no button needs a client wrapper: it writes `--mag-x`/`--mag-y`,
  * which `.btn` turns into a `translate` (globals.css). Nothing happens with reduced motion, on a
  * touch screen or a narrow window.
  */
@@ -19,8 +19,8 @@ export function Magnetic() {
     let frame = 0
 
     const reset = (el: HTMLElement) => {
-      el.style.removeProperty('--mx')
-      el.style.removeProperty('--my')
+      el.style.removeProperty('--mag-x')
+      el.style.removeProperty('--mag-y')
     }
     const onMove = (event: PointerEvent) => {
       if (event.pointerType !== 'mouse') return
@@ -41,8 +41,8 @@ export function Magnetic() {
         const box = target.getBoundingClientRect()
         const x = (clientX - (box.left + box.width / 2)) / (box.width / 2)
         const y = (clientY - (box.top + box.height / 2)) / (box.height / 2)
-        target.style.setProperty('--mx', `${(Math.max(-1, Math.min(1, x)) * PULL).toFixed(1)}px`)
-        target.style.setProperty('--my', `${(Math.max(-1, Math.min(1, y)) * PULL).toFixed(1)}px`)
+        target.style.setProperty('--mag-x', `${(Math.max(-1, Math.min(1, x)) * PULL).toFixed(1)}px`)
+        target.style.setProperty('--mag-y', `${(Math.max(-1, Math.min(1, y)) * PULL).toFixed(1)}px`)
       })
     }
     const onLeave = () => {

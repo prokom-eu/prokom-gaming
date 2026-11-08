@@ -11,7 +11,7 @@ import { useLayoutEffect, useRef } from 'react'
  * an image still loading when the browser mounts it waits hidden (`data-fade="wait"`); one
  * already in the cache stays as it is, so nothing flashes on hydration.
  */
-export function FadeImage({ onLoad, alt, ...props }: ImageProps) {
+export function FadeImage({ onLoad, onError, alt, ...props }: ImageProps) {
   const ref = useRef<HTMLImageElement>(null)
 
   useLayoutEffect(() => {
@@ -27,6 +27,11 @@ export function FadeImage({ onLoad, alt, ...props }: ImageProps) {
       onLoad={(event) => {
         if (event.currentTarget.dataset.fade) event.currentTarget.dataset.fade = 'in'
         onLoad?.(event)
+      }}
+      // A failed image must not stay hidden: the browser shows its alt text or a broken frame.
+      onError={(event) => {
+        if (event.currentTarget.dataset.fade) event.currentTarget.dataset.fade = 'in'
+        onError?.(event)
       }}
     />
   )

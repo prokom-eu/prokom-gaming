@@ -137,6 +137,8 @@ export function RailPanel({
       ref={nav}
       className="rail"
       data-open={open}
+      // Closed on a touch screen, the first tap only opens it (NavPending must not start).
+      data-nav-hold={open ? undefined : ''}
       aria-label="Sekcje strony"
       onMouseEnter={() => later(true, OPEN_DELAY)}
       onMouseLeave={() => {

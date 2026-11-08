@@ -60,8 +60,8 @@ export function Configurator({ data, initial, initialChanges, fromAddress, siteU
     initialChanges.length > 0 ? changeMessage(view, initialChanges) : null,
   )
   const [other, setOther] = useState('')
-  // Which way the last step change went: the new step slides in from that side.
-  const [dir, setDir] = useState<'next' | 'back'>('next')
+  // Which way the last step change went (none yet: the first step is there from the first paint).
+  const [dir, setDir] = useState<'next' | 'back' | null>(null)
   const mainRef = useRef<HTMLDivElement>(null)
   const headingRef = useRef<HTMLHeadingElement>(null)
   const stepChanged = useRef(false)
@@ -188,7 +188,7 @@ export function Configurator({ data, initial, initialChanges, fromAddress, siteU
         <div className="cf-grid">
           <div className="cf-main" ref={mainRef}>
             {/* Keyed by step: each new step enters from the side it came from (PREMIUM §2.3). */}
-            <div key={state.step} className="cf-step" data-dir={dir}>
+            <div key={state.step} className="cf-pane" data-dir={dir ?? undefined}>
               {state.step === 'monitor' && (
                 <StepMonitor
                   headingRef={headingRef}
