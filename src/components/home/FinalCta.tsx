@@ -25,7 +25,7 @@ export function FinalCta() {
     <section className="hm-sec hm-fin" id="napisz" aria-labelledby="fin-title">
       <span className="hm-fin__sky" aria-hidden="true" />
       <div className="wrap hm-fin__in">
-        <ul className="hm-fin__sigils" aria-hidden="true">
+        <ul className="hm-fin__sigils" aria-hidden="true" data-reveal="">
           {menuCreatures.map((c, i) => (
             <li
               key={c.slug}
@@ -33,17 +33,20 @@ export function FinalCta() {
                 {
                   '--c': `var(--c-${c.slug})`,
                   '--a': `${(last === 0 ? 0 : -SPAN + (2 * SPAN * i) / last).toFixed(2)}deg`,
+                  '--i': i,
                 } as CSSProperties
               }
             >
               <Sigil id={c.id} size={46} />
+              {/* Shown on hover only; the list is decorative (names are in the menu and cards). */}
+              <span className="hm-fin__name">{c.name}</span>
             </li>
           ))}
         </ul>
-        <h2 id="fin-title" className="h">
+        <h2 id="fin-title" className="h" data-reveal="">
           Napisz, w co grasz
         </h2>
-        <p className="hm-lead">
+        <p className="hm-lead" data-reveal="">
           Szesnaście istot czeka. Dobierzemy tę właściwą i odpiszemy z imienną listą części, ceną i
           terminem. Zwykle w ciągu godziny, codziennie od 8 do 22.
         </p>

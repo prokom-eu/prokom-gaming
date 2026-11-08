@@ -82,6 +82,14 @@ a {
   outline: 3px solid var(--grom2);
   outline-offset: 3px;
 }
+/* Keyboard focus lands with a short flash (runda v3 PREMIUM §2.3): the gold ring starts wide and
+   contracts onto the element. A transition, so it never replaces an element's own animation. */
+@media (prefers-reduced-motion: no-preference) {
+  :where(a, button, input, select, summary, [tabindex]) {
+    outline-offset: 10px;
+    transition: outline-offset var(--dur-2) var(--ease-enter);
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -104,11 +112,195 @@ a {
     opacity: 0;
     translate: 0 calc(16px * var(--motion-scale));
   }
+  /* Hiding is instant (only the entry moves): an element is set to wait right after hydration,
+     often in a section the browser does not render yet (content-visibility), where a running
+     hide transition would never end. The !important covers the transitions of its insides. */
+  [data-reveal='wait'],
+  [data-reveal='wait'] * {
+    transition: none !important;
+  }
+  /* Section headings: the lines rise out of their own lower edge (PREMIUM §2.3). */
+  .h[data-reveal] {
+    /* An explicit end (clip-path does not animate to `none`), wide enough for glows. */
+    clip-path: inset(-1em);
+    transition:
+      opacity var(--dur-3) var(--ease-enter),
+      translate var(--dur-4) var(--ease-enter),
+      clip-path var(--dur-4) var(--ease-enter);
+  }
+  .h[data-reveal='wait'] {
+    translate: 0 calc(0.45em * var(--motion-scale));
+    clip-path: inset(100% -1em -1em);
+  }
+}
+/* Counting numbers (components/motion/Count): the digits on screen are a counter of `--count-n`, a
+   registered integer, so a transition counts through every value. The DOM number is for screen
+   readers and copying; the counter sits in an aria-hidden span. Width reserved, digits tabular. */
+@property --count-n {
+  syntax: '<integer>';
+  inherits: false;
+  initial-value: 0;
+}
+.count {
+  --count-n: var(--to);
+  display: inline-block;
+  min-width: calc(var(--digits, 1) * 1ch);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  counter-reset: n var(--count-n);
+  transition: --count-n var(--dur-4) var(--ease-enter);
+}
+.count__d::before {
+  content: counter(n);
+}
+.count__v {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+/* Before the block's entry: from zero; the source label comes after the number. */
+:is([data-reveal='wait'], [data-shown='false']) .count {
+  --count-n: 0;
+  /* Set to wait right after hydration: drop to zero at once, never count down. */
+  transition: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  [data-reveal] .src,
+  [data-shown] .src {
+    transition: opacity var(--dur-3) var(--ease-enter) var(--dur-4);
+  }
+  :is([data-reveal='wait'], [data-shown='false']) .src {
+    opacity: 0;
+  }
+}
+/* A rolling price (components/motion/RollNumber): the digits on screen come from `data-v` of an
+   aria-hidden span (generated content is read out otherwise). */
+.roll {
+  font-variant-numeric: tabular-nums;
+}
+.roll__d::before {
+  content: attr(data-v);
+}
+.roll.is-flash {
+  animation: roll-flash var(--dur-3) var(--ease-enter);
+}
+@keyframes roll-flash {
+  from {
+    color: var(--grom2);
+    text-shadow: 0 0 18px color-mix(in srgb, var(--grom) 70%, transparent);
+  }
+}
+/* An image that emerges once loaded (components/motion/FadeImage). */
+/* An animation, not a transition: the image keeps its own hover transitions (card scenes). */
+@media (prefers-reduced-motion: no-preference) {
+  img[data-fade='wait'] {
+    opacity: 0;
+  }
+  img[data-fade='in'] {
+    animation: fade-in var(--dur-3) var(--ease-enter);
+  }
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    filter: blur(6px);
+  }
+}
+/* Page to page (React <ViewTransition> in the App Router, runda v3 PREMIUM §2.3): the shell
+   stays where it is, the page crossfades quickly, and a list card's case photo flies onto the
+   build page's pedestal (components/motion/SharedCase). The overlay never takes a click
+   (builds.css). Without support: a plain navigation. */
+.nav {
+  view-transition-name: site-header;
+}
+.tabbar {
+  view-transition-name: site-tabbar;
+}
+.rail {
+  view-transition-name: site-rail;
+}
+/* The transition overlay must not swallow a click: it goes through to the page underneath. */
+::view-transition {
+  pointer-events: none;
+}
+::view-transition-group(root) {
+  animation-duration: var(--dur-2);
+}
+::view-transition-group(*.case-morph) {
+  animation-duration: var(--dur-3);
+  animation-timing-function: var(--ease-enter);
+}
+/* The flight softens mid-way, which hides the photo being scaled between two sizes. */
+::view-transition-image-pair(*.case-morph) {
+  animation-name: case-blur;
+}
+@keyframes case-blur {
+  40% {
+    filter: blur(2px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-image-pair(*) {
+    animation: none !important;
+  }
+}
+/* A slow page change (components/motion/NavPending): the sigil of the next creature lights up
+   and breathes in its colour — gold for other pages — over the page, never taking a click. */
+.nav-pending {
+  --c: var(--grom);
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+.nav-pending__mark {
+  display: grid;
+  place-items: center;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  color: var(--c);
+  background: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--smola) 80%, transparent),
+    transparent
+  );
+  filter: drop-shadow(0 0 14px color-mix(in srgb, var(--c) 70%, transparent));
+  animation:
+    pending-in var(--dur-3) var(--ease-enter) both,
+    pending-breathe 1.8s ease-in-out var(--dur-3) infinite;
+}
+.nav-pending__ring {
+  width: 54px;
+  height: 54px;
+  border: 2px solid var(--c);
+  border-radius: 50%;
+}
+@keyframes pending-in {
+  from {
+    opacity: 0;
+    scale: 0.9;
+  }
+}
+@keyframes pending-breathe {
+  50% {
+    opacity: 0.55;
+    filter: drop-shadow(0 0 4px color-mix(in srgb, var(--c) 40%, transparent));
+  }
 }
 @media print {
   [data-reveal] {
     opacity: 1 !important;
     translate: none !important;
+    clip-path: none !important;
   }
 }
 /* One line of light runs along a card's border on hover or focus (runda v3 PREMIUM §2.3): a
@@ -324,6 +516,8 @@ a {
 
 /* ---------- buttons, chips, segmented ---------- */
 .btn {
+  position: relative;
+  overflow: hidden;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -343,7 +537,61 @@ a {
     0 12px 40px -10px color-mix(in srgb, var(--grom) 60%, transparent);
   transition:
     transform 0.2s,
-    box-shadow 0.2s;
+    box-shadow 0.2s,
+    scale var(--dur-1),
+    translate var(--dur-2) var(--ease-enter);
+  /* Pulled towards the cursor, at most 4 px (components/motion/Magnetic, desktop only). */
+  translate: var(--mag-x, 0) var(--mag-y, 0);
+}
+.btn:active {
+  scale: 0.98;
+}
+/* Gold buttons: one sheen runs across on hover (as on „Dobierz komputer”, PREMIUM §2.3). The
+   dark and outlined buttons of the parents' sections stay calm (trust pages, PREMIUM §2.3). */
+.btn:not(.btn--ghost, .pr-btn-line, .pr-btn-dark, .hm-par__btn, .hm-par__call)::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -60%;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(100deg, transparent, var(--gold-sheen), transparent);
+  transform: skewX(-20deg);
+  pointer-events: none;
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .btn:not(.btn--ghost, .pr-btn-line, .pr-btn-dark, .hm-par__btn, .hm-par__call)::before {
+    transition: left 0.6s var(--ease-enter);
+  }
+  .btn:not(.btn--ghost, .pr-btn-line, .pr-btn-dark, .hm-par__btn, .hm-par__call):hover::before {
+    left: 120%;
+  }
+  /* „Dla rodziców” is a trust page: no sheen on any of its buttons. */
+  :where(.pr-hero, .pr-sec, .pr-final) .btn:hover::before {
+    left: -60%;
+  }
+}
+/* Sending a form (runda v3 PREMIUM §2.3 „Ładowanie”): „Wysyłam…”, the button disabled, and a
+   line of light running along its lower edge. Reduced motion: the text alone. */
+.btn[aria-busy='true'] {
+  cursor: progress;
+}
+.btn[aria-busy='true']::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 40%;
+  height: 2px;
+  background: currentColor;
+  opacity: 0.55;
+  translate: 250% 0;
+  animation: busy-run 1.1s ease-in-out infinite;
+}
+@keyframes busy-run {
+  from {
+    translate: -100% 0;
+  }
 }
 .btn:hover {
   transform: translateY(-1px);
@@ -733,8 +981,29 @@ button.ico {
 .nav .badge {
   box-shadow: 0 0 0 2px var(--noc);
 }
+/* A counter that grew jumps once (ShellProvider `…Bump`, keyed so each rise replays it). */
+.is-bump {
+  animation: badge-bump var(--dur-3) var(--ease-enter);
+}
+@keyframes badge-bump {
+  35% {
+    scale: 1.45;
+    box-shadow: 0 0 14px color-mix(in srgb, var(--grom) 80%, transparent);
+  }
+}
+/* The dot that flies from an added build to the comparison counter (lib/fly.ts). */
+.fly-dot {
+  position: fixed;
+  z-index: 200;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--c);
+  box-shadow: 0 0 18px var(--c);
+  pointer-events: none;
+}
 
-/* „Dobierz komputer”: gold gradient, sheen on hover */
+/* „Dobierz komputer”: gold gradient; its hover sheen is the one of every gold .btn */
 .nav .nav__cta {
   position: relative;
   overflow: hidden;
@@ -747,26 +1016,6 @@ button.ico {
   box-shadow:
     0 8px 24px -10px var(--gold-cta-shadow),
     inset 0 1px 0 var(--gold-cta-inset);
-}
-.nav .nav__cta::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -60%;
-  width: 40%;
-  height: 100%;
-  background: linear-gradient(100deg, transparent, var(--gold-sheen), transparent);
-  transform: skewX(-20deg);
-  transition: left 0.6s;
-  pointer-events: none;
-}
-.nav .nav__cta:hover::before {
-  left: 120%;
-}
-@media (prefers-reduced-motion: reduce) {
-  .nav .nav__cta::before {
-    display: none;
-  }
 }
 
 .burg {
@@ -1014,13 +1263,20 @@ body:has([data-nav-light]) .nav:not([data-top='false']) .nav__caps a[aria-curren
   border-radius: var(--radius-sheet) var(--radius-sheet) 0 0;
   box-shadow: 0 -30px 80px -20px var(--shadow);
   transform: translateY(104%);
+  /* Closing: out quickly. */
   transition:
-    transform 0.34s cubic-bezier(0.2, 0.8, 0.2, 1),
-    overlay 0.34s allow-discrete,
-    display 0.34s allow-discrete;
+    transform var(--dur-2) var(--ease-exit),
+    overlay var(--dur-2) allow-discrete,
+    display var(--dur-2) allow-discrete;
 }
 .sheet[open] {
   transform: translateY(var(--drag, 0px));
+  /* Opening: a long, springy landing (runda v3 PREMIUM §2.3) — no overshoot, the sheet is
+     anchored to the bottom edge and must never show a gap under it. */
+  transition:
+    transform var(--dur-3) var(--ease-spring),
+    overlay var(--dur-3) allow-discrete,
+    display var(--dur-3) allow-discrete;
 }
 @starting-style {
   .sheet[open] {
@@ -1032,11 +1288,11 @@ body:has([data-nav-light]) .nav:not([data-top='false']) .nav__caps a[aria-curren
 }
 .sheet::backdrop {
   background: var(--backdrop);
-  -webkit-backdrop-filter: blur(3px);
-  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
   opacity: 0;
   transition:
-    opacity 0.25s,
+    opacity var(--dur-2),
     overlay 0.25s allow-discrete,
     display 0.25s allow-discrete;
 }

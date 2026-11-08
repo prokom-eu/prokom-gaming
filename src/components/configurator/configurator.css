@@ -42,12 +42,29 @@
   color: var(--cf-lead);
 }
 .cf-steps {
+  --gap: 8px;
+  position: relative;
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-  gap: 8px;
+  gap: var(--gap);
   margin: 0;
   padding: 0;
   list-style: none;
+}
+/* A gold marker slides under the current step (runda v3 PREMIUM §2.3): one column wide, moved
+   by --step columns (a translate percentage is the marker's own width, plus one gap). */
+.cf-steps::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -7px;
+  width: calc((100% - 5 * var(--gap)) / 6);
+  height: 2px;
+  border-radius: 2px;
+  background: var(--grom);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--grom) 60%, transparent);
+  translate: calc(var(--step, 0) * (100% + var(--gap))) 0;
+  transition: translate var(--dur-3) var(--ease-enter);
 }
 .cf-steps button {
   width: 100%;
@@ -847,7 +864,16 @@
   max-height: 210px;
   object-fit: contain;
   filter: drop-shadow(0 16px 22px color-mix(in srgb, var(--shadow) 60%, transparent));
-  animation: cf-hov 6s ease-in-out infinite;
+  /* A new case dissolves in, even from the cache (keyed by photo in Preview); then it floats. */
+  animation:
+    cf-case-in var(--dur-3) var(--ease-enter),
+    cf-hov 6s ease-in-out infinite;
+}
+@keyframes cf-case-in {
+  from {
+    opacity: 0;
+    scale: 0.96;
+  }
 }
 @keyframes cf-hov {
   50% {
@@ -1024,6 +1050,72 @@
   display: none;
 }
 
+/* A new step enters from the side it came from: forward from the right, back from the left;
+   on a phone from below (PREMIUM §2.3). The old step leaves at once — an exit would delay the
+   click that asked for the new one (§2.1 pt 2). */
+.cf-pane[data-dir] {
+  animation: cf-step-in var(--dur-3) var(--ease-enter);
+}
+.cf-pane[data-dir='back'] {
+  --from: -1;
+}
+@keyframes cf-step-in {
+  from {
+    opacity: 0;
+    transform: translateX(calc(var(--from, 1) * 40px * var(--motion-scale)));
+  }
+}
+/* Choosing an option: a wave of gold light spreads from the click (set by Configurator). */
+:is(.cf-mon, .cf-tier__b, .cf-oc, .cf-mc) {
+  position: relative;
+  overflow: hidden;
+}
+:is(.cf-mon, .cf-tier__b, .cf-oc, .cf-mc).is-wave::after {
+  content: '';
+  position: absolute;
+  left: var(--wx);
+  top: var(--wy);
+  width: 24px;
+  height: 24px;
+  margin: -12px 0 0 -12px;
+  border-radius: 50%;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--grom) 45%, transparent),
+    transparent
+  );
+  pointer-events: none;
+  opacity: 0;
+  animation: cf-wave var(--dur-4) var(--ease-enter);
+}
+@keyframes cf-step-up {
+  from {
+    opacity: 0;
+    transform: translateY(calc(24px * var(--motion-scale)));
+  }
+}
+@keyframes cf-wave {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(40);
+  }
+}
+/* A new power level: the glow under the case flashes once in the new creature's colour. */
+.cf-sb__glow {
+  animation: cf-glow var(--dur-4) var(--ease-enter);
+}
+@keyframes cf-glow {
+  30% {
+    opacity: 1;
+    transform: scale(1.35, 1.9);
+    filter: blur(8px) brightness(1.6);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .cf,
   .cf * {
@@ -1068,6 +1160,13 @@
 /* Phone (ADR-G003 §4, `stany/tel-07`, `tel-08`): steps as a scrolled row, no side panel, the price
    and „Dalej” above the tab bar. */
 @media (max-width: 760px) {
+  /* A scrolled row of steps: no marker (the current step keeps its gold frame). */
+  .cf-steps::after {
+    display: none;
+  }
+  .cf-pane[data-dir] {
+    animation-name: cf-step-up;
+  }
   .cf {
     padding: 24px 0 170px;
   }

@@ -8,10 +8,10 @@ export function Games({ panel }: { panel: GamesPanelData | null }) {
     <section className="hm-sec hm-games" id="w-co-grasz" aria-labelledby="games-title">
       <div className="wrap hm-games__grid">
         <div className="hm-games__intro">
-          <h2 id="games-title" className="h">
+          <h2 id="games-title" className="h" data-reveal="">
             W co grasz?
           </h2>
-          <p className="hm-lead">
+          <p className="hm-lead" data-reveal="">
             Trzydzieści trzy gry, od Minecrafta po Cyberpunka. Kliknij swoją i wybierz monitor.
             Zobaczysz, ile klatek da każdy poziom mocy, i od razu wiesz, skąd jest wynik: z
             niezależnego testu, przeliczone z testów czy to nasz szacunek.

@@ -776,27 +776,42 @@
   background: repeating-linear-gradient(180deg, var(--fps-track) 0 1px, transparent 1px 42px);
   border-bottom: 1px solid var(--line);
 }
-/* Bars grow once when the chart comes into view; a switch changes their height smoothly. */
+/* Bars grow from zero in a cascade once the chart comes into view (runda v3 PREMIUM §2.3); a
+   switch of game or resolution moves them smoothly. Only `transform` moves (scale of the full
+   track height), the numbers count along with their bar, the step text comes after it. */
+.hm-cmp__chart li {
+  --cmp-delay: calc(var(--i, 0) * var(--stagger) * 2);
+}
+.hm-cmp__chart li:nth-child(2) {
+  --i: 1;
+}
+.hm-cmp__chart li:nth-child(3) {
+  --i: 2;
+}
 .hm-cmp__bar s {
   display: block;
   width: 100%;
-  height: var(--h);
+  height: 100%;
   border-radius: 3px 3px 0 0;
   background: linear-gradient(180deg, var(--c), color-mix(in srgb, var(--c) 22%, transparent));
   box-shadow: 0 0 28px color-mix(in srgb, var(--c) 55%, transparent);
+  transform: scaleY(var(--k));
   transform-origin: 50% 100%;
-  transition:
-    transform 1s cubic-bezier(0.2, 0.7, 0.2, 1),
-    height 0.5s ease;
+  transition: transform var(--dur-4) var(--ease-enter) var(--cmp-delay);
 }
-.hm-cmp__chart li:nth-child(2) .hm-cmp__bar s {
-  transition-delay: 0.12s, 0s;
-}
-.hm-cmp__chart li:nth-child(3) .hm-cmp__bar s {
-  transition-delay: 0.24s, 0s;
+.hm-cmp__chart .count {
+  transition-delay: var(--cmp-delay);
 }
 .hm-cmp__chart[data-shown='false'] .hm-cmp__bar s {
   transform: scaleY(0);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .hm-cmp__chart em {
+    transition: opacity var(--dur-3) var(--ease-enter) calc(var(--dur-4) + var(--cmp-delay));
+  }
+  .hm-cmp__chart[data-shown='false'] em {
+    opacity: 0;
+  }
 }
 .hm-cmp__chart b {
   margin-top: 10px;
@@ -865,6 +880,19 @@
   color: var(--grom);
   background: color-mix(in srgb, var(--grom) 8%, transparent);
   box-shadow: 0 0 18px color-mix(in srgb, var(--grom) 18%, transparent);
+}
+/* Entry, once: the icons draw their outline (PREMIUM §2.3). The dash is longer than any line of
+   a 24×24 icon, so one value fits all of them without a pathLength on every shape. */
+@media (prefers-reduced-motion: no-preference) {
+  .hm-inc__list[data-reveal] .hm-inc__icon svg > * {
+    stroke-dasharray: 100;
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset var(--dur-4) var(--ease-enter)
+      calc(var(--dur-2) + var(--i, 0) * var(--stagger) * 2);
+  }
+  .hm-inc__list[data-reveal='wait'] .hm-inc__icon svg > * {
+    stroke-dashoffset: 100;
+  }
 }
 .hm-inc__list b {
   display: block;
@@ -1026,20 +1054,55 @@
   opacity: 0.6;
   filter: drop-shadow(0 0 10px var(--c));
   transform: rotate(var(--a)) translateY(calc(var(--r) * -1)) rotate(calc(var(--a) * -1));
-  animation: hm-glow 6s ease-in-out infinite;
+  transition:
+    opacity var(--dur-2),
+    filter var(--dur-2);
 }
-.hm-fin__sigils li:nth-child(2n) {
-  animation-delay: 1.5s;
+/* Hover: the sigil shines and shows its name (runda v3 PREMIUM §2.3). */
+.hm-fin__sigils li:hover {
+  opacity: 1;
+  filter: drop-shadow(0 0 16px var(--c)) drop-shadow(0 0 4px var(--c));
 }
-.hm-fin__sigils li:nth-child(3n) {
-  animation-delay: 3s;
+.hm-fin__name {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 50%;
+  translate: -50% 0;
+  font-family: var(--font-name);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  color: var(--kosc);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur-2);
 }
-.hm-fin__sigils li:nth-child(5n) {
-  animation-delay: 4.5s;
+.hm-fin__sigils li:hover .hm-fin__name {
+  opacity: 1;
 }
-@keyframes hm-glow {
-  50% {
+/* Entry, once: the sigils light up one by one from Skrzat to Perun (PREMIUM §2.3). The list
+   itself does not fade in like other [data-reveal] blocks — only its sigils wait, dimmed. */
+@media (prefers-reduced-motion: no-preference) {
+  .hm-fin__sigils[data-reveal] {
     opacity: 1;
+    translate: none;
+  }
+  .hm-fin__sigils[data-reveal='wait'] li {
+    opacity: 0.12;
+    filter: none;
+  }
+  .hm-fin__sigils[data-reveal='in'] li {
+    animation: hm-light var(--dur-4) var(--ease-enter) calc(var(--i, 0) * 70ms) backwards;
+  }
+}
+@keyframes hm-light {
+  from {
+    opacity: 0.12;
+    filter: none;
+  }
+  45% {
+    opacity: 1;
+    filter: drop-shadow(0 0 18px var(--c)) drop-shadow(0 0 4px var(--c));
   }
 }
 .hm-sec.hm-fin h2.h {
@@ -1327,7 +1390,8 @@
     margin: 0 auto 26px;
   }
   .hm-fin__sigils li {
-    position: static;
+    position: relative;
+    inset: auto;
     margin: 0;
     transform: none;
   }
@@ -1343,7 +1407,6 @@
     animation: none;
   }
   .hm-cmp__bar s {
-    transform: none;
     transition: none;
   }
   .hm-inc__list li {

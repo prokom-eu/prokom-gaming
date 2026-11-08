@@ -29,15 +29,15 @@ export function HowToBuy() {
     <section className="hm-sec hm-buy" id="jak-kupic" aria-labelledby="buy-title">
       <div className="wrap">
         <div className="hm-head hm-head--row">
-          <h2 id="buy-title" className="h">
+          <h2 id="buy-title" className="h" data-reveal="">
             Jak kupić, skoro nie ma przycisku „Kup”
           </h2>
-          <p>
+          <p data-reveal="">
             Ceny części zmieniają się codziennie, więc najpierw dostajesz ofertę z aktualną ceną.
             Płacisz dopiero wtedy, gdy ją zaakceptujesz, a zapytanie do niczego Cię nie zobowiązuje.
           </p>
         </div>
-        <ol className="hm-buy__steps">
+        <ol className="hm-buy__steps" data-reveal="">
           {STEPS.map((step, i) => (
             <li key={step.title}>
               <span className="hm-buy__n nm" aria-hidden="true">

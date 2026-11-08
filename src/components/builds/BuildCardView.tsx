@@ -2,6 +2,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import { CasePhoto } from '@/components/CasePhoto'
+import { FadeImage } from '@/components/motion/FadeImage'
+import { SharedCase } from '@/components/motion/SharedCase'
 import { IconArrow } from '@/components/icons'
 import { SourceLabel } from '@/components/SourceLabel'
 import type { BuildCard } from '@/lib/builds'
@@ -14,13 +16,15 @@ import { zl } from '@/lib/pricing/format'
  * link; it covers the whole card, so the card is one tab stop with a short accessible name.
  */
 export function BuildCardView({ card, eager = false }: { card: BuildCard; eager?: boolean }) {
+  // A lazy scene emerges once loaded (runda v3 PREMIUM §2.3); an eager one may be the LCP.
+  const SceneImg = eager ? Image : FadeImage
   return (
     <article
       className="bl-card card-sweep cut"
       style={{ ['--c' as string]: `var(--c-${card.slug})` }}
     >
       <span className="bl-card__art" aria-hidden="true">
-        <Image
+        <SceneImg
           className="bl-card__scene"
           src={`/scenes/${card.key}-card.webp`}
           alt=""
@@ -35,7 +39,9 @@ export function BuildCardView({ card, eager = false }: { card: BuildCard; eager?
           <span className="bl-card__photo">
             {/* The case is at most 180 px tall (72% of the 250 px art); file width from its box. */}
             {/* Lazy, as before: the scene above is the LCP element, the photo must not compete. */}
-            <CasePhoto photo={card.photo} caseHeight={180} />
+            <SharedCase slug={card.slug}>
+              <CasePhoto photo={card.photo} caseHeight={180} />
+            </SharedCase>
           </span>
         )}
       </span>

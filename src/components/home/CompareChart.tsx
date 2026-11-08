@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 
 import { CasePhoto } from '@/components/CasePhoto'
 import { Sigil } from '@/components/Sigil'
+import { Count } from '@/components/motion/Count'
 import { SourceLabel } from '@/components/SourceLabel'
 import { Segmented } from '@/components/ui/Segmented'
 import { RESOLUTION_LABELS, type Resolution } from '@/lib/fps'
@@ -97,9 +98,11 @@ export function CompareChart({ data }: { data: CompareData }) {
             </span>
             <span className="hm-cmp__price">{zl(card.price)}</span>
             <span className="hm-cmp__bar" aria-hidden="true">
-              <s style={{ ['--h' as string]: `${card.percent}%` }} />
+              <s style={{ ['--k' as string]: card.percent / 100 }} />
             </span>
-            <b>{card.fps} FPS</b>
+            <b>
+              <Count value={card.fps} /> FPS
+            </b>
             <SourceLabel kind={card.kind} />
             <em>{card.step ? compareStepText(card.step) : 'punkt wyjścia'}</em>
           </li>

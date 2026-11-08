@@ -125,7 +125,7 @@ export default async function ContactPage() {
             </h2>
             <p className="ct-p">Komputery składamy i testujemy w Rabce-Zdroju.</p>
           </div>
-          <div className="ct-stores">
+          <div className="ct-stores" data-reveal="">
             {STORES.map((store) => (
               <article key={store.title} className="ct-store">
                 <a
@@ -205,7 +205,7 @@ export default async function ContactPage() {
           <h2 id="ct-firm-h" className="h">
             Dane firmy
           </h2>
-          <dl>
+          <dl data-reveal="">
             <div>
               <dt>Firma</dt>
               <dd>{company.name}</dd>

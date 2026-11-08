@@ -1,3 +1,5 @@
+import type { CSSProperties } from 'react'
+
 import { STEPS, type StepKey } from '@/lib/configurator'
 
 import type { ConfiguratorView } from './view'
@@ -17,7 +19,12 @@ export function StepBar({
 }) {
   const index = STEPS.findIndex((s) => s.key === current)
   return (
-    <ol className="cf-steps" aria-label="Kroki konfiguratora">
+    // --step drives the gold marker that slides under the current step (PREMIUM §2.3).
+    <ol
+      className="cf-steps"
+      aria-label="Kroki konfiguratora"
+      style={{ '--step': index } as CSSProperties}
+    >
       {STEPS.map((s, i) => (
         <li key={s.key}>
           <button

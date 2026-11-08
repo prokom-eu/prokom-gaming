@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, type ReactNode } from 'react'
+import { useState, type CSSProperties, type ReactNode } from 'react'
 import { flushSync } from 'react-dom'
 
 import { BottomSheet } from '@/components/BottomSheet'
@@ -55,7 +55,12 @@ export function BuildsBrowser({ items, initial }: Props) {
     if (!document.startViewTransition || sheetOpen || prefersReducedMotion()) {
       setFilters(next)
     } else {
-      document.startViewTransition(() => flushSync(() => setFilters(next)))
+      // The card names exist only while filtering (builds.css): a navigation to a build page
+      // must morph just the case photo, not 16 cards.
+      document.documentElement.setAttribute('data-vt', 'filter')
+      const transition = document.startViewTransition(() => flushSync(() => setFilters(next)))
+      const done = () => document.documentElement.removeAttribute('data-vt')
+      transition.finished.then(done, done)
     }
     window.history.replaceState(null, '', `${window.location.pathname}${filtersQuery(next)}`)
   }
@@ -135,7 +140,11 @@ export function BuildsBrowser({ items, initial }: Props) {
         {count > 0 ? (
           <ul className="bl-grid">
             {shown.map((item) => (
-              <li key={item.slug} data-reveal="" style={{ viewTransitionName: `bl-${item.slug}` }}>
+              <li
+                key={item.slug}
+                data-reveal=""
+                style={{ '--vt': `bl-${item.slug}` } as CSSProperties}
+              >
                 {item.card}
               </li>
             ))}

@@ -22,3 +22,10 @@ Po rundzie v2 strona jest kompletna i spójna, ale statyczna — Krystian ocenia
 ## Uzupełnienie (Krystian, 08.11.2026, plan E2)
 - **E2 bez GSAP:** wejście hero, zmiana istoty, karty i sceny pokrywa CSS (klatki kluczowe, `@property`, animacje sterowane przewijaniem) i View Transitions; GSAP nie jest zależnością. Pkt 2 decyzji dalej dopuszcza GSAP tam, gdzie potrzebna oś czasu — wraca do oceny w E3 (porównanie). Konsekwencja o dependabocie dotyczy GSAP dopiero, gdy zostanie dodany.
 - Wariant intensywności ruchu: **spokojny** (`--motion-scale: 1`), wybrany na nagraniach.
+
+## Uzupełnienie (E3, 08.11.2026)
+- **Wejścia sekcji przy przewijaniu** (nagłówki, treść, liczby, ikony — raz, przez `data-reveal`) zastępują dla stron publicznych zasadę ADR-G003 §1 pkt 3 „bez wjeżdżania sekcji przy przewijaniu”. Ograniczenia: tylko `transform`/`opacity` (nagłówek: odsłonięcie `clip-path`), raz na element, ukrycie natychmiastowe, `prefers-reduced-motion` = nic nie czeka ukryte.
+- **E3 też bez GSAP:** porównanie i liczby pokrywa CSS (`@property --count-n` + `counter()`, słupy przez `scaleY`), cena w konfiguratorze — mały licznik w `requestAnimationFrame` (`RollNumber`). 0 KB zależności.
+- **Krok konfiguratora bez animacji wyjścia** (PREMIUM §2.3: „obecny krok wysuwa się w lewo”): wyjście opóźniałoby pokazanie kroku, o który użytkownik prosi (§2.1 pkt 2) — nowy krok wjeżdża z kierunku zmiany.
+- **Wolne przejście między stronami bez `loading.tsx`** (PREMIUM §2.3 „Ładowanie”): zastępnik trasy podmienia stronę przy każdym kliknięciu (mignięcie pustki przy szybkich przejściach) i wyłącza przelot obudowy przez View Transition (nowa strona musi przyjść w tym samym commicie). Zamiast tego `NavPending`: pieczęć po 300 ms, tylko przy wolnej nawigacji.
+- **Podgląd obudowy w konfiguratorze:** nowe zdjęcie wyłania się (także z pamięci przeglądarki), bez nakładania na stare — prawdziwe przejście krzyżowe wymagałoby dwóch warstw zdjęć w podglądzie.

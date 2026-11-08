@@ -1,11 +1,12 @@
-import Image from 'next/image'
 import type { CSSProperties } from 'react'
 
+import { Count } from '@/components/motion/Count'
+import { FadeImage } from '@/components/motion/FadeImage'
+import { RollNumber } from '@/components/motion/RollNumber'
 import { Sigil } from '@/components/Sigil'
 import { SourceLabel } from '@/components/SourceLabel'
 import { Button, ButtonLink } from '@/components/ui/Button'
 import type { BuildMatch, ConfiguratorState } from '@/lib/configurator'
-import { zl } from '@/lib/pricing/format'
 
 import type { ConfiguratorView } from './view'
 
@@ -39,9 +40,12 @@ export function Preview({
           className="cf-sb__stage"
           style={{ '--glow': `var(--c-${view.level.build})` } as CSSProperties}
         >
-          <span className="cf-sb__glow" aria-hidden="true" />
+          {/* Keyed by creature: a new power level flashes the glow in its colour once. */}
+          <span key={view.level.build} className="cf-sb__glow" aria-hidden="true" />
+          {/* Keyed by photo: a new case emerges once loaded instead of popping in. */}
           {caseItem?.photo && (
-            <Image
+            <FadeImage
+              key={caseItem.photo.src}
               className="cf-sb__img"
               src={caseItem.photo.src}
               alt={caseItem.label}
@@ -79,7 +83,15 @@ export function Preview({
             {view.fps.map((f) => (
               <div key={f.slug} className="cf-fr">
                 <span>{f.name}</span>
-                <b>{f.cell ? `${f.cell.fps} kl./s` : '—'}</b>
+                <b>
+                  {f.cell ? (
+                    <>
+                      <Count value={f.cell.fps} /> kl./s
+                    </>
+                  ) : (
+                    '—'
+                  )}
+                </b>
                 <i aria-hidden="true">
                   <s style={{ width: `${f.bar}%` }} />
                 </i>
@@ -93,7 +105,9 @@ export function Preview({
           {match && (
             <span className={match.exact ? 'cf-tag is-exact' : 'cf-tag'}>{match.short}</span>
           )}
-          <b>{zl(view.price)}</b>
+          <b>
+            <RollNumber value={view.price} />
+          </b>
           <small>Windows 11, montaż, test i wysyłka w cenie</small>
           {last ? (
             <ButtonLink className="cf-wide" href={askHref}>

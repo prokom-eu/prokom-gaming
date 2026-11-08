@@ -164,6 +164,11 @@ function measureSharpness(page: Page, sel: string) {
     const imgs = [...document.querySelectorAll(sel)] as HTMLImageElement[]
     return Promise.all(
       imgs.map(async (img) => {
+        // A lazy picture the browser has not started yet (a cold CI cache) has no currentSrc.
+        if (!img.currentSrc || !img.complete) {
+          img.loading = 'eager'
+          await img.decode()
+        }
         // `naturalWidth` of an x-descriptor candidate is divided by its density: load the file
         // again on its own to read its real width.
         const probe = new Image()

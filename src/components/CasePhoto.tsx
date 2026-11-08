@@ -1,5 +1,6 @@
 import Image from 'next/image'
 
+import { FadeImage } from '@/components/motion/FadeImage'
 import { caseVars, drawnWidthOf, type CasePhoto as CasePhotoData } from '@/lib/caseBox'
 
 import './case-photo.css'
@@ -45,9 +46,11 @@ export function CasePhoto({
   const drawn = drawnWidth ?? (caseHeight ? drawnWidthOf(photo, caseHeight) : undefined)
   const width = drawn ?? photo.width
   const height = drawn ? Math.round((drawn * photo.height) / photo.width) : photo.height
+  // A lazy photo emerges once loaded (runda v3 PREMIUM §2.3); an eager one may be the LCP.
+  const Img = eager || priority ? Image : FadeImage
   return (
     <span className="case" style={caseVars(photo)}>
-      <Image
+      <Img
         className="case__img"
         src={photo.src}
         alt={alt}
