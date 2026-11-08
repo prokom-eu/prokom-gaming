@@ -104,11 +104,25 @@ a {
     opacity: 0;
     translate: 0 calc(16px * var(--motion-scale));
   }
+  /* Section headings: the lines rise out of their own lower edge (PREMIUM §2.3). */
+  .h[data-reveal] {
+    /* An explicit end (clip-path does not animate to `none`), wide enough for glows. */
+    clip-path: inset(-1em);
+    transition:
+      opacity var(--dur-3) var(--ease-enter),
+      translate var(--dur-4) var(--ease-enter),
+      clip-path var(--dur-4) var(--ease-enter);
+  }
+  .h[data-reveal='wait'] {
+    translate: 0 calc(0.45em * var(--motion-scale));
+    clip-path: inset(100% -1em -1em);
+  }
 }
 @media print {
   [data-reveal] {
     opacity: 1 !important;
     translate: none !important;
+    clip-path: none !important;
   }
 }
 /* One line of light runs along a card's border on hover or focus (runda v3 PREMIUM §2.3): a

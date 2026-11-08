@@ -24,10 +24,10 @@ export function ForParents() {
       <div className="wrap">
         <div className="hm-par__grid">
           <div>
-            <h2 id="par-title" className="h">
+            <h2 id="par-title" className="h" data-reveal="">
               Kupujesz komputer dla dziecka?
             </h2>
-            <p className="hm-lead">
+            <p className="hm-lead" data-reveal="">
               Rozumiemy, to duża kwota i dużo nieznanych słów. Dlatego wszystko, co obiecujemy,
               możesz sprawdzić sam, zanim zapłacisz. A jeśli wolisz porozmawiać, zadzwoń.
             </p>
@@ -41,7 +41,7 @@ export function ForParents() {
               </a>
             </div>
           </div>
-          <ul className="hm-par__cards">
+          <ul className="hm-par__cards" data-reveal="">
             <li>
               <span className="hm-par__icon" aria-hidden="true">
                 <IconDoc size={22} />

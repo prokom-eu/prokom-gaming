@@ -443,3 +443,18 @@
     gap: 14px 16px;
   }
 }
+
+/* Hover of the cards (runda v3 PREMIUM §2.3): calm — a 2 px lift, no light show. Pointer only. */
+.pr-q__card,
+.pr-proof li {
+  transition:
+    translate var(--dur-2) var(--ease-enter),
+    box-shadow var(--dur-2) var(--ease-enter);
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .pr-q__card:hover,
+  .pr-proof li:hover {
+    translate: 0 -2px;
+    box-shadow: 0 28px 52px -34px var(--par-card-shadow);
+  }
+}

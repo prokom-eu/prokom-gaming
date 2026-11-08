@@ -16,12 +16,12 @@ export function Bestiary({ hero, games }: { hero: HeroData; games: readonly Pane
     <section className="hm-sec hm-best" id="istoty" aria-labelledby="best-title">
       <div className="wrap">
         <div className="hm-head hm-head--row">
-          <h2 id="best-title" className="h">
+          <h2 id="best-title" className="h" data-reveal="">
             Szesnaście istot.
             <br />
             Każda gra po swojemu.
           </h2>
-          <p>
+          <p data-reveal="">
             Moc to procesor i karta graficzna, czyli to, co decyduje o klatkach. Od Skrzata, który
             pociągnie Robloxa, Minecrafta i CS2 w FullHD, po Peruna, który gra w 4K bez kompromisów.
             Każda istota ma swój charakter i swoje miejsce w dawnych podaniach.

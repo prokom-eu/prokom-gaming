@@ -1559,3 +1559,18 @@
     transform: none;
   }
 }
+
+/* Hover of the contact cards (runda v3 PREMIUM §2.3): calm — a 2 px lift. Pointer only. */
+.ct-channel,
+.ct-store {
+  transition:
+    translate var(--dur-2) var(--ease-enter),
+    border-color var(--dur-2);
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .ct-channel:hover,
+  .ct-store:hover {
+    translate: 0 -2px;
+    border-color: var(--ct-channel-hl-line);
+  }
+}

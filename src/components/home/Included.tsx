@@ -1,4 +1,4 @@
-import type { ComponentType } from 'react'
+import type { ComponentType, CSSProperties } from 'react'
 
 import {
   IconBars,
@@ -35,12 +35,13 @@ export function Included() {
   return (
     <section className="hm-sec hm-inc" id="w-cenie" aria-labelledby="inc-title">
       <div className="wrap">
-        <h2 id="inc-title" className="h">
+        <h2 id="inc-title" className="h" data-reveal="">
           W cenie każdego komputera
         </h2>
-        <ul className="hm-inc__list">
-          {ITEMS.map(([Icon, title, text]) => (
-            <li key={title}>
+        <ul className="hm-inc__list" data-reveal="">
+          {ITEMS.map(([Icon, title, text], i) => (
+            // Icons draw column by column: the two rows of five share their timing.
+            <li key={title} style={{ '--i': i % 5 } as CSSProperties}>
               <span className="hm-inc__icon" aria-hidden="true">
                 <Icon size={22} />
               </span>
