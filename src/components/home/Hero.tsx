@@ -13,6 +13,7 @@ import {
 } from 'react'
 
 import { CasePhoto } from '@/components/CasePhoto'
+import { Fireflies } from '@/components/Fireflies'
 import { IconClock, IconRosette, IconShield, IconShop } from '@/components/icons'
 import { ButtonLink } from '@/components/ui/Button'
 import { HERO_DEFAULT, HERO_INTERVAL_MS, rotationOf, type HeroData } from '@/lib/home'
@@ -180,6 +181,7 @@ export function Hero({ data }: { data: HeroData }) {
           })}
         </div>
         <div className="hero__veil" aria-hidden="true" />
+        <Fireflies />
         <div className="hero__fgs" aria-hidden="true">
           {mounted.map((slug) => {
             const b = builds.get(slug)

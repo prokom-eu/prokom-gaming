@@ -19,6 +19,11 @@ Ostatnia aktualizacja: 08.11.2026 (scalone: A #79, B1 #80, B2 + D1 #81, C1 #82, 
 - **Sprawdzone lokalnie:** lint, typecheck, 1000 testów, `format:check`; e2e `contact` (nowy), `content-pages`, `a11y` na 1440 i 414 — zielone. Zrzuty `tmp/zrzuty-przed/c2`, `tmp/zrzuty-po/c2` (1440, 1100, 414). Przegląd `recenzent` — poprawione (opis strony z danych firmy, cele dotyku bez przesuwania podkreślenia, „otwiera się w nowej karcie” dla czytników, e-mail w danych firmy).
 - **Następny krok:** Krystian: po scaleniu C2 (#83) — staging i telefon (lista w PR-ach); dalej sesja D2 (R9, przegląd całej rundy) i R4 (nowe sceny, gdy będą grafiki).
 
+## R4 PR 2 — świetliki w hero (`feat/r4-swietliki`, od `develop` przed scaleniem #88)
+- Warstwa kodem z runda v2 §3.2: `components/Fireflies.tsx` + `fireflies.css` — 12 świetlików w kolorze istoty (`--c`) po bokach sceny, tylko CSS (`transform`/`opacity`), na głównej i w nagłówku karty zestawu. Tylko od 1024 px i przy `prefers-reduced-motion: no-preference` (ADR-G003 §5), na telefonie ukryte. Gradacji w kolorze istoty nie dodaję — nowe sceny z #88 mają ją już w obrazie, druga warstwa koloru przyciemniałaby tekst.
+- Po przeglądzie (`recenzent`): warstwa pod zasłoną/przyciemnieniem i pod zdjęciem (`z-index: 1` — wcześniej kropki przy 1024–1260 px wchodziły na obudowę i świeciły pod tekstem głównej), bez `will-change`, paralaksa razem ze sceną na głównej, test także na głównej.
+- Sprawdzone: lint, typecheck; e2e `build-page` i `home` (testy świetlików), `a11y` na 1440 i 414; Lighthouse mobile bez zmian (główna 88, Wampir 90 — na telefonie warstwy nie ma).
+
 ## Uwagi na później (GN-2b, scalone w #86)
 - **GN-2b (`feat/gn2b-na-tej-stronie`, od `develop` po #81; zastępuje zamknięty #85):** „Na tej stronie” w szynie także na „O nas” (5 sekcji — kotwice na istniejących `id` nagłówków H2) i „Komputer do {gry}” (polecane, każdy poziom mocy `#gm-tiers`, wymagania i pytania `#gm-more`). Bez grupy, zgodnie z §4.4: „Dobór pod grę” (1 sekcja), „Pytania” (własne zakładki grup), poradniki (własny spis treści). „Dla rodziców” — dopisać grupę po scaleniu C1 (#82): `id` są już na stronie (`start`, `pytania-rodzica`, `dowody`, `zakup`, `slowniczek`, `pytania`, `napisz`). „Ostatnio oglądane” nadal niezrobione (flaga + migracja `site-settings`; spec i tak trzyma grupę ukrytą do opinii prawnika). Sprawdzone: testy `railConfig` (każde `id` istnieje w plikach stron), e2e `rail`, `game-pages`, `content-pages` na 1440 i 414.
 
@@ -62,7 +67,7 @@ Ostatnia aktualizacja: 08.11.2026 (scalone: A #79, B1 #80, B2 + D1 #81, C1 #82, 
 - **GN-2b:** „Na tej stronie” na pozostałych podstronach + „Ostatnio oglądane” za flagą (szczegóły w „W toku” → B2).
 - Linki „Sprawdź w CEIDG / na białej liście” prowadzą do pustych wyszukiwarek — sprawdzić, czy da się podać NIP w adresie (np. biznes.gov.pl) i podmienić w `lib/site.ts` `registers`.
 - Szybkie wejścia do gier w „Napisz, w co grasz” mają slugi na sztywno — gdy gra zniknie z panelu, link da 404; ewentualnie brać 3 najpopularniejsze z `games`.
-- **Sceny kodem (runda v2 §3.2)** — warstwy, mgła, winieta, świetliki, gradacja: wydzielone z R3 (decyzja 06.11), zrobić razem z R4 (nowe grafiki), żeby nie stroić dwa razy.
+- **Sceny kodem (runda v2 §3.2):** sceny 16 istot — R4 (#88); świetliki w hero — R4 PR 2; gradacja świadomie pominięta (kolor istoty jest w obrazach scen).
 - Miniatury prawdziwie 75% wymagałyby sceny ~270 px (dziś 250) albo niższego postumentu w grafikach `*-card.webp` — przy R4.
 - `PickCard` (dobór pod grę) i konfigurator/konto pokazują zdjęcie obudowy po staremu (cały plik) — przy porządkach przejść na `CasePhoto`.
 - **`backdrop-filter` nie działa nigdzie na stronie** (GN-1): Lightning CSS z pary `backdrop-filter` → `-webkit-backdrop-filter` zostawia tylko ostatnią (z prefiksem), a Chrome jej nie zna. W nagłówku i dolnym pasku poprawione (`-webkit-` najpierw); zostały `.bp-bar`, `.cmp-bar`, `.bl-quick`, arkusze i inne — poprawka zmieni ich wygląd (rozmycie), więc osobno, ze zrzutami.

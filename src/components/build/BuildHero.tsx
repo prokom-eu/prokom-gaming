@@ -3,6 +3,7 @@ import type { CSSProperties } from 'react'
 
 import { CasePhoto } from '@/components/CasePhoto'
 import { IconArrow } from '@/components/icons'
+import { Fireflies } from '@/components/Fireflies'
 import { Scene } from '@/components/Scene'
 import { Sigil } from '@/components/Sigil'
 import type { BuildPageData } from '@/lib/buildPage.server'
@@ -27,6 +28,7 @@ export function BuildHero({ data }: { data: BuildPageData }) {
     >
       <Scene id={build.key} eager />
       <div className="bp-hero__fade" aria-hidden="true" />
+      <Fireflies />
 
       <nav className="bp-crumbs" aria-label="Okruszki">
         <Link href={routes.home}>Strona główna</Link>

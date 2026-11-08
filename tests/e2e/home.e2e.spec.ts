@@ -97,6 +97,23 @@ test.describe('automatic switch', () => {
   })
 })
 
+// Runda v2 §3.2 / ADR-G003 §5: fireflies only on a desktop width with motion allowed.
+test('fireflies: shown on a desktop with motion, hidden on a phone or with reduced motion', async ({
+  page,
+  isMobile,
+}) => {
+  await gotoHome(page)
+  const layer = page.locator('.hero .fireflies')
+  await expect(layer).toBeAttached()
+  if (isMobile) {
+    await expect(layer).toBeHidden()
+    return
+  }
+  await expect(layer).toBeVisible()
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await expect(layer).toBeHidden()
+})
+
 test('the page carries no cost or internal model', async ({ page, playwright, baseURL }) => {
   const internalModels = await panelInternalModels(playwright, baseURL)
   const response = await page.goto('/')
