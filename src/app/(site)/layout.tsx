@@ -5,6 +5,7 @@ import type { ReactNode } from 'react'
 import { CookieBanner } from '@/components/CookieBanner'
 import { MenuSheet } from '@/components/MenuSheet'
 import { MobileTabBar } from '@/components/MobileTabBar'
+import { RevealObserver } from '@/components/motion/RevealObserver'
 import { ShellProvider } from '@/components/shell/ShellProvider'
 import { SiteFooter } from '@/components/SiteFooter'
 import { SiteRail } from '@/components/rail/SiteRail'
@@ -62,6 +63,7 @@ export default async function SiteLayout({ children }: { children: ReactNode }) 
           <SiteHeader hours={hours} />
           <SiteRail creatures={menuCreatures} />
           <SearchHost />
+          <RevealObserver />
           <main id="tresc">{children}</main>
           <SiteFooter features={flags} />
           <MobileTabBar />

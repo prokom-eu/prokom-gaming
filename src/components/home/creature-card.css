@@ -11,12 +11,13 @@
   border: 1px solid color-mix(in srgb, var(--kosc) 9%, transparent);
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--c) 18%, transparent);
   transition:
-    transform 0.4s cubic-bezier(0.2, 0.7, 0.2, 1),
-    border-color 0.4s,
-    box-shadow 0.4s;
+    transform var(--dur-3) var(--ease-enter),
+    border-color var(--dur-3),
+    box-shadow var(--dur-3);
 }
-.hm-card:hover {
-  transform: translateY(-8px);
+/* Hover and keyboard focus look the same (runda v3 PREMIUM §2.3); a touch only presses. */
+.hm-card:is(:hover, :focus-visible) {
+  transform: translateY(calc(-6px * var(--motion-scale)));
   border-color: color-mix(in srgb, var(--c) 55%, transparent);
   box-shadow:
     0 0 0 1px color-mix(in srgb, var(--c) 55%, transparent),
@@ -42,11 +43,12 @@
   transform: translateX(-67%);
   transform-origin: 67% 100%;
   transition:
-    transform 0.8s cubic-bezier(0.2, 0.7, 0.2, 1),
-    filter 0.6s;
+    transform var(--dur-4) var(--ease-enter),
+    filter var(--dur-3);
 }
-.hm-card:hover .hm-card__scene {
-  transform: translateX(-67%) scale(1.06);
+/* The scene drifts a few px against the lifting case: a hint of depth (parallax). */
+.hm-card:is(:hover, :focus-visible) .hm-card__scene {
+  transform: translateX(calc(-67% - 6px * var(--motion-scale))) scale(1.03);
   filter: brightness(1.12) saturate(1.08);
 }
 .hm-card__glow {
@@ -67,10 +69,33 @@
   inset: 0;
   /* The hover lift grows from the case's feet, so it stays on the middle of the pedestal. */
   transform-origin: 50% calc(100% - var(--case-base));
-  transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
+  transition: transform var(--dur-3) var(--ease-enter);
 }
-.hm-card:hover .hm-card__photo {
-  transform: translateY(-6px) scale(1.03);
+.hm-card:is(:hover, :focus-visible) .hm-card__photo {
+  transform: translateY(calc(-4px * var(--motion-scale))) scale(1.04);
+}
+/* The pedestal brightens in the creature's colour under the case (its top face is --case-base
+   above the bottom of the view). Only opacity moves. */
+.hm-card__photo::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--case-base) - 26px);
+  width: min(78cqw, 300px);
+  height: 52px;
+  translate: -50% 0;
+  border-radius: 50%;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--c) 70%, transparent),
+    transparent
+  );
+  opacity: 0;
+  transition: opacity var(--dur-3);
+  pointer-events: none;
+}
+.hm-card:is(:hover, :focus-visible) .hm-card__photo::before {
+  opacity: 0.85;
 }
 .hm-card__sigil {
   position: absolute;
@@ -78,9 +103,9 @@
   top: 12px;
   color: var(--c);
   filter: drop-shadow(0 0 8px var(--c));
-  transition: transform 0.5s;
+  transition: transform var(--dur-3) var(--ease-enter);
 }
-.hm-card:hover .hm-card__sigil {
+.hm-card:is(:hover, :focus-visible) .hm-card__sigil {
   transform: rotate(-8deg) scale(1.08);
 }
 .hm-card__tier {
@@ -153,8 +178,14 @@
   color: var(--kosc);
 }
 
+@media (hover: none) {
+  .hm-card:active {
+    transform: scale(0.985);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .hm-card:hover .hm-card__scene {
+  .hm-card:is(:hover, :focus-visible) .hm-card__scene {
     transform: translateX(-67%);
   }
   .hm-card,
@@ -163,9 +194,9 @@
   .hm-card__sigil {
     transition: none;
   }
-  .hm-card:hover,
-  .hm-card:hover .hm-card__photo,
-  .hm-card:hover .hm-card__sigil {
+  .hm-card:is(:hover, :focus-visible, :active),
+  .hm-card:is(:hover, :focus-visible) .hm-card__photo,
+  .hm-card:is(:hover, :focus-visible) .hm-card__sigil {
     transform: none;
   }
 }

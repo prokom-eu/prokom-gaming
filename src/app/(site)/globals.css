@@ -92,6 +92,56 @@ a {
     scroll-behavior: auto !important;
   }
 }
+/* Entry into view (components/motion/RevealObserver): only elements the observer marked
+   `wait` (below the fold, motion allowed) start hidden; 16 px up + fade, cascade by --reveal-i. */
+@media (prefers-reduced-motion: no-preference) {
+  [data-reveal] {
+    transition:
+      opacity var(--dur-3) var(--ease-enter) calc(var(--reveal-i, 0) * var(--stagger)),
+      translate var(--dur-3) var(--ease-enter) calc(var(--reveal-i, 0) * var(--stagger));
+  }
+  [data-reveal='wait'] {
+    opacity: 0;
+    translate: 0 calc(16px * var(--motion-scale));
+  }
+}
+/* One line of light runs along a card's border on hover or focus (runda v3 PREMIUM §2.3): a
+   gradient on a 1 px ring (mask), moved once; it snaps back only after it has faded. */
+.card-sweep::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  padding: 1px;
+  pointer-events: none;
+  background: linear-gradient(
+      110deg,
+      transparent 42%,
+      color-mix(in srgb, var(--c) 70%, var(--white)) 50%,
+      transparent 58%
+    )
+    100% 0 / 300% 100% no-repeat;
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box exclude,
+    linear-gradient(#000 0 0);
+  opacity: 0;
+  transition:
+    opacity var(--dur-2),
+    background-position 0s var(--dur-2);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .card-sweep:is(:hover, :focus-visible, :has(:focus-visible))::before {
+    opacity: 1;
+    background-position: 0 0;
+    transition:
+      opacity var(--dur-1),
+      background-position var(--dur-4) var(--ease-enter);
+  }
+}
 .sr-only {
   position: absolute;
   width: 1px;

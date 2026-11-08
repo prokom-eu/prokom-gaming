@@ -87,7 +87,7 @@
   flex-direction: column;
   width: 100%;
   background: linear-gradient(180deg, var(--zc-from), var(--panel-to));
-  transition: transform 0.35s;
+  transition: transform var(--dur-3) var(--ease-enter);
 }
 .bl-card::after {
   content: '';
@@ -97,8 +97,9 @@
   border: 1px solid color-mix(in srgb, var(--kosc) 10%, transparent);
   clip-path: inherit;
 }
-.bl-card:hover {
-  transform: translateY(-6px);
+/* Hover and keyboard focus on the name link look the same (runda v3 PREMIUM §2.3). */
+.bl-card:is(:hover, :has(:focus-visible)) {
+  transform: translateY(calc(-6px * var(--motion-scale)));
 }
 .bl-card__art {
   /* Runda v2 §3.3: 20 px taller than the board, so the case can take ~75% of it. */
@@ -133,10 +134,11 @@
   height: var(--scene-h);
   transform: translateX(-67%);
   transform-origin: 67% 73.5%;
-  transition: transform 0.8s;
+  transition: transform var(--dur-4) var(--ease-enter);
 }
-.bl-card:hover .bl-card__scene {
-  transform: translateX(-67%) scale(1.08);
+/* The scene drifts a few px against the lifting case: a hint of depth (parallax). */
+.bl-card:is(:hover, :has(:focus-visible)) .bl-card__scene {
+  transform: translateX(calc(-67% - 6px * var(--motion-scale))) scale(1.03);
 }
 .bl-card__photo {
   /* The case stands on the middle of the pedestal, ~72% of the art, ≥ 10 px below the top. */
@@ -144,6 +146,38 @@
   --case-w-max: 86cqw;
   position: absolute;
   inset: 0;
+  transform-origin: 50% calc(100% - var(--case-base));
+  transition: transform var(--dur-3) var(--ease-enter);
+}
+.bl-card:is(:hover, :has(:focus-visible)) .bl-card__photo {
+  transform: translateY(calc(-4px * var(--motion-scale))) scale(1.04);
+}
+/* The pedestal brightens in the creature's colour under the case. Only opacity moves. */
+.bl-card__photo::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--case-base) - 22px);
+  width: min(64cqw, 260px);
+  height: 44px;
+  translate: -50% 0;
+  border-radius: 50%;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--c) 70%, transparent),
+    transparent
+  );
+  opacity: 0;
+  transition: opacity var(--dur-3);
+  pointer-events: none;
+}
+.bl-card:is(:hover, :has(:focus-visible)) .bl-card__photo::before {
+  opacity: 0.85;
+}
+@media (hover: none) {
+  .bl-card:active {
+    transform: scale(0.985);
+  }
 }
 .bl-card__tx {
   display: flex;
@@ -457,13 +491,15 @@
 @media (prefers-reduced-motion: reduce) {
   .bl-quick,
   .bl-card,
-  .bl-card__scene {
+  .bl-card__scene,
+  .bl-card__photo {
     transition: none;
   }
-  .bl-card:hover {
+  .bl-card:is(:hover, :has(:focus-visible), :active),
+  .bl-card:is(:hover, :has(:focus-visible)) .bl-card__photo {
     transform: none;
   }
-  .bl-card:hover .bl-card__scene {
+  .bl-card:is(:hover, :has(:focus-visible)) .bl-card__scene {
     transform: translateX(-67%);
   }
 }

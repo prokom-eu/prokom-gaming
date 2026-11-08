@@ -48,7 +48,7 @@ export function CreatureCardView({
   return (
     <Link
       href={`/zestawy/${card.slug}`}
-      className="hm-card"
+      className="hm-card card-sweep"
       style={{ ['--c' as string]: `var(--c-${card.slug})` }}
     >
       <span className="hm-card__view" aria-hidden="true">

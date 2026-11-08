@@ -22,7 +22,7 @@ export function Neighbours({ data }: { data: BuildPageData }) {
         </div>
         <ul className="bp-near__list">
           {data.neighbours.map((build) => (
-            <li key={build.slug}>
+            <li key={build.slug} data-reveal="">
               <CreatureCard build={build} game={game} />
             </li>
           ))}

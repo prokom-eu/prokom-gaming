@@ -125,7 +125,9 @@ export function BuildsBrowser({ items, initial }: Props) {
         {count > 0 ? (
           <ul className="bl-grid">
             {shown.map((item) => (
-              <li key={item.slug}>{item.card}</li>
+              <li key={item.slug} data-reveal="">
+                {item.card}
+              </li>
             ))}
           </ul>
         ) : (
