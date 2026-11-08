@@ -1,0 +1,13 @@
+/* Font fallbacks that next/font cannot size right (fonts.ts). Imported by both layouts — the site
+   and the panel — because both use the Cinzel variable. */
+/* Fallback for Cinzel while it loads (fonts.ts). size-adjust is the median that matches the width
+   of the 16 build names in capitals (103–116% by letters; measured in session F); ascent and
+   descent keep Cinzel's line box (Cinzel 0.976 / 0.372 of the em, divided by size-adjust). */
+@font-face {
+  font-family: 'Cinzel Caps Fallback';
+  src: local('Times New Roman');
+  size-adjust: 108%;
+  ascent-override: 90.4%;
+  descent-override: 34.4%;
+  line-gap-override: 0%;
+}
