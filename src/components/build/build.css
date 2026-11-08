@@ -180,6 +180,9 @@
   transform: translate(calc(var(--mx, 0) * -10px), calc(var(--my, 0) * -5px));
   transition: transform var(--dur-4) var(--ease-enter);
 }
+.bp-hero > .scene-fx {
+  z-index: 1;
+}
 .bp-hero__horizon {
   position: absolute;
   inset: 0;

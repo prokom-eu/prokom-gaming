@@ -70,6 +70,10 @@
 .hero__scene img {
   object-fit: cover;
 }
+/* A hidden scene keeps nothing moving (its mist and particles). */
+.hero__scene[data-on='false'] .scene-fx {
+  display: none;
+}
 /* Foreground 2880×2000 = the frame in 2×, wider by 200 units each side (board `.fg6`). */
 .hero__fgs {
   position: absolute;

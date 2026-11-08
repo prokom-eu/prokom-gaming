@@ -15,6 +15,7 @@ import {
 import { CasePhoto } from '@/components/CasePhoto'
 import { Fireflies } from '@/components/Fireflies'
 import { Letters } from '@/components/motion/Letters'
+import { SceneFx } from '@/components/SceneFx'
 import { SceneLayers } from '@/components/SceneLayers'
 import { IconClock, IconRosette, IconShield, IconShop } from '@/components/icons'
 import { ButtonLink } from '@/components/ui/Button'
@@ -212,6 +213,7 @@ export function Hero({ data }: { data: HeroData }) {
                   sizes="(max-width: 1023px) 450vw, 300vw"
                   eager={slug === first}
                 />
+                <SceneFx id={b.key} />
               </div>
             )
           })}

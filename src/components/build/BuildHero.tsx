@@ -7,6 +7,7 @@ import { Fireflies } from '@/components/Fireflies'
 import { Letters } from '@/components/motion/Letters'
 import { MouseParallax } from '@/components/motion/MouseParallax'
 import { Scene } from '@/components/Scene'
+import { SceneFx } from '@/components/SceneFx'
 import { Sigil } from '@/components/Sigil'
 import type { BuildPageData } from '@/lib/buildPage.server'
 import { buildHref, routes } from '@/lib/nav'
@@ -30,6 +31,7 @@ export function BuildHero({ data }: { data: BuildPageData }) {
       aria-labelledby="bp-name"
     >
       <Scene id={build.key} eager layers />
+      <SceneFx id={build.key} />
       <div className="bp-hero__horizon" aria-hidden="true" />
       <div className="bp-hero__fade" aria-hidden="true" />
       <Fireflies />

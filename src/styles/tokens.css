@@ -545,4 +545,11 @@
   --ease-exit: cubic-bezier(0.7, 0, 0.84, 0); /* wyjście: powolny start, szybki koniec */
   --stagger: 50ms; /* opóźnienie kolejnych elementów kaskady (max 6, src/lib/motion.ts) */
   --motion-scale: 1; /* wariant „spokojny” (Krystian 08.11, nagrania E2) */
+  /* warstwa ruchu scen (SceneFx, PREMIUM §2.4): mgła, śnieg, żar, błysk burzy, odbicie wody */
+  --fx-mist: rgba(200, 210, 205, 0.16);
+  --fx-snow: rgba(240, 246, 255, 0.85);
+  --fx-ember: #ffd27a;
+  --fx-ember-glow: #ff9a3c;
+  --fx-flash: rgba(220, 230, 255, 0.55);
+  --fx-water: rgba(255, 255, 255, 0.18);
 }
