@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 
 import { IconArrow, IconClose } from '@/components/icons'
+import { RollNumber } from '@/components/motion/RollNumber'
 import { Button, ButtonLink } from '@/components/ui/Button'
 import { track } from '@/lib/analytics'
 import {
@@ -18,7 +19,6 @@ import {
   type StepKey,
 } from '@/lib/configurator'
 import type { ConfiguratorData } from '@/lib/configurator.server'
-import { zl } from '@/lib/pricing/format'
 import { priceFromSnapshot } from '@/lib/pricing/snapshot'
 import type { Config, OptionType } from '@/lib/pricing/types'
 import { readItem, storageKeys, writeItem } from '@/lib/storage'
@@ -60,6 +60,9 @@ export function Configurator({ data, initial, initialChanges, fromAddress, siteU
     initialChanges.length > 0 ? changeMessage(view, initialChanges) : null,
   )
   const [other, setOther] = useState('')
+  // Which way the last step change went: the new step slides in from that side.
+  const [dir, setDir] = useState<'next' | 'back'>('next')
+  const mainRef = useRef<HTMLDivElement>(null)
   const headingRef = useRef<HTMLHeadingElement>(null)
   const stepChanged = useRef(false)
   const restoring = useRef(false)
@@ -94,6 +97,26 @@ export function Configurator({ data, initial, initialChanges, fromAddress, siteU
     writeItem(storageKeys.config, query)
   }, [state])
 
+  // Choosing an option: a wave of light from the point of the click (runda v3 PREMIUM §2.3).
+  // One listener for every option; the position goes to CSS, the wave restarts on each click.
+  useEffect(() => {
+    const main = mainRef.current
+    if (!main) return
+    const onDown = (event: PointerEvent) => {
+      if (!(event.target instanceof Element)) return
+      const option = event.target.closest<HTMLElement>(WAVE_TARGETS)
+      if (!option || option.getAttribute('aria-disabled') === 'true') return
+      const box = option.getBoundingClientRect()
+      option.style.setProperty('--wx', `${event.clientX - box.left}px`)
+      option.style.setProperty('--wy', `${event.clientY - box.top}px`)
+      option.classList.remove('is-wave')
+      void option.offsetWidth // restart the animation
+      option.classList.add('is-wave')
+    }
+    main.addEventListener('pointerdown', onDown)
+    return () => main.removeEventListener('pointerdown', onDown)
+  }, [])
+
   // A new step: move the focus to its heading (and the view to the top of the steps).
   useEffect(() => {
     if (!stepChanged.current) return
@@ -105,6 +128,7 @@ export function Configurator({ data, initial, initialChanges, fromAddress, siteU
   const goTo = (step: StepKey) => {
     if (step === state.step) return
     stepChanged.current = true
+    setDir(stepOf(step) > stepOf(state.step) ? 'next' : 'back')
     setNotice(null)
     setState((s) => ({ ...s, step }))
     track('configurator_step', { step })
@@ -136,6 +160,7 @@ export function Configurator({ data, initial, initialChanges, fromAddress, siteU
     const build = data.builds.find((b) => b.slug === slug)
     if (!build || priceFromSnapshot(build.config, data.prices) === null) return
     stepChanged.current = true
+    setDir('next')
     setNotice(null)
     setState((s) => ({ ...s, config: build.config, step: 'poziom' }))
   }
@@ -161,59 +186,62 @@ export function Configurator({ data, initial, initialChanges, fromAddress, siteU
         </div>
 
         <div className="cf-grid">
-          <div className="cf-main">
-            {state.step === 'monitor' && (
-              <StepMonitor
-                headingRef={headingRef}
-                data={data}
-                state={state}
-                onMonitor={(monitor) => setState((s) => ({ ...s, monitor }))}
-                onGames={(games) => setState((s) => ({ ...s, games }))}
-                onTake={takeBuild}
-              />
-            )}
-            {state.step === 'poziom' && (
-              <StepLevel headingRef={headingRef} data={data} state={state} onPick={pickLevel} />
-            )}
-            {state.step === 'obudowa' && (
-              <StepCase
-                headingRef={headingRef}
-                data={data}
-                state={state}
-                view={view}
-                onPick={(code) => pickOption('case', code)}
-              />
-            )}
-            {state.step === 'chlodzenie' && (
-              <StepCooler
-                headingRef={headingRef}
-                data={data}
-                state={state}
-                view={view}
-                onPick={(code) => pickOption('cooler', code)}
-              />
-            )}
-            {state.step === 'pamiec' && (
-              <StepMemory
-                headingRef={headingRef}
-                data={data}
-                state={state}
-                view={view}
-                onPick={pickOption}
-              />
-            )}
-            {state.step === 'podsumowanie' && (
-              <StepSummary
-                headingRef={headingRef}
-                state={state}
-                view={view}
-                match={match}
-                askHref={askHref}
-                siteUrl={siteUrl}
-                other={other}
-                onOther={setOther}
-              />
-            )}
+          <div className="cf-main" ref={mainRef}>
+            {/* Keyed by step: each new step enters from the side it came from (PREMIUM §2.3). */}
+            <div key={state.step} className="cf-step" data-dir={dir}>
+              {state.step === 'monitor' && (
+                <StepMonitor
+                  headingRef={headingRef}
+                  data={data}
+                  state={state}
+                  onMonitor={(monitor) => setState((s) => ({ ...s, monitor }))}
+                  onGames={(games) => setState((s) => ({ ...s, games }))}
+                  onTake={takeBuild}
+                />
+              )}
+              {state.step === 'poziom' && (
+                <StepLevel headingRef={headingRef} data={data} state={state} onPick={pickLevel} />
+              )}
+              {state.step === 'obudowa' && (
+                <StepCase
+                  headingRef={headingRef}
+                  data={data}
+                  state={state}
+                  view={view}
+                  onPick={(code) => pickOption('case', code)}
+                />
+              )}
+              {state.step === 'chlodzenie' && (
+                <StepCooler
+                  headingRef={headingRef}
+                  data={data}
+                  state={state}
+                  view={view}
+                  onPick={(code) => pickOption('cooler', code)}
+                />
+              )}
+              {state.step === 'pamiec' && (
+                <StepMemory
+                  headingRef={headingRef}
+                  data={data}
+                  state={state}
+                  view={view}
+                  onPick={pickOption}
+                />
+              )}
+              {state.step === 'podsumowanie' && (
+                <StepSummary
+                  headingRef={headingRef}
+                  state={state}
+                  view={view}
+                  match={match}
+                  askHref={askHref}
+                  siteUrl={siteUrl}
+                  other={other}
+                  onOther={setOther}
+                />
+              )}
+            </div>
 
             <div className="cf-nav">
               <Button variant="ghost" disabled={!prev} onClick={() => prev && goTo(prev.key)}>
@@ -249,7 +277,9 @@ export function Configurator({ data, initial, initialChanges, fromAddress, siteU
       <div className="cf-mbar" role="region" aria-label="Cena i następny krok">
         <span>
           <small>{match?.sideName ?? view.build?.name}</small>
-          <b>{zl(view.price)}</b>
+          <b>
+            <RollNumber value={view.price} />
+          </b>
         </span>
         {next ? (
           <Button onClick={() => goTo(next.key)}>Dalej: {next.name}</Button>
@@ -272,6 +302,11 @@ export function Configurator({ data, initial, initialChanges, fromAddress, siteU
     </section>
   )
 }
+
+/** Options that answer a click with a wave of light. */
+const WAVE_TARGETS = '.cf-mon, .cf-tier__b, .cf-oc, .cf-mc'
+
+const stepOf = (key: StepKey) => STEPS.findIndex((s) => s.key === key)
 
 function changeMessage(view: ConfiguratorView, changes: SlotChange[]): string | null {
   return levelChangeMessage(view.level.tierLabel, { changes, keptChoice: true }, view.optionLabel)

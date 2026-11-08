@@ -159,6 +159,34 @@ a {
     opacity: 0;
   }
 }
+/* A rolling price (components/motion/RollNumber): the digits on screen come from `data-v`. */
+.roll {
+  font-variant-numeric: tabular-nums;
+}
+.roll::before {
+  content: attr(data-v);
+}
+.roll.is-flash {
+  animation: roll-flash var(--dur-3) var(--ease-enter);
+}
+@keyframes roll-flash {
+  from {
+    color: var(--grom2);
+    text-shadow: 0 0 18px color-mix(in srgb, var(--grom) 70%, transparent);
+  }
+}
+/* An image that emerges once loaded (components/motion/FadeImage). */
+@media (prefers-reduced-motion: no-preference) {
+  img[data-fade] {
+    transition:
+      opacity var(--dur-3) var(--ease-enter),
+      filter var(--dur-3) var(--ease-enter);
+  }
+  img[data-fade='wait'] {
+    opacity: 0;
+    filter: blur(6px);
+  }
+}
 @media print {
   [data-reveal] {
     opacity: 1 !important;
