@@ -17,19 +17,19 @@ import { Fireflies } from '@/components/Fireflies'
 import { IconClock, IconRosette, IconShield, IconShop } from '@/components/icons'
 import { ButtonLink } from '@/components/ui/Button'
 import { HERO_DEFAULT, HERO_INTERVAL_MS, rotationOf, type HeroData } from '@/lib/home'
+import {
+  DESKTOP,
+  FINE_POINTER,
+  matchesMedia as matches,
+  REDUCED_MOTION as CALM,
+} from '@/lib/motion'
 
 import { HeroCard } from './HeroCard'
 import { Pedestal } from './Pedestal'
 import { TierStrip } from './TierStrip'
 
-/** Autoswitch and parallax only here (ADR-G003 §5): desktop width, a mouse, motion allowed. */
-const DESKTOP = '(min-width: 1024px)'
-const MOUSE = '(hover: hover) and (pointer: fine)'
-const CALM = '(prefers-reduced-motion: reduce)'
 /** The next creature of the rotation is fetched this long before it shows. */
 const PRELOAD_AFTER_MS = 3000
-
-const matches = (query: string) => typeof window !== 'undefined' && window.matchMedia(query).matches
 
 /**
  * Home hero (spec. §4 pt 1, ADR-G003 §5, board Main `.hero6`). Only the first creature's scene and
@@ -108,7 +108,7 @@ export function Hero({ data }: { data: HeroData }) {
 
   const onMouseMove = (event: MouseEvent<HTMLElement>) => {
     const el = section.current
-    if (!el || !matches(DESKTOP) || !matches(MOUSE) || matches(CALM)) return
+    if (!el || !matches(DESKTOP) || !matches(FINE_POINTER) || matches(CALM)) return
     const { clientX, clientY } = event
     cancelAnimationFrame(frame.current)
     frame.current = requestAnimationFrame(() => {

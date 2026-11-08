@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type MouseEvent } from 'react'
 
 import { useShell } from '@/components/shell/ShellProvider'
+import { prefersReducedMotion } from '@/lib/motion'
 import { routes } from '@/lib/nav'
 
 import {
@@ -122,7 +123,7 @@ export function RailPanel({
   }
 
   const toTop = () => {
-    const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const calm = prefersReducedMotion()
     // The button disappears at the top: hand focus to the first entry, so the keyboard keeps its
     // place instead of falling back to the page start.
     nav.current?.querySelector<HTMLElement>('.rail__cta')?.focus({ preventScroll: true })

@@ -8,6 +8,7 @@ import { SourceLabel } from '@/components/SourceLabel'
 import { Segmented } from '@/components/ui/Segmented'
 import { RESOLUTION_LABELS, type Resolution } from '@/lib/fps'
 import { compareStepText, type CompareData } from '@/lib/home'
+import { prefersReducedMotion } from '@/lib/motion'
 import { zl } from '@/lib/pricing/format'
 
 /**
@@ -28,7 +29,7 @@ export function CompareChart({ data }: { data: CompareData }) {
     if (!el || typeof IntersectionObserver === 'undefined') return
     // Already on screen: no growth (it would flash). Below the fold: hide, then grow into view.
     if (el.getBoundingClientRect().top < window.innerHeight) return
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    if (prefersReducedMotion()) return
     el.dataset.shown = 'false'
     const observer = new IntersectionObserver(
       ([entry]) => {
