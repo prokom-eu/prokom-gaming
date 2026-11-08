@@ -4,6 +4,8 @@ import type { CSSProperties } from 'react'
 import { CasePhoto } from '@/components/CasePhoto'
 import { IconArrow } from '@/components/icons'
 import { Fireflies } from '@/components/Fireflies'
+import { Letters } from '@/components/motion/Letters'
+import { MouseParallax } from '@/components/motion/MouseParallax'
 import { Scene } from '@/components/Scene'
 import { Sigil } from '@/components/Sigil'
 import type { BuildPageData } from '@/lib/buildPage.server'
@@ -19,7 +21,8 @@ export function BuildHero({ data }: { data: BuildPageData }) {
   const { build, switcher } = data
   return (
     <section
-      className="bp-hero"
+      // Entry once per page, from the first paint, CSS only (runda v3 PREMIUM §2.3).
+      className="bp-hero bp-hero--intro"
       id="przeglad"
       data-scene-top
       data-material={build.material}
@@ -27,8 +30,12 @@ export function BuildHero({ data }: { data: BuildPageData }) {
       aria-labelledby="bp-name"
     >
       <Scene id={build.key} eager />
+      <div className="bp-hero__horizon" aria-hidden="true" />
       <div className="bp-hero__fade" aria-hidden="true" />
       <Fireflies />
+      {/* Black that lifts at the entry: over the scene and the computer, under the text. */}
+      <div className="bp-hero__dawn" aria-hidden="true" />
+      <MouseParallax />
 
       <nav className="bp-crumbs" aria-label="Okruszki">
         <Link href={routes.home}>Strona główna</Link>
@@ -50,7 +57,7 @@ export function BuildHero({ data }: { data: BuildPageData }) {
           <i aria-hidden="true" />
         </span>
         <h1 id="bp-name" className="bp-title__name nm">
-          {build.name}
+          <Letters text={build.name} label />
         </h1>
       </div>
 

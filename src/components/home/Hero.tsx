@@ -14,6 +14,7 @@ import {
 
 import { CasePhoto } from '@/components/CasePhoto'
 import { Fireflies } from '@/components/Fireflies'
+import { Letters } from '@/components/motion/Letters'
 import { IconClock, IconRosette, IconShield, IconShop } from '@/components/icons'
 import { ButtonLink } from '@/components/ui/Button'
 import { HERO_DEFAULT, HERO_INTERVAL_MS, rotationOf, type HeroData } from '@/lib/home'
@@ -146,7 +147,9 @@ export function Hero({ data }: { data: HeroData }) {
   return (
     <section
       ref={section}
-      className="hero"
+      // The entry (runda v3 PREMIUM §2.3) runs once, from the first paint, in CSS alone; a
+      // switch to another creature has its own animation.
+      className={switches === 0 ? 'hero hero--intro' : 'hero'}
       id="start"
       data-scene-top
       data-material={build.material}
@@ -180,6 +183,7 @@ export function Hero({ data }: { data: HeroData }) {
             )
           })}
         </div>
+        <div className="hero__horizon" aria-hidden="true" />
         <div className="hero__veil" aria-hidden="true" />
         <Fireflies />
         <div className="hero__fgs" aria-hidden="true">
@@ -194,6 +198,8 @@ export function Hero({ data }: { data: HeroData }) {
           })}
         </div>
         <div className="hero__edge" aria-hidden="true" />
+        {/* Black that lifts at the entry: over the scene and the computer, under the text. */}
+        <div className="hero__dawn" aria-hidden="true" />
 
         <div
           key={`title-${animationKey}`}
@@ -209,7 +215,9 @@ export function Hero({ data }: { data: HeroData }) {
             {build.epithet}
             <span className="hero__flourish hero__flourish--r" />
           </span>
-          <span className="hero__name">{build.name}</span>
+          <span className="hero__name">
+            <Letters text={build.name} />
+          </span>
         </div>
 
         <div className="hero__stage">

@@ -546,3 +546,8 @@
   --stagger: 50ms; /* opóźnienie kolejnych elementów kaskady (max 6, src/lib/motion.ts) */
   --motion-scale: 1;
 }
+/* TODO(krystian): wariant intensywności do wyboru na nagraniu (E2) — po decyzji zostaje jedna
+   wartość `--motion-scale` wyżej, a ta reguła znika. Spokojny = 1, mocniejszy = 1.7. */
+:root[data-motion='strong'] {
+  --motion-scale: 1.7;
+}

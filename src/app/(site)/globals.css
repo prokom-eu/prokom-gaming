@@ -142,6 +142,59 @@ a {
       background-position var(--dur-4) var(--ease-enter);
   }
 }
+/* Hero entry keyframes shared by the home page and the build page (runda v3 PREMIUM §2.3).
+   Each gives only the start; the element's own style is the end state. */
+@keyframes intro-dawn {
+  from {
+    opacity: 1;
+  }
+}
+@keyframes intro-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes intro-scene {
+  from {
+    transform: scale(1.04);
+  }
+}
+@keyframes intro-rise {
+  from {
+    opacity: 0;
+    transform: translateY(calc(12px * var(--motion-scale)));
+  }
+}
+@keyframes intro-draw {
+  from {
+    clip-path: inset(0 0 0 100%);
+  }
+}
+@keyframes intro-letter {
+  from {
+    opacity: 0;
+    transform: translateY(calc(0.32em * var(--motion-scale)));
+  }
+}
+@keyframes intro-settle {
+  from {
+    transform: translateY(calc(48px * var(--motion-scale)));
+  }
+  72% {
+    transform: translateY(calc(-4px * var(--motion-scale)));
+  }
+}
+@keyframes intro-pulse {
+  50% {
+    opacity: 0.55;
+  }
+}
+@keyframes intro-slide {
+  from {
+    opacity: 0;
+    transform: translateX(calc(32px * var(--motion-scale)));
+  }
+}
 .sr-only {
   position: absolute;
   width: 1px;
