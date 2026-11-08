@@ -1,10 +1,17 @@
 # STAN — prokom-gaming
 
-Ostatnia aktualizacja: 08.11.2026 (scalone: A #79, B1 #80, B2 + D1 #81, C1 #82; ta gałąź: GN-2b #86).
+Ostatnia aktualizacja: 08.11.2026 (scalone: A #79, B1 #80, B2 + D1 #81, C1 #82, GN-2b #86; ta gałąź: C2 „Kontakt” #83).
 
 ## W toku
+- **Gałąź:** `feat/c2-kontakt` (od `origin/develop` po #79). Sesja C2 = R8 (`docs/zadania/gaming-runda-v2.md`, runda v2 §6).
+- **Zrobione:** nagłówek „Porozmawiajmy o Twoim komputerze” + „Odpowiadamy codziennie 8–22, zwykle w godzinę.”; trzy równe karty z jedną akcją (Zapytanie — złota, Telefon, E-mail; numer i adres jako duże linki ≥ 44 px, akcje wyrównane do dołu); sklep jako jedna szeroka karta (statyczna mapa `StoreMap` obok adresu, „Prowadź do sklepu”), adres i pinezka z `lib/site.ts`; „Pytanie, które nie jest wyceną?” (logika formularza bez zmian, krótsze zdanie bez powtórzenia); „Masz już komputer od nas?” z telefonem serwisu; nowy pas „Dane firmy” (firma, NIP, adres, e-mail, CEIDG, biała lista; `ct-firm` — nazwa `ct-company` była już zajęta przez „O nas”). Cele dotyku linków przez niewidoczne `::after` (podkreślenie zostaje przy tekście).
+- **Decyzje (rekomendacje Claude):** jeden wariant; wspólny komponent „dowodów firmy” z C1 nie wydzielony — C1 i C2 to osobne gałęzie od `develop`; do zrobienia po scaleniu obu (Pomysły na później).
+- **Otwarte `TODO(krystian)` (bez zmian):** numer telefonu Gaming i jego godziny [SZEF]; godziny otwarcia sklepu [SZEF] — do tego czasu tylko adres.
+- **Sprawdzone lokalnie:** lint, typecheck, 1000 testów, `format:check`; e2e `contact` (nowy), `content-pages`, `a11y` na 1440 i 414 — zielone. Zrzuty `tmp/zrzuty-przed/c2`, `tmp/zrzuty-po/c2` (1440, 1100, 414). Przegląd `recenzent` — poprawione (opis strony z danych firmy, cele dotyku bez przesuwania podkreślenia, „otwiera się w nowej karcie” dla czytników, e-mail w danych firmy).
+- **Następny krok:** Krystian: po scaleniu C2 (#83) — staging i telefon (lista w PR-ach); dalej sesja D2 (R9, przegląd całej rundy) i R4 (nowe sceny, gdy będą grafiki).
+
+## Uwagi na później (GN-2b, scalone w #86)
 - **GN-2b (`feat/gn2b-na-tej-stronie`, od `develop` po #81; zastępuje zamknięty #85):** „Na tej stronie” w szynie także na „O nas” (5 sekcji — kotwice na istniejących `id` nagłówków H2) i „Komputer do {gry}” (polecane, każdy poziom mocy `#gm-tiers`, wymagania i pytania `#gm-more`). Bez grupy, zgodnie z §4.4: „Dobór pod grę” (1 sekcja), „Pytania” (własne zakładki grup), poradniki (własny spis treści). „Dla rodziców” — dopisać grupę po scaleniu C1 (#82): `id` są już na stronie (`start`, `pytania-rodzica`, `dowody`, `zakup`, `slowniczek`, `pytania`, `napisz`). „Ostatnio oglądane” nadal niezrobione (flaga + migracja `site-settings`; spec i tak trzyma grupę ukrytą do opinii prawnika). Sprawdzone: testy `railConfig` (każde `id` istnieje w plikach stron), e2e `rail`, `game-pages`, `content-pages` na 1440 i 414.
-- **Następny krok:** Krystian: scalić GN-2b (#86) i C2 (#83) po zielonym CI. „Dla rodziców” ma już swoją grupę „Na tej stronie” (7 części).
 
 ## Uwagi na później (C1, scalone w #82)
 - **Gałąź:** `feat/c1-dla-rodzicow` (od `origin/develop` po #79). Sesja C1 = R7 (`docs/zadania/gaming-runda-v2.md`, runda v2 §5).
