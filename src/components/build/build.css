@@ -227,6 +227,14 @@
   color: var(--grom);
 }
 
+/* Anchor jumps (side rail „Na tej stronie”) land below the sticky price bar too, not only below
+   the header (html scroll-padding-top). */
+@media (min-width: 761px) {
+  .bp section[id] {
+    scroll-margin-top: 90px;
+  }
+}
+
 /* ---------- sticky bar ---------- */
 .bp-bar {
   position: sticky;

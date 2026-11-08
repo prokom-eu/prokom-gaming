@@ -522,6 +522,17 @@ body:has([data-scene-top]) .nav[data-top='true'] {
     border-color 0.2s,
     color 0.2s;
 }
+/* The header's search: hidden where the side rail (≥ 1400 px) has it — but not on pages without
+   the rail (/konto, /metryka), where the magnifier stays the way in (NAWIGACJA §5). */
+@media (min-width: 1400px) {
+  .nav__search:not(.nav__search--always) {
+    display: none;
+  }
+}
+button.ico {
+  cursor: pointer;
+  font: inherit;
+}
 .ico::after {
   content: '';
   position: absolute;
@@ -654,6 +665,17 @@ body:has([data-nav-light]) .nav:not([data-top='false']) .nav__caps a[aria-curren
 @media (max-width: 1399px) {
   .nav__phone {
     display: none;
+  }
+}
+/* GN-3: the magnifier (42 px) joins the header up to 1399 px; at 1200–1279 the header gets a bit
+   denser so it still fits (measured: +39 px over at 1200 without this). */
+@media (max-width: 1279px) {
+  .nav {
+    gap: 10px;
+  }
+  /* 9 px, not 10: Linux fonts in CI are a little wider (1200 px was 1.4 px over). */
+  .nav__caps a {
+    padding: 0 9px;
   }
 }
 @media (max-width: 1199px) {
@@ -913,6 +935,26 @@ html:has(dialog[open]) {
   align-items: center;
   justify-content: space-between;
   padding: 4px 0 14px;
+}
+.menu__search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 48px;
+  margin: 0 0 18px;
+  padding: 0 16px;
+  border: 1px solid color-mix(in srgb, var(--grom) 42%, transparent);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--grom) 6%, transparent);
+  color: var(--mgla);
+  font: inherit;
+  font-size: 15px;
+  text-align: left;
+  cursor: pointer;
+}
+.menu__search svg {
+  color: var(--grom);
 }
 .menu__sec {
   display: flex;
