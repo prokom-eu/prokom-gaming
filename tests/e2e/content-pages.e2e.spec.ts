@@ -197,7 +197,7 @@ test('/dla-rodzicow: the only mention of instalments is „Na razie nie…” (s
   const question = page.locator('details', { hasText: 'Czy da się kupić na raty?' })
   await question.locator('summary').click()
   await expect(question).toContainText('Na razie nie prowadzimy sprzedaży ratalnej.')
-  await expect(page.getByRole('link', { name: 'biała lista VAT' })).toHaveAttribute(
+  await expect(page.getByRole('link', { name: 'Sprawdź na białej liście VAT' })).toHaveAttribute(
     'href',
     /podatki\.gov\.pl/,
   )
