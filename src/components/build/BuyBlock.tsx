@@ -4,7 +4,8 @@ import { FpsList } from '@/components/FpsList'
 import { IconMail } from '@/components/icons'
 import { PROMISES } from '@/components/promises'
 import { ButtonLink } from '@/components/ui/Button'
-import { inquiryHref } from '@/lib/buildPage'
+import { ARGB_NOTE } from '@/components/ArgbNote'
+import { inquiryHref, lookText } from '@/lib/buildPage'
 import type { BuildPageData } from '@/lib/buildPage.server'
 import { dateText } from '@/lib/home'
 import { routes } from '@/lib/nav'
@@ -28,9 +29,9 @@ export function BuyBlock({ data, pageUrl }: { data: BuildPageData; pageUrl: stri
             <p className="lore bp-why__t">{build.why}</p>
             <div className="bp-why__look">
               <b>Wygląd</b>
+              {/* No light colour choice (runda v3 §1.4): the light is ARGB, the photo shows one. */}
               <p>
-                {build.look}. Kolor światła zmienisz przyciskiem na obudowie, ale to jest znak
-                rozpoznawczy tej istoty.
+                Obudowa {lookText(build.look)}. {ARGB_NOTE}
               </p>
             </div>
           </div>

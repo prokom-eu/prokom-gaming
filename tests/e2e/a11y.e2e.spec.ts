@@ -26,7 +26,7 @@ const PAGES = [
   { path: '/porownaj?z=baba-jaga,wampir,weles&gra=cyberpunk-2077&rozdz=2k&hz=144', status: 200 },
   { path: '/porownaj?z=skrzat,licho&gra=elden-ring&rozdz=4k&hz=60&roznice=1', status: 200 },
   { path: '/zapytanie?zestaw=wampir', status: 200 },
-  { path: '/zapytanie?k=P13.LB500.PL3LX.R32.NM1&swiatlo=lod', status: 200 },
+  { path: '/zapytanie?k=P13.LB500.PL3LX.R32.NM1', status: 200 },
   { path: '/zapytanie/wyslane?nr=PKG-2026-0001&istota=wampir', status: 200 },
   { path: '/pytania', status: 200 },
   { path: '/kontakt', status: 200 },

@@ -24,7 +24,7 @@ const PATHS = [
     icon: 'parts',
     color: 'var(--c-kikimora)',
     title: 'Znam się na częściach',
-    text: 'Konfigurator z trybem eksperta: zasilacz, chłodzenie, płyta, światło. Licznik klatek przelicza się przy każdej zmianie.',
+    text: 'Konfigurator z trybem eksperta: zasilacz, chłodzenie, płyta. Licznik klatek przelicza się przy każdej zmianie.',
     link: 'Otwórz konfigurator',
     href: '/konfigurator',
   },

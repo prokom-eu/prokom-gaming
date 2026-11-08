@@ -94,12 +94,12 @@ Kolejność sekcji (plansza Main, telefon: Telefon):
 ## 6. Karta zestawu `/zestawy/[slug]` (G9)
 Sekcje (plansza Zestaw):
 1. Hero: scena istoty, imię, przydomek, poziom; „Wyróżnik” — tytuł i 1–2 zdania o samym komputerze, bez źródła (ADR-G013, R2; do R2 legenda „Z podań” ze źródłem); „W grach” (dar); przełącznik poprzedni/następny (16 istot). Galeria: przód, wnętrze, w ciemności, film z testu — prawdziwe zdjęcia naszego egzemplarza (do sesji zdjęciowej: poglądowe z podpisem).
-2. **Dlaczego {istota}?** + wygląd (kolor światła; zmiana koloru przyciskiem na obudowie — tekst z planszy).
+2. **Dlaczego {istota}?** + wygląd (obudowa, „na zdjęciu …” i zdanie o podświetleniu ARGB — bez wyboru koloru, ADR-G014 §4).
 3. Cena (z `lib/pricing/`), „z montażem, Windows 11 i wysyłką”, data ceny (= data ostatniej publikacji cen, ADR-G002 §2), „Listę części potwierdzimy w ofercie ważnej 48 godzin”; **Zapytaj o {istotę}** · Zmień części (→ konfigurator z przepisem) · Porównaj · Wyślij rodzicowi ze specyfikacją (link + mail/SMS przez `mailto:`/`sms:`); obietnice (gotowy w 5–10 dni roboczych, wysyłka w cenie albo odbiór, metryka, 2 lata gwarancji z odbiorem). Na jaki monitor: FullHD / 2K / 4K z oceną jak w JS planszy Zestaw (z klatek zestawu).
 4. **Ile klatek w Twojej grze** — 12+ gier, segmenty FullHD/2K/4K, etykiety źródeł, „Jak liczymy?”.
 5. **Co jest w środku {istoty}** — plan wnętrza z 8 ponumerowanymi częściami (klik/dotyk podświetla część, opis, „Minimum, którego pilnujemy”), klasy części; obudowa i chłodzenie z pełną nazwą.
 6. **Miejsce na rozbudowę** (`power-levels.upgrade`: wolne gniazda RAM, M.2, gniazdo procesora, moc zasilacza — `TODO(krystian)`: potwierdzić z modelem płyty przed publikacją).
-7. **Dopasuj {istotę} pod siebie** — RAM, dysk, kolor światła; cena na żywo z `lib/pricing/`; „Zapytaj o tę wersję” (przekazuje konfigurację) i „Więcej zmian w konfiguratorze”.
+7. **Dopasuj {istotę} pod siebie** — RAM, dysk (bez koloru światła — ADR-G014 §4); cena na żywo z `lib/pricing/`; „Zapytaj o tę wersję” (przekazuje konfigurację) i „Więcej zmian w konfiguratorze”.
 8. **Od zapytania do Twojego biurka** — 8 etapów z czasem; **Zanim wyjedzie z Rabki** (60 min, 3 gry, 100% pamięci, BIOS) + przykładowa metryka.
 9. **Co znajdziesz w pudełku** (8 pozycji — [serwis] potwierdzić listę).
 10. **Gwarancja i opieka** (4 kafle) + **Co, jeśli…** (3 sytuacje).
@@ -112,7 +112,7 @@ Sekcje (plansza Zestaw):
 
 ## 7. Konfigurator `/konfigurator` (G10)
 Logika i zachowanie: **ADR-G002 §5–§6** (kroki, wyszarzenia z powodem, zmiana poziomu z zachowaniem wyboru, rozpoznanie gotowca, najbliższy gotowiec, ostrzeżenia, „Inna obudowa / chłodzenie”). Wygląd: plansza Konfigurator (1440) i Konfigurator-telefon, `stany/tel-07`, `tel-08`, `stany/konf-*`.
-- Podgląd: zdjęcie wybranej obudowy, kolor światła; nazwa poziomu, najbliższy gotowiec, klatki na żywo (3 gry wybrane w kroku 1), cena.
+- Podgląd: zdjęcie wybranej obudowy w poświacie istoty (bez wyboru koloru światła — ADR-G014 §4; w kroku obudowy zdanie o ARGB); nazwa poziomu, najbliższy gotowiec, klatki na żywo (3 gry wybrane w kroku 1), cena.
 - Podsumowanie: klasy części + pełne nazwy obudowy i chłodzenia, cena z Windows 11, montażem, testem i wysyłką, czas realizacji, gwarancja; **„Zapytaj o tę konfigurację”** (→ `/zapytanie?k=…`). Marży nigdzie nie pokazujemy.
 - Stan w adresie i w `localStorage` (powrót do konfiguracji); „Zapisz na koncie” po zalogowaniu (G14).
 

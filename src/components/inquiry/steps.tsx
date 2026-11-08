@@ -85,7 +85,7 @@ export function StepComputer({ state, data, errors, update, set, headingRef }: S
     state.mode === 'build' &&
     !state.config &&
     state.build !== null &&
-    (Object.keys(state.changes).length > 0 || state.light !== null)
+    Object.keys(state.changes).length > 0
   return (
     <div className="iq-step">
       <Heading headingRef={headingRef}>Od czego zaczynasz?</Heading>

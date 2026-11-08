@@ -141,15 +141,11 @@ export function Configurator({ data, initial, initialChanges, fromAddress, siteU
   }
 
   const match = buildMatch(state.config, data.builds, data.prices)
-  const askHref = configInquiryHref(state.config, state.light, other)
+  const askHref = configInquiryHref(state.config, other)
   const color = `var(--c-${view.level.build})`
 
   return (
-    <section
-      className="cf"
-      style={{ '--c': color, '--lc': view.lightColor } as CSSProperties}
-      aria-labelledby="cf-h1"
-    >
+    <section className="cf" style={{ '--c': color } as CSSProperties} aria-labelledby="cf-h1">
       <div className="wrap">
         <div className="cf-top">
           <div>
@@ -186,7 +182,6 @@ export function Configurator({ data, initial, initialChanges, fromAddress, siteU
                 state={state}
                 view={view}
                 onPick={(code) => pickOption('case', code)}
-                onLight={(light) => setState((s) => ({ ...s, light }))}
               />
             )}
             {state.step === 'chlodzenie' && (
@@ -217,7 +212,6 @@ export function Configurator({ data, initial, initialChanges, fromAddress, siteU
                 siteUrl={siteUrl}
                 other={other}
                 onOther={setOther}
-                onLight={(light) => setState((s) => ({ ...s, light }))}
               />
             )}
 

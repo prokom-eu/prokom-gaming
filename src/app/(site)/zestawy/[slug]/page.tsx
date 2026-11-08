@@ -11,7 +11,7 @@ import { Journey } from '@/components/build/Journey'
 import { BuildFaq, Neighbours } from '@/components/build/Neighbours'
 import { StickyBar } from '@/components/build/StickyBar'
 import { TuneBuild } from '@/components/build/TuneBuild'
-import { buildJsonLd, ownLight } from '@/lib/buildPage'
+import { buildJsonLd } from '@/lib/buildPage'
 import { loadBuildPage } from '@/lib/buildPage.server'
 import { getEnv } from '@/lib/env'
 import { RESOLUTION_LABELS } from '@/lib/fps'
@@ -82,7 +82,6 @@ export default async function BuildPage({ params }: Props) {
           cpu={build.cpu}
           gpu={build.gpu}
           ramType={data.ramType}
-          ownLight={ownLight(build.look)}
           config={data.config}
           price={build.price}
           ram={data.tune.ram}

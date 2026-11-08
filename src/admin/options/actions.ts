@@ -10,6 +10,7 @@ import {
 } from 'payload'
 import { z } from 'zod'
 
+import { CASE_PHOTO_HINT, CASE_PHOTO_WARNING, caseBoxOf, casePhotoIssues } from '../../lib/caseBox'
 import { errorFields, log } from '../../lib/logger'
 import { toCostOption, type PricingSettingsInput } from '../../lib/pricing/catalog'
 import { partKey } from '../../lib/pricing/partKey'
@@ -304,7 +305,14 @@ const IMAGE_TYPES = ['image/webp', 'image/png', 'image/jpeg', 'image/avif']
 // Under the 1 MB body limit of Server Actions (Next default, kept for the whole app).
 const MAX_IMAGE = 900 * 1024
 
-export type AddResult = { ok: true; code: string } | { ok: false; messages: string[] }
+export type AddResult =
+  | {
+      ok: true
+      code: string
+      /** Runda v3 §1.2: the case photo was saved, but is cut at the source or too small. */
+      photoWarning?: string
+    }
+  | { ok: false; messages: string[] }
 
 /**
  * „Dodaj do zatwierdzenia” (panel spec §10): the option is created switched off; it waits in
@@ -349,6 +357,7 @@ export async function addOption(form: FormData): Promise<AddResult> {
   try {
     const req = await asUser(payload, user)
     const code = await freeCode(payload, data.publicLabel)
+    let photoWarning: string | undefined
     // One transaction: photo, option and links are saved together, or nothing (a file written
     // to disk stays — STAN). A retry after an error never leaves a half-made option behind.
     await initTransaction(req)
@@ -367,6 +376,15 @@ export async function addOption(form: FormData): Promise<AddResult> {
             req,
           })
         : null
+      // The upload hook measured the case (`box`): warn, never refuse (Krystian decides).
+      if (image && data.type === 'case') {
+        const issues = casePhotoIssues({
+          width: image.width,
+          height: image.height,
+          box: caseBoxOf(image.box),
+        })
+        if (issues.length > 0) photoWarning = `${CASE_PHOTO_WARNING}. ${CASE_PHOTO_HINT}`
+      }
       await payload.create({
         collection: 'options',
         data: {
@@ -396,7 +414,7 @@ export async function addOption(form: FormData): Promise<AddResult> {
     }
     log.info({ code, type: data.type, links: links.length, userId: user.id }, 'option added')
     revalidatePath('/admin', 'layout')
-    return { ok: true, code }
+    return { ok: true, code, photoWarning }
   } catch (error) {
     log.error({ ...errorFields(error) }, 'option add failed')
     return { ok: false, messages: [messageOf(error, 'Nie udało się dodać — szczegóły w logach.')] }

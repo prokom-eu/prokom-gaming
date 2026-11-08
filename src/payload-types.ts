@@ -291,6 +291,9 @@ export interface Option {
   costSource: 'market' | 'invoice';
   costNote?: string | null;
   costUpdatedAt?: string | null;
+  /**
+   * Obudowa — Całe zdjęcie obudowy z przezroczystym tłem, bez napisów, najlepiej 1200 px wysokości (min. 900 px). Ucięte lub za małe zdjęcia obudów pokazują Pulpit i lista Opcji.
+   */
   image?: (number | null) | Media;
   description?: string | null;
   gpuMaxMm?: number | null;

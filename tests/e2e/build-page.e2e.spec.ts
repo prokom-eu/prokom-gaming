@@ -98,18 +98,25 @@ test('„Dopasuj” prices from the published batch and passes the version on', 
   // Surcharges = the board and the pricing sheet: 64 GB +3 190 zł, 2 TB +610 zł.
   await tune.getByRole('button', { name: /^64 GB/ }).click()
   await tune.getByRole('button', { name: /^2 TB/ }).click()
-  await tune.getByRole('button', { name: 'Lód' }).click()
   await expect(total).toHaveText(/18\s?340 zł/)
   expect(price(await total.textContent())).toBe(wampir.price + 3190 + 610)
-  await expect(ask).toHaveAttribute('href', '/zapytanie?zestaw=wampir&ram=R64&ssd=NM2&swiatlo=lod')
-  await expect(tune.getByRole('button', { name: 'Lód' })).toHaveAttribute('aria-pressed', 'true')
+  await expect(ask).toHaveAttribute('href', '/zapytanie?zestaw=wampir&ram=R64&ssd=NM2')
 
   // Back to the recipe: the price and the link are the build's own again.
   await tune.getByRole('button', { name: /^32 GB/ }).click()
   await tune.getByRole('button', { name: /^1 TB/ }).click()
-  await tune.getByRole('button', { name: 'Istoty' }).click()
   expect(price(await total.textContent())).toBe(wampir.price)
   await expect(ask).toHaveAttribute('href', '/zapytanie?zestaw=wampir')
+})
+
+test('no light colour to pick: the look says ARGB instead (runda v3 §1.4)', async ({ page }) => {
+  await page.goto('/zestawy/wampir')
+  await expect(page.locator('.bp-tune')).not.toContainText(/światło/i)
+  await expect(page.getByRole('group', { name: 'Światło' })).toHaveCount(0)
+  const look = page.locator('.bp-why__look')
+  await expect(look).toContainText('na zdjęciu')
+  await expect(look).toContainText('Podświetlenie ARGB: kolor i efekty ustawisz sam')
+  await expect(page.locator('main')).not.toContainText('Kolor światła')
 })
 
 async function barBox(page: Page) {

@@ -10,7 +10,7 @@ import { zl } from '@/lib/pricing/format'
 import type { ConfiguratorView } from './view'
 
 /**
- * The preview (board `.k2-side`, spec. §7): the chosen case with the light colour, the level, the
+ * The preview (board `.k2-side`, spec. §7): the chosen case in the creature's glow, the level, the
  * parts with prices, FPS in the chosen games, the ready-build tag and the price. Desktop only; on
  * a phone the bar above the tab bar and the summary step carry the same information.
  */
@@ -35,7 +35,10 @@ export function Preview({
   return (
     <aside className="cf-side" aria-label="Twoja konfiguracja">
       <div className="cf-sb cut">
-        <div className="cf-sb__stage" style={{ '--glow': view.lightColor } as CSSProperties}>
+        <div
+          className="cf-sb__stage"
+          style={{ '--glow': `var(--c-${view.level.build})` } as CSSProperties}
+        >
           <span className="cf-sb__glow" aria-hidden="true" />
           {caseItem?.photo && (
             <Image

@@ -1,9 +1,9 @@
 'use client'
 
 import Link from 'next/link'
-import { useState, type CSSProperties } from 'react'
+import { useState } from 'react'
 
-import { inquiryHref, LIGHTS, tunedNote, type LightKey, type TuneChoice } from '@/lib/buildPage'
+import { inquiryHref, tunedNote, type TuneChoice } from '@/lib/buildPage'
 import { routes } from '@/lib/nav'
 import { zl } from '@/lib/pricing/format'
 import type { Config } from '@/lib/pricing/types'
@@ -17,8 +17,6 @@ type Props = {
   cpu: string
   gpu: string
   ramType: string
-  /** „czerwone światło” — the default light. */
-  ownLight: string
   config: Config
   /** The build's published price; the tuned one adds the surcharges of the picks. */
   price: number
@@ -29,22 +27,21 @@ type Props = {
 const signed = (v: number) => (v === 0 ? 'w zestawie' : v > 0 ? `+${zl(v)}` : `−${zl(-v)}`)
 
 /**
- * „Dopasuj {istotę} pod siebie” (spec. §6 pt 7, board Zestaw `.dp7`): RAM, SSD and light colour.
+ * „Dopasuj {istotę} pod siebie” (spec. §6 pt 7, board Zestaw `.dp7`): RAM and SSD (no light
+ * colour since runda v3 §1.4 — ARGB, see „Wygląd”).
  * Gets only finished choices with their surcharges (computed on the server from the published
  * batch, `tuneChoices()`), so the price here is the build price + surcharges — the same sum as
- * the configurator and `/api/inquiry`. „Zapytaj o tę wersję” carries the codes and the colour.
+ * the configurator and `/api/inquiry`. „Zapytaj o tę wersję” carries the codes.
  */
 export function TuneBuild(props: Props) {
   const ownRam = props.ram.find((c) => c.own)
   const ownSsd = props.ssd.find((c) => c.own)
   const [ram, setRam] = useState(ownRam?.code ?? props.config.ram)
   const [ssd, setSsd] = useState(ownSsd?.code ?? props.config.ssd)
-  const [light, setLight] = useState<LightKey | null>(null)
 
   const ramPick = props.ram.find((c) => c.code === ram) ?? ownRam
   const ssdPick = props.ssd.find((c) => c.code === ssd) ?? ownSsd
   const diff = (ramPick?.surcharge ?? 0) + (ssdPick?.surcharge ?? 0)
-  const lightLabel = LIGHTS.find((l) => l.key === light)?.label ?? props.ownLight
 
   return (
     <section className="bp-tune" id="dopasuj" aria-labelledby="bp-tune-h">
@@ -54,39 +51,12 @@ export function TuneBuild(props: Props) {
             Dopasuj {props.accusative} pod siebie
           </h2>
           <p className="bp-tune__lead">
-            Moc zostaje ta sama. Zmieniasz to, co wynika z Twojego grania: pamięć, miejsce na gry i
-            kolor światła. Cena przelicza się od razu.
+            Moc zostaje ta sama. Zmieniasz to, co wynika z Twojego grania: pamięć i miejsce na gry.
+            Cena przelicza się od razu.
           </p>
 
           <Choices label="Pamięć RAM" choices={props.ram} value={ram} onPick={setRam} />
           <Choices label="Dysk" choices={props.ssd} value={ssd} onPick={setSsd} />
-
-          <fieldset className="bp-tune__group">
-            <legend>Światło</legend>
-            <div className="bp-lights">
-              <button
-                type="button"
-                aria-pressed={light === null}
-                onClick={() => setLight(null)}
-                style={{ '--lc': `var(--c-${props.slug})` } as CSSProperties}
-              >
-                <i aria-hidden="true" />
-                <small>Istoty</small>
-              </button>
-              {LIGHTS.map((l) => (
-                <button
-                  key={l.key}
-                  type="button"
-                  aria-pressed={light === l.key}
-                  onClick={() => setLight(l.key)}
-                  style={{ '--lc': `var(--light-${l.key})` } as CSSProperties}
-                >
-                  <i aria-hidden="true" />
-                  <small>{l.label}</small>
-                </button>
-              ))}
-            </div>
-          </fieldset>
         </div>
 
         <aside className="bp-tune__sum" aria-label="Twoja wersja">
@@ -109,20 +79,16 @@ export function TuneBuild(props: Props) {
               <span>Dysk</span>
               <em>{ssdPick ? `${ssdPick.label} NVMe` : '—'}</em>
             </li>
-            <li>
-              <span>Światło</span>
-              <em>{lightLabel}</em>
-            </li>
           </ul>
           <div className="bp-tune__price" aria-live="polite">
             <b>{zl(props.price + diff)}</b>
-            <span>{tunedNote(diff, light, zl)}</span>
+            <span>{tunedNote(diff, zl)}</span>
           </div>
           <AskLink
             className="bp-tune__ask"
             size="lg"
             build={props.slug}
-            href={inquiryHref(props.slug, props.config, { ram, ssd, light })}
+            href={inquiryHref(props.slug, props.config, { ram, ssd })}
           >
             Zapytaj o tę wersję
           </AskLink>

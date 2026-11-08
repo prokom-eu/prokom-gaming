@@ -4,7 +4,6 @@ import type { CustomerSession } from '@/lib/account/session.server'
 import { ticketCategoryLabel, ticketStatusLabel } from '@/lib/account/tickets'
 import { plDate } from '@/lib/certificate'
 import { decodeConfig } from '@/lib/configurator'
-import { labelOf, LIGHT_COLOR_CHOICES } from '@/lib/inquiry/types'
 import {
   CUSTOMER_STAGE_TEXT,
   isOrderStage,
@@ -245,9 +244,8 @@ export async function loadAccount({ payload, customer }: CustomerSession): Promi
       const config = decodeConfig(saved.k)
       if (!saved.id || !config) return []
       const caseOption = optionByCode.get(config.case)
+      // An old saved light colour is not shown nor carried on (runda v3 §1.4).
       const params = new URLSearchParams({ k: saved.k })
-      if (saved.light) params.set('swiatlo', saved.light)
-      const light = saved.light ? labelOf(LIGHT_COLOR_CHOICES, saved.light) : null
       const savedAt = plDate(saved.savedAt)
       return [
         {
@@ -255,7 +253,6 @@ export async function loadAccount({ payload, customer }: CustomerSession): Promi
           label: saved.label,
           href: `/konfigurator?${params.toString()}`,
           details: [
-            light,
             optionByCode.get(config.ram)?.publicLabel,
             optionByCode.get(config.ssd)?.publicLabel,
             savedAt && `zapisana ${savedAt}`,

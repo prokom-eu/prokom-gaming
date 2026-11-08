@@ -151,10 +151,13 @@ export function RailPanel({
       onKeyDown={onKeyDown}
       onClickCapture={onClickCapture}
     >
-      {/* Search at the top of the rail (NAWIGACJA §4.2 pt 1). */}
+      {/* Search at the top of the rail (NAWIGACJA §4.2 pt 1). „Szukaj” + the shortcut fit the open
+          rail; the full name stays for screen readers and in the dialog (runda v3 §1.3). */}
       <button type="button" className="rail__cta" onClick={openSearch}>
         <RailSvg icon="szukaj" />
-        <span className="rail__lbl">Szukaj zestawu lub gry</span>
+        <span className="rail__lbl">
+          Szukaj<span className="sr-only"> zestawu lub gry</span>
+        </span>
         <kbd className="rail__kbd rail__lbl" aria-hidden="true">
           {isMac ? '⌘K' : 'Ctrl K'}
         </kbd>

@@ -149,11 +149,11 @@ describe('confirmationEmail', () => {
     expect(mail.html).toContain('https://prokomgaming.pl/polityka-prywatnosci')
   })
 
-  it("names the picked light colour; nothing when it is the creature's own", () => {
-    expect(confirmationEmail({ ...inquiry, lightColor: 'lod' }, opts).text).toContain(
-      '- Światło: Lód\n',
-    )
-    expect(mail.text).not.toContain('Światło')
+  it('never mentions a light colour (runda v3 §1.4: every case is ARGB)', () => {
+    for (const text of [mail.text, mail.html]) {
+      expect(text).not.toContain('Światło')
+      expect(text).not.toContain('Kolor światła')
+    }
   })
 
   it('works without a response time in the settings', () => {

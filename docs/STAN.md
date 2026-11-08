@@ -1,14 +1,16 @@
 # STAN — prokom-gaming
 
-Ostatnia aktualizacja: 08.11.2026 (scalone: A #79, B1 #80, B2 + D1 #81, C1 #82, GN-2b #86, C2 #83, R9 #87; ta gałąź: R4 — nowe sceny kodem).
+Ostatnia aktualizacja: 08.11.2026 (scalone: runda v2 do #93; ta gałąź: E1 rundy v3 — poprawki).
 
 ## W toku
-- **Gałąź:** `feat/r4-sceny` (od `origin/develop` po #87). Sesja R4 (`docs/zadania/gaming-runda-v2.md`, runda v2 §3.2, `SCENY-BRIEF.md`).
-- **Decyzja Krystiana 08.11:** bez grafik z generatora AI — sceny rysuje kod (dopisane w `ZMIANY.md` §3.2 i na górze `SCENY-BRIEF.md`). Próba na Skrzacie i Wampirze zaakceptowana, potem pozostałe 14.
-- **Zrobione:** `scripts/scenes/` — `lib.mjs` (losowanie z ziarnem, mieszanie kolorów, sylwetki: świerki, drzewa, brzozy, mgła, poświata, księżyc, gwiazdy, trawa), `shapes.mjs` (wzgórza, góry, woda z odbiciem, trzciny, lilie, chata, stogi, płot, zamek na skale, ruiny, chatka na wzgórzu, dąb, piorun, burza, zorza, śnieg, ćmy, wir liści, bazalt, żar, wianki; elementy pierwszego planu), `scenes.mjs` (16 miejsc z briefu §4), `generate.mjs` (`pnpm generate:scenes [id…]`: hero 2880×1067, karta 1680×960, pierwszy plan rysowany 2880×2000 i zapisywany 2160×1500; ziarno przeciw pasmom). Postument karty z pieczęcią wycięty raz ze starych scen do `scripts/scenes/pedestals/` i wklejany — komputer stoi jak wcześniej (`builds.css` 67% / 26,5%). Jasne detale (okna, świetliki, latarnie) na brzegach panoramy, poza tekstem karty zestawu; środek pusty pod komputer. 48 plików w `public/scenes/` (2,0 MB zamiast 1,5 MB; `next/image` i tak przelicza).
-- **Do PR-u 2 (ta sama sesja, osobny PR):** warstwy kodem w hero z §3.2 — świetliki (jedna animowana warstwa, tylko przy ruchu włączonym), gradacja w kolorze istoty. Ten PR ma już ok. 2200 linii skryptów rysujących (kod rysunków, nie logika), więc podział zgodnie z planem.
-- **Sprawdzone:** zrzuty 16 kart zestawów przy 1920/1440/390, główna, lista zestawów (`tmp/r4/`); e2e i Lighthouse — w opisie PR.
-- **Następny krok:** sceny scalone w #88; PR 2 (świetliki) na `feat/r4-swietliki` — opis w sekcji „R4 PR 2” niżej. Po scaleniu obu runda v2 jest zamknięta; Krystian: staging i prawdziwe telefony, potem produkcja po akceptacji w Asanie.
+- **Runda v3 „premium”, sesja E** (`docs/zadania/gaming-runda-v3.md`, `runda-v3/PREMIUM.md`, ADR-G014): 3 PR-y po kolei — E1 poprawki, E2 ruch + hero, E3 ruch w sekcjach. Plan zaakceptowany 08.11.
+- **Gałąź:** `fix/e1-poprawki` (od `origin/develop` po #93). Zrzuty i nagrania „przed” całej sesji: `tmp/zrzuty-przed/e/` (skrypt `tmp/e-shots.mjs`, 1440 i 390, webm); „po” E1: `tmp/zrzuty-po/e1/`. Lighthouse bazowy: `tmp/lh/e-przed.txt`, JS stron: `tmp/lh/e-przed-js.txt` (główna 196,2 KB gzip — baza budżetu E2 +≤ 35 KB).
+- **E1 zrobione:** miniatury na środku karty (`/zestawy` — scena przesunięta jak na kartach głównej; ~72% wysokości; plik 2× z `caseHeight`), walidacja zdjęć obudów w panelu (krawędź pliku albo plik < 900 px → znacznik w „Opcjach”, pozycja na Pulpicie, uwaga po dodaniu; bez migracji), „Szukaj” + Ctrl K w szynie, usunięty wybór koloru światła (zdanie o ARGB, „na zdjęciu …”, stare `?swiatlo=` ignorowane, `lightColor` zostaje w bazie dla starych zapytań). Szczegóły w opisie PR. Sprawdzone: lint, typecheck, 1049 testów, build; e2e zmienionych obszarów na buildzie produkcyjnym (ostrość przy DPR 2, case-stage 1440/1100/390, szyna, axe); Lighthouse mobile bez zmian poza `/zestawy` 88 → 87–88 (mediana 87, LCP +0–0,1 s — większy plik sceny na telefonie przy postumencie na środku; `tmp/lh/e1-po*.txt`). Przegląd `recenzent` — poprawione: luka sceny przy 1001–1130 px (+ test 1100 px i pokrycia kadru), `sizes` sceny pod szerokość karty, test zapisu bez `lightColor`, Pulpit „aktywne”.
+- **Decyzje w planowaniu (Krystian 08.11):** opisy `look` z dopiskiem „na zdjęciu” (bez migracji danych), szyna „Szukaj” + skrót, miniatury przez powiększenie sceny w CSS.
+- **Następny krok:** po scaleniu E1 — Krystian na stagingu (lista w `gaming-runda-v3.md` §3) i nowe zdjęcia obudów; potem sesja E2 na `feat/e2-ruch-hero` od `origin/develop`: tokeny ruchu, GSAP (licencja i wersja w dniu instalacji), hero, karty, sceny warstwami, 2 warianty intensywności na nagraniu do wyboru.
+
+## Uwagi na później (R4, scalone w #88 i #90)
+- Sceny 16 istot rysowane kodem (`scripts/scenes/`, decyzja Krystiana 08.11 — bez generatora AI) i świetliki w hero (sekcja „R4 PR 2” niżej). Runda v2 zamknięta.
 
 ## Uwagi na później (R9, scalone w #87)
 - Przegląd rundy v2 na lokalnym buildzie produkcyjnym: 62 strony z sitemapy, kryteria §8 mają testy. Poprawione przewijanie w bok karty zestawu przy 360/390 px (nowy e2e `narrow`), gitleaks w CI pobierany zapasowo przez API. Niespełnione: LCP ≤ 2,5 s (lab 3,1–3,7 s) — Pomysły na później. Zrzuty sekcji głównej: `content-visibility: auto` zostawia je puste na zrzucie całej strony.
@@ -78,6 +80,8 @@ Ostatnia aktualizacja: 08.11.2026 (scalone: A #79, B1 #80, B2 + D1 #81, C1 #82, 
 - Pasek przewijania w Firefoksie — bez testu w Playwright (sprawdzany ręcznie).
 
 ## Pomysły na później (R1–R2, GN-1, A, C1, B1, B2, R9)
+- **(E1)** Karty głównej na telefonie (2 kolumny po ~157 px): obudowa 67,8% kadru zamiast ~70–75% — wyższa wymagałaby przesunięcia sceny jak na `/zestawy` (test e2e trzyma próg 0,67).
+- **(E1)** `/zestawy` przy 761–1000 px (jedna kolumna, karta ~900 px): scena powiększona ~1,5×, przy ekranie 2× źródło 1680 px nie daje pełnej ostrości tła — rozważyć sceny kart z postumentem na środku (`scripts/scenes`).
 - **R9 — LCP ≤ 2,5 s (kryterium §8) niespełnione:** lab 3,1–3,7 s na 7 stronach (główna i karta zestawu 3,5–3,7 s). Osobna sesja wydajności: obraz LCP (zdjęcie obudowy / scena) — rozmiar i `fetchPriority`, fonty `latin-ext`, JS powłoki; mierzyć z odniesieniem z tego samego dnia.
 - „Dla rodziców”: osadzić statyczną mapę (obraz, bez skryptów) w karcie sklepu — dziś link do trasy; liczby 48 h i godziny brać z `site-settings` (`offerTerms`, `responseTime`).
 - **GN-2b:** „Na tej stronie” na pozostałych podstronach + „Ostatnio oglądane” za flagą (szczegóły w „W toku” → B2).

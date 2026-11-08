@@ -15,15 +15,7 @@ type State = 'idle' | 'saving' | 'saved' | 'login' | 'full' | 'error'
  * in the address and in `localStorage`, nothing is lost.
  * TODO(krystian): the messages are drafts — the board has only the button.
  */
-export function SaveConfigButton({
-  config,
-  light,
-  label,
-}: {
-  config: Config
-  light: string | null
-  label: string
-}) {
+export function SaveConfigButton({ config, label }: { config: Config; label: string }) {
   const [state, setState] = useState<State>('idle')
 
   async function save() {
@@ -33,7 +25,7 @@ export function SaveConfigButton({
         method: 'POST',
         credentials: 'same-origin',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ label, k: encodeConfig(config), light }),
+        body: JSON.stringify({ label, k: encodeConfig(config) }),
       })
       setState(
         response.status === 201

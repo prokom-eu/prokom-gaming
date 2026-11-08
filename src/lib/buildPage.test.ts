@@ -6,9 +6,9 @@ import {
   buildJsonLd,
   inquiryHref,
   interiorParts,
+  lookText,
   monitorFit,
   neighbours,
-  ownLight,
   prevNext,
   tuneChoices,
   tunedNote,
@@ -103,16 +103,10 @@ describe('Dopasuj: RAM and SSD choices (= board Zestaw JS, prices from the publi
 
   it('every tuned price of every build = its own price + the surcharges', () => {
     for (const build of pricingExpected.builds) {
-      expect(tunedPrice(build.config, { ...build.config, light: null }, seedSnapshot)).toBe(
-        build.price,
-      )
+      expect(tunedPrice(build.config, build.config, seedSnapshot)).toBe(build.price)
       for (const ram of tuneChoices('ram', build.config, offer, seedSnapshot)) {
         for (const ssd of tuneChoices('ssd', build.config, offer, seedSnapshot)) {
-          const price = tunedPrice(
-            build.config,
-            { ram: ram.code, ssd: ssd.code, light: null },
-            seedSnapshot,
-          )
+          const price = tunedPrice(build.config, { ram: ram.code, ssd: ssd.code }, seedSnapshot)
           expect(price, `${build.slug} ${ram.code} ${ssd.code}`).toBe(
             build.price + ram.surcharge + ssd.surcharge,
           )
@@ -122,25 +116,29 @@ describe('Dopasuj: RAM and SSD choices (= board Zestaw JS, prices from the publi
   })
 
   it('writes the note under the price like the board', () => {
-    expect(tunedNote(3190, null, zl)).toBe(
+    expect(tunedNote(3190, zl)).toBe(
       `Różnica +${zl(3190)} względem zestawu. Liczymy tak samo jak konfigurator.`,
     )
-    expect(tunedNote(-840, 'lod', zl)).toBe(
+    expect(tunedNote(-840, zl)).toBe(
       'Różnica −840 zł względem zestawu. Liczymy tak samo jak konfigurator.',
     )
-    expect(tunedNote(0, 'lod', zl)).toBe('Kolor światła bez dopłaty.')
-    expect(tunedNote(0, null, zl)).toBe('Wersja jak na zdjęciu.')
-    expect(ownLight('czarna, czerwone światło')).toBe('czerwone światło')
+    expect(tunedNote(0, zl)).toBe('Wersja jak na zdjęciu.')
+  })
+
+  it('says the light is what the photo shows, not a fixed colour (runda v3 §1.4)', () => {
+    expect(lookText('czarna, czerwone światło')).toBe('czarna, na zdjęciu czerwone światło')
+    expect(lookText('czarna, złoty piorun')).toBe('czarna, na zdjęciu złoty piorun')
+    expect(lookText('biała')).toBe('biała')
   })
 
   it('passes only what changed to the inquiry', () => {
     const config = configOf('wampir')
     expect(inquiryHref('wampir', config)).toBe('/zapytanie?zestaw=wampir')
-    expect(inquiryHref('wampir', config, { ram: 'R32', ssd: 'NM1', light: null })).toBe(
+    expect(inquiryHref('wampir', config, { ram: 'R32', ssd: 'NM1' })).toBe(
       '/zapytanie?zestaw=wampir',
     )
-    expect(inquiryHref('wampir', config, { ram: 'R64', ssd: 'NM2', light: 'lod' })).toBe(
-      '/zapytanie?zestaw=wampir&ram=R64&ssd=NM2&swiatlo=lod',
+    expect(inquiryHref('wampir', config, { ram: 'R64', ssd: 'NM2' })).toBe(
+      '/zapytanie?zestaw=wampir&ram=R64&ssd=NM2',
     )
   })
 })

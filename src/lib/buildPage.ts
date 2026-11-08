@@ -7,7 +7,6 @@ import { checkCompat, indexOffer, resolveParts } from './compat'
 import { fpsFor, RESOLUTION_LABELS, RESOLUTIONS, type FpsTable, type Resolution } from './fps'
 import type { HeroBuild } from './home'
 import { priceFromSnapshot, surcharge, type PriceList } from './pricing/snapshot'
-import { LIGHT_COLOR_CHOICES, type LightColor } from './inquiry/types'
 import type { CompatLevel, CompatOption, Config } from './pricing/types'
 
 // ---------------------------------------------------------------------------------------------
@@ -171,7 +170,8 @@ export function interiorParts(p: InteriorInput): InteriorPart[] {
 }
 
 // ---------------------------------------------------------------------------------------------
-// „Dopasuj {istotę} pod siebie” (spec. §6 pt 7): RAM, SSD and light; price from the snapshot.
+// „Dopasuj {istotę} pod siebie” (spec. §6 pt 7): RAM and SSD; price from the snapshot. No light
+// colour (runda v3 §1.4): every case is ARGB, the colour is the customer's to set.
 // ---------------------------------------------------------------------------------------------
 
 export type TuneOffer = {
@@ -228,19 +228,16 @@ export function tuneChoices(
   return [...best.values()].sort((a, b) => a.capacityGb - b.capacityGb)
 }
 
-export type LightKey = LightColor
-
-/** Light colours of „Dopasuj” (board `LIGHTS`); the creature's own light is the default. */
-export const LIGHTS: readonly { key: LightKey; label: string }[] = LIGHT_COLOR_CHOICES.map(
-  ({ value, label }) => ({ key: value, label }),
-)
-
-/** „czerwone światło” from `look` = „czarna, czerwone światło” (board `lightDef`). */
-export function ownLight(look: string): string {
-  return look.split(', ')[1] ?? 'światło istoty'
+/**
+ * `look` as the page says it: „czarna, czerwone światło” → „czarna, na zdjęciu czerwone światło”.
+ * The light is what the photo shows, not a fixed colour (ARGB, runda v3 §1.4).
+ */
+export function lookText(look: string): string {
+  const [body, ...light] = look.split(', ')
+  return light.length > 0 ? `${body}, na zdjęciu ${light.join(', ')}` : look
 }
 
-export type Tuned = { ram: string; ssd: string; light: LightKey | null }
+export type Tuned = { ram: string; ssd: string }
 
 /**
  * Price of the tuned version — the same sum as the configurator and the inquiry. The page shows
@@ -252,23 +249,19 @@ export function tunedPrice(config: Config, tuned: Tuned, prices: PriceList): num
 }
 
 /** Line under the price (board `ver.diff`). */
-export function tunedNote(diff: number, light: LightKey | null, zl: (v: number) => string): string {
+export function tunedNote(diff: number, zl: (v: number) => string): string {
   if (diff !== 0) {
     const sign = diff > 0 ? `+${zl(diff)}` : `−${zl(-diff)}`
     return `Różnica ${sign} względem zestawu. Liczymy tak samo jak konfigurator.`
   }
-  return light ? 'Kolor światła bez dopłaty.' : 'Wersja jak na zdjęciu.'
+  return 'Wersja jak na zdjęciu.'
 }
 
-/**
- * „Zapytaj o tę wersję” → `/zapytanie?zestaw=wampir&ram=R64&ssd=NM2&swiatlo=lod`, only what
- * differs from the build. The form saves the light colour as `lightColor` (ADR-G005, 30.10.2026).
- */
+/** „Zapytaj o tę wersję” → `/zapytanie?zestaw=wampir&ram=R64&ssd=NM2`, only what differs. */
 export function inquiryHref(slug: string, config: Config, tuned?: Tuned): string {
   const params = new URLSearchParams({ zestaw: slug })
   if (tuned && tuned.ram !== config.ram) params.set('ram', tuned.ram)
   if (tuned && tuned.ssd !== config.ssd) params.set('ssd', tuned.ssd)
-  if (tuned?.light) params.set('swiatlo', tuned.light)
   return `/zapytanie?${params.toString()}`
 }
 

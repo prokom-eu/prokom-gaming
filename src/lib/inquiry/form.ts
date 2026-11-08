@@ -19,16 +19,13 @@ import {
   EXTRA_CHOICES,
   FOR_WHOM_CHOICES,
   INVOICE_CHOICES,
-  isLight,
   labelOf,
-  LIGHT_COLOR_CHOICES,
   LIGHTING_CHOICES,
   MONITOR_CHOICES,
   PICKUP_CHOICES,
   PREFERRED_CONTACT_CHOICES,
   REFRESH_CHOICES,
   type InquiryType,
-  type LightColor,
 } from './types'
 
 type Value<T extends readonly { value: string }[]> = T[number]['value']
@@ -104,8 +101,6 @@ export type FormState = {
   changes: Partial<Config>
   /** Full configuration from the configurator (`k`); while set, it is the computer. */
   config: Config | null
-  /** Light colour from „Dopasuj” / the configurator; `null` = the creature's own light. */
-  light: LightColor | null
   /** Builds of the comparison (`z`); the inquiry is then of type `compare`. */
   compared: string[]
   forWhom: Value<typeof FOR_WHOM_CHOICES> | null
@@ -138,7 +133,6 @@ const EMPTY: FormState = {
   build: null,
   changes: {},
   config: null,
-  light: null,
   compared: [],
   forWhom: null,
   budget: null,
@@ -214,8 +208,7 @@ export function initialState(params: URLSearchParams, data: Pick<FormData, 'buil
     if (params.get('dla') === 'dziecko') state.forWhom = 'child'
   }
 
-  const light = params.get('swiatlo')
-  if (isLight(light)) state.light = light
+  // An old `swiatlo=…` (light colour, removed in runda v3 §1.4) is ignored: old links still work.
 
   const other = Array.from((params.get('inne') ?? '').trim())
     .slice(0, ADDRESS_TEXT_MAX)
@@ -252,7 +245,6 @@ export function draftOf(state: FormState): string[] {
     if (state.changes.ram) params.set('ram', state.changes.ram)
     if (state.changes.ssd) params.set('ssd', state.changes.ssd)
   }
-  if (state.light) params.set('swiatlo', state.light)
   return [params.toString()]
 }
 
@@ -432,7 +424,6 @@ export function canSend(state: FormState, data: FormData): boolean {
 const FIELD_STEP: Record<string, Step> = {
   build: 0,
   config: 0,
-  lightColor: 0,
   forWhom: 0,
   budget: 0,
   customList: 0,
@@ -484,10 +475,7 @@ function monitorText(state: FormState): string {
   return chosen.length > 0 ? chosen.join(', ') : NONE
 }
 
-const lightText = (state: FormState) =>
-  state.light ? `światło ${labelOf(LIGHT_COLOR_CHOICES, state.light)}` : null
-
-/** „Wampir, Moc VII, 4K, pamięć 64 GB, światło Lód” — what the customer asks about. */
+/** „Wampir, Moc VII, 4K, pamięć 64 GB” — what the customer asks about. */
 export function computerText(state: FormState, data: FormData): string {
   if (state.mode === 'advice') {
     const who = label(FOR_WHOM_CHOICES, state.forWhom) ?? 'dla kogo: nie podano'
@@ -514,7 +502,7 @@ export function computerText(state: FormState, data: FormData): string {
         state.changes.ram ? `pamięć ${option[state.changes.ram] ?? state.changes.ram}` : null,
         state.changes.ssd ? `dysk ${option[state.changes.ssd] ?? state.changes.ssd}` : null,
       ]
-  return [...parts, lightText(state)].filter((p): p is string => Boolean(p)).join(', ')
+  return parts.filter((p): p is string => Boolean(p)).join(', ')
 }
 
 export type Summary = {
@@ -541,12 +529,7 @@ export function summaryOf(state: FormState, data: FormData): Summary {
     sub = 'sprawdzimy i wycenimy'
   } else if (creature) {
     title = creature.name
-    sub = [
-      state.config ? 'Twoja konfiguracja' : `${creature.power}, ${creature.realm}`,
-      lightText(state),
-    ]
-      .filter(Boolean)
-      .join(', ')
+    sub = state.config ? 'Twoja konfiguracja' : `${creature.power}, ${creature.realm}`
   } else {
     title = 'Wybierz komputer'
     sub = 'jeszcze nic nie wybrano'
@@ -641,11 +624,7 @@ export function sentSummaryOf(state: FormState, data: FormData): SentSummary {
     { label: 'Pamięć', value: option[recipe.ram] ?? '' },
     { label: 'Dysk', value: option[recipe.ssd] ?? '' },
   ].filter((row) => row.value)
-  const sub = [
-    level?.power,
-    option[recipe.case] ? `obudowa ${option[recipe.case]}` : null,
-    lightText(state),
-  ]
+  const sub = [level?.power, option[recipe.case] ? `obudowa ${option[recipe.case]}` : null]
     .filter(Boolean)
     .join(', ')
   return { key: summary.key, title: summary.title, sub, rows: [...rows, pickup] }
@@ -667,7 +646,6 @@ export function toPayload(
   return {
     type,
     ...computer,
-    lightColor: computer && state.light ? state.light : undefined,
     forWhom: type === 'advice' ? (state.forWhom ?? undefined) : undefined,
     budget: type === 'advice' ? (state.budget ?? undefined) : undefined,
     customList: type === 'custom_list' ? state.customList.trim() : undefined,

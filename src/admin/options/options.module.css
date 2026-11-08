@@ -28,6 +28,11 @@
   gap: 2px;
 }
 
+.photoWarn {
+  justify-self: start;
+  margin-top: 4px;
+}
+
 .item b {
   font-weight: 700;
 }

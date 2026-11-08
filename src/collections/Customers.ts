@@ -113,7 +113,14 @@ export const Customers: CollectionConfig = {
             { name: 'label', label: 'Nazwa', type: 'text', required: true, maxLength: 80 },
             // Five codes as in the configurator address (`k=`, `lib/configurator.ts`).
             { name: 'k', label: 'Kody (k=)', type: 'text', required: true, maxLength: 120 },
-            { name: 'light', label: 'Światło', type: 'text', maxLength: 20 },
+            // Runda v3 §1.4: no longer saved; shown only on old rows that have it.
+            {
+              name: 'light',
+              label: 'Światło (stare)',
+              type: 'text',
+              maxLength: 20,
+              admin: { readOnly: true, condition: (_, sibling) => Boolean(sibling?.light) },
+            },
             { name: 'savedAt', label: 'Zapisano', type: 'date', required: true },
           ],
         },

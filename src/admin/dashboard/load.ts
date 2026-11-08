@@ -2,6 +2,7 @@ import 'server-only'
 
 import type { Payload } from 'payload'
 
+import { caseBoxOf, casePhotoIssues } from '../../lib/caseBox'
 import { DEFAULT_REPLY_HOURS, type ReplyHours } from '../../lib/inquiry/sla'
 import { topicOf } from '../../lib/inquiry/thread.server'
 import type { InquiryStatus } from '../../lib/inquiry/types'
@@ -109,12 +110,37 @@ async function loadWorkshop(payload: Payload): Promise<WorkshopData> {
   }
 }
 
+/** Runda v3 §1.2: codes of active cases whose photo is cut at the source or too small. */
+async function casePhotoCodes(payload: Payload): Promise<string[]> {
+  const cases = await payload.find({
+    collection: 'options',
+    where: { and: [{ type: { equals: 'case' } }, { active: { equals: true } }] },
+    select: { code: true, image: true },
+    populate: { media: { width: true, height: true, box: true } },
+    sort: 'code',
+    ...trusted,
+    depth: 1,
+  })
+  return cases.docs
+    .filter((o) => {
+      const m = o.image
+      if (!m || typeof m !== 'object') return false
+      return casePhotoIssues({ width: m.width, height: m.height, box: caseBoxOf(m.box) }).length > 0
+    })
+    .map((o) => o.code)
+}
+
 export async function loadDashboard(payload: Payload, now: Date): Promise<DashboardData> {
   const days = lastDays(now)
   const since = new Date(`${days[0]}T00:00:00Z`).getTime() - DAY_MS // a margin for the time zone
 
   const period = periodRange(now, 30)
   const reader = traffic()
+  // Started with the rest, awaited below (kept out of the long tuple).
+  const casePhotos = casePhotoCodes(payload).catch((error: unknown) => {
+    log.warn(errorFields(error), 'case photo check failed')
+    return []
+  })
 
   const [mail, monthly, waiting, recent, dueOrders, workshop, prices, events, report, visits] =
     await Promise.all([
@@ -249,6 +275,7 @@ export async function loadDashboard(payload: Payload, now: Date): Promise<Dashbo
                 .map((i) => ({ title: i.title, builds: i.builds })),
             }
           : null,
+        casePhotos: await casePhotos,
       },
       now,
     ),
