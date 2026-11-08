@@ -16,7 +16,6 @@ import {
   INQUIRY_TYPE_CHOICES,
   INVOICE_CHOICES,
   labelOf,
-  LIGHT_COLOR_CHOICES,
   LIGHTING_CHOICES,
   MONITOR_CHOICES,
   PICKUP_CHOICES,
@@ -55,8 +54,6 @@ export type InquiryForEmail = {
   number: string
   type: InquiryType
   computer: ComputerForEmail | null
-  /** Empty = the creature's own light. */
-  lightColor?: Choice<typeof LIGHT_COLOR_CHOICES>
   forWhom?: Choice<typeof FOR_WHOM_CHOICES>
   budget?: Choice<typeof BUDGET_CHOICES>
   customList?: string
@@ -134,11 +131,7 @@ const optional = <V extends string>(
   value: V | undefined,
 ) => (value === undefined ? undefined : labelOf(choices, value))
 
-function computerLines(
-  computer: ComputerForEmail,
-  withCodes: boolean,
-  lightColor: InquiryForEmail['lightColor'],
-): string[] {
+function computerLines(computer: ComputerForEmail, withCodes: boolean): string[] {
   return [
     ...(computer.buildName ? [`Zestaw: ${computer.buildName}`] : []),
     ...PART_KEYS.map((key) => {
@@ -146,7 +139,6 @@ function computerLines(
       const label = computer.labels[key] ?? code
       return `- ${PART_LABELS[key]}: ${label}${withCodes && label !== code ? ` (${code})` : ''}`
     }),
-    ...(lightColor ? [`- Światło: ${labelOf(LIGHT_COLOR_CHOICES, lightColor)}`] : []),
     computer.unit
       ? `Cena za ten egzemplarz: ${zl(computer.price)} brutto` +
         (withCodes && computer.unit.discount > 0
@@ -171,11 +163,7 @@ const kv = (label: string, value: string | null | undefined, extra?: Partial<Key
   value ? [{ label, value, ...extra }] : []
 
 /** The computer as rows of a card; codes only for the team (never `internalModel`). */
-function computerRows(
-  computer: ComputerForEmail,
-  withCodes: boolean,
-  lightColor: InquiryForEmail['lightColor'],
-): KeyValue[] {
+function computerRows(computer: ComputerForEmail, withCodes: boolean): KeyValue[] {
   return [
     ...PART_KEYS.flatMap((key) => {
       const code = computer.config[key]
@@ -190,7 +178,6 @@ function computerRows(
         },
       ]
     }),
-    ...kv('Światło', lightColor ? labelOf(LIGHT_COLOR_CHOICES, lightColor) : undefined),
   ]
 }
 
@@ -223,7 +210,7 @@ function computerCard(
     title: computer.buildName ?? 'Konfiguracja z konfiguratora',
     accent: buildAccent(computer.buildName),
     subtitle: computer.labels.level,
-    rows: computerRows(computer, withCodes, inquiry.lightColor),
+    rows: computerRows(computer, withCodes),
     price: computerPrice(computer, withCodes),
   }
 }
@@ -431,7 +418,7 @@ export function notificationEmail(
     `Nowe zapytanie ${inquiry.number} ze strony PRO-KOM Gaming.`,
     '',
     `Rodzaj: ${typeLabel(inquiry.type)}`,
-    ...(inquiry.computer ? computerLines(inquiry.computer, true, inquiry.lightColor) : []),
+    ...(inquiry.computer ? computerLines(inquiry.computer, true) : []),
     ...(inquiry.stock
       ? rows([
           ['Egzemplarz', `#${inquiry.stock.id}, ${inquiry.stock.location}`],
@@ -548,7 +535,7 @@ export function confirmationEmail(
         ? [
             '',
             inquiry.stock ? 'Zarezerwowany egzemplarz:' : 'Twoja konfiguracja:',
-            ...computerLines(inquiry.computer, false, inquiry.lightColor),
+            ...computerLines(inquiry.computer, false),
           ]
         : []),
       ...(inquiry.stock

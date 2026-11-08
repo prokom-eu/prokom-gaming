@@ -1,8 +1,8 @@
 import Image from 'next/image'
 import { useState, type ReactNode, type RefObject } from 'react'
 
+import { ArgbNote } from '@/components/ArgbNote'
 import { Chip } from '@/components/ui/Chip'
-import type { LightKey } from '@/lib/buildPage'
 import {
   CASE_FILTERS,
   caseMatches,
@@ -19,7 +19,6 @@ import { signedZl, zl } from '@/lib/pricing/format'
 import { lookupPrice } from '@/lib/pricing/snapshot'
 
 import type { PricedData } from './Configurator'
-import { LightPicker } from './LightPicker'
 import type { ConfiguratorView } from './view'
 
 type StepProps = {
@@ -35,15 +34,8 @@ const AIO_TEXT: Record<string, string> = {
   top_only: 'AIO 360 (góra)',
 }
 
-/** Step 3 (board `show2`): cases with a photo, filters, light colour. */
-export function StepCase({
-  headingRef,
-  data,
-  state,
-  view,
-  onPick,
-  onLight,
-}: StepProps & { onLight: (light: LightKey | null) => void }) {
+/** Step 3 (board `show2`): cases with a photo, filters; ARGB instead of a light colour (v3 §1.4). */
+export function StepCase({ headingRef, data, state, view, onPick }: StepProps) {
   const [filter, setFilter] = useState<CaseFilter>('all')
   const states = optionStates('case', state.config, data, data.prices).filter((s) => {
     const o = view.option(s.code)
@@ -78,7 +70,7 @@ export function StepCase({
           o.type === 'case' ? [`karta do ${o.gpuMaxMm} mm`, AIO_TEXT[o.aio360] ?? 'AIO 360'] : []
         }
       />
-      <LightPicker value={state.light} ownColor={`var(--c-${view.level.build})`} onPick={onLight} />
+      <ArgbNote className="cf-mut cf-argb" />
     </div>
   )
 }

@@ -820,8 +820,7 @@
   grid-template-columns: repeat(3, 1fr);
   gap: 10px;
 }
-.bp-opts button,
-.bp-lights button {
+.bp-opts button {
   font: inherit;
   cursor: pointer;
   transition:
@@ -852,36 +851,6 @@
   border-color: var(--c);
   background: color-mix(in srgb, var(--c) 10%, var(--bp-panel));
   box-shadow: inset 0 0 0 1px var(--c);
-}
-.bp-lights {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-.bp-lights button {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  width: 76px;
-  padding: 10px 4px;
-  border: 1px solid color-mix(in srgb, var(--kosc) 12%, transparent);
-  background: var(--bp-panel);
-  color: var(--hero-tier-name);
-}
-.bp-lights i {
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  background: var(--lc);
-  box-shadow: 0 0 14px var(--lc);
-}
-.bp-lights small {
-  font-size: 12px;
-}
-.bp-lights [aria-pressed='true'] {
-  border-color: var(--lc);
-  box-shadow: inset 0 0 0 1px var(--lc);
 }
 .bp-tune__sum {
   position: sticky;
@@ -1479,9 +1448,6 @@
   .bp-opts small {
     display: none;
   }
-  .bp-lights button {
-    width: calc(33.3% - 7px);
-  }
   .bp-bar__p {
     display: none;
   }
@@ -1510,7 +1476,6 @@
   .bp-draw__marks circle,
   .bp-part,
   .bp-opts button,
-  .bp-lights button,
   .bp-faq summary i::after {
     transition: none;
   }

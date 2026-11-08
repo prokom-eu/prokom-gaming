@@ -1,6 +1,5 @@
 import { useMemo } from 'react'
 
-import { LIGHTS } from '@/lib/buildPage'
 import {
   capacityText,
   fpsCell,
@@ -38,8 +37,6 @@ export type ConfiguratorView = {
   fpsNote: string
   /** Values under the step names (board `VALS`). */
   stepValues: Record<string, string>
-  lightColor: string
-  lightLabel: string
 }
 
 // FPS bar in the side panel (board: `v / 3` %, i.e. 300 FPS = full).
@@ -122,7 +119,6 @@ export function deriveView(data: Data, state: ConfiguratorState): ConfiguratorVi
       ? `${capacityText(ram.capacityGb)} · ${capacityText(ssd.capacityGb)}`
       : ''
 
-  const light = LIGHTS.find((l) => l.key === state.light)
   return {
     level,
     build,
@@ -143,7 +139,5 @@ export function deriveView(data: Data, state: ConfiguratorState): ConfiguratorVi
       pamiec: memory,
       podsumowanie: zl(price),
     },
-    lightColor: light ? `var(--light-${light.key})` : `var(--c-${level.build})`,
-    lightLabel: light?.label ?? 'Istoty',
   }
 }

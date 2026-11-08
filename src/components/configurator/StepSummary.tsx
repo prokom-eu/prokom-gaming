@@ -5,7 +5,6 @@ import { Sigil } from '@/components/Sigil'
 import { IconBars, IconMail } from '@/components/icons'
 import { PROMISES } from '@/components/promises'
 import { ButtonLink } from '@/components/ui/Button'
-import type { LightKey } from '@/lib/buildPage'
 import {
   OTHER_PART_MAX,
   stateQuery,
@@ -15,7 +14,6 @@ import {
 import { routes } from '@/lib/nav'
 import { zl } from '@/lib/pricing/format'
 
-import { LightPicker } from './LightPicker'
 import type { ConfiguratorView } from './view'
 
 /**
@@ -32,7 +30,6 @@ export function StepSummary({
   siteUrl,
   other,
   onOther,
-  onLight,
 }: {
   headingRef: RefObject<HTMLHeadingElement | null>
   state: ConfiguratorState
@@ -42,7 +39,6 @@ export function StepSummary({
   siteUrl: string
   other: string
   onOther: (text: string) => void
-  onLight: (light: LightKey | null) => void
 }) {
   const link = new URL(
     `${routes.configurator}?${stateQuery({ ...state, step: 'podsumowanie' })}`,
@@ -81,11 +77,6 @@ export function StepSummary({
             <dd className="cf-sum__p">{l.price}</dd>
           </div>
         ))}
-        <div className="cf-sum__row">
-          <dt>Światło</dt>
-          <dd>{view.lightLabel}</dd>
-          <dd className="cf-sum__p">bez dopłaty</dd>
-        </div>
         <div className="cf-sum__row is-total">
           <dt>Razem</dt>
           <dd>z Windows 11, montażem, testem i wysyłką</dd>
@@ -101,8 +92,6 @@ export function StepSummary({
           </li>
         ))}
       </ul>
-
-      <LightPicker value={state.light} ownColor={`var(--c-${view.level.build})`} onPick={onLight} />
 
       <label className="cf-lbl" htmlFor="cf-other">
         Chcesz obudowę albo chłodzenie, których nie ma na liście?
@@ -134,7 +123,6 @@ export function StepSummary({
         )}
         <SaveConfigButton
           config={state.config}
-          light={state.light}
           label={`Moc ${view.level.tier}, ${view.optionLabel(state.config.case)}`}
         />
       </div>

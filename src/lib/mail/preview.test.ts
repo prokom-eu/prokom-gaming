@@ -36,7 +36,6 @@ const sample: InquiryForEmail = {
     price: 9890,
     publishedAt: '2026-10-25T10:00:00.000Z',
   },
-  lightColor: undefined,
   forWhom: 'self',
   budget: undefined,
   games: ['Counter-Strike 2', 'Cyberpunk 2077', 'Baldur’s Gate 3'],

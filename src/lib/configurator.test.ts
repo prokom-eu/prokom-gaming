@@ -268,9 +268,16 @@ describe('address', () => {
       monitor: 'uhd' as const,
       games: ['valorant', 'cyberpunk-2077'],
       config: { ...recipe('kikimora'), ssd: 'NM2' },
-      light: 'lod' as const,
     }
     expect(parseState(new URLSearchParams(stateQuery(state)), ctx)!.state).toEqual(state)
+  })
+
+  it('an old ?swiatlo= link (runda v3 §1.4) opens the same state and is not written back', () => {
+    const k = encodeConfig(recipe('wampir'))
+    const plain = parseState(new URLSearchParams({ k }), ctx)!.state
+    const old = parseState(new URLSearchParams({ k, swiatlo: 'lod' }), ctx)!.state
+    expect(old).toEqual(plain)
+    expect(stateQuery(old)).not.toContain('swiatlo')
   })
 
   it('no parameters: the board’s start (Wampir, 2K, three games, step 1)', () => {
@@ -279,7 +286,6 @@ describe('address', () => {
       monitor: 'qhd',
       games: ['fortnite', 'counter-strike-2', 'cyberpunk-2077'],
       config: recipe('wampir'),
-      light: null,
     })
   })
 
@@ -294,7 +300,6 @@ describe('address', () => {
       const { state } = parseState(new URLSearchParams(query), ctx)!
       expect(state.config).toEqual(recipe('wampir'))
       expect(state.monitor).toBe('qhd')
-      expect(state.light).toBeNull()
       expect(['monitor', 'poziom']).toContain(state.step)
     }
     expect(
@@ -322,11 +327,11 @@ describe('address', () => {
     expect(changes.map((c) => c.slot)).toEqual(['ram'])
   })
 
-  it('inquiry link: codes, light and the other-part text (trimmed, capped)', () => {
-    expect(configInquiryHref(recipe('wampir'), null)).toBe('/zapytanie?k=P13.LB500.PL3LX.R32.NM1')
-    const href = configInquiryHref(recipe('wampir'), 'lod', `  Lian Li O11 ${'x'.repeat(400)}`)
+  it('inquiry link: codes and the other-part text (trimmed, capped), no light colour', () => {
+    expect(configInquiryHref(recipe('wampir'))).toBe('/zapytanie?k=P13.LB500.PL3LX.R32.NM1')
+    const href = configInquiryHref(recipe('wampir'), `  Lian Li O11 ${'x'.repeat(400)}`)
     const params = new URL(href, 'https://example.test').searchParams
-    expect(params.get('swiatlo')).toBe('lod')
+    expect(params.has('swiatlo')).toBe(false)
     expect(params.get('inne')!.length).toBe(OTHER_PART_MAX)
     expect(params.get('inne')!.startsWith('Lian Li O11')).toBe(true)
   })
@@ -495,7 +500,7 @@ describe('unpublished or inactive offer (review G10)', () => {
   })
 
   it('the other-part text is cut by characters, not halves of an emoji', () => {
-    const href = configInquiryHref(recipe('wampir'), null, `${'a'.repeat(OTHER_PART_MAX - 1)}😀😀`)
+    const href = configInquiryHref(recipe('wampir'), `${'a'.repeat(OTHER_PART_MAX - 1)}😀😀`)
     const inne = new URL(href, 'https://example.test').searchParams.get('inne')!
     expect(Array.from(inne)).toHaveLength(OTHER_PART_MAX)
     expect(inne.endsWith('😀')).toBe(true)

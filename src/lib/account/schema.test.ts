@@ -67,17 +67,14 @@ describe('ticketSchema', () => {
 })
 
 describe('savedConfigSchema', () => {
-  it('accepts five codes and a known light', () => {
-    const input = { label: 'Moc 4, biała', k: 'P13.LB500.PL3LX.R32.NM1', light: 'lod' }
+  it('accepts five codes; an old light colour (runda v3 §1.4) is dropped', () => {
+    const input = { label: 'Moc 4, biała', k: 'P13.LB500.PL3LX.R32.NM1' }
     expect(savedConfigSchema.parse(input)).toEqual(input)
+    expect(savedConfigSchema.parse({ ...input, light: 'lod' })).toEqual(input)
   })
 
-  it('rejects broken codes and unknown lights', () => {
+  it('rejects broken codes', () => {
     expect(savedConfigSchema.safeParse({ label: 'x', k: 'P13.LB500' }).success).toBe(false)
-    expect(
-      savedConfigSchema.safeParse({ label: 'x', k: 'P13.LB500.PL3LX.R32.NM1', light: 'neon' })
-        .success,
-    ).toBe(false)
   })
 })
 

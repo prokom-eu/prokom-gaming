@@ -1,7 +1,7 @@
 /* Configurator `/konfigurator` (spec. §7): sizes from the boards Konfigurator / Konfigurator-telefon
    (`.k2`, `.k2-steps`, `.mons`, `.reco`, `.tr`, `.og`/`.oc`, `.mg`/`.mc`, `.match`, `.sl`, `.sb`,
-   `.toast`, `.mbar`). Colours only from tokens.css; `--c` is the level's creature colour and `--lc`
-   the chosen light, both set on `.cf`. */
+   `.toast`, `.mbar`). Colours only from tokens.css; `--c` is the level's creature colour, set on
+   `.cf`. */
 
 .cf {
   position: relative;
@@ -611,47 +611,10 @@
   color: var(--cf-err);
 }
 
-/* light colour (look of `.bp-lights`, board Zestaw) */
-.cf-lights {
-  margin: 28px 0 0;
-  padding: 0;
-  border: 0;
-}
-/* A legend ignores vertical margins inside a fieldset: the fieldset carries the space. */
-.cf-lights .cf-lbl {
-  margin: 0 0 12px;
-}
-.cf-lights__row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-.cf-lights__row button {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  min-width: 56px;
-  padding: 8px 6px;
-  border: 1px solid var(--line);
-  background: none;
-  color: var(--cf-pill);
-  font: inherit;
-  cursor: pointer;
-}
-.cf-lights__row i {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: var(--lc);
-  box-shadow: 0 0 12px var(--lc);
-}
-.cf-lights__row small {
-  font-size: 12px;
-}
-.cf-lights__row button[aria-pressed='true'] {
-  border-color: var(--grom);
-  color: var(--kosc);
+/* ARGB instead of a light colour (runda v3 §1.4) */
+.cf-argb {
+  margin-top: 24px;
+  font-size: 15px;
 }
 
 /* ---------- step 5: memory and disk ---------- */

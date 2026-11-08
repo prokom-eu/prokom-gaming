@@ -4,6 +4,7 @@
  * safe: public labels, sell prices (published snapshot) and stored FPS only (ADR-G002 §8.7, ADR-
  * G004). `lib/compare.server.ts` reads the database.
  */
+import { lookText } from './buildPage'
 import { RESOLUTION_LABELS, type FpsKind, type GameScale, type Resolution } from './fps'
 import { firstParam, resolutionFromParam, RESOLUTION_PARAMS, SMOOTH_FPS } from './games'
 import { zl } from './pricing/format'
@@ -471,8 +472,9 @@ const SPEC: (SpecDef | { group: string })[] = [
   { group: 'Wygląd' },
   {
     label: 'Obudowa i światło',
-    hint: 'kolor podświetlenia zmienisz w konfiguratorze',
-    value: (b) => b.look,
+    // Runda v3 §1.4: ARGB — no colour to pick, the photo shows one.
+    hint: 'podświetlenie ARGB, kolor ustawisz sam',
+    value: (b) => lookText(b.look),
   },
   { group: 'W cenie każdego' },
   { label: 'Gwarancja', hint: '', value: () => '2 lata na cały komputer' },

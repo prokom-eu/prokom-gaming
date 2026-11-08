@@ -13,7 +13,6 @@ import {
   EXTRA_CHOICES,
   FOR_WHOM_CHOICES,
   INVOICE_CHOICES,
-  LIGHT_COLOR_CHOICES,
   LIGHTING_CHOICES,
   MONITOR_CHOICES,
   PICKUP_CHOICES,
@@ -70,8 +69,7 @@ const baseSchema = z.object({
       ssd: code.optional(),
     })
     .optional(),
-  // Light colour from „Dopasuj” / the configurator; empty = the creature's own light.
-  lightColor: optionalChoice(LIGHT_COLOR_CHOICES),
+  // No `lightColor` since runda v3 §1.4 (every case is ARGB): an old client's value is dropped.
   forWhom: optionalChoice(FOR_WHOM_CHOICES),
   budget: optionalChoice(BUDGET_CHOICES),
   customList: optionalText(MAX.customList),
@@ -158,7 +156,6 @@ const inquirySchema = baseSchema.superRefine((data, ctx) => {
     // A computer is saved only where the customer picked one; elsewhere nobody asked for it.
     if (data.build !== undefined) issue('build', 'build only with a computer')
     if (data.config !== undefined) issue('config', 'configuration only with a computer')
-    if (data.lightColor !== undefined) issue('lightColor', 'light colour only with a computer')
   }
 
   if (data.type !== 'advice') {

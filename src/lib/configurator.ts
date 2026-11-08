@@ -5,8 +5,6 @@
  * board's JS 1:1 where the board has them; reasons for greyed-out options are the ADR texts
  * (`compatMessage`). `lib/configurator.server.ts` reads the database.
  */
-import { type LightKey } from './buildPage'
-import { isLight } from './inquiry/types'
 import {
   checkCompat,
   compatMessage,
@@ -114,7 +112,8 @@ export function shortGameName(name: string): string {
 }
 
 // ---------------------------------------------------------------------------------------------
-// State and address: `/konfigurator?krok=…&monitor=…&gry=…&k=…&swiatlo=…` (or `?zestaw=wampir`).
+// State and address: `/konfigurator?krok=…&monitor=…&gry=…&k=…` (or `?zestaw=wampir`). An old
+// `swiatlo=…` (light colour, removed in runda v3 §1.4 — every case is ARGB) is ignored.
 // ---------------------------------------------------------------------------------------------
 
 export type ConfiguratorState = {
@@ -122,7 +121,6 @@ export type ConfiguratorState = {
   monitor: Resolution
   games: string[]
   config: Config
-  light: LightKey | null
 }
 
 const K_SEPARATOR = '.'
@@ -193,9 +191,6 @@ export function parseState(
       ? [...DEFAULT_GAMES].filter((g) => known.has(g))
       : [...new Set(gry.split(',').filter((g) => known.has(g)))]
 
-  const swiatlo = params.get('swiatlo')
-  const light = isLight(swiatlo) ? swiatlo : null
-
   const usable = (c: Config) => sellable(c, ctx.offer, ctx.prices) && valid(c, ctx.offer)
   const fallback = [...ctx.builds]
     .sort((a, b) => Number(b.slug === DEFAULT_BUILD) - Number(a.slug === DEFAULT_BUILD))
@@ -219,7 +214,7 @@ export function parseState(
       config = fallback.config
     }
   }
-  return { state: { step, monitor, games, config, light }, changes }
+  return { state: { step, monitor, games, config }, changes }
 }
 
 /** Query string of a state (without `?`); `zestaw` is never written back — `k` says it all. */
@@ -229,7 +224,6 @@ export function stateQuery(state: ConfiguratorState): string {
   params.set('monitor', MONITORS.find((m) => m.resolution === state.monitor)?.param ?? '2k')
   params.set('gry', state.games.join(','))
   params.set('k', encodeConfig(state.config))
-  if (state.light) params.set('swiatlo', state.light)
   return params.toString()
 }
 
@@ -237,12 +231,11 @@ export function stateQuery(state: ConfiguratorState): string {
 export const OTHER_PART_MAX = 200
 
 /**
- * „Zapytaj o tę konfigurację” → `/zapytanie?k=…[&swiatlo=…][&inne=…]`; the form reads `k` as the
- * configuration, `swiatlo` as the light colour and `inne` into the notes (`lib/inquiry/form.ts`).
+ * „Zapytaj o tę konfigurację” → `/zapytanie?k=…[&inne=…]`; the form reads `k` as the
+ * configuration and `inne` into the notes (`lib/inquiry/form.ts`).
  */
-export function configInquiryHref(config: Config, light: LightKey | null, other = ''): string {
+export function configInquiryHref(config: Config, other = ''): string {
   const params = new URLSearchParams({ k: encodeConfig(config) })
-  if (light) params.set('swiatlo', light)
   // By code points, so an emoji is never cut in half.
   const text = Array.from(other.trim()).slice(0, OTHER_PART_MAX).join('')
   if (text) params.set('inne', text)

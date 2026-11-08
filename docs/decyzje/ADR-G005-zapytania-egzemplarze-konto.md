@@ -61,6 +61,7 @@ Decyzje Krystiana przy planie G6; kontrakt w `src/lib/inquiry/schema.ts` (Zod) i
 
 ## Uzupełnienie 30.10.2026 (G12 — formularz zapytania)
 Decyzje Krystiana przy planie G12.
+- **Aktualizacja 08.11.2026 (ADR-G014 §4):** kolor światła usunięty ze strony — pole `lightColor` nie jest już przyjmowane ani zapisywane; zostaje w bazie i w panelu (tylko gdy ma wartość) dla starych zapytań.
 - **Nowe pole `lightColor`** (`piorun | krew | las | czary | lod | ogien`, opcjonalne; puste = światło istoty): kolor światła z „Dopasuj” na karcie zestawu i z konfiguratora (spec. §7) to wybór produktu, więc jest polem, nie tekstem w uwagach. Tylko w typach z komputerem (`build`, `config`, `compare`). Słownik: `LIGHT_COLOR_CHOICES` w `lib/inquiry/types.ts` (z niego bierze też karta zestawu i konfigurator). Migracja `inquiries_light_color`.
 - **Porównanie (`/zapytanie?z=a,b,c`) bez zmiany kontraktu:** typ `compare`, `build` = pierwszy zestaw z porównania (klient może zmienić w kroku 1), pozostałe formularz dopisuje do uwag („Z porównania: …”). Relacja do kilku zestawów — dopiero, gdy okaże się potrzebna.
 - **Token formularza** wydaje strona `/zapytanie` (renderowana per żądanie), bez osobnego `GET`.

@@ -233,13 +233,9 @@
    `.bpl`, `.dp7`, `.tr7`, `LIGHTS`).
    --------------------------------------------------------------------------------------------- */
 :root {
-  /* kolory światła w „Dopasuj” (plansza: LIGHTS) */
-  --light-piorun: #f2c230;
-  --light-krew: #e0322b;
+  /* zieleń z dawnego wyboru światła (plansza: LIGHTS) — została tylko w „O nas”; wybór usunięty
+     w rundzie v3 §1.4 */
   --light-las: #3ddc97;
-  --light-czary: #b26bff;
-  --light-lod: #9fe7ff;
-  --light-ogien: #ff7a1a;
   /* tła */
   --bp-panel: #08100d; /* kafle części, opcje, kroki, pudełko, gwarancja */
   --bp-frame-from: #081210;

@@ -2,6 +2,7 @@ import { IconEye } from '@/components/icons'
 import { Sigil } from '@/components/Sigil'
 import { SourceLabel } from '@/components/SourceLabel'
 import { ButtonLink } from '@/components/ui/Button'
+import { lookText } from '@/lib/buildPage'
 import { RESOLUTION_LABELS } from '@/lib/fps'
 import { dateText, HERO_GAMES, siblingsText, type HeroBuild } from '@/lib/home'
 import { zl } from '@/lib/pricing/format'
@@ -39,7 +40,7 @@ export function HeroCard({ build, siblings, pricedAt, animationKey, onPick }: Pr
               type="button"
               className="hero-card__tab"
               aria-pressed={s.slug === build.slug}
-              aria-label={`${s.name}: ${s.look}`}
+              aria-label={`${s.name}: ${lookText(s.look)}`}
               style={{ ['--mc' as string]: `var(--c-${s.slug})` }}
               onClick={() => onPick(s.slug)}
             >
@@ -51,7 +52,7 @@ export function HeroCard({ build, siblings, pricedAt, animationKey, onPick }: Pr
       )}
       <p className="hero-card__look">
         <IconEye size={14} />
-        <span>Obudowa {build.look}</span>
+        <span>Obudowa {lookText(build.look)}</span>
       </p>
       <div key={`do-${animationKey}`} className={`hero-card__do${fresh}`}>
         {build.heroTitle && <b>{build.heroTitle}</b>}

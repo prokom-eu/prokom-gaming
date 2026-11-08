@@ -3,7 +3,6 @@ import { z } from 'zod'
 import { PASSWORD_MIN_LENGTH } from '../auth/password'
 import { decodeConfig } from '../configurator'
 import { ACCOUNT_CONSENT_CLAUSE } from '../inquiry/consent'
-import { LIGHT_COLOR_CHOICES } from '../inquiry/types'
 import { TICKET_CATEGORIES, TICKET_DESCRIPTION_MAX } from './tickets'
 
 // What the account forms send to `/api/konto/*` (G14). Only these fields ever reach the database:
@@ -34,8 +33,6 @@ export const ticketSchema = z.object({
 })
 export type TicketInput = z.infer<typeof ticketSchema>
 
-const LIGHTS = LIGHT_COLOR_CHOICES.map((l) => l.value) as [string, ...string[]]
-
 export const savedConfigSchema = z.object({
   label: z.string().trim().min(1).max(80),
   // Five well-formed codes of the configurator address (`k=`).
@@ -43,7 +40,7 @@ export const savedConfigSchema = z.object({
     .string()
     .max(120)
     .refine((k) => decodeConfig(k) !== null, 'invalid configuration'),
-  light: z.enum(LIGHTS).nullable().optional(),
+  // An old client may still send `light` (removed in runda v3 §1.4): Zod drops unknown keys.
 })
 export type SavedConfigInput = z.infer<typeof savedConfigSchema>
 

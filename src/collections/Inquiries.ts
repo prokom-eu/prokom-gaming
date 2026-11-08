@@ -205,7 +205,16 @@ export const Inquiries: CollectionConfig = {
             },
           ],
         },
-        select('lightColor', 'Kolor światła (puste = światło istoty)'),
+        // Runda v3 §1.4: no longer asked (every case is ARGB). Kept for old inquiries and shown
+        // only where one was saved.
+        {
+          name: 'lightColor',
+          label: 'Kolor światła (stare zapytania)',
+          type: 'select',
+          options: options(CHOICES.lightColor),
+          access: locked.access,
+          admin: { readOnly: true, condition: (data) => Boolean(data?.lightColor) },
+        },
         {
           type: 'row',
           fields: [

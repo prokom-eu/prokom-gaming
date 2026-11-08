@@ -143,7 +143,6 @@ describe('submitInquiryWith', () => {
       config: wampir.config,
       priceAtInquiry: wampir.price,
       priceBatch: 2,
-      lightColor: 'lod',
       games: [7],
       consent: {
         accepted: true,

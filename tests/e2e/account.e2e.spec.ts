@@ -176,13 +176,14 @@ test('sign up, verify, see the order, report a problem, reset the password', asy
 
   // Saving a configuration, then it opens in the configurator.
   const save = await page.request.post('/api/konto/konfiguracje', {
+    // An old client may still send a light colour (removed in runda v3 §1.4): dropped, saved.
     data: { label: 'Moc 4, biała', k: 'P13.LB500.PL3LX.R32.NM1', light: 'lod' },
   })
   expect(save.status()).toBe(201)
   await page.reload()
   await expect(page.locator('.kt-saved__item a')).toHaveAttribute(
     'href',
-    '/konfigurator?k=P13.LB500.PL3LX.R32.NM1&swiatlo=lod',
+    '/konfigurator?k=P13.LB500.PL3LX.R32.NM1',
   )
 
   // Sign-out, then a new password from the e-mail link signs in again.
