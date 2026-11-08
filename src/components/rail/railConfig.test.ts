@@ -3,8 +3,11 @@ import path from 'path'
 import { describe, expect, it } from 'vitest'
 
 import {
+  ABOUT_SECTIONS,
   activeIndex,
   BUILD_SECTIONS,
+  GAME_SECTIONS,
+  PARENTS_SECTIONS,
   HOME_SECTIONS,
   pageGroup,
   RAIL_ICONS,
@@ -37,6 +40,21 @@ describe('rail sections', () => {
     for (const s of BUILD_SECTIONS) expect(ids, s.id).toContain(s.id)
   })
 
+  it('has every „O nas” and game page anchor in those pages', () => {
+    const about = fs.readFileSync(path.resolve('src/app/(site)/o-nas/page.tsx'), 'utf8')
+    for (const s of ABOUT_SECTIONS) expect(about, s.id).toContain(`id="${s.id}"`)
+    const game = [
+      fs.readFileSync(path.resolve('src/app/(site)/komputer-do/[gra]/page.tsx'), 'utf8'),
+      fs.readFileSync(path.resolve('src/components/games/GameResults.tsx'), 'utf8'),
+    ].join(' ')
+    for (const s of GAME_SECTIONS) expect(game, s.id).toContain(`id="${s.id}"`)
+  })
+
+  it('has every „Dla rodziców” anchor on that page', () => {
+    const page = fs.readFileSync(path.resolve('src/app/(site)/dla-rodzicow/page.tsx'), 'utf8')
+    for (const s of PARENTS_SECTIONS) expect(page, s.id).toContain(`id="${s.id}"`)
+  })
+
   it('never repeats an anchor and has an icon for every entry', () => {
     const all = [...HOME_SECTIONS, ...BUILD_SECTIONS]
     expect(new Set(HOME_SECTIONS.map((s) => s.id)).size).toBe(HOME_SECTIONS.length)
@@ -53,6 +71,13 @@ describe('pageGroup / railHidden', () => {
     expect(pageGroup('/zestawy/nieznany', names)).toBeNull()
     expect(pageGroup('/zestawy', names)).toBeNull()
     expect(pageGroup('/', names)).toBeNull()
+    expect(pageGroup('/o-nas', names)?.sections).toBe(ABOUT_SECTIONS)
+    expect(pageGroup('/dla-rodzicow', names)?.sections).toBe(PARENTS_SECTIONS)
+    expect(pageGroup('/komputer-do/fortnite', names)?.sections).toBe(GAME_SECTIONS)
+    // Fewer than three sections or their own navigation: no group (NAWIGACJA §4.4).
+    expect(pageGroup('/dobor-pod-gre', names)).toBeNull()
+    expect(pageGroup('/pytania', names)).toBeNull()
+    expect(pageGroup('/poradniki/rodzice', names)).toBeNull()
   })
 
   it('hides the rail on the certificate and the account pages only', () => {

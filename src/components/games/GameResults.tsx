@@ -80,7 +80,9 @@ export function GameResults({ data, game }: { data: PickerData; game: GameInfo }
           )}
 
           <div className="gm-body__head gm-body__head--tiers">
-            <h2 className="h">{game.name} na każdym poziomie mocy</h2>
+            <h2 className="h" id="gm-tiers">
+              {game.name} na każdym poziomie mocy
+            </h2>
             <p>Średnia liczba klatek. Kolor mówi, czy będzie płynnie (60 klatek i więcej).</p>
           </div>
           <TierTable rows={rows} />
