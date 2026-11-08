@@ -67,10 +67,10 @@ Adresy w linkach plansz (`*.dc.html`) zamień na adresy z tej tabeli.
 - **Baner cookies:** przy pierwszej wizycie, „Odrzuć” i „Akceptuję” tej samej wagi, link do ustawień; pokazujemy tylko, gdy w ustawieniach strony włączone są narzędzia wymagające zgody (§24).
 - **404:** scena Licha, „Licho tu było i stronę zabrało”, 2 przyciski i 4 linki.
 
-## 4. Strona główna `/` (G7 hero i taśma, G8 sekcje)
+## 4. Strona główna `/` (G7 hero, G8 sekcje)
 Kolejność sekcji (plansza Main, telefon: Telefon):
 1. **Hero** — „Komputery do gier. Sprawdzone w grach.”; scena wybranej istoty (domyślnie Wampir), ogromne imię krojem Cinzel z materiałem istoty, przydomek, zdjęcie komputera na podstawie, karta istoty po prawej (pieczęć, legenda „Z podań” ze źródłem, „Moc istoty”, procesor i karta, klatki w CS2 i Cyberpunku z etykietą źródła, cena, „Poznaj {istotę}”), przełącznik istot z tego samego poziomu, na dole 9 medalionów poziomów („od Skrzata do Peruna”). Autoprzełączanie 7 s tylko na komputerze (ADR-G003 §5). Na telefonie: imię → komputer → nagłówek i przyciski → medaliony (przewijane) → karta.
-2. **Taśma „Teraz w warsztacie w Rabce”** — etapy bieżących zamówień (tylko nazwa zestawu i kolor) z `GET /api/warsztat`; bez danych → stały tekst z procesu (G14 podłącza dane).
+2. ~~Taśma „Teraz w warsztacie w Rabce”~~ — **usunięta na stałe (ADR-G015, 08.11.2026): ma jej nigdy nie być**, także `GET /api/warsztat`.
 3. **Od czego zaczynasz?** — 3 drogi: Kupuję dla dziecka (→ `/dla-rodzicow`), Wiem, w co gram (→ `/dobor-pod-gre`), Znam się na częściach (→ `/konfigurator`). Telefon: karuzela.
 4. **Szesnaście istot. Każda gra po swojemu.** — 16 kart (scena, zdjęcie, pieczęć, imię, poziom, klatki, cena) w kolejności ceny; skala mocy; „Wszystkie zestawy z filtrami”. Telefon: przewijany rząd.
 5. **Jak kupić, skoro nie ma przycisku „Kup”** — 4 kroki z czasem (Wysyłasz zapytanie · Dostajesz ofertę · Płacisz, jak Ci wygodnie [przelew albo BLIK] · Składamy i wysyłamy) + „Wyślij zapytanie”.
@@ -140,7 +140,7 @@ Plansza Bon: podgląd bonu na żywo (kwota, wygląd jednej z 4 istot, dla kogo, 
 Plansza Metryka: „{Istota}, egzemplarz nr …”, kto złożył i przetestował, data, test obciążeniowy (czas, wynik), temperatury maks., klatki zmierzone (3 gry), części z producentem, modelem, SN i gwarancją, gwarancja PRO-KOM do daty, „Pobierz PDF”. Bez danych klienta. `/metryka` bez kodu: pole „Wpisz kod z naklejki”. Nieznany kod → 404. `noindex`.
 
 ## 14. Warsztat (G14)
-Taśma na głównej (§4 pkt 2) z `orders` (etap, nazwa zestawu, kolor). Pełna strona `/warsztat` — **poza zakresem 20.11** (brak planszy; ewentualnie w grudniu wg wzoru taśmy).
+Bez publicznej taśmy i bez strony `/warsztat` (ADR-G015): etapy zamówień widać tylko w panelu, w koncie klienta i w metryce.
 
 ## 15. Konto `/konto` (G14)
 Plansza Konto: „Cześć, {imię}”, **Moje komputery** (oś etapów zamówienia, metryka, faktura), **Gwarancje** (PRO-KOM + części), **Zgłoś problem** (egzemplarz, kategoria, opis, zgoda na pomoc zdalną), historia zgłoszeń, **Zapisane konfiguracje** (otwórz w konfiguratorze), dane i zgody, wyloguj. Logowanie: e-mail + hasło (Payload auth, weryfikacja e-maila, reset hasła). Pierwszy cel do cięcia (ADR-G005).

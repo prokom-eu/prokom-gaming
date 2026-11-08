@@ -80,22 +80,12 @@ export const MailSettings: GlobalConfig = {
     },
     // Section „Zamówienia i klienci” of the board Ustawienia (panel spec §13, decided in P5:
     // here, beside the other mail settings). Switched in the panel view.
+    // The strip of orders on the home page and its switch are gone for good (ADR-G015).
     {
-      type: 'row',
-      fields: [
-        {
-          name: 'stageEmail',
-          label: 'E-mail do klienta przy zmianie etapu',
-          type: 'checkbox',
-          defaultValue: true,
-        },
-        {
-          name: 'workshopStrip',
-          label: 'Pokazuj zamówienia na tablicy warsztatu',
-          type: 'checkbox',
-          defaultValue: true,
-        },
-      ],
+      name: 'stageEmail',
+      label: 'E-mail do klienta przy zmianie etapu',
+      type: 'checkbox',
+      defaultValue: true,
     },
   ],
 }

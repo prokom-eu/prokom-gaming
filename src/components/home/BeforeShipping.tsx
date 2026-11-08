@@ -77,7 +77,7 @@ export function BeforeShipping({
   inWorkshop = 0,
 }: {
   metric: MetricSample | null
-  /** Paid orders not shipped yet (`loadWorkshop()`); 0 = the line is hidden. */
+  /** Paid orders not shipped yet (`loadInWorkshopCount()`); 0 = the line is hidden. */
   inWorkshop?: number
 }) {
   return (

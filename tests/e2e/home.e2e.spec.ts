@@ -2,7 +2,7 @@ import { expect, test, type Page } from '@playwright/test'
 import { expectNoHiddenOffer, panelInternalModels } from './helpers/hiddenOffer'
 
 /**
- * Home hero and workshop strip (G7, spec. §4 pt 1–2, ADR-G003 §5): Wampir first, medallions and
+ * Home hero (G7, spec. §4 pt 1, ADR-G003 §5): Wampir first, medallions and
  * the tier switcher, the automatic switch only on desktop and never with reduced motion, and no
  * cost or internal model in the page (ADR-G002 §8.7).
  */
@@ -33,7 +33,8 @@ test('starts with Wampir: name, card, price and FPS with their source', async ({
     'href',
     '/zestawy/wampir',
   )
-  await expect(page.getByRole('heading', { name: 'Teraz w warsztacie w Rabce' })).toBeVisible()
+  // ADR-G015: the strip of orders under the hero is gone for good.
+  await expect(page.getByText('Teraz w warsztacie')).toHaveCount(0)
 })
 
 test('a medallion picks the lead creature of its tier, the switcher its sibling', async ({

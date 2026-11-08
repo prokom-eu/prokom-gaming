@@ -37,13 +37,6 @@ export function OrderSwitches({ initial }: { initial: Record<SwitchName, boolean
         checked={values.stageEmail}
         onChange={(e) => flip('stageEmail', e.currentTarget.checked)}
       />
-      <Toggle
-        id="pn-workshop-strip"
-        label="Pokazuj zamówienia na tablicy warsztatu"
-        hint="na stronie tylko nazwa zestawu i etap, bez danych klienta"
-        checked={values.workshopStrip}
-        onChange={(e) => flip('workshopStrip', e.currentTarget.checked)}
-      />
       <p className="pn-formstatus" role="status" aria-live="polite">
         {message ?? ''}
       </p>

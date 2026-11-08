@@ -4,7 +4,6 @@ import type { Payload } from 'payload'
 
 import {
   BOARD_STAGES,
-  boardStripText,
   CHECKLIST_ITEMS,
   isOrderStage,
   nextStage,
@@ -29,7 +28,6 @@ export type BoardCard = {
   inStage: string | null
   note: string | null
   build: { name: string; slug: string; key: string } | null
-  strip: string | null
   next: { stage: OrderStage; label: string; mails: boolean } | null
   checklist: { key: string; label: string; done: boolean }[]
   unitCode: string | null
@@ -143,7 +141,6 @@ export async function loadBoard(
         inStage: inStageLabel(o.stageChangedAt ?? null, now),
         note: o.workshopNote?.trim() || null,
         build: b,
-        strip: boardStripText(b?.name ?? null, o.stage),
         next: next
           ? { stage: next, label: stageLabel(next), mails: STAGE_MAIL_STAGES.includes(next) }
           : null,

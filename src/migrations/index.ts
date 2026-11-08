@@ -24,6 +24,7 @@ import * as migration_20261101_210949_bez_zakopanego from './20261101_210949_bez
 import * as migration_20261102_200229_p8_weekly_report from './20261102_200229_p8_weekly_report'
 import * as migration_20261104_211926_r2_highlight from './20261104_211926_r2_highlight'
 import * as migration_20261105_225049_media_case_box from './20261105_225049_media_case_box'
+import * as migration_20261108_174724_usun_pasek_warsztatu from './20261108_174724_usun_pasek_warsztatu'
 
 export const migrations = [
   {
@@ -155,5 +156,10 @@ export const migrations = [
     up: migration_20261105_225049_media_case_box.up,
     down: migration_20261105_225049_media_case_box.down,
     name: '20261105_225049_media_case_box',
+  },
+  {
+    up: migration_20261108_174724_usun_pasek_warsztatu.up,
+    down: migration_20261108_174724_usun_pasek_warsztatu.down,
+    name: '20261108_174724_usun_pasek_warsztatu',
   },
 ]

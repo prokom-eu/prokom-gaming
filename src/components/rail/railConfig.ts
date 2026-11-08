@@ -28,7 +28,7 @@ export type RailIcon = keyof typeof RAIL_ICONS
 export type RailSection = { id: string; label: string; icon: RailIcon }
 export type HomeSection = RailSection & { roman: string }
 
-/** Home sections I–XI, in page order (NAWIGACJA §4.2). „Teraz w warsztacie” is not in the rail. */
+/** Home sections I–XI, in page order (NAWIGACJA §4.2). */
 export const HOME_SECTIONS: readonly HomeSection[] = [
   { id: 'start', label: 'Start', roman: 'I', icon: 'start' },
   { id: 'od-czego-zaczynasz', label: 'Od czego zaczynasz', roman: 'II', icon: 'sciezki' },

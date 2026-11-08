@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest'
 
 import {
   BOARD_STAGES,
-  boardStripText,
   CHECKLIST_ITEMS,
   nextStage,
   stageLabel,
@@ -13,8 +12,6 @@ import {
   type OrderStage,
   timeline,
   TIMELINE_STEPS,
-  WORKSHOP_LIMIT,
-  workshopItems,
 } from './orders'
 
 describe('formatOrderNumber', () => {
@@ -94,55 +91,6 @@ describe('timeline', () => {
   })
 })
 
-describe('workshopItems', () => {
-  const now = new Date('2026-11-20T12:00:00Z')
-  const wampir = { name: 'Wampir', slug: 'wampir', key: 'wampir' }
-  const daysAgo = (d: number) => new Date(now.getTime() - d * 86_400_000).toISOString()
-
-  it('shows build name, creature and stage text only', () => {
-    const items = workshopItems([{ stage: 'test', stageChangedAt: daysAgo(0), build: wampir }], now)
-    expect(items).toEqual([
-      { name: 'Wampir', slug: 'wampir', key: 'wampir', stage: 'test', text: 'test obciążeniowy' },
-    ])
-  })
-
-  it('skips accepted offers (not paid yet) and delivered orders', () => {
-    const items = workshopItems(
-      [
-        { stage: 'offer', stageChangedAt: daysAgo(0), build: wampir },
-        { stage: 'delivered', stageChangedAt: daysAgo(0), build: wampir },
-      ],
-      now,
-    )
-    expect(items).toEqual([])
-  })
-
-  it('keeps a shipped order for 3 days only', () => {
-    const items = workshopItems(
-      [
-        { stage: 'shipped', stageChangedAt: daysAgo(1), build: wampir },
-        { stage: 'shipped', stageChangedAt: daysAgo(4), build: wampir },
-        { stage: 'shipped', stageChangedAt: null, build: wampir },
-      ],
-      now,
-    )
-    expect(items).toHaveLength(1)
-  })
-
-  it('skips orders without a build (custom configurations have no creature)', () => {
-    expect(workshopItems([{ stage: 'test', stageChangedAt: null, build: null }], now)).toEqual([])
-  })
-
-  it('caps the strip', () => {
-    const many = Array.from({ length: 30 }, () => ({
-      stage: 'assembly' as const,
-      stageChangedAt: null,
-      build: wampir,
-    }))
-    expect(workshopItems(many, now)).toHaveLength(WORKSHOP_LIMIT)
-  })
-})
-
 describe('checklist', () => {
   it('has the 8 items of the board with unique keys', () => {
     expect(CHECKLIST_ITEMS).toHaveLength(8)
@@ -170,9 +118,7 @@ describe('board stages', () => {
     expect(nextStage('delivered')).toBeNull()
   })
 
-  it('says what the home page strip shows', () => {
-    expect(boardStripText('Skrzat', 'test')).toBe('Skrzat: Testy')
-    expect(boardStripText(null, 'test')).toBeNull()
+  it('labels a stage for the panel', () => {
     expect(stageLabel('metric_ready')).toBe('Metryka')
   })
 })

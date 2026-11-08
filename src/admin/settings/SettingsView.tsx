@@ -221,7 +221,6 @@ export async function SettingsView({ initPageResult }: AdminViewServerProps) {
           <OrderSwitches
             initial={{
               stageEmail: mail.stageEmail ?? true,
-              workshopStrip: mail.workshopStrip ?? true,
             }}
           />
         </Card>
