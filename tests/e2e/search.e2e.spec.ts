@@ -12,8 +12,20 @@ const field = (page: Page) => dialog(page).getByRole('combobox')
 
 async function home(page: Page) {
   await page.goto('/')
-  // Hydrated: the hero reacts only after React attached its handlers.
   await expect(page.locator('.hero')).toHaveAttribute('data-material', 'krew')
+}
+
+/**
+ * Press the shortcut until the dialog shows. The page is server-rendered, so nothing visible
+ * tells when React has attached the key listener; a press before that is lost (opening twice
+ * is harmless: `openSearch` only sets the state).
+ */
+async function openWith(page: Page, key: string) {
+  await expect(async () => {
+    // Press again only while nothing opened: a second „/” would be typed into the open field.
+    if (!(await dialog(page).isVisible())) await page.keyboard.press(key)
+    await expect(dialog(page)).toBeVisible({ timeout: 4_000 })
+  }).toPass({ timeout: 20_000 })
 }
 
 test.describe('desktop', () => {
@@ -21,7 +33,7 @@ test.describe('desktop', () => {
 
   test('Ctrl K → „fortn” → Enter opens the game page', async ({ page }) => {
     await home(page)
-    await page.keyboard.press('Control+k')
+    await openWith(page, 'Control+k')
     await expect(dialog(page)).toBeVisible()
     await expect(field(page)).toBeFocused()
     await field(page).fill('fortn')
@@ -35,7 +47,7 @@ test.describe('desktop', () => {
 
   test('Shift+Enter on a game opens „Dobór pod grę” with it', async ({ page }) => {
     await home(page)
-    await page.keyboard.press('Control+k')
+    await openWith(page, 'Control+k')
     await field(page).fill('cs2')
     await expect(dialog(page).getByRole('option').first()).toContainText('Counter-Strike 2')
     await page.keyboard.press('Shift+Enter')
@@ -44,7 +56,7 @@ test.describe('desktop', () => {
 
   test('nothing found → „Zapytaj” leads to the inquiry', async ({ page }) => {
     await home(page)
-    await page.keyboard.press('Control+k')
+    await openWith(page, 'Control+k')
     await field(page).fill('xyz')
     await expect(dialog(page).getByRole('option')).toHaveText([/Nie mamy tego w bazie/])
     await page.keyboard.press('Enter')
@@ -53,7 +65,7 @@ test.describe('desktop', () => {
 
   test('arrows move the selection; „/” opens outside fields only', async ({ page }) => {
     await home(page)
-    await page.keyboard.press('/')
+    await openWith(page, '/')
     await expect(dialog(page)).toBeVisible()
     // „Popularne” without a query: the first option is selected, ↓ moves to the next.
     const options = dialog(page).getByRole('option')
@@ -106,7 +118,7 @@ test.describe('desktop', () => {
 
   test('the open dialog passes axe', async ({ page }) => {
     await home(page)
-    await page.keyboard.press('Control+k')
+    await openWith(page, 'Control+k')
     await field(page).fill('wampir')
     await expect(dialog(page).getByRole('option').first()).toContainText('Wampir')
     const { violations } = await new AxeBuilder({ page })
@@ -139,5 +151,19 @@ test.describe('phone', () => {
     await page.getByRole('button', { name: 'Menu' }).last().click()
     await page.getByRole('button', { name: /Szukaj istoty, gry albo strony/ }).click()
     await expect(dialog(page)).toBeVisible()
+  })
+
+  test('closed after opening from the menu, the focus returns to the Menu button', async ({
+    page,
+  }) => {
+    await home(page)
+    const menuButton = page.getByRole('button', { name: 'Menu' }).last()
+    await menuButton.focus()
+    await page.keyboard.press('Enter')
+    await page.getByRole('button', { name: /Szukaj istoty, gry albo strony/ }).click()
+    await expect(dialog(page)).toBeVisible()
+    await page.keyboard.press('Escape')
+    await expect(dialog(page)).toHaveCount(0)
+    await expect(menuButton).toBeFocused()
   })
 })

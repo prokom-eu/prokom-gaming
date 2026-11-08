@@ -213,8 +213,12 @@ test.describe('phone', () => {
   test('header hides on scroll down and returns on scroll up', async ({ page }) => {
     await page.goto(MISSING)
     const header = page.locator('header.nav')
-    await page.mouse.wheel(0, 600)
-    await expect(header).toHaveAttribute('data-hidden', 'true')
+    // Scroll until it hides: a wheel before React attached the scroll listener is lost (flaky in
+    // CI on the phone project).
+    await expect(async () => {
+      await page.mouse.wheel(0, 600)
+      await expect(header).toHaveAttribute('data-hidden', 'true', { timeout: 1_000 })
+    }).toPass({ timeout: 20_000 })
     await expect(header).not.toBeInViewport()
     await page.mouse.wheel(0, -200)
     await expect(header).toHaveAttribute('data-hidden', 'false')
