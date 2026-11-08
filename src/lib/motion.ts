@@ -1,9 +1,8 @@
-import { useSyncExternalStore } from 'react'
-
 /**
  * Motion in one place (runda v3 PREMIUM §2.1, ADR-G014): the media queries every moving part
  * asks, and the cascade rule. CSS keeps its own `prefers-reduced-motion` blocks (globals.css
  * lands every animation on its end state); JavaScript asks here, never `matchMedia` by hand.
+ * Pure and safe on the server; the React hooks live in `useMotion.ts`.
  */
 export const REDUCED_MOTION = '(prefers-reduced-motion: reduce)'
 /** Autoswitch and mouse parallax only on a desktop width (ADR-G003 §5). */
@@ -27,25 +26,4 @@ export function prefersReducedMotion(): boolean {
 /** Position of an item in a cascade (0…STAGGER_MAX - 1): later items share the last slot. */
 export function staggerIndex(position: number): number {
   return Math.min(Math.max(0, Math.floor(position)), STAGGER_MAX - 1)
-}
-
-/**
- * A media query as React state: re-renders when it changes. The server (and the first client
- * render, so hydration matches) gets `serverValue`.
- */
-export function useMediaQuery(query: string, serverValue = false): boolean {
-  return useSyncExternalStore(
-    (onChange) => {
-      const list = window.matchMedia(query)
-      list.addEventListener('change', onChange)
-      return () => list.removeEventListener('change', onChange)
-    },
-    () => window.matchMedia(query).matches,
-    () => serverValue,
-  )
-}
-
-/** `prefers-reduced-motion: reduce` as React state. */
-export function useReducedMotion(): boolean {
-  return useMediaQuery(REDUCED_MOTION)
 }

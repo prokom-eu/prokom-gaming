@@ -29,7 +29,7 @@ export function BuildHero({ data }: { data: BuildPageData }) {
       style={{ '--fs': build.nameSize } as CSSProperties}
       aria-labelledby="bp-name"
     >
-      <Scene id={build.key} eager />
+      <Scene id={build.key} eager layers />
       <div className="bp-hero__horizon" aria-hidden="true" />
       <div className="bp-hero__fade" aria-hidden="true" />
       <Fireflies />

@@ -154,6 +154,11 @@ a {
     opacity: 0;
   }
 }
+@keyframes intro-zoom {
+  from {
+    scale: 1.04;
+  }
+}
 @keyframes intro-scene {
   from {
     transform: scale(1.04);
@@ -443,6 +448,51 @@ a {
 .scene img {
   object-fit: cover;
   object-position: 50% 100%;
+}
+/* Parallax planes of a hero scene (components/SceneLayers, runda v3 PREMIUM §2.4). The near
+   plane exists only on a desktop width; it moves 4 px more than the back with the mouse (the
+   hero sets --mx/--my) and, while the hero scrolls away, the back sinks slower than the page —
+   depth from scrolling, where the browser supports scroll-driven animations. */
+.scene-plane {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+.scene-plane--near {
+  display: none;
+}
+@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+  .scene-plane--near {
+    display: block;
+    transform: translate(calc(var(--mx, 0) * -4px), calc(var(--my, 0) * -2px));
+    transition: transform var(--dur-4) var(--ease-enter);
+  }
+  @supports (animation-timeline: view()) {
+    .scene-plane img {
+      animation: plane-drift linear both;
+      animation-timeline: view();
+      animation-range: exit 0% exit 100%;
+    }
+    .scene-plane--near img {
+      animation-name: plane-drift-near;
+    }
+  }
+}
+/* With reduced motion the planes still stand together — the near one shown, never moving. */
+@media (min-width: 1024px) and (prefers-reduced-motion: reduce) {
+  .scene-plane--near {
+    display: block;
+  }
+}
+@keyframes plane-drift {
+  to {
+    translate: 0 60px;
+  }
+}
+@keyframes plane-drift-near {
+  to {
+    translate: 0 24px;
+  }
 }
 .scene__fg {
   position: absolute;

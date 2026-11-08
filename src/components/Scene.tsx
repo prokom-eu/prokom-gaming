@@ -1,5 +1,7 @@
 import Image from 'next/image'
 
+import { SceneLayers } from './SceneLayers'
+
 type Props = {
   /** Creature key of the files in /public/scenes (e.g. `licho`, `baba`). */
   id: string
@@ -15,6 +17,8 @@ type Props = {
    * the panorama at max(300%, 4320px) wide, anchored bottom-centre, so only its middle shows.
    */
   fit?: 'hero' | 'wide'
+  /** Desktop parallax planes instead of one picture (`SceneLayers`, build page hero). */
+  layers?: boolean
 }
 
 /**
@@ -22,13 +26,21 @@ type Props = {
  * optional foreground 2880×2000, both `cover` anchored bottom-centre in the parent, which must
  * be `position: relative`. Decorative (empty `alt`): the page text says what the scene shows.
  */
-export function Scene({ id, eager = false, foreground = false, fit = 'hero' }: Props) {
+export function Scene({
+  id,
+  eager = false,
+  foreground = false,
+  fit = 'hero',
+  layers = false,
+}: Props) {
   const loading = eager ? 'eager' : 'lazy'
   const fetchPriority = eager ? 'high' : undefined
   const src = `/scenes/${id}-hero.webp`
   return (
     <div className={fit === 'wide' ? 'scene scene--wide' : 'scene'} aria-hidden="true">
-      {fit === 'wide' ? (
+      {layers ? (
+        <SceneLayers id={id} sizes="100vw" eager={eager} />
+      ) : fit === 'wide' ? (
         <Image
           src={src}
           alt=""

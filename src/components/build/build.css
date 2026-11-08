@@ -236,8 +236,9 @@
 .bp-hero--intro .bp-hero__dawn {
   animation: intro-dawn var(--dur-3) var(--ease-exit) both;
 }
-.bp-hero--intro .scene img {
-  animation: intro-scene 1.2s var(--ease-enter) both;
+/* `scale`, not `transform`: the scene keeps its mouse parallax, its planes their scroll drift. */
+.bp-hero--intro .scene {
+  animation: intro-zoom 1.2s var(--ease-enter) both;
 }
 .bp-hero--intro .bp-hero__horizon {
   animation:

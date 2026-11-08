@@ -15,6 +15,7 @@ import {
 import { CasePhoto } from '@/components/CasePhoto'
 import { Fireflies } from '@/components/Fireflies'
 import { Letters } from '@/components/motion/Letters'
+import { SceneLayers } from '@/components/SceneLayers'
 import { IconClock, IconRosette, IconShield, IconShop } from '@/components/icons'
 import { ButtonLink } from '@/components/ui/Button'
 import { HERO_DEFAULT, HERO_INTERVAL_MS, rotationOf, type HeroData } from '@/lib/home'
@@ -23,9 +24,8 @@ import {
   FINE_POINTER,
   matchesMedia as matches,
   REDUCED_MOTION as CALM,
-  useMediaQuery,
-  useReducedMotion,
 } from '@/lib/motion'
+import { useMediaQuery, useReducedMotion } from '@/lib/useMotion'
 
 import { HeroCard } from './HeroCard'
 import { Pedestal } from './Pedestal'
@@ -207,12 +207,10 @@ export function Hero({ data }: { data: HeroData }) {
             if (!b) return null
             return (
               <div key={slug} className="hero__scene" data-on={slug === active}>
-                <Image
-                  src={`/scenes/${b.key}-hero.webp`}
-                  alt=""
-                  fill
+                <SceneLayers
+                  id={b.key}
                   sizes="(max-width: 1023px) 450vw, 300vw"
-                  loading={slug === first ? 'eager' : 'lazy'}
+                  eager={slug === first}
                 />
               </div>
             )
