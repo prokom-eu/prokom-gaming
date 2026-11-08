@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { connection } from 'next/server'
 
+import { ExternalLink, RegisterLinks } from '@/components/ExternalLink'
 import { BreadcrumbJsonLd } from '@/components/BreadcrumbJsonLd'
 import { ContactForm } from '@/components/content/ContactForm'
 import { PageHeader } from '@/components/content/PageHeader'
@@ -11,7 +12,7 @@ import { ButtonLink } from '@/components/ui/Button'
 import { getEnv } from '@/lib/env'
 import { issueFormToken } from '@/lib/inquiry/spam'
 import { routes } from '@/lib/nav'
-import { company, registers } from '@/lib/site'
+import { company, shopDirections } from '@/lib/site'
 
 import '@/components/content/content.css'
 import '@/components/inquiry/inquiry.css'
@@ -22,9 +23,6 @@ export const metadata: Metadata = {
   alternates: { canonical: routes.contact },
 }
 
-const mapsHref = (query: string) =>
-  `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`
-
 // One shop (01.11.2026). Address from the company data (`lib/site.ts`), not a literal.
 const STORES = [
   {
@@ -33,11 +31,9 @@ const STORES = [
     address: company.address,
     pin: `PRO-KOM, ${company.postal.street.replace(/^ul\. /, '')}`,
     text: 'Tu składamy i testujemy komputery. Zobaczysz egzemplarz na żywo i odbierzesz zamówienie.',
-    maps: mapsHref(`${company.name}, ${company.address}`),
+    maps: shopDirections,
   },
 ] as const
-
-const external = { target: '_blank', rel: 'noopener noreferrer' } as const
 
 // Board-only questions of the contact page (not the `faq` collection: they do not appear on
 // `/pytania` in this wording).
@@ -138,7 +134,7 @@ export default async function ContactPage() {
                   target="_blank"
                   rel="noopener noreferrer"
                   // Visible text of the map first (WCAG 2.5.3 Label in Name).
-                  aria-label={`${store.pin}: otwórz mapę, ${store.address}`}
+                  aria-label={`${store.pin}: trasa do sklepu, ${store.address} (otwiera się w nowej karcie)`}
                 >
                   <StoreMap id={`ct-map-${store.key}`} label={store.pin} />
                 </a>
@@ -148,14 +144,9 @@ export default async function ContactPage() {
                   <p>{store.text}</p>
                   {/* TODO(krystian): opening hours of the shop [SZEF] — the line with the
                       clock comes back when they are known (no placeholders, spec. §27.7). */}
-                  <a
-                    className="lnk ct-gold ct-store__go"
-                    href={store.maps}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  <ExternalLink href={store.maps} className="lnk ct-gold ct-store__go">
                     Prowadź do sklepu
-                  </a>
+                  </ExternalLink>
                 </div>
               </article>
             ))}
@@ -237,13 +228,7 @@ export default async function ContactPage() {
             </div>
           </dl>
           <p className="ct-firm__links">
-            <a className="lnk ct-gold" href={registers.ceidg} {...external}>
-              Sprawdź w CEIDG<span className="sr-only"> (otwiera się w nowej karcie)</span>
-            </a>
-            <a className="lnk ct-gold" href={registers.vatList} {...external}>
-              Sprawdź na białej liście VAT
-              <span className="sr-only"> (otwiera się w nowej karcie)</span>
-            </a>
+            <RegisterLinks className="lnk ct-gold" />
           </p>
         </div>
       </section>

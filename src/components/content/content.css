@@ -322,8 +322,8 @@
   padding: 28px;
   border: 1px solid var(--ct-channel-line);
   background: var(--ct-channel-bg);
-  backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
 }
 .ct-channel--hl {
   border-color: var(--ct-channel-hl-line);
@@ -680,8 +680,8 @@
   list-style: none;
   border: 1px solid var(--ct-band-line);
   background: var(--ct-band-bg);
-  backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
 }
 .ct-numbers li {
   padding: 28px 30px;

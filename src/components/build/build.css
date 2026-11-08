@@ -244,8 +244,8 @@
   border-top: 1px solid color-mix(in srgb, var(--c) 40%, var(--line));
   border-bottom: 1px solid var(--line);
   background: var(--zmb-bg);
-  backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
 }
 .bp-bar__in {
   display: flex;

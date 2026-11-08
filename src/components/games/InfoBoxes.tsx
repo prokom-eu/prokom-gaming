@@ -1,3 +1,4 @@
+import { ExternalLink } from '@/components/ExternalLink'
 import { dateText } from '@/lib/home'
 import type { GameRequirements } from '@/lib/games'
 
@@ -23,9 +24,9 @@ export function RequirementsBox({
       {requirements.source && requirements.checkedAt && (
         <p className="gm-box__muted">
           Ze strony gry,{' '}
-          <a className="lnk" href={requirements.source} rel="noopener noreferrer" target="_blank">
+          <ExternalLink className="lnk" href={requirements.source}>
             źródło
-          </a>
+          </ExternalLink>
           , stan na {dateText(requirements.checkedAt)}.
         </p>
       )}

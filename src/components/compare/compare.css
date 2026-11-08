@@ -30,8 +30,8 @@
   transition: top 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
   z-index: 40;
   background: var(--cmp-bar-bg);
-  backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
   border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
 }
