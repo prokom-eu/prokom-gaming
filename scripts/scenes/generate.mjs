@@ -1,6 +1,9 @@
 // Creature scenes drawn in code (R4, runda v2 §3.2): for every creature a hero panorama
 // (2880×1067), a card scene (1680×960, pedestal at x 1124) and a transparent foreground
 // (drawn 2880×2000, saved 2160×1500), as WebP in public/scenes/. Same id = same picture (seeded).
+// The hero panorama also comes in two planes for the desktop parallax (runda v3 PREMIUM §2.4):
+// `-back` (sky, far hills, ground, middle; opaque) and `-near` (mist, near silhouettes, the
+// scene's particles, fade and vignette; transparent). Back + near = the flat `-hero` picture.
 //
 //   pnpm generate:scenes                        all 16
 //   pnpm generate:scenes skrzat zmij            only these
@@ -174,9 +177,12 @@ function finish(ctx) {
   ctx.add('fx', `<rect width="${W}" height="${H}" fill="url(#${v})"/>`)
 }
 
-function svgOf(L, layers, defs) {
-  // Back to front; the ground goes right after the far fog, under everything that stands on it.
-  const seq = ['sky', 'far', 'farFog', 'ground', 'back', 'mid', 'fog', 'near', 'fx']
+// Back to front; the ground goes right after the far fog, under everything that stands on it.
+const ORDER = ['sky', 'far', 'farFog', 'ground', 'back', 'mid', 'fog', 'near', 'fx']
+/** The two parallax planes of the hero: where `ORDER` is cut. */
+const PLANES = { back: ORDER.slice(0, 6), near: ORDER.slice(6) }
+
+function svgOf(L, layers, defs, seq = ORDER) {
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${L.W}" height="${L.H}" viewBox="0 0 ${L.W} ${L.H}"><defs>${defs.join('')}</defs>${seq.map((k) => layers[k].join('')).join('')}</svg>`
 }
 
@@ -204,13 +210,24 @@ async function render(key, accent, kind) {
   scene.draw(ctx)
   finish(ctx)
   const svg = svgOf(L, layers, defs)
-  const extras = [{ input: await grain(L.W, L.H, key + kind, 10), blend: 'soft-light' }]
+  const grainLayer = await grain(L.W, L.H, key + kind, 10)
+  const extras = [{ input: grainLayer, blend: 'soft-light' }]
   if (kind === 'card')
     extras.push({ input: await pedestalFor(key), left: PEDESTAL_BOX.left, top: PEDESTAL_BOX.top })
   await sharp(Buffer.from(svg))
     .composite(extras)
     .webp({ quality: 82, effort: 6 })
     .toFile(path.join(OUT, `${key}-${kind}.webp`))
+  if (kind !== 'hero') return
+  // Parallax planes: the back keeps the grain (it holds the big dark gradients), the near plane
+  // is mostly empty — transparent, a little lower quality, never the LCP element.
+  await sharp(Buffer.from(svgOf(L, layers, defs, PLANES.back)))
+    .composite([{ input: grainLayer, blend: 'soft-light' }])
+    .webp({ quality: 82, effort: 6 })
+    .toFile(path.join(OUT, `${key}-back.webp`))
+  await sharp(Buffer.from(svgOf(L, layers, defs, PLANES.near)))
+    .webp({ quality: 72, alphaQuality: 70, effort: 6 })
+    .toFile(path.join(OUT, `${key}-near.webp`))
 }
 
 /** Foreground: dark silhouettes in the bottom corners and at the top edges, middle empty. */
@@ -251,5 +268,5 @@ for (const { id: key, color } of creatures) {
   await render(key, color, 'hero')
   await render(key, color, 'card')
   await renderFg(key, color)
-  console.log(`scene ${key}: hero, card, fg`)
+  console.log(`scene ${key}: hero (+ back, near), card, fg`)
 }
