@@ -345,8 +345,8 @@
     gap: 10px;
     padding: 10px 0 10px 16px;
     background: var(--zmb-bg);
-    backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
     border-bottom: 1px solid var(--line);
   }
   /* The phone header comes back on scroll up (fixed, over the page): stay under it, then slide

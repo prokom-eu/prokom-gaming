@@ -113,6 +113,8 @@
   aspect-ratio: 600 / 640;
   margin: 0 0 6px;
   overflow: hidden;
+  /* The case below is sized from this box (cqh, cqw). */
+  container-type: size;
 }
 .gm-pick__scene {
   position: absolute;
@@ -133,18 +135,15 @@
     linear-gradient(180deg, color-mix(in srgb, var(--card-fade) 60%, transparent), transparent 24%);
 }
 .gm-pick__photo {
+  /* Standing on the middle of the pedestal (the same in all 16 card scenes, moved to the middle
+     above): top face at ~26.5% of the scene height, which is as tall as this box. The case
+     itself (not the file with its margin) gets ~62% of the height, never wider than the card
+     (CasePhoto, as on the creature cards — runda v2 §3.3). */
+  --case-base: calc(100cqh * 0.265);
+  --case-h-max: calc(100cqh * 0.62);
+  --case-w-max: 82cqw;
   position: absolute;
-  left: 0;
-  right: 0;
-  /* Standing on the pedestal: its top edge is at ~74% of the scene height. */
-  bottom: 25.5%;
-  height: 58%;
-}
-.gm-pick__photo img {
-  display: block;
-  width: auto;
-  height: 100%;
-  margin: 0 auto;
+  inset: 0;
 }
 .gm-pick strong {
   font-size: 30px;

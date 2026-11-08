@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 
+import { CasePhoto } from '@/components/CasePhoto'
 import { SourceLabel } from '@/components/SourceLabel'
 import type { FpsKind } from '@/lib/fps'
 import type { PickCard as PickCardData, PickTag } from '@/lib/games'
@@ -44,13 +45,8 @@ export function PickCard({
         <span className="gm-pick__fade" />
         {card.photo && (
           <span className="gm-pick__photo">
-            <Image
-              src={card.photo.src}
-              alt=""
-              width={300}
-              height={341}
-              loading={eager ? 'eager' : 'lazy'}
-            />
+            {/* The file is drawn ~260 px wide at 1440: a short 1x/2x srcset (as the cards). */}
+            <CasePhoto photo={card.photo} drawnWidth={260} eager={eager} />
           </span>
         )}
       </span>
