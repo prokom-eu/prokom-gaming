@@ -3,9 +3,18 @@
    only from tokens.css (ADR-G003 §2). */
 
 /* ---------- hero: frame ---------- */
+/* The creature's colour as a registered property: on a switch the whole scene's light (halo,
+   horizon, name glow, pedestal) glides to the new colour instead of jumping (runda v3 §2.3). */
+@property --hero-c {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
+}
 .hero {
   --mx: 0;
   --my: 0;
+  --c: var(--hero-c);
+  transition: --hero-c var(--dur-4) ease;
   position: relative;
   overflow: hidden;
   isolation: isolate;
@@ -227,7 +236,17 @@
   -webkit-background-clip: text;
   background-clip: text;
 }
-/* A switch to another creature (Hero `is-new`): the name comes up letter by letter. */
+/* A switch to another creature: the old name rises and fades (Hero `is-gone`), the new one comes
+   up letter by letter (`is-new`). */
+.hero__title.is-gone {
+  animation: hero-gone var(--dur-3) var(--ease-exit) forwards;
+}
+@keyframes hero-gone {
+  to {
+    opacity: 0;
+    transform: translateY(calc(-24px * var(--motion-scale)));
+  }
+}
 .hero__title.is-new > :not(.hero__name) {
   animation: hero-in var(--dur-4) var(--ease-enter) both;
 }
@@ -353,6 +372,14 @@
   transition:
     opacity 0.9s ease,
     visibility 0s;
+}
+/* The computer that leaves sinks down while it fades; the new one rises (hero-photo-in). */
+.hero__photo[data-on='false'] {
+  transform: translateY(calc(32px * var(--motion-scale)));
+  transition:
+    opacity var(--dur-3) var(--ease-exit),
+    transform var(--dur-3) var(--ease-exit),
+    visibility 0s linear var(--dur-3);
 }
 .hero__photo[data-new='true'] {
   animation: hero-photo-in var(--dur-4) var(--ease-enter);
@@ -775,6 +802,7 @@
   opacity: 1;
 }
 .hero-tiers__medal {
+  position: relative;
   display: block;
   border-radius: 50%;
   background: var(--scene-fade);
@@ -787,6 +815,51 @@
   display: block;
   width: calc(var(--u) * 54) !important;
   height: calc(var(--u) * 54) !important;
+}
+.hero-tiers__ring {
+  position: absolute;
+  inset: calc(var(--u) * -6);
+  width: calc(100% + var(--u) * 12);
+  height: calc(100% + var(--u) * 12);
+  rotate: -90deg;
+  overflow: visible;
+  pointer-events: none;
+}
+.hero-tiers__ring circle {
+  fill: none;
+  stroke: var(--tc);
+  stroke-dasharray: 100;
+}
+.hero-tiers__ring-base {
+  stroke-width: 1;
+  opacity: 0.45;
+}
+/* The run of the autoswitch: hidden unless the hero rotates, frozen while it is paused. */
+.hero-tiers__ring-run {
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-dashoffset: 100;
+  opacity: 0;
+}
+.hero[data-rotating='true'] .hero-tiers__ring-run {
+  opacity: 1;
+  animation: ring-run var(--hero-interval) linear both;
+}
+.hero[data-paused='true'] .hero-tiers__ring-run {
+  animation-play-state: paused;
+}
+.hero--intro .hero-tiers__ring-base {
+  animation: ring-draw var(--dur-4) var(--ease-enter) 300ms both;
+}
+@keyframes ring-run {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes ring-draw {
+  from {
+    stroke-dashoffset: 100;
+  }
 }
 .hero-tiers__item[aria-pressed='true'] .hero-tiers__medal {
   transform: scale(1.12);
@@ -1167,6 +1240,7 @@
   .workshop__live {
     animation: none;
   }
+  .hero,
   .hero *,
   .hero *::before,
   .hero *::after {
