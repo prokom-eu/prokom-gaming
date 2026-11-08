@@ -10,7 +10,8 @@ import localFont from 'next/font/local'
 // Each sets a CSS variable read by `--font-*` in globals.css (tokens.css keeps the plain names).
 // Preload only Manrope (body and UI text) and the ~1 KB logo font: preloading every font meant
 // ~410 KB ahead of everything else and LCP 5.0 s (Lighthouse, G2). The others load when used and
-// swap in (`display: swap`, fallback metrics adjusted by next/font — no layout shift).
+// swap in (`display: swap`, fallback metrics adjusted by next/font — no layout shift). Cinzel is the
+// exception: its fallback face lives in `src/styles/font-fallbacks.css` (see below).
 
 export const cinzel = localFont({
   // Names 700, one label 400.
@@ -19,7 +20,11 @@ export const cinzel = localFont({
   style: 'normal',
   display: 'swap',
   preload: false,
-  adjustFontFallback: 'Times New Roman',
+  // Own fallback face (`src/styles/font-fallbacks.css`): next/font sizes it from the average width of lower-case
+  // letters (137%), but Cinzel's lower case is small caps and the names are set in capitals —
+  // the Times New Roman name came out ~26% wider and jumped when Cinzel arrived (CLS, session F).
+  adjustFontFallback: false,
+  fallback: ['Cinzel Caps Fallback', 'Georgia', 'serif'],
   variable: '--font-cinzel',
 })
 

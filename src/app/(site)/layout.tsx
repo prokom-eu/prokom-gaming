@@ -22,6 +22,7 @@ import { company, cookieBannerEnabled, menuCreatures } from '@/lib/site'
 
 import { fontVariables } from './fonts'
 import './globals.css'
+import '../../styles/font-fallbacks.css'
 
 /**
  * Defaults of every page (spec. §23). Per request, not at build time: one image serves staging and
