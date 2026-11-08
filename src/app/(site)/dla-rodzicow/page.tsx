@@ -1,12 +1,32 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
+import { connection } from 'next/server'
+import { Suspense } from 'react'
 
 import { BreadcrumbJsonLd } from '@/components/BreadcrumbJsonLd'
-import { IconPhone } from '@/components/icons'
+import {
+  IconBook,
+  IconDoc,
+  IconGamepad,
+  IconMail,
+  IconPhone,
+  IconQr,
+  IconShield,
+  IconShop,
+  IconTruck,
+} from '@/components/icons'
+import { JsonLd } from '@/components/JsonLd'
 import { ButtonLink } from '@/components/ui/Button'
-import { routes } from '@/lib/nav'
+import { dateText, EMPTY_HERO, type HeroData } from '@/lib/home'
+import { errorFields, log } from '@/lib/logger'
+import { buildHref, routes } from '@/lib/nav'
+import { loadPublicOffer } from '@/lib/offer.server'
+import { budgetBands } from '@/lib/parents'
+import { zl } from '@/lib/pricing/format'
 import { company, registers } from '@/lib/site'
 
 import '@/components/content/content.css'
+import '@/components/parents/parents.css'
 
 export const metadata: Metadata = {
   title: 'Komputer dla dziecka',
@@ -15,51 +35,65 @@ export const metadata: Metadata = {
   alternates: { canonical: routes.parents },
 }
 
+/** „Opisz, w co gra dziecko”: the inquiry opens on „Pomóżcie mi dobrać”, for a child. */
+const ASK = `${routes.inquiry}?tryb=dobor&dla=dziecko`
+
+/** Directions in the visitor's own maps app: a plain link, no map script or cookies. */
+const DIRECTIONS = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
+  `${company.name}, ${company.address}`,
+)}`
+
+const external = { target: '_blank', rel: 'noopener noreferrer' } as const
+
 const STEPS = [
   {
-    title: 'Napisz, w co gra',
+    icon: IconGamepad,
+    title: 'Piszesz, w co gra dziecko',
     text: 'Wystarczy nazwa gry, np. Fortnite albo Minecraft, i rodzaj monitora. Nie musisz znać się na częściach.',
   },
   {
+    icon: IconMail,
     title: 'Dostajesz ofertę',
-    text: 'W godzinę odpisujemy z imienną listą części, ceną i terminem. Możesz ją pokazać komuś, kto się zna.',
+    text: 'Imienna lista części, cena i termin, zwykle w ciągu godziny. Oferta jest ważna 48 godzin, możesz ją spokojnie pokazać komuś, kto się zna.',
   },
   {
+    icon: IconDoc,
     title: 'Płacisz, gdy jesteś pewien',
     text: 'Faktura pro forma, potem przelew albo BLIK. Bez pobrań i bez zaliczek w ciemno.',
   },
   {
-    title: 'Komputer przyjeżdża gotowy',
-    text: 'Z Windowsem, sterownikami i metryką. Wystarczy podłączyć monitor i grać. Albo odbierz w sklepie.',
+    icon: IconTruck,
+    title: 'Odbierasz albo czekasz na kuriera',
+    text: 'Komputer przyjeżdża gotowy: z Windowsem, sterownikami i metryką. Albo odbierz go w sklepie w Rabce-Zdroju.',
   },
 ] as const
 
-// The cheat sheet of the board. Colour = the first creature named (creature tokens).
-const GAMES = [
-  {
-    games: 'Minecraft, Roblox',
-    pick: 'Skrzat albo Licho',
-    note: 'Płynnie na każdym monitorze FullHD.',
-    color: 'var(--c-skrzat)',
-  },
-  {
-    games: 'Fortnite, EA Sports FC',
-    pick: 'Licho albo Bies',
-    note: 'Wysokie ustawienia, monitor FullHD.',
-    color: 'var(--c-licho)',
-  },
-  {
-    games: 'GTA V, Wiedźmin 3',
-    pick: 'Strzyga albo Kikimora',
-    note: 'Duże, piękne światy w FullHD i 2K.',
-    color: 'var(--c-strzyga)',
-  },
-  {
-    games: 'Najnowsze gry AAA',
-    pick: 'Baba Jaga albo Bazyliszek',
-    note: 'Zapas mocy na kilka lat.',
-    color: 'var(--c-baba-jaga)',
-  },
+/** Six words a parent meets in every offer, each in one sentence (runda v2 §5 pt 5). */
+const GLOSSARY = [
+  [
+    'Karta graficzna',
+    'Najważniejsza część do gier: to ona rysuje obraz. Od niej najbardziej zależy, czy gra chodzi płynnie.',
+  ],
+  [
+    'FullHD i 2K',
+    'Ostrość obrazu na monitorze. FullHD to najpopularniejsze monitory, 2K jest ostrzejsze i potrzebuje mocniejszego komputera.',
+  ],
+  [
+    'Klatki (FPS)',
+    'Ile razy na sekundę zmienia się obraz. Im więcej, tym płynniej; przy każdym zestawie pokazujemy je z testów, nie z obietnic.',
+  ],
+  [
+    'Pamięć RAM',
+    'Podręczna pamięć, z której korzystają gra i otwarte programy. Gdy jest jej za mało, gra zaczyna się zacinać.',
+  ],
+  [
+    'Dysk NVMe',
+    'Szybki dysk na gry i Windows. Dzięki niemu system i gra wczytują się w kilka sekund.',
+  ],
+  [
+    'Chłodzenie',
+    'Wentylatory albo chłodzenie wodne, które odbierają ciepło od części. Dobre chłodzenie to cichszy komputer.',
+  ],
 ] as const
 
 // Questions of the board (not the `faq` collection: the `parents` group there asks other things).
@@ -70,8 +104,8 @@ const QUESTIONS = [
     a: 'Tak. Windows 11 jest aktywowany, sterowniki zainstalowane, BIOS aktualny. Podłączasz monitor, klawiaturę i myszkę.',
   },
   {
-    q: 'Co, jeśli coś się zepsuje?',
-    a: 'Najpierw pomagamy zdalnie. Jeśli trzeba, kurier odbiera komputer od Ciebie na nasz koszt. Gwarancja PRO-KOM obejmuje cały komputer przez 2 lata.',
+    q: 'Czy ustawicie kontrolę rodzicielską?',
+    a: 'Tak, na życzenie ustawimy konto dziecka w Windows 11 z kontrolą rodzicielską: limity czasu, filtrowanie stron i zgoda na zakupy w grach.',
   },
   {
     q: 'Czy mogę zwrócić komputer?',
@@ -83,130 +117,212 @@ const QUESTIONS = [
   },
 ] as const
 
-/** „Dla rodziców” (spec. §16, boards Rodzice / Rodzice-telefon): a light page, no scene. */
+/**
+ * „Dla rodziców” (spec. §16, runda v2 §5): a light page in seven parts — hero, the four questions
+ * of a parent (prices from the published batch), proof the company is real, buying in four steps,
+ * a glossary, questions and the closing call. No scene, no gaming ornaments.
+ */
 export default function ParentsPage() {
   return (
     <>
       <BreadcrumbJsonLd crumbs={[{ name: 'Dla rodziców', path: routes.parents }]} />
+      <JsonLd
+        data={{
+          '@context': 'https://schema.org',
+          '@type': 'FAQPage',
+          mainEntity: QUESTIONS.map((item) => ({
+            '@type': 'Question',
+            name: item.q,
+            acceptedAnswer: { '@type': 'Answer', text: item.a },
+          })),
+        }}
+      />
+
       {/* Light top section: the header floats over it with dark text (globals.css). */}
-      <header className="ct-par-hero" data-scene-top data-nav-light>
-        <div className="wrap ct-par-hero__grid">
+      <header className="pr-hero" id="start" data-scene-top data-nav-light>
+        <div className="wrap pr-hero__grid">
           <div>
+            <p className="pr-kicker">Dla rodziców</p>
             <h1 className="h">Komputer dla dziecka bez stresu i bez żargonu</h1>
-            <p className="ct-par-lead">
+            <p className="pr-lead">
               Rozumiemy: to duża kwota, a w sklepach wszyscy mówią w obcym języku. U nas wystarczy
               powiedzieć, w co dziecko gra. Resztą zajmiemy się my, a wszystko, co obiecujemy,
               sprawdzisz sam.
             </p>
-            <div className="ct-par-cta">
-              <ButtonLink href={routes.inquiry} size="lg" className="ct-btn-dark">
-                Zapytaj bez zobowiązań
+            <div className="pr-cta">
+              <ButtonLink href={ASK} size="lg" className="pr-btn-dark">
+                Opisz, w co gra dziecko
               </ButtonLink>
-              {/* TODO(krystian): Gaming phone [SZEF] — the shop number until confirmed. */}
-              <a className="lnk ct-par-phone" href={company.phoneHref}>
-                <IconPhone />
-                Wolę zadzwonić: {company.phone}
+              <a className="btn btn--lg pr-btn-line" href={company.phoneHref}>
+                <IconPhone size={18} />
+                Zadzwoń: {company.phone}
               </a>
             </div>
           </div>
-          <div className="ct-par-card">
-            <h2 className="h">Sprawdź nas, zanim zapłacisz</h2>
-            <ul>
-              <li>
-                <Check />
-                <span>
-                  <b>Firma od 2004 roku.</b> {company.name}, NIP {company.nip},{' '}
-                  <a href={registers.ceidg} target="_blank" rel="noopener noreferrer">
-                    CEIDG
-                  </a>{' '}
-                  i{' '}
-                  <a href={registers.vatList} target="_blank" rel="noopener noreferrer">
-                    biała lista VAT
-                  </a>
-                  .
-                </span>
-              </li>
-              <li>
-                <Check />
-                <span>
-                  <b>Sklep stacjonarny.</b> Rabka-Zdrój, ul. Orkana 16B.
-                </span>
-              </li>
-              <li>
-                <Check />
-                <span>
-                  <b>Płacisz po ofercie.</b> Nigdy przed nią.
-                </span>
-              </li>
-              <li>
-                <Check />
-                <span>
-                  <b>Metryka na piśmie.</b> Wyniki testów i numery części.
-                </span>
-              </li>
-            </ul>
-          </div>
+          <ul className="pr-facts" aria-label="W skrócie">
+            <li>
+              <b>od 2004</b>
+              <span>firma w Rabce-Zdroju</span>
+            </li>
+            <li>
+              <b>48 h</b>
+              <span>ważności oferty z listą części</span>
+            </li>
+            <li>
+              <b>24 mies.</b>
+              <span>gwarancji z odbiorem od Ciebie</span>
+            </li>
+          </ul>
         </div>
       </header>
 
-      <section className="ct-par-sec ct-par-steps" aria-labelledby="par-steps">
+      <section className="pr-sec" id="pytania-rodzica" aria-labelledby="pr-q-h">
         <div className="wrap">
-          <h2 id="par-steps" className="h">
-            Jak to wygląda, krok po kroku
+          <h2 id="pr-q-h" className="h">
+            Cztery pytania, które zadaje każdy rodzic
           </h2>
-          <ol>
-            {STEPS.map((step, i) => (
-              <li key={step.title}>
-                <b className="nm" aria-hidden="true">
-                  {i + 1}
-                </b>
-                <h3 className="h">{step.title}</h3>
-                <p>{step.text}</p>
+          <div className="pr-q">
+            {/* Prices stream in: the rest of the page is sent before the offer is read. */}
+            <Suspense fallback={<BudgetCardFallback />}>
+              <BudgetCard />
+            </Suspense>
+            <article className="pr-q__card">
+              <h3>Czy to nie za mocny komputer?</h3>
+              <p>
+                Dobieramy moc do gier, w które dziecko gra, z rozsądnym zapasem na nowe. Jeśli
+                wystarczy tańszy zestaw, to go zaproponujemy, a w ofercie napiszemy, dlaczego ten.
+              </p>
+            </article>
+            <article className="pr-q__card">
+              <h3>Co jeśli coś się zepsuje?</h3>
+              <p>
+                Najpierw pomagamy zdalnie. Jeśli trzeba, kurier odbiera komputer od Ciebie na nasz
+                koszt. Gwarancja PRO-KOM obejmuje cały komputer przez 2 lata.
+              </p>
+            </article>
+            <article className="pr-q__card">
+              <h3>Czy mogę zobaczyć przed zakupem?</h3>
+              <p>
+                Tak. Sklep jest w Rabce-Zdroju, {company.postal.street}. Przy odbiorze włączymy
+                komputer i odpalimy grę przy Tobie.
+              </p>
+              <a className="lnk" href={DIRECTIONS} {...external}>
+                Prowadź do sklepu
+              </a>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section className="pr-sec pr-sec--paper" id="dowody" aria-labelledby="pr-proof-h">
+        <div className="wrap">
+          <h2 id="pr-proof-h" className="h">
+            Sprawdź nas, zanim zapłacisz
+          </h2>
+          <ul className="pr-proof">
+            <li>
+              <span className="pr-ico" aria-hidden="true">
+                <IconDoc size={22} />
+              </span>
+              <h3>Prawdziwa firma od 2004 roku</h3>
+              <p>
+                {company.name}, NIP {company.nip}. Wpisz NIP w publicznym rejestrze i sprawdź nas
+                sam.
+              </p>
+              <p className="pr-links">
+                <a className="lnk" href={registers.ceidg} {...external}>
+                  Sprawdź w CEIDG
+                </a>
+                <a className="lnk" href={registers.vatList} {...external}>
+                  Sprawdź na białej liście VAT
+                </a>
+              </p>
+            </li>
+            <li>
+              <span className="pr-ico" aria-hidden="true">
+                <IconShop size={22} />
+              </span>
+              <h3>Sklep, do którego możesz przyjechać</h3>
+              <p>{company.address}.</p>
+              <p className="pr-links">
+                <a className="lnk" href={DIRECTIONS} {...external}>
+                  Prowadź do sklepu
+                </a>
+              </p>
+            </li>
+            <li>
+              <span className="pr-ico" aria-hidden="true">
+                <IconShield size={22} />
+              </span>
+              <h3>Gwarancja 24 miesiące z odbiorem</h3>
+              <p>
+                Na cały komputer. Gdy coś nie działa, kurier odbiera go od Ciebie na nasz koszt.
+              </p>
+            </li>
+            <li>
+              <span className="pr-ico" aria-hidden="true">
+                <IconQr size={22} />
+              </span>
+              <h3>Metryka każdego egzemplarza</h3>
+              <p>Wyniki testów i numery części na piśmie, w pudełku i online pod kodem QR.</p>
+              <p className="pr-links">
+                <Link className="lnk" href="/#metryka">
+                  Zobacz, co jest w metryce
+                </Link>
+              </p>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <section className="pr-sec" id="zakup" aria-labelledby="pr-steps-h">
+        <div className="wrap">
+          <h2 id="pr-steps-h" className="h">
+            Jak wygląda zakup
+          </h2>
+          <ol className="pr-steps">
+            {STEPS.map(({ icon: Icon, title, text }) => (
+              <li key={title}>
+                <span className="pr-ico" aria-hidden="true">
+                  <Icon size={22} />
+                </span>
+                <h3>{title}</h3>
+                <p>{text}</p>
               </li>
             ))}
           </ol>
         </div>
       </section>
 
-      <section className="ct-par-sec ct-par-games" aria-labelledby="par-games">
-        <div className="wrap">
-          <h2 id="par-games" className="h">
-            W co gra Twoje dziecko?
-          </h2>
-          <p className="ct-par-games__lead">
-            Najprostsza ściągawka. Nie musisz zapamiętywać nazw części, wystarczy nazwa gry.
-          </p>
-          <ul className="ct-par-games__grid">
-            {GAMES.map((item) => (
-              <li key={item.games} style={{ '--c': item.color } as React.CSSProperties}>
-                <small>Gra w</small>
-                <b>{item.games}</b>
-                <span>polecamy</span>
-                <strong className="nm">{item.pick}</strong>
-                <p>{item.note}</p>
-              </li>
+      <section className="pr-sec pr-sec--paper" id="slowniczek" aria-labelledby="pr-words-h">
+        <div className="wrap pr-words">
+          <div>
+            <h2 id="pr-words-h" className="h">
+              Słowniczek dla rodzica
+            </h2>
+            <p className="pr-lead pr-lead--small">
+              Sześć słów, które padają w każdej ofercie. Po jednym zdaniu, bez żargonu.
+            </p>
+          </div>
+          <dl>
+            {GLOSSARY.map(([term, text]) => (
+              <div key={term}>
+                <dt>{term}</dt>
+                <dd>{text}</dd>
+              </div>
             ))}
-          </ul>
-          <ButtonLink href={routes.gamePicker} className="ct-btn-dark">
-            Sprawdź konkretną grę
-          </ButtonLink>
+          </dl>
         </div>
       </section>
 
-      <section className="ct-sec ct-par-safe" aria-labelledby="par-safe">
-        <div className="wrap ct-par-safe__grid">
-          <div>
-            <h2 id="par-safe" className="h ct-h2">
-              Bezpieczeństwo i spokój
-            </h2>
-            <p className="ct-p">
-              Na życzenie ustawimy konto dziecka w Windows 11 z kontrolą rodzicielską: limity czasu,
-              filtrowanie stron i zgoda na zakupy w grach.
-            </p>
-          </div>
+      <section className="pr-sec" id="pytania" aria-labelledby="pr-faq-h">
+        <div className="wrap pr-faq">
+          <h2 id="pr-faq-h" className="h">
+            Pytania rodziców
+          </h2>
           <div>
             {QUESTIONS.map((item, i) => (
-              <details key={item.q} className="ct-qa" open={i === 0}>
+              <details key={item.q} className="ct-qa pr-qa" open={i === 0}>
                 <summary>
                   {item.q}
                   <i aria-hidden="true" />
@@ -217,25 +333,101 @@ export default function ParentsPage() {
           </div>
         </div>
       </section>
+
+      <section className="pr-final" id="napisz" aria-labelledby="pr-final-h">
+        <div className="wrap pr-final__in">
+          <h2 id="pr-final-h" className="h">
+            Napisz, w co gra dziecko
+          </h2>
+          <p className="pr-lead">
+            Odpiszemy z imienną listą części, ceną i terminem, zwykle w ciągu godziny, codziennie od
+            8 do 22. Zapytanie nic nie kosztuje i do niczego nie zobowiązuje.
+          </p>
+          <div className="pr-cta pr-cta--center">
+            <ButtonLink href={ASK} size="lg" className="pr-btn-dark">
+              Opisz, w co gra dziecko
+            </ButtonLink>
+            <a className="btn btn--lg pr-btn-line" href={company.phoneHref}>
+              <IconPhone size={18} />
+              Zadzwoń: {company.phone}
+            </a>
+          </div>
+          <p className="pr-note">
+            <IconBook size={16} />{' '}
+            <Link className="lnk" href={`${routes.guides}/rodzice`}>
+              Przeczytaj poradnik dla rodziców
+            </Link>
+          </p>
+        </div>
+      </section>
     </>
   )
 }
 
-function Check() {
+/**
+ * „Ile trzeba wydać?” with the published prices (runda v2 §5 pt 2). Read per request; without the
+ * database the card says to ask instead of showing numbers.
+ */
+async function BudgetCard() {
+  await connection()
+  const hero: HeroData = await loadPublicOffer()
+    .then((offer) => offer.hero)
+    .catch((error: unknown) => {
+      log.error({ ...errorFields(error) }, 'parents page offer failed')
+      return EMPTY_HERO
+    })
+  const bands = budgetBands(hero.builds)
   return (
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      focusable="false"
-    >
-      <path d="M5 12.5l4.5 4.5L19 7.5" />
-    </svg>
+    <article className="pr-q__card pr-q__card--wide">
+      <h3>Ile trzeba wydać?</h3>
+      {bands.length > 0 ? (
+        <>
+          <p>Zależy od gier i monitora. Najtańsze zestawy, które do nich wystarczą:</p>
+          <ul className="pr-bands">
+            {bands.map((band) => (
+              <li key={band.title}>
+                <span className="pr-bands__what">{band.title}</span>
+                <b className="pr-bands__price">od {zl(band.from)}</b>
+                <span className="pr-bands__picks">
+                  {band.picks.map((pick, i) => (
+                    <span key={pick.slug}>
+                      {i > 0 && ' albo '}
+                      <Link
+                        className="lnk nm"
+                        href={buildHref(pick.slug)}
+                        style={{ ['--c' as string]: `var(--c-${pick.slug})` }}
+                      >
+                        {pick.name}
+                      </Link>
+                    </span>
+                  ))}
+                </span>
+              </li>
+            ))}
+          </ul>
+          <p className="pr-note">
+            Ceny z montażem, Windows 11 i wysyłką
+            {hero.pricedAt ? `, z ${dateText(hero.pricedAt)}` : ''}. Nie wiesz, którą grę wybrać?{' '}
+            <Link className="lnk" href={routes.gamePicker}>
+              Sprawdź konkretną grę
+            </Link>
+            .
+          </p>
+        </>
+      ) : (
+        // TODO(krystian): text when prices are unavailable (not on the board).
+        <p>Napisz, w co gra dziecko, a w ofercie podamy dokładną cenę i termin.</p>
+      )}
+    </article>
+  )
+}
+
+/** Same box while the prices load, so nothing jumps when they arrive. */
+function BudgetCardFallback() {
+  return (
+    <article className="pr-q__card pr-q__card--wide" aria-busy="true">
+      <h3>Ile trzeba wydać?</h3>
+      <p>Zależy od gier i monitora. Sprawdzamy aktualne ceny…</p>
+    </article>
   )
 }
