@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { connection } from 'next/server'
 import { Suspense } from 'react'
 
+import { ExternalLink, RegisterLinks } from '@/components/ExternalLink'
 import { BreadcrumbJsonLd } from '@/components/BreadcrumbJsonLd'
 import {
   IconBook,
@@ -23,7 +24,7 @@ import { buildHref, routes } from '@/lib/nav'
 import { loadPublicOffer } from '@/lib/offer.server'
 import { budgetBands } from '@/lib/parents'
 import { zl } from '@/lib/pricing/format'
-import { company, registers } from '@/lib/site'
+import { company, shopDirections } from '@/lib/site'
 
 import '@/components/content/content.css'
 import '@/components/parents/parents.css'
@@ -37,13 +38,6 @@ export const metadata: Metadata = {
 
 /** „Opisz, w co gra dziecko”: the inquiry opens on „Pomóżcie mi dobrać”, for a child. */
 const ASK = `${routes.inquiry}?tryb=dobor&dla=dziecko`
-
-/** Directions in the visitor's own maps app: a plain link, no map script or cookies. */
-const DIRECTIONS = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
-  `${company.name}, ${company.address}`,
-)}`
-
-const external = { target: '_blank', rel: 'noopener noreferrer' } as const
 
 const STEPS = [
   {
@@ -206,9 +200,9 @@ export default function ParentsPage() {
                 Tak. Sklep jest w Rabce-Zdroju, {company.postal.street}. Przy odbiorze włączymy
                 komputer i odpalimy grę przy Tobie.
               </p>
-              <a className="lnk" href={DIRECTIONS} {...external}>
+              <ExternalLink href={shopDirections} className="lnk">
                 Prowadź do sklepu
-              </a>
+              </ExternalLink>
             </article>
           </div>
         </div>
@@ -230,12 +224,7 @@ export default function ParentsPage() {
                 sam.
               </p>
               <p className="pr-links">
-                <a className="lnk" href={registers.ceidg} {...external}>
-                  Sprawdź w CEIDG
-                </a>
-                <a className="lnk" href={registers.vatList} {...external}>
-                  Sprawdź na białej liście VAT
-                </a>
+                <RegisterLinks />
               </p>
             </li>
             <li>
@@ -245,9 +234,9 @@ export default function ParentsPage() {
               <h3>Sklep, do którego możesz przyjechać</h3>
               <p>{company.address}.</p>
               <p className="pr-links">
-                <a className="lnk" href={DIRECTIONS} {...external}>
+                <ExternalLink href={shopDirections} className="lnk">
                   Prowadź do sklepu
-                </a>
+                </ExternalLink>
               </p>
             </li>
             <li>

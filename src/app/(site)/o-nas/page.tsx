@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 
+import { ExternalLink } from '@/components/ExternalLink'
 import { BreadcrumbJsonLd } from '@/components/BreadcrumbJsonLd'
 import { PageHeader } from '@/components/content/PageHeader'
 import { Sigil } from '@/components/Sigil'
@@ -224,13 +225,8 @@ export default function AboutPage() {
             <div>
               <dt>Rejestry</dt>
               <dd>
-                <a href={registers.ceidg} target="_blank" rel="noopener noreferrer">
-                  CEIDG
-                </a>{' '}
-                i{' '}
-                <a href={registers.vatList} target="_blank" rel="noopener noreferrer">
-                  biała lista podatników VAT
-                </a>
+                <ExternalLink href={registers.ceidg}>CEIDG</ExternalLink> i{' '}
+                <ExternalLink href={registers.vatList}>biała lista podatników VAT</ExternalLink>
               </dd>
             </div>
           </dl>

@@ -20,6 +20,11 @@ export const company = {
   parentSite: { label: 'pro-kom.eu', href: 'https://pro-kom.eu' },
 } as const
 
+/** Directions to the shop in the visitor's own maps app: a plain link, no map script or cookies. */
+export const shopDirections = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
+  `${company.name}, ${company.address}`,
+)}`
+
 // Public registers where a customer checks the company (spec. §16, boards Rodzice, OFirmie).
 export const registers = {
   ceidg: 'https://aplikacja.ceidg.gov.pl/ceidg/ceidg.public.ui/search.aspx',

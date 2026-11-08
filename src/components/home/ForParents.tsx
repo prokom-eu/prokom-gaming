@@ -9,14 +9,8 @@ import {
   IconShop,
   IconTruck,
 } from '@/components/icons'
-import { company, registers } from '@/lib/site'
-
-/** Directions to the shop in the visitor's own maps app: a plain link, no map script or cookies. */
-const DIRECTIONS = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
-  `${company.name}, ${company.address}`,
-)}`
-
-const external = { target: '_blank', rel: 'noopener noreferrer' } as const
+import { ExternalLink, RegisterLinks } from '@/components/ExternalLink'
+import { company, shopDirections } from '@/lib/site'
 
 /**
  * „Kupujesz komputer dla dziecka?” (spec. §4 pt 9, runda v2 §4.1): the light section. A parent
@@ -58,12 +52,7 @@ export function ForParents() {
                 sam.
               </p>
               <p className="hm-par__links">
-                <a className="lnk" href={registers.ceidg} {...external}>
-                  Sprawdź w CEIDG
-                </a>
-                <a className="lnk" href={registers.vatList} {...external}>
-                  Sprawdź na białej liście VAT
-                </a>
+                <RegisterLinks />
               </p>
             </li>
             <li>
@@ -86,9 +75,9 @@ export function ForParents() {
                 odpalimy grę przy Tobie.
               </p>
               <p className="hm-par__links">
-                <a className="lnk" href={DIRECTIONS} {...external}>
+                <ExternalLink href={shopDirections} className="lnk">
                   Prowadź do sklepu
-                </a>
+                </ExternalLink>
               </p>
             </li>
             <li>

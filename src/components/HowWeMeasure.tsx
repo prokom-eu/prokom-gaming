@@ -5,6 +5,7 @@ import { useState } from 'react'
 import type { FpsRow } from '@/lib/fps'
 
 import { BottomSheet } from './BottomSheet'
+import { ExternalLink } from './ExternalLink'
 
 /**
  * „Jak liczymy?” (spec. §6.4, ADR-G004 §6): a link under an FPS list that opens a sheet with the
@@ -84,9 +85,7 @@ export function HowWeMeasure({ rows }: { rows: readonly FpsRow[] }) {
                 <b>{row.name}</b>
                 <span>{row.setting}. </span>
                 {row.sourceUrl ? (
-                  <a href={row.sourceUrl} target="_blank" rel="noopener noreferrer">
-                    {row.sourceLabel}
-                  </a>
+                  <ExternalLink href={row.sourceUrl}>{row.sourceLabel}</ExternalLink>
                 ) : (
                   row.sourceLabel
                 )}
