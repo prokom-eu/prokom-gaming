@@ -105,8 +105,15 @@ a {
     translate: 0 calc(16px * var(--motion-scale));
   }
 }
+@media print {
+  [data-reveal] {
+    opacity: 1 !important;
+    translate: none !important;
+  }
+}
 /* One line of light runs along a card's border on hover or focus (runda v3 PREMIUM §2.3): a
-   gradient on a 1 px ring (mask), moved once; it snaps back only after it has faded. */
+   gradient on a 1 px ring (mask), moved once; it snaps back only after it has faded. The
+   `#000` in masks is not a colour (only its alpha counts) — the one exception to ADR-G003 §2. */
 .card-sweep::before {
   content: '';
   position: absolute;
@@ -133,8 +140,18 @@ a {
     opacity var(--dur-2),
     background-position 0s var(--dur-2);
 }
+/* Keyboard focus anywhere; the cursor only where there is one (a tap must not leave it lit). */
 @media (prefers-reduced-motion: no-preference) {
-  .card-sweep:is(:hover, :focus-visible, :has(:focus-visible))::before {
+  .card-sweep:is(:focus-visible, :has(:focus-visible))::before {
+    opacity: 1;
+    background-position: 0 0;
+    transition:
+      opacity var(--dur-1),
+      background-position var(--dur-4) var(--ease-enter);
+  }
+}
+@media (prefers-reduced-motion: no-preference) and (hover: hover) {
+  .card-sweep:hover::before {
     opacity: 1;
     background-position: 0 0;
     transition:

@@ -30,6 +30,8 @@ export function RevealObserver() {
           observer.unobserve(el)
         })
       },
+      // Enters a little above the bottom edge. The last 8% of the page never counts as „in”:
+      // the footer sits there, never a revealed card.
       { rootMargin: '0px 0px -8% 0px' },
     )
 

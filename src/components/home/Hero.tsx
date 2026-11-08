@@ -102,14 +102,17 @@ export function Hero({ data }: { data: HeroData }) {
 
   useEffect(() => {
     const onVisibility = () => setHidden(document.hidden)
+    // A page opened in a background tab starts hidden.
+    onVisibility()
     document.addEventListener('visibilitychange', onVisibility)
     return () => document.removeEventListener('visibilitychange', onVisibility)
   }, [])
 
-  // A new creature gets the full 7 s (declared before the timer: it runs first).
+  // A new creature, or the rotation coming back (width, reduced motion), gets the full 7 s —
+  // the ring restarts then too. Declared before the timer: it runs first.
   useEffect(() => {
     remaining.current = HERO_INTERVAL_MS
-  }, [active])
+  }, [active, rotating])
 
   // Every 7 s; a pause stops the clock and keeps what is left, in step with the ring around the
   // active medallion (TierStrip), which CSS pauses at the same moment.
@@ -233,10 +236,10 @@ export function Hero({ data }: { data: HeroData }) {
           })}
         </div>
         <div className="hero__edge" aria-hidden="true" />
-        {/* Black that lifts at the entry: over the scene and the computer, under the text. */}
+        {/* Black that lifts at the entry: over the scene, under the name, the computer and the text. */}
         <div className="hero__dawn" aria-hidden="true" />
 
-        {left && animationKey && (
+        {left && animationKey && !calm && (
           <div
             key={`gone-${animationKey}`}
             className="hero__title is-gone"

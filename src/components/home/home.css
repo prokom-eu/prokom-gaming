@@ -1171,7 +1171,9 @@
 .hero__dawn {
   position: absolute;
   inset: 0 calc(var(--u) * -200);
-  z-index: 7;
+  /* Over the scene, its light and the veil (z 2, later in the DOM); under the name (3), the
+     computer (4, the LCP photo on a phone — never covered) and the text. */
+  z-index: 2;
   pointer-events: none;
   background: var(--scene-bg);
   opacity: 0;
@@ -1195,8 +1197,10 @@
   animation: intro-draw var(--dur-3) var(--ease-enter) 350ms both;
 }
 .hero--intro .hero__name .ch {
+  /* Readable by 700 ms (PREMIUM §2.1): from 100 ms, 30 ms apart, the 9th letter on with the 8th. */
   animation:
-    intro-letter var(--dur-3) var(--ease-enter) calc(300ms + var(--ch) * 40ms) both,
+    intro-letter calc(var(--dur-2) * 1.5) var(--ease-enter) calc(100ms + min(var(--ch), 8) * 30ms)
+      both,
     hero-shine var(--dur-4) ease calc(800ms + var(--ch) * 40ms) both;
 }
 .hero--intro .hero__photo[data-on='true'] {
@@ -1226,7 +1230,7 @@
     hero-pulse 8s ease-in-out 1.5s infinite;
 }
 .hero--intro .hero-card {
-  animation: intro-slide var(--dur-3) var(--ease-enter) 250ms both;
+  animation: intro-slide var(--dur-3) var(--ease-enter) 200ms both;
 }
 @keyframes intro-flare {
   from {

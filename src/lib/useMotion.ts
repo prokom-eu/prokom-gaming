@@ -1,6 +1,6 @@
 'use client'
 
-import { useSyncExternalStore } from 'react'
+import { useCallback, useSyncExternalStore } from 'react'
 
 import { REDUCED_MOTION } from './motion'
 
@@ -9,12 +9,17 @@ import { REDUCED_MOTION } from './motion'
  * render, so hydration matches) gets `serverValue`.
  */
 export function useMediaQuery(query: string, serverValue = false): boolean {
-  return useSyncExternalStore(
-    (onChange) => {
+  // Stable per query: a new function would re-subscribe on every render.
+  const subscribe = useCallback(
+    (onChange: () => void) => {
       const list = window.matchMedia(query)
       list.addEventListener('change', onChange)
       return () => list.removeEventListener('change', onChange)
     },
+    [query],
+  )
+  return useSyncExternalStore(
+    subscribe,
     () => window.matchMedia(query).matches,
     () => serverValue,
   )

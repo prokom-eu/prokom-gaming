@@ -119,7 +119,8 @@
   }
 }
 
-/* Water (Wodnik, Rusałka, Weles): a band of light below the horizon that trembles. */
+/* Water (Wodnik, Rusałka, Weles): a band of light below the horizon that trembles. `#000` in the
+   mask counts only as alpha, not a colour (ADR-G003 §2). */
 .scene-fx__water {
   position: absolute;
   left: 15%;

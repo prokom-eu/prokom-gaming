@@ -16,12 +16,21 @@
     box-shadow var(--dur-3);
 }
 /* Hover and keyboard focus look the same (runda v3 PREMIUM §2.3); a touch only presses. */
-.hm-card:is(:hover, :focus-visible) {
+.hm-card:focus-visible {
   transform: translateY(calc(-6px * var(--motion-scale)));
   border-color: color-mix(in srgb, var(--c) 55%, transparent);
   box-shadow:
     0 0 0 1px color-mix(in srgb, var(--c) 55%, transparent),
     0 30px 60px -30px color-mix(in srgb, var(--c) 60%, transparent);
+}
+@media (hover: hover) {
+  .hm-card:hover {
+    transform: translateY(calc(-6px * var(--motion-scale)));
+    border-color: color-mix(in srgb, var(--c) 55%, transparent);
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--c) 55%, transparent),
+      0 30px 60px -30px color-mix(in srgb, var(--c) 60%, transparent);
+  }
 }
 .hm-card__view {
   --view-h: 330px;
@@ -47,9 +56,15 @@
     filter var(--dur-3);
 }
 /* The scene drifts a few px against the lifting case: a hint of depth (parallax). */
-.hm-card:is(:hover, :focus-visible) .hm-card__scene {
+.hm-card:focus-visible .hm-card__scene {
   transform: translateX(calc(-67% - 6px * var(--motion-scale))) scale(1.03);
   filter: brightness(1.12) saturate(1.08);
+}
+@media (hover: hover) {
+  .hm-card:hover .hm-card__scene {
+    transform: translateX(calc(-67% - 6px * var(--motion-scale))) scale(1.03);
+    filter: brightness(1.12) saturate(1.08);
+  }
 }
 .hm-card__glow {
   position: absolute;
@@ -71,8 +86,13 @@
   transform-origin: 50% calc(100% - var(--case-base));
   transition: transform var(--dur-3) var(--ease-enter);
 }
-.hm-card:is(:hover, :focus-visible) .hm-card__photo {
+.hm-card:focus-visible .hm-card__photo {
   transform: translateY(calc(-4px * var(--motion-scale))) scale(1.04);
+}
+@media (hover: hover) {
+  .hm-card:hover .hm-card__photo {
+    transform: translateY(calc(-4px * var(--motion-scale))) scale(1.04);
+  }
 }
 /* The pedestal brightens in the creature's colour under the case (its top face is --case-base
    above the bottom of the view). Only opacity moves. */
@@ -94,8 +114,13 @@
   transition: opacity var(--dur-3);
   pointer-events: none;
 }
-.hm-card:is(:hover, :focus-visible) .hm-card__photo::before {
+.hm-card:focus-visible .hm-card__photo::before {
   opacity: 0.85;
+}
+@media (hover: hover) {
+  .hm-card:hover .hm-card__photo::before {
+    opacity: 0.85;
+  }
 }
 .hm-card__sigil {
   position: absolute;
@@ -105,8 +130,13 @@
   filter: drop-shadow(0 0 8px var(--c));
   transition: transform var(--dur-3) var(--ease-enter);
 }
-.hm-card:is(:hover, :focus-visible) .hm-card__sigil {
+.hm-card:focus-visible .hm-card__sigil {
   transform: rotate(-8deg) scale(1.08);
+}
+@media (hover: hover) {
+  .hm-card:hover .hm-card__sigil {
+    transform: rotate(-8deg) scale(1.08);
+  }
 }
 .hm-card__tier {
   position: absolute;
