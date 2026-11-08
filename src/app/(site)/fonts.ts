@@ -19,7 +19,11 @@ export const cinzel = localFont({
   style: 'normal',
   display: 'swap',
   preload: false,
-  adjustFontFallback: 'Times New Roman',
+  // Own fallback face (`globals.css`): next/font sizes it from the average width of lower-case
+  // letters (137%), but Cinzel's lower case is small caps and the names are set in capitals —
+  // the Times New Roman name came out ~26% wider and jumped when Cinzel arrived (CLS, session F).
+  adjustFontFallback: false,
+  fallback: ['Cinzel Caps Fallback', 'Georgia', 'serif'],
   variable: '--font-cinzel',
 })
 

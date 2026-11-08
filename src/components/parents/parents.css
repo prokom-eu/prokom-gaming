@@ -96,6 +96,9 @@
 }
 .pr-facts b {
   font-family: var(--font-name);
+  /* One line on a phone too (the 132 px column holds „24 mies.”): a 110 px column broke
+     „od 2004” in Cinzel but not in its fallback — the card jumped when the font arrived. */
+  white-space: nowrap;
   font-size: 30px;
   font-weight: 700;
   color: var(--par-head);
@@ -418,7 +421,6 @@
     grid-template-columns: 1fr;
   }
   .pr-facts li {
-    grid-template-columns: 110px 1fr;
     padding: 18px 20px;
   }
 }
