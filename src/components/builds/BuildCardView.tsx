@@ -24,8 +24,8 @@ export function BuildCardView({ card, eager = false }: { card: BuildCard; eager?
           width={580}
           height={331}
           // Drawn ~1.52× the card's width (pedestal in the middle, runda v3 §1.1): one column up to
-          // 1000 px, three of ~420 px above. Without `sizes` a phone took far too big a file (G15).
-          sizes="(max-width: 1000px) 152vw, 640px"
+          // 1000 px (card = 100vw - 2 × 22 px gutter), three of ~420 px above (LCP on a phone, G15).
+          sizes="(max-width: 1000px) calc(152vw - 67px), 640px"
           loading={eager ? 'eager' : 'lazy'}
         />
         {card.photo && (

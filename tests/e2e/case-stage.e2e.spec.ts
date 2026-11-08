@@ -17,7 +17,7 @@ import buildsSeed from '../../seed/prokomgaming/builds.json' with { type: 'json'
  */
 
 const HERO_WIDTHS = [1920, 1440, 1280, 1100, 390]
-const CARD_WIDTHS = [1440, 390]
+const CARD_WIDTHS = [1440, 1100, 390]
 const GAP = 12
 const SLUGS = buildsSeed.items.map((b) => b.slug)
 
@@ -132,6 +132,11 @@ function measureCards(page: Page, sel: CardList) {
       const art = card.querySelector(sel.art)!.getBoundingClientRect()
       const scene = card.querySelector(sel.scene) as HTMLImageElement
       const sr = scene.getBoundingClientRect()
+      const covered =
+        sr.top <= art.top + 0.5 &&
+        sr.left <= art.left + 0.5 &&
+        sr.right >= art.right - 0.5 &&
+        sr.bottom >= art.bottom - 0.5
       const pedestalX = sr.left + (1125 * sr.height) / 960
       const caseEl = card.querySelector('.case') as HTMLElement
       const img = caseEl.querySelector('img')!.getBoundingClientRect()
@@ -147,6 +152,7 @@ function measureCards(page: Page, sel: CardList) {
         art: { left: art.left, right: art.right, top: art.top, bottom: art.bottom },
         box,
         pedestalX,
+        covered,
       }
     })
   }, sel)
@@ -228,6 +234,7 @@ for (const width of CARD_WIDTHS) {
           `${c.href}: off the card's centre`,
         ).toBeLessThanOrEqual(4)
         expect(Math.abs(centre - c.pedestalX), `${c.href}: off the pedestal`).toBeLessThanOrEqual(4)
+        expect(c.covered, `${c.href}: the scene leaves a gap in the picture`).toBe(true)
         // ~70–75%; the 2-column home cards on a phone allow 67.8%. A wide case filling the card's
         // width (≥ 85%) is capped by it instead.
         const widthBound = c.box.right - c.box.left >= 0.85 * (c.art.right - c.art.left)

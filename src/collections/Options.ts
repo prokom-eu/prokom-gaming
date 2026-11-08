@@ -131,7 +131,7 @@ export const Options: CollectionConfig = {
       admin: {
         condition: forTypes('case', 'cooler'),
         // Runda v3 §1.2: a cut or small case photo shows on the Pulpit and in „Opcje”.
-        description: `${CASE_PHOTO_HINT} Ucięte lub za małe zdjęcia obudów pokazują Pulpit i lista Opcji.`,
+        description: `Obudowa — ${CASE_PHOTO_HINT} Ucięte lub za małe zdjęcia obudów pokazują Pulpit i lista Opcji.`,
       },
     },
     { name: 'description', label: 'Opis', type: 'text' },

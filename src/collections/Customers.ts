@@ -119,7 +119,7 @@ export const Customers: CollectionConfig = {
               label: 'Światło (stare)',
               type: 'text',
               maxLength: 20,
-              admin: { condition: (_, sibling) => Boolean(sibling?.light) },
+              admin: { readOnly: true, condition: (_, sibling) => Boolean(sibling?.light) },
             },
             { name: 'savedAt', label: 'Zapisano', type: 'date', required: true },
           ],

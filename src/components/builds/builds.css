@@ -112,8 +112,10 @@
      (67% of the width), top face at 26.5% of the height above the bottom. It goes to the middle
      of the card (runda v3 §1.1), so the 33% of the scene right of it must cover half the card:
      scene height ≥ 100cqw / 2 / 0.33 / 1.75 ≈ 86.6cqw. The extra height is cut at the top (sky)
-     and a little at the bottom; the pedestal's top sits at 21% of the art. */
-  --scene-h: max(var(--art-h), 86.6cqw);
+     and a little at the bottom; the pedestal's top sits at 21% of the art. The scene must also
+     reach the top of the art: 0.21 × art + 0.735 × scene ≥ art → scene ≥ 1.075 × art (narrow
+     3-column cards at 1001–1130 px). */
+  --scene-h: max(calc(var(--art-h) * 1.075), 86.6cqw);
   --case-base: calc(var(--art-h) * 0.21);
 }
 .bl-card__art::after {

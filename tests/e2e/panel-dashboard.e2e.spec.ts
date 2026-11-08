@@ -41,7 +41,7 @@ test.describe('signed in as admin', () => {
     // Runda v3 §1.2: the seed has 5 case photos cut at the source or under 900 px.
     await expect(main(page).getByText('5 zdjęć obudów do wymiany')).toBeVisible()
     await expect(
-      main(page).getByText(/Ucięte lub za małe: EXO, LB500, PANO100, PANO130, PANOR5/),
+      main(page).getByText(/Aktywne, ucięte lub za małe: EXO, LB500, PANO100, PANO130, PANOR5/),
     ).toBeVisible()
     for (const title of [
       'Ostatnie zapytania',

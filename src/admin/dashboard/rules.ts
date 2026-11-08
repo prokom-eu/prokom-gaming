@@ -260,7 +260,7 @@ function photosItem(input: TodoInput): TodoItem | null {
     urgent: false,
     icon: 'alert',
     title: `${codes.length} ${plural(codes.length, ['zdjęcie obudowy', 'zdjęcia obudów', 'zdjęć obudów'])} do wymiany`,
-    note: `Ucięte lub za małe: ${codes.join(', ')}. Całe zdjęcie z przezroczystym tłem, min. 900 px wysokości.`,
+    note: `Aktywne, ucięte lub za małe: ${codes.join(', ')}. Całe zdjęcie z przezroczystym tłem, min. 900 px wysokości.`,
     action: { label: 'Opcje', path: '/opcje' },
   }
 }

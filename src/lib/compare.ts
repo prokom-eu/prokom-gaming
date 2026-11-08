@@ -473,6 +473,7 @@ const SPEC: (SpecDef | { group: string })[] = [
   {
     label: 'Obudowa i światło',
     // Runda v3 §1.4: ARGB — no colour to pick, the photo shows one.
+    // TODO(krystian): hint not on the board.
     hint: 'podświetlenie ARGB, kolor ustawisz sam',
     value: (b) => lookText(b.look),
   },
