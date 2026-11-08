@@ -108,6 +108,13 @@
   height: var(--art-h);
   overflow: hidden;
   container-type: inline-size;
+  /* The pedestal is the same in all 16 card scenes (1680×960, aspect 1.75): centre at x 1125
+     (67% of the width), top face at 26.5% of the height above the bottom. It goes to the middle
+     of the card (runda v3 §1.1), so the 33% of the scene right of it must cover half the card:
+     scene height ≥ 100cqw / 2 / 0.33 / 1.75 ≈ 86.6cqw. The extra height is cut at the top (sky)
+     and a little at the bottom; the pedestal's top sits at 21% of the art. */
+  --scene-h: max(var(--art-h), 86.6cqw);
+  --case-base: calc(var(--art-h) * 0.21);
 }
 .bl-card__art::after {
   content: '';
@@ -117,26 +124,22 @@
 }
 .bl-card__scene {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  /* The card scenes (1680×960) have the pedestal at ~67% of the width. */
-  object-fit: cover;
-  object-position: 67% 100%;
+  left: 50%;
+  bottom: calc(var(--case-base) - var(--scene-h) * 0.265);
+  width: auto;
+  max-width: none;
+  height: var(--scene-h);
+  transform: translateX(-67%);
+  transform-origin: 67% 73.5%;
   transition: transform 0.8s;
 }
 .bl-card:hover .bl-card__scene {
-  transform: scale(1.08);
+  transform: translateX(-67%) scale(1.08);
 }
 .bl-card__photo {
-  /* Height of the scene as drawn by `cover` (aspect 1.75, anchored 67% / bottom). The pedestal is
-     the same in all 16 card scenes (1680×960): centre at x 1125 (67%), top face at ~26.5% of the
-     height above the bottom. The case stands on it, ~75% of the art, never cut at the top. */
-  --scene-h: max(var(--art-h), 100cqw / 1.75);
-  --case-cx: 67cqw;
-  --case-base: calc(var(--scene-h) * 0.265);
-  --case-h-max: min(var(--art-h) * 0.75, var(--art-h) - var(--case-base) - 10px);
-  --case-w-max: 62cqw;
+  /* The case stands on the middle of the pedestal, ~72% of the art, ≥ 10 px below the top. */
+  --case-h-max: min(var(--art-h) * 0.72, var(--art-h) - var(--case-base) - 10px);
+  --case-w-max: 86cqw;
   position: absolute;
   inset: 0;
 }
@@ -455,8 +458,10 @@
   .bl-card__scene {
     transition: none;
   }
-  .bl-card:hover,
-  .bl-card:hover .bl-card__scene {
+  .bl-card:hover {
     transform: none;
+  }
+  .bl-card:hover .bl-card__scene {
+    transform: translateX(-67%);
   }
 }

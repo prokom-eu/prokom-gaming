@@ -23,16 +23,16 @@ export function BuildCardView({ card, eager = false }: { card: BuildCard; eager?
           alt=""
           width={580}
           height={331}
-          // One column up to 1000 px, three of ~420 px above. Without `sizes` a phone took the
-          // 1200 px variant for a ~400 px card — the biggest item before LCP (Lighthouse G15).
-          sizes="(max-width: 1000px) 100vw, 420px"
+          // Drawn ~1.52× the card's width (pedestal in the middle, runda v3 §1.1): one column up to
+          // 1000 px, three of ~420 px above. Without `sizes` a phone took far too big a file (G15).
+          sizes="(max-width: 1000px) 152vw, 640px"
           loading={eager ? 'eager' : 'lazy'}
         />
         {card.photo && (
           <span className="bl-card__photo">
-            {/* The file is drawn at most ~190 px wide (~110 px on a phone). */}
+            {/* The case is at most 180 px tall (72% of the 250 px art); file width from its box. */}
             {/* Lazy, as before: the scene above is the LCP element, the photo must not compete. */}
-            <CasePhoto photo={card.photo} drawnWidth={190} />
+            <CasePhoto photo={card.photo} caseHeight={180} />
           </span>
         )}
       </span>

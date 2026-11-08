@@ -66,8 +66,8 @@ export function CreatureCardView({
         <span className="hm-card__glow" />
         {card.photo && (
           <span className="hm-card__photo">
-            {/* The file is drawn at most ~220 px wide: 190 gives a 384 px 2x variant (G15). */}
-            <CasePhoto photo={card.photo} drawnWidth={190} eager={eager} />
+            {/* The case is at most ~231 px tall (330 px view); its file width follows from the box. */}
+            <CasePhoto photo={card.photo} caseHeight={231} eager={eager} />
           </span>
         )}
         <span className="hm-card__sigil">

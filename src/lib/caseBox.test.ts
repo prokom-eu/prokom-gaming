@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest'
 
 import optionsSeed from '../../seed/prokomgaming/options.json' with { type: 'json' }
 
-import { caseBoxOf, casePhotoOf, caseVars } from './caseBox'
+import { caseBoxOf, casePhotoIssues, casePhotoOf, caseVars, drawnWidthOf } from './caseBox'
 import { measureCaseBox } from './caseBoxMeasure'
 
 /** A transparent canvas with an opaque rectangle at a known place. */
@@ -126,5 +126,64 @@ describe('caseBoxOf / casePhotoOf / caseVars', () => {
       '--bh': 1,
       '--case-ar': 0.8,
     })
+  })
+})
+
+describe('drawnWidthOf', () => {
+  it('is the width of the whole file when the case itself is that tall', () => {
+    // Case 90% of a 800×1000 file: 180 px case → file 200 px tall → 160 px wide.
+    expect(
+      drawnWidthOf({ width: 800, height: 1000, box: { x: 0, y: 0.05, w: 1, h: 0.9 } }, 180),
+    ).toBe(160)
+    expect(drawnWidthOf({ width: 800, height: 1000, box: null }, 180)).toBe(144)
+  })
+
+  it('rounds up, so a 2x file is never narrower than twice the drawn width', () => {
+    expect(drawnWidthOf({ width: 837, height: 873, box: null }, 180)).toBe(173)
+  })
+})
+
+describe('casePhotoIssues (runda v3 §1.2)', () => {
+  it('passes a tall case with a transparent margin', () => {
+    expect(
+      casePhotoIssues({ width: 1200, height: 1400, box: { x: 0.05, y: 0.03, w: 0.9, h: 0.93 } }),
+    ).toEqual([])
+  })
+
+  it('flags a case touching the edge of its file (cut at the source)', () => {
+    expect(
+      casePhotoIssues({ width: 1200, height: 1400, box: { x: 0, y: 0.03, w: 0.9, h: 0.93 } }),
+    ).toEqual(['edge'])
+    // `media.box` is rounded to 4 decimals: 0.9999 still touches.
+    expect(
+      casePhotoIssues({ width: 1200, height: 1400, box: { x: 0.05, y: 0.03, w: 0.9, h: 0.9699 } }),
+    ).toEqual(['edge'])
+  })
+
+  it('flags a case under 900 px tall', () => {
+    expect(
+      casePhotoIssues({ width: 800, height: 950, box: { x: 0.05, y: 0.03, w: 0.9, h: 0.93 } }),
+    ).toEqual(['small'])
+  })
+
+  it('treats a photo without a box (no transparency) as touching every edge', () => {
+    expect(casePhotoIssues({ width: 1200, height: 1400, box: null })).toEqual(['edge'])
+    expect(casePhotoIssues({ width: null, height: null, box: null })).toEqual(['edge', 'small'])
+  })
+
+  it('flags the seed photos the review found (EXO, LB500 cut; PANO130, PANO100 small)', async () => {
+    const issuesOf = async (code: string) => {
+      const file = path.resolve('seed/prokomgaming/media/options', `${code}.webp`)
+      const meta = await sharp(file).metadata()
+      return casePhotoIssues({
+        width: meta.width,
+        height: meta.height,
+        box: await measureCaseBox(file),
+      })
+    }
+    expect(await issuesOf('EXO')).toEqual(['edge', 'small'])
+    expect(await issuesOf('LB500')).toEqual(['edge', 'small'])
+    expect(await issuesOf('PANO130')).toEqual(['small'])
+    expect(await issuesOf('PANO100')).toEqual(['small'])
   })
 })
