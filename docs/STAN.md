@@ -441,6 +441,7 @@ G1 → G2 → G3 → G4 → G5 → G6 → G7 → G8 → G9 → (kontrola 8.11) �
 - [Krystian, przed G16] SPF/DKIM/DMARC domeny nadawcy w Seohost.
 
 ## Pomysły na później
+- **Wspólna paralaksa myszą (E2, przegląd):** `Hero.tsx` ma własny `onMouseMove` z `--mx/--my`, a karta zestawu `components/motion/MouseParallax.tsx` — Hero mógłby wstawić `<MouseParallax />` i zostawić sobie tylko `hovered`. Bez zmiany działania, do porządków.
 - Zaproszenie do konta klienta po wpłacie (plansza Ustawienia „Zamówienia i klienci”): e-mail z linkiem do rejestracji, gdy zamówienie wchodzi w „Opłacone” i klient nie ma konta.
 - Push `workshop` dla roli `serwis` przy zmianie etapu (spec. panelu §14, opcjonalny).
 - Sprawdzanie cen po EAN, gdy pole wypełnione: szukanie na Ceneo i w sklepach po kodzie, EAN w tytule/stronie = pewne dopasowanie.
