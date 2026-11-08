@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 
 import { Sigil } from '@/components/Sigil'
+import { Count } from '@/components/motion/Count'
 import { SourceLabel } from '@/components/SourceLabel'
 import { ButtonLink } from '@/components/ui/Button'
 import { Segmented } from '@/components/ui/Segmented'
@@ -276,7 +277,11 @@ export function Compare({
                     <strong className="nm">{b.name}</strong>
                     <div className="cmp-slot__fps">
                       <b>
-                        {num ? (view.capped ? String(view.game.fpsCap ?? num.fps) : num.fps) : '—'}
+                        {num ? (
+                          <Count value={view.capped ? (view.game.fpsCap ?? num.fps) : num.fps} />
+                        ) : (
+                          '—'
+                        )}
                       </b>
                       <span>
                         klatek, {view.game.name}, {res}
@@ -386,10 +391,14 @@ export function Compare({
                   >
                     <span className="cmp-chart__name">{b.name}</span>
                     <span className="cmp-chart__track" aria-hidden="true">
-                      {point !== null && <i style={{ left: `${point}%` }} />}
+                      {point !== null && <i style={{ '--p': point } as CSSProperties} />}
                     </span>
                     <b>
-                      {num ? (view.capped ? String(view.game.fpsCap ?? num.fps) : num.fps) : '—'}
+                      {num ? (
+                        <Count value={view.capped ? (view.game.fpsCap ?? num.fps) : num.fps} />
+                      ) : (
+                        '—'
+                      )}
                       {num && (
                         <span
                           className={`cmp-dot cmp-dot--${sourceOf(num.kind).tone}`}

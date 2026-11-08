@@ -118,6 +118,47 @@ a {
     clip-path: inset(100% -1em -1em);
   }
 }
+/* Counting numbers (components/motion/Count): the digits on screen are a counter of `--n`, a
+   registered integer, so a transition counts through every value. The DOM number is for screen
+   readers and copying; the counter sits in an aria-hidden span. Width reserved, digits tabular. */
+@property --n {
+  syntax: '<integer>';
+  inherits: false;
+  initial-value: 0;
+}
+.count {
+  --n: var(--to);
+  display: inline-block;
+  min-width: calc(var(--digits, 1) * 1ch);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  counter-reset: n var(--n);
+  transition: --n var(--dur-4) var(--ease-enter);
+}
+.count__d::before {
+  content: counter(n);
+}
+.count__v {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+/* Before the block's entry: from zero; the source label comes after the number. */
+:is([data-reveal='wait'], [data-shown='false']) .count {
+  --n: 0;
+}
+@media (prefers-reduced-motion: no-preference) {
+  [data-reveal] .src,
+  [data-shown] .src {
+    transition: opacity var(--dur-3) var(--ease-enter) var(--dur-4);
+  }
+  :is([data-reveal='wait'], [data-shown='false']) .src {
+    opacity: 0;
+  }
+}
 @media print {
   [data-reveal] {
     opacity: 1 !important;

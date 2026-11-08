@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useState } from 'react'
 
+import { CountText } from '@/components/motion/Count'
 import { SourceLabel } from '@/components/SourceLabel'
 import { Segmented } from '@/components/ui/Segmented'
 import { RESOLUTIONS, RESOLUTION_LABELS, type Resolution } from '@/lib/fps'
@@ -67,7 +68,7 @@ export function GamesPanel({ data }: { data: GamesPanelData }) {
             onChange={setResolution}
           />
         </div>
-        <ul className="hm-games__rows">
+        <ul className="hm-games__rows" data-reveal="">
           {rows.map((row) => (
             <li key={row.tier} style={{ ['--c' as string]: `var(--c-${row.lead})` }}>
               <Link href={`/zestawy/${row.lead}`} className="hm-games__row">
@@ -79,7 +80,9 @@ export function GamesPanel({ data }: { data: GamesPanelData }) {
                   <s style={{ width: `${row.percent}%` }} />
                 </span>
                 <span className="hm-games__value">
-                  <b>{row.text}</b>
+                  <b>
+                    <CountText text={row.text} />
+                  </b>
                   <SourceLabel kind={row.kind} />
                 </span>
               </Link>

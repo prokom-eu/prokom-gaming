@@ -776,27 +776,42 @@
   background: repeating-linear-gradient(180deg, var(--fps-track) 0 1px, transparent 1px 42px);
   border-bottom: 1px solid var(--line);
 }
-/* Bars grow once when the chart comes into view; a switch changes their height smoothly. */
+/* Bars grow from zero in a cascade once the chart comes into view (runda v3 PREMIUM §2.3); a
+   switch of game or resolution moves them smoothly. Only `transform` moves (scale of the full
+   track height), the numbers count along with their bar, the step text comes after it. */
+.hm-cmp__chart li {
+  --cmp-delay: calc(var(--i, 0) * var(--stagger) * 2);
+}
+.hm-cmp__chart li:nth-child(2) {
+  --i: 1;
+}
+.hm-cmp__chart li:nth-child(3) {
+  --i: 2;
+}
 .hm-cmp__bar s {
   display: block;
   width: 100%;
-  height: var(--h);
+  height: 100%;
   border-radius: 3px 3px 0 0;
   background: linear-gradient(180deg, var(--c), color-mix(in srgb, var(--c) 22%, transparent));
   box-shadow: 0 0 28px color-mix(in srgb, var(--c) 55%, transparent);
+  transform: scaleY(var(--k));
   transform-origin: 50% 100%;
-  transition:
-    transform 1s cubic-bezier(0.2, 0.7, 0.2, 1),
-    height 0.5s ease;
+  transition: transform var(--dur-4) var(--ease-enter) var(--cmp-delay);
 }
-.hm-cmp__chart li:nth-child(2) .hm-cmp__bar s {
-  transition-delay: 0.12s, 0s;
-}
-.hm-cmp__chart li:nth-child(3) .hm-cmp__bar s {
-  transition-delay: 0.24s, 0s;
+.hm-cmp__chart .count {
+  transition-delay: var(--cmp-delay);
 }
 .hm-cmp__chart[data-shown='false'] .hm-cmp__bar s {
   transform: scaleY(0);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .hm-cmp__chart em {
+    transition: opacity var(--dur-3) var(--ease-enter) calc(var(--dur-4) + var(--cmp-delay));
+  }
+  .hm-cmp__chart[data-shown='false'] em {
+    opacity: 0;
+  }
 }
 .hm-cmp__chart b {
   margin-top: 10px;
@@ -1392,7 +1407,6 @@
     animation: none;
   }
   .hm-cmp__bar s {
-    transform: none;
     transition: none;
   }
   .hm-inc__list li {
