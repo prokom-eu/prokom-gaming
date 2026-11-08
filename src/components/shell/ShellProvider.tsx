@@ -21,6 +21,10 @@ type Shell = {
   compareCount: number
   /** Items in the inquiry. */
   inquiryCount: number
+  /** The search dialog (NAWIGACJA §5): open from the rail, the header, Ctrl K, „/”, the menu. */
+  searchOpen: boolean
+  openSearch: () => void
+  closeSearch: () => void
 }
 
 const ShellContext = createContext<Shell | null>(null)
@@ -41,6 +45,12 @@ export function ShellProvider({ children }: { children: ReactNode }) {
   const menuOpen = menuOpenAt === pathname
   const openMenu = useCallback(() => setMenuOpenAt(pathname), [pathname])
   const closeMenu = useCallback(() => setMenuOpenAt(null), [])
+  const [searchOpen, setSearchOpen] = useState(false)
+  const openSearch = useCallback(() => {
+    setMenuOpenAt(null)
+    setSearchOpen(true)
+  }, [])
+  const closeSearch = useCallback(() => setSearchOpen(false), [])
 
   const compareCount = useSyncExternalStore(
     subscribeStorage,
@@ -54,8 +64,26 @@ export function ShellProvider({ children }: { children: ReactNode }) {
   )
 
   const value = useMemo(
-    () => ({ menuOpen, openMenu, closeMenu, compareCount, inquiryCount }),
-    [menuOpen, openMenu, closeMenu, compareCount, inquiryCount],
+    () => ({
+      menuOpen,
+      openMenu,
+      closeMenu,
+      compareCount,
+      inquiryCount,
+      searchOpen,
+      openSearch,
+      closeSearch,
+    }),
+    [
+      menuOpen,
+      openMenu,
+      closeMenu,
+      compareCount,
+      inquiryCount,
+      searchOpen,
+      openSearch,
+      closeSearch,
+    ],
   )
   return <ShellContext.Provider value={value}>{children}</ShellContext.Provider>
 }

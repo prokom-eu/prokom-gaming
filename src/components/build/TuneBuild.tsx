@@ -47,7 +47,7 @@ export function TuneBuild(props: Props) {
   const lightLabel = LIGHTS.find((l) => l.key === light)?.label ?? props.ownLight
 
   return (
-    <section className="bp-tune" aria-labelledby="bp-tune-h">
+    <section className="bp-tune" id="dopasuj" aria-labelledby="bp-tune-h">
       <div className="wrap bp-tune__grid">
         <div>
           <h2 id="bp-tune-h" className="h">

@@ -19,6 +19,7 @@ export function BuildHero({ data }: { data: BuildPageData }) {
   return (
     <section
       className="bp-hero"
+      id="przeglad"
       data-scene-top
       data-material={build.material}
       style={{ '--fs': build.nameSize } as CSSProperties}

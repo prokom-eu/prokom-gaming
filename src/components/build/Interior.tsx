@@ -24,7 +24,7 @@ export function Interior({ data }: { data: BuildPageData }) {
   }
 
   return (
-    <section className="bp-plan" aria-labelledby="bp-plan-h">
+    <section className="bp-plan" id="wnetrze" aria-labelledby="bp-plan-h">
       <div className="wrap">
         <div className="bp-sh">
           <h2 id="bp-plan-h" className="h">

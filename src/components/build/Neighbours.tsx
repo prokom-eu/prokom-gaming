@@ -12,7 +12,7 @@ export function Neighbours({ data }: { data: BuildPageData }) {
   if (data.neighbours.length === 0) return null
   const game = data.fps.games.find((g) => g.slug === CREATURE_CARD_GAME) ?? null
   return (
-    <section className="bp-near" aria-labelledby="bp-near-h">
+    <section className="bp-near" id="inne-istoty" aria-labelledby="bp-near-h">
       <div className="wrap">
         <div className="bp-sh">
           <h2 id="bp-near-h" className="h">
@@ -36,7 +36,7 @@ export function Neighbours({ data }: { data: BuildPageData }) {
 export function BuildFaq({ data }: { data: BuildPageData }) {
   if (data.faq.length === 0) return null
   return (
-    <section className="bp-faq" aria-labelledby="bp-faq-h">
+    <section className="bp-faq" id="pytania-o-zestaw" aria-labelledby="bp-faq-h">
       <div className="wrap bp-faq__in">
         <h2 id="bp-faq-h" className="h">
           Pytania o {data.build.accusative}

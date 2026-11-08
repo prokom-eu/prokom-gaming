@@ -15,6 +15,9 @@ export type AnalyticsEvents = {
   game_pick: { game: string }
   compare_open: undefined
   build_ask: { build: string }
+  /** The search dialog opened (NAWIGACJA §5.3) — never the typed text (privacy). */
+  search_open: undefined
+  search_select: { kind: 'build' | 'game' | 'page' | 'none' }
 }
 export type AnalyticsEvent = keyof AnalyticsEvents
 

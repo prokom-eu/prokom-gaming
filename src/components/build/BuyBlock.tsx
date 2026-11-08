@@ -20,7 +20,7 @@ import { AskLink } from './AskLink'
 export function BuyBlock({ data, pageUrl }: { data: BuildPageData; pageUrl: string }) {
   const { build } = data
   return (
-    <section className="bp-buy" aria-label={`${build.name}: cena i klatki`}>
+    <section className="bp-buy" id="cena-i-klatki" aria-label={`${build.name}: cena i klatki`}>
       <div className="wrap bp-buy__grid">
         <div className="bp-buy__main">
           <div className="bp-why cut">
