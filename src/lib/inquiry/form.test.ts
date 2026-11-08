@@ -118,7 +118,18 @@ describe('initialState: entry from the address', () => {
 
   it('the computer parameters', () => {
     expect(hasComputer(new URLSearchParams('zestaw=wampir'))).toBe(true)
+    expect(hasComputer(new URLSearchParams('tryb=dobor'))).toBe(true)
+    expect(hasComputer(new URLSearchParams('tryb=cos'))).toBe(false)
     expect(hasComputer(new URLSearchParams('swiatlo=lod&inne=x'))).toBe(false)
+  })
+
+  it('„Dla rodziców”: opens „Pomóżcie mi dobrać” for a child', () => {
+    expect(start('tryb=dobor&dla=dziecko')).toMatchObject({ mode: 'advice', forWhom: 'child' })
+    expect(inquiryType(start('tryb=dobor&dla=dziecko'))).toBe('advice')
+    expect(start('tryb=dobor')).toMatchObject({ mode: 'advice', forWhom: null })
+    // An unknown mode or recipient changes nothing; a named computer wins.
+    expect(start('tryb=cos&dla=kot')).toMatchObject({ mode: 'build', forWhom: null })
+    expect(start('tryb=dobor&zestaw=wampir')).toMatchObject({ mode: 'build', build: 'wampir' })
   })
 })
 

@@ -208,6 +208,10 @@ export function initialState(params: URLSearchParams, data: Pick<FormData, 'buil
   } else if (build && known.has(build)) {
     state.build = build
     state.changes = cleanChanges({ ram: params.get('ram'), ssd: params.get('ssd') })
+  } else if (params.get('tryb') === 'dobor') {
+    // „Opisz, w co gra dziecko” („Dla rodziców”): „Pomóżcie mi dobrać”, for a child when asked.
+    state.mode = 'advice'
+    if (params.get('dla') === 'dziecko') state.forWhom = 'child'
   }
 
   const light = params.get('swiatlo')
@@ -222,9 +226,12 @@ export function initialState(params: URLSearchParams, data: Pick<FormData, 'buil
   return state
 }
 
-/** Parameters that name a computer; without them the form returns to the saved draft. */
+/**
+ * Parameters that say what the form opens with (a computer, or „Pomóżcie mi dobrać”); without
+ * them the form returns to the saved draft.
+ */
 export function hasComputer(params: URLSearchParams): boolean {
-  return ['k', 'z', 'zestaw'].some((key) => params.has(key))
+  return ['k', 'z', 'zestaw'].some((key) => params.has(key)) || params.get('tryb') === 'dobor'
 }
 
 /**
