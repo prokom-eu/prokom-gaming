@@ -1,9 +1,18 @@
 # STAN — prokom-gaming
 
-Ostatnia aktualizacja: 08.11.2026 (scalone: A #79, B1 #80, B2 + D1 #81, C1 #82, GN-2b #86; ta gałąź: C2 „Kontakt” #83).
+Ostatnia aktualizacja: 08.11.2026 (scalone: A #79, B1 #80, B2 + D1 #81, C1 #82, GN-2b #86, C2 #83; ta gałąź: R9 — przegląd rundy v2).
 
 ## W toku
-- **Gałąź:** `feat/c2-kontakt` (od `origin/develop` po #79). Sesja C2 = R8 (`docs/zadania/gaming-runda-v2.md`, runda v2 §6).
+- **Gałąź:** `fix/r9-przeglad` (od `origin/develop` po #83). Sesja D2 = R9 (`docs/zadania/gaming-runda-v2.md` §4, kryteria `runda-v2/ZMIANY.md` §8).
+- **Jak sprawdzone:** lokalny `pnpm build` + `pnpm start` z `pnpm seed` (ten sam kod co staging; staging za hasłem Nginx). Skrypt Playwright poza repo: wszystkie 62 adresy z sitemapy — status, błędy JS, przewijanie w bok przy 360/390/414, zrzuty całych stron 1440 i 390, hero 16 kart zestawów i głównej przy 1920 (`tmp/zrzuty-r9`, po poprawce `tmp/zrzuty-r9-po`). Uwaga do zrzutów: sekcje głównej mają `content-visibility: auto` — zrzut całej strony zostawia je puste, skrypt wymusza `visible`.
+- **Znalezione i poprawione:** karta zestawu przewijała się w bok przy 360 px (wszystkie 16, +6 px) i u Peruna także przy 390 (+12 px): kafelki „Na jaki monitor” w 3 kolumnach (`1fr` nie kurczy się poniżej treści „bez kompromisów”) i kolumna `.bp-buy__grid` na telefonie. Teraz `minmax(0, 1fr)`, a poniżej 414 px kafelki jeden pod drugim (rozdzielczość i opis w rzędzie). Nowy e2e `narrow.e2e.spec.ts`: każda strona z sitemapy przy 360 px bez przewijania w bok (dotąd testy sprawdzały tylko 414). CI: pobieranie gitleaks z `--retry 4` (trzeci raz 504 z GitHuba). `.claude/launch.json`: konfiguracja `start` (podgląd buildu produkcyjnego).
+- **Kryteria §8:** imię ≠ komputer 16 × 5 i miniatury — `case-stage` zielony; `og:image` 1200×630 na każdej stronie sitemapy (`og`), `/favicon.ico` 200 i `WebSite` w JSON-LD (`seo`), brak „Z podań” i linków do źródeł (`highlight`) — testy są i przechodzą w CI; axe 0 (`a11y`, 1440 i 414); 62 strony 200 bez błędów JS; `prefers-reduced-motion`: globalna reguła w `globals.css` + Hero (`CALM`) i „Do góry” w szynie bez płynnego przewijania. Umami na produkcji i prawdziwe telefony — Krystian.
+- **Lighthouse mobile** (`next start`, 3 przebiegi, wydajność/dostępność/dobre praktyki): główna 85/88/88, `/zestawy` 87/90/87, Wampir 91×3, konfigurator 93/92/92, dobór 89×3, `/dla-rodzicow` 93/94/94, `/kontakt` 94×3; dostępność i dobre praktyki 100 wszędzie. Bez spadku względem A–C. **Niespełnione: LCP ≤ 2,5 s** (lab 3,1–3,7 s, tak samo przed rundą) — Pomysły na później.
+- **Sprawdzone:** lint, typecheck, 1036 testów, `format:check`, `build`; e2e `narrow` (nowy), `build-page`, `a11y`, `case-stage` na 1440 i 414 (93 zielone). Lokalnie 2 testy `offer-integrity` (panel) czerwone na bazie po wielu przebiegach — w CI zielone, kod nie zmieniony.
+- **Następny krok:** Krystian: staging i prawdziwe telefony (lista z PR-ów A–C2 + ta poprawka przy 360 px), potem produkcja po akceptacji szefa w Asanie. Dalej: R4 (nowe sceny, gdy będą grafiki) albo porządki z „Pomysłów na później”.
+
+## Uwagi na później (C2, scalone w #83)
+- Sesja C2 = R8 (`docs/zadania/gaming-runda-v2.md`, runda v2 §6).
 - **Zrobione:** nagłówek „Porozmawiajmy o Twoim komputerze” + „Odpowiadamy codziennie 8–22, zwykle w godzinę.”; trzy równe karty z jedną akcją (Zapytanie — złota, Telefon, E-mail; numer i adres jako duże linki ≥ 44 px, akcje wyrównane do dołu); sklep jako jedna szeroka karta (statyczna mapa `StoreMap` obok adresu, „Prowadź do sklepu”), adres i pinezka z `lib/site.ts`; „Pytanie, które nie jest wyceną?” (logika formularza bez zmian, krótsze zdanie bez powtórzenia); „Masz już komputer od nas?” z telefonem serwisu; nowy pas „Dane firmy” (firma, NIP, adres, e-mail, CEIDG, biała lista; `ct-firm` — nazwa `ct-company` była już zajęta przez „O nas”). Cele dotyku linków przez niewidoczne `::after` (podkreślenie zostaje przy tekście).
 - **Decyzje (rekomendacje Claude):** jeden wariant; wspólny komponent „dowodów firmy” z C1 nie wydzielony — C1 i C2 to osobne gałęzie od `develop`; do zrobienia po scaleniu obu (Pomysły na później).
 - **Otwarte `TODO(krystian)` (bez zmian):** numer telefonu Gaming i jego godziny [SZEF]; godziny otwarcia sklepu [SZEF] — do tego czasu tylko adres.
@@ -46,7 +55,9 @@ Ostatnia aktualizacja: 08.11.2026 (scalone: A #79, B1 #80, B2 + D1 #81, C1 #82, 
 - **Odstępstwo od spec §2.3 (pomiar):** poniżej 1440 odstępy 14 px i linki 12 px; „Odpowiadamy w godzinę” od 1400 px (spec: 1280); kapsuła od 1200, hamburger 761–1199. **Świadomie bez zmian:** linki kapsuły 36 px (axe bez uwag).
 - Pasek przewijania w Firefoksie — bez testu w Playwright (sprawdzany ręcznie).
 
-## Pomysły na później (R1–R2, GN-1, A, C1, B1, B2)
+## Pomysły na później (R1–R2, GN-1, A, C1, B1, B2, R9)
+- **R9 — LCP ≤ 2,5 s (kryterium §8) niespełnione:** lab 3,1–3,7 s na 7 stronach (główna i karta zestawu 3,5–3,7 s). Osobna sesja wydajności: obraz LCP (zdjęcie obudowy / scena) — rozmiar i `fetchPriority`, fonty `latin-ext`, JS powłoki; mierzyć z odniesieniem z tego samego dnia.
+- **R9 — niestabilny e2e** `shell.e2e.spec.ts:213` (414: „header hides on scroll down…”) — w CI 08.11 przeszedł dopiero przy ponowieniu; jak przy „menu drag” — poprawić na gałęzi `fix/`.
 - „Dla rodziców”: osadzić statyczną mapę (obraz, bez skryptów) w karcie sklepu — dziś link do trasy; liczby 48 h i godziny brać z `site-settings` (`offerTerms`, `responseTime`).
 - **GN-2b:** „Na tej stronie” na pozostałych podstronach + „Ostatnio oglądane” za flagą (szczegóły w „W toku” → B2).
 - Linki „Sprawdź w CEIDG / na białej liście” prowadzą do pustych wyszukiwarek — sprawdzić, czy da się podać NIP w adresie (np. biznes.gov.pl) i podmienić w `lib/site.ts` `registers`.

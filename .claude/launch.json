@@ -9,6 +9,13 @@
       "url": "http://localhost:3100"
     },
     {
+      "name": "start",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["start"],
+      "port": 3100,
+      "url": "http://localhost:3100"
+    },
+    {
       "name": "dev-gotowe-bon",
       "runtimeExecutable": "pnpm",
       "runtimeArgs": ["dev"],

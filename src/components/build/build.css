@@ -449,7 +449,7 @@
 }
 .bp-mon ul {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
   margin: 10px 0 0;
   padding: 0;
@@ -1370,7 +1370,8 @@
   .bp-tests,
   .bp-up,
   .bp-whatif {
-    grid-template-columns: 1fr;
+    /* minmax(0, …): a single column must not grow past the screen with its widest child. */
+    grid-template-columns: minmax(0, 1fr);
   }
   .bp-side,
   .bp-plan__view,
@@ -1486,6 +1487,21 @@
   }
   .bp-bar .btn {
     white-space: nowrap;
+  }
+}
+
+/* Three monitor tiles do not fit below 414 px („bez kompromisów”): one per row instead.
+   413 = just under the 414 screenshots, which keep the three tiles. */
+@media (max-width: 413px) {
+  .bp-mon ul {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+  }
+  .bp-mon li {
+    flex-direction: row;
+    align-items: baseline;
+    gap: 8px;
+    padding: 8px 10px;
   }
 }
 

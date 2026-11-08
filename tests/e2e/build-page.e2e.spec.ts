@@ -172,6 +172,15 @@ test.describe('phone', () => {
     )
     expect(overflow).toBe(0)
   })
+
+  test('monitor tiles hold their text (Perun: „bez kompromisów” three times)', async ({ page }) => {
+    await page.goto('/zestawy/perun')
+    await page.evaluate(() => document.fonts.ready.then(() => true))
+    const spill = await page
+      .locator('.bp-mon li')
+      .evaluateAll((items) => items.filter((li) => li.scrollWidth > li.clientWidth).length)
+    expect(spill).toBe(0)
+  })
 })
 
 test('the page carries no cost or internal model', async ({ page, playwright, baseURL }) => {
