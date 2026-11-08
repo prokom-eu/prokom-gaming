@@ -4,7 +4,7 @@ Ostatnia aktualizacja: 08.11.2026 (scalone: A #79, B1 #80, B2 + D1 #81, C1 #82; 
 
 ## W toku
 - **GN-2b (`feat/gn2b-na-tej-stronie`, od `develop` po #81; zastępuje zamknięty #85):** „Na tej stronie” w szynie także na „O nas” (5 sekcji — kotwice na istniejących `id` nagłówków H2) i „Komputer do {gry}” (polecane, każdy poziom mocy `#gm-tiers`, wymagania i pytania `#gm-more`). Bez grupy, zgodnie z §4.4: „Dobór pod grę” (1 sekcja), „Pytania” (własne zakładki grup), poradniki (własny spis treści). „Dla rodziców” — dopisać grupę po scaleniu C1 (#82): `id` są już na stronie (`start`, `pytania-rodzica`, `dowody`, `zakup`, `slowniczek`, `pytania`, `napisz`). „Ostatnio oglądane” nadal niezrobione (flaga + migracja `site-settings`; spec i tak trzyma grupę ukrytą do opinii prawnika). Sprawdzone: testy `railConfig` (każde `id` istnieje w plikach stron), e2e `rail`, `game-pages`, `content-pages` na 1440 i 414.
-- **Następny krok:** Krystian: scalić GN-2b (#86) i C2 (#83) po zielonym CI. Dla „Dla rodziców” (już w `develop`) dopisać grupę „Na tej stronie” w `railConfig.ts` — `id` sekcji są na stronie.
+- **Następny krok:** Krystian: scalić GN-2b (#86) i C2 (#83) po zielonym CI. „Dla rodziców” ma już swoją grupę „Na tej stronie” (7 części).
 
 ## Uwagi na później (C1, scalone w #82)
 - **Gałąź:** `feat/c1-dla-rodzicow` (od `origin/develop` po #79). Sesja C1 = R7 (`docs/zadania/gaming-runda-v2.md`, runda v2 §5).
