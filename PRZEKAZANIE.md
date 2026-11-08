@@ -49,7 +49,7 @@ G1 (szkielet) → G2 → … Każda sesja: `/zadanie G<n>` → plan → „ok”
 | `docs/strony/prokomgaming.md` | specyfikacja całej strony |
 | `docs/decyzje/` | ADR-G001 repo i serwer · G002 cennik i konfigurator · G003 wygląd i telefon · G004 FPS · G005 zapytania, metryka, konto (do przyjęcia w G0) |
 | `docs/zadania/prokomgaming.md` | sesje G0–G16, kalendarz, prompty, plan cięcia |
-| `docs/design/prokomgaming/` | plansze v37, hero na 5 ekranach, zrzuty 1440 i 414 wszystkich stron, 13 stanów telefonu, 6 kroków konfiguratora, sceny i pieczęcie 16 istot, tokeny |
+| `docs/design/prokomgaming/` | plansze v36, hero na 5 ekranach, zrzuty 1440 i 414 wszystkich stron, 13 stanów telefonu, 6 kroków konfiguratora, sceny i pieczęcie 16 istot, tokeny |
 | `seed/prokomgaming/` | cennik, 16 poziomów (9 stopni mocy), 57 opcji (+46 zdjęć), 16 zestawów, 16 istot, 33 gry, 1 584 klatki ze źródłami, FAQ (strona, główna, karta zestawu), poradniki |
 | `tests/fixtures/pricing-expected.json` | oczekiwane ceny i marże 16 zestawów, 11 scenariuszy, podsumowanie pełnego przeglądu (85 134 zgodnych, minimum marży), ceny „od” |
 | `docs/wzorce-prokom-web/` | kopie konfiguracji `prokom-web` do wzorowania w G1 i G16 |

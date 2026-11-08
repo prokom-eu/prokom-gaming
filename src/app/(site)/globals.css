@@ -1,0 +1,1577 @@
+/* Tailwind CSS 4 + design tokens (ADR-G003). Colour values live only in tokens.css.
+   Shell and base components are plain CSS classes: their values come 1:1 from the boards'
+   CSS (docs/design/prokomgaming/boards), which keeps the comparison with the pattern simple.
+   Page layouts use Tailwind utilities mapped to the same tokens in @theme below. */
+@import 'tailwindcss';
+@import '../../styles/tokens.css';
+
+/* next/font sets --font-cinzel etc. on <html>; the tokens keep the plain family names as a
+   fallback (global-error renders without the root layout and its fonts). */
+:root {
+  --font-name: var(--font-cinzel, 'Cinzel'), Georgia, serif;
+  --font-head: var(--font-cormorant, 'Cormorant Garamond'), Georgia, serif;
+  --font-text: var(--font-manrope, 'Manrope'), system-ui, sans-serif;
+  --font-logo: var(--font-archivo, 'Archivo'), sans-serif;
+}
+
+@theme inline {
+  --color-smola: var(--smola);
+  --color-noc: var(--noc);
+  --color-mech: var(--mech);
+  --color-kosc: var(--kosc);
+  --color-kosc2: var(--kosc2);
+  --color-kosc-hi: var(--kosc-hi);
+  --color-mgla: var(--mgla);
+  --color-lead: var(--lead);
+  --color-grom: var(--grom);
+  --color-grom2: var(--grom2);
+  --color-on-grom: var(--on-grom);
+  --color-line: var(--line);
+  --font-name: var(--font-name);
+  --font-head: var(--font-head);
+  --font-text: var(--font-text);
+}
+
+/* ---------- base ---------- */
+html {
+  background: var(--smola);
+  color-scheme: dark;
+}
+/* Page scrollbar (NAWIGACJA.md §3): gold thumb on a night track. Site only — the panel keeps
+   Payload's. scrollbar-color switches off ::-webkit-scrollbar styles in Chrome/Edge 121+, so it
+   applies only where those do not exist (Firefox). Hidden carousel bars stay hidden. */
+html::-webkit-scrollbar {
+  width: 12px;
+}
+html::-webkit-scrollbar-track {
+  background: var(--noc);
+}
+html::-webkit-scrollbar-thumb {
+  border: 3px solid var(--noc);
+  border-radius: 12px;
+  background: var(--scroll-thumb);
+}
+html::-webkit-scrollbar-thumb:hover {
+  background: var(--grom2);
+}
+@supports not selector(::-webkit-scrollbar) {
+  html {
+    scrollbar-color: var(--grom) var(--noc);
+    scrollbar-width: auto;
+  }
+}
+body {
+  margin: 0;
+  background: var(--smola);
+  color: var(--kosc);
+  font-family: var(--font-text);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+:where(button) {
+  font: inherit;
+  color: inherit;
+}
+:where(a, button, input, select, summary, [tabindex]):focus-visible {
+  outline: 3px solid var(--grom2);
+  outline-offset: 3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+.skip-link {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: 400;
+  padding: 10px 16px;
+  border-radius: var(--radius-pill);
+  background: var(--grom);
+  color: var(--on-grom);
+  font-weight: 800;
+  transform: translateY(-200%);
+}
+.skip-link:focus-visible {
+  transform: none;
+}
+
+/* type helpers from the boards (.h, .nm, .lore) */
+.h {
+  font-family: var(--font-head);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.02;
+  text-wrap: balance;
+}
+.nm {
+  font-family: var(--font-name);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1;
+}
+.lore {
+  font-family: var(--font-head);
+  font-style: italic;
+  font-weight: 500;
+}
+.cut {
+  clip-path: polygon(
+    var(--cut) 0,
+    calc(100% - var(--cut)) 0,
+    100% var(--cut),
+    100% calc(100% - var(--cut)),
+    calc(100% - var(--cut)) 100%,
+    var(--cut) 100%,
+    0 calc(100% - var(--cut)),
+    0 var(--cut)
+  );
+}
+.wrap {
+  position: relative;
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 0 var(--gutter-desktop);
+}
+@media (max-width: 1000px) {
+  .wrap {
+    padding: 0 var(--gutter-mobile);
+  }
+}
+
+/* ---------- logo ---------- */
+.logo {
+  display: inline-flex;
+  flex: none;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 44px;
+  line-height: 1;
+}
+.logo b {
+  font-family: var(--font-logo);
+  font-stretch: 118%;
+  font-weight: 800;
+  font-size: 23px;
+  letter-spacing: -0.01em;
+  color: var(--kosc);
+}
+.logo b i {
+  font-style: normal;
+  color: var(--grom);
+}
+.logo__sub {
+  align-self: flex-end;
+  margin-top: 5px;
+  padding-top: 4px;
+  border-top: 2px solid var(--grom);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.32em;
+  color: var(--kosc2);
+}
+.logo--sm b {
+  font-size: 20px;
+}
+
+/* ---------- buttons, chips, segmented ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 0 26px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(180deg, var(--grom2), var(--grom));
+  color: var(--on-grom);
+  font-weight: 800;
+  font-size: 15.5px;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--grom2) 45%, transparent),
+    0 12px 40px -10px color-mix(in srgb, var(--grom) 60%, transparent);
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
+}
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--grom2) 60%, transparent),
+    0 16px 50px -10px color-mix(in srgb, var(--grom) 75%, transparent);
+}
+.btn--lg {
+  min-height: 58px;
+  padding: 0 34px;
+  font-size: 17px;
+}
+.btn--ghost {
+  background: color-mix(in srgb, var(--kosc) 6%, transparent);
+  color: var(--kosc);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--kosc) 22%, transparent);
+}
+.btn--ghost:hover {
+  background: color-mix(in srgb, var(--kosc) 10%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--kosc) 22%, transparent);
+}
+.lnk {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 15.5px;
+  border-bottom: 1px solid color-mix(in srgb, var(--kosc) 35%, transparent);
+  padding-bottom: 3px;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 9px 16px;
+  border-radius: var(--radius-pill);
+  border: 1px solid color-mix(in srgb, var(--kosc) 16%, transparent);
+  background: transparent;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--nav-text);
+  white-space: nowrap;
+  cursor: pointer;
+}
+.chip[aria-pressed='true'] {
+  background: var(--grom);
+  border-color: var(--grom);
+  color: var(--on-grom);
+}
+.seg {
+  display: inline-flex;
+  padding: 4px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--line);
+}
+.seg button {
+  position: relative;
+  min-height: 36px;
+  padding: 8px 14px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: none;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--kosc2);
+  cursor: pointer;
+}
+/* 36 px pill inside a 4 px padded track: the touch area covers the track, 44 px. */
+.seg button::after {
+  content: '';
+  position: absolute;
+  inset: -4px 0;
+}
+.seg button[aria-checked='true'] {
+  background: var(--grom);
+  color: var(--on-grom);
+}
+/* A choice without data (e.g. no FPS in 4K): visible, not selectable. */
+.seg button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ---------- sigil (CSS mask: colour = currentColor) ---------- */
+.sigil {
+  display: inline-block;
+  flex: none;
+  background: currentColor;
+  -webkit-mask: var(--sigil) center / contain no-repeat;
+  mask: var(--sigil) center / contain no-repeat;
+}
+
+/* ---------- horizontal scroll ---------- */
+.hscroll {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+}
+.hscroll::-webkit-scrollbar {
+  display: none;
+}
+.hscroll > * {
+  flex: none;
+  scroll-snap-align: start;
+}
+
+/* ---------- scene (image layers, ADR-G003 §3) ---------- */
+.scene {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: var(--scene-bg);
+  pointer-events: none;
+}
+.scene img {
+  object-fit: cover;
+  object-position: 50% 100%;
+}
+.scene__fg {
+  position: absolute;
+  inset: 0;
+}
+.scene--wide img {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: max(300%, 4320px);
+  max-width: none;
+  height: auto;
+  transform: translateX(-50%);
+}
+
+/* ---------- header (NAWIGACJA.md §2, §6; ADR-G012) ----------
+   Fixed on every width from 761 px (decision 05.11): solid at the top of a normal page,
+   transparent over a scene, glass with a gold thread once the page moves, 66 px from 80 px,
+   hidden while scrolling down. State attributes come from SiteHeader (lib/navScroll.ts). */
+.nav {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  height: var(--nav-h);
+  padding: 0 28px;
+  background: linear-gradient(180deg, var(--nav-solid-from), var(--nav-solid-to));
+  border-bottom: 1px solid var(--line);
+  /* Same timing as the sticky bars that follow it (top 0.3s): no overlap while both move. */
+  transition:
+    transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1),
+    height 0.3s cubic-bezier(0.2, 0.8, 0.2, 1),
+    background-color 0.2s;
+}
+/* A page without a scene keeps its content below the header. */
+body:not(:has([data-scene-top])) {
+  padding-top: var(--nav-h);
+}
+@media print {
+  body:not(:has([data-scene-top])) {
+    padding-top: 0;
+  }
+}
+/* Anchor jumps and keyboard focus scroll to below the header (WCAG 2.4.11): a jump up brings the
+   header back over the target. The phone keeps its own rules (header in the flow). */
+@media (min-width: 761px) {
+  html {
+    scroll-padding-top: calc(var(--nav-h) + 16px);
+  }
+}
+/* A page that starts with a scene marks it with [data-scene-top]: the header floats over it. */
+body:has([data-scene-top]) .nav[data-top='true'] {
+  background: none;
+  border-bottom-color: transparent;
+}
+.nav[data-top='false'] {
+  background: var(--nav-glass);
+  /* -webkit- first: Lightning CSS keeps only the last of the pair, Chrome needs the plain one. */
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+}
+.nav::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 -1px 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--nav-thread) 50%, transparent);
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+}
+.nav[data-top='false']::after {
+  opacity: 1;
+}
+.nav[data-hidden='true'] {
+  transform: translateY(-110%);
+}
+@media (min-width: 761px) {
+  .nav[data-scrolled='true'] {
+    height: var(--nav-h-scrolled);
+  }
+}
+
+/* the 7 links in a capsule, centred between the mark and the actions; active page = gold pill
+   with a rhombus under it */
+.nav__caps {
+  margin: 0 auto;
+}
+.nav__caps ul {
+  display: flex;
+  gap: 2px;
+  margin: 0;
+  padding: 5px;
+  list-style: none;
+  border-radius: var(--radius-pill);
+  background: var(--nav-caps-bg);
+  border: 1px solid var(--nav-caps-line);
+  box-shadow: inset 0 1px 0 var(--nav-caps-shine);
+}
+.nav__caps a {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: var(--radius-pill);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--nav-link);
+  white-space: nowrap;
+  transition:
+    color 0.2s,
+    background-color 0.2s;
+}
+.nav__caps a:hover {
+  color: var(--kosc);
+  background: var(--nav-link-hover-bg);
+}
+.nav__caps a[aria-current='page'] {
+  color: var(--grom2);
+  background: linear-gradient(180deg, var(--nav-on-from), var(--nav-on-to));
+  box-shadow: inset 0 0 0 1px var(--nav-on-line);
+}
+.nav__caps a[aria-current='page']::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -6px;
+  width: 5px;
+  height: 5px;
+  margin-left: -2.5px;
+  background: var(--grom);
+  transform: rotate(45deg);
+  box-shadow: 0 0 10px var(--nav-on-glow);
+}
+.nav :focus-visible {
+  outline: 2px solid var(--grom);
+  outline-offset: 3px;
+}
+
+/* „Odpowiadamy w godzinę / codziennie 8–22” */
+.nav__phone {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 9px;
+  min-height: 44px;
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--nav-link);
+  white-space: nowrap;
+}
+.nav__phone svg {
+  flex: none;
+  color: var(--grom);
+}
+.nav__phone em {
+  display: block;
+  font-style: normal;
+  font-weight: 500;
+  color: var(--mgla);
+}
+
+/* round comparison and account (42 px look, 46 px touch area) */
+.ico {
+  position: relative;
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid var(--nav-ico-line);
+  color: var(--kosc);
+  background: var(--nav-ico-bg);
+  transition:
+    border-color 0.2s,
+    color 0.2s;
+}
+/* The header's search: hidden where the side rail (≥ 1400 px) has it — but not on pages without
+   the rail (/konto, /metryka), where the magnifier stays the way in (NAWIGACJA §5). */
+@media (min-width: 1400px) {
+  .nav__search:not(.nav__search--always) {
+    display: none;
+  }
+}
+button.ico {
+  cursor: pointer;
+  font: inherit;
+}
+.ico::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+}
+.ico:hover {
+  border-color: var(--nav-ico-hover);
+  color: var(--grom2);
+}
+.badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  display: grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 9px;
+  background: var(--grom);
+  color: var(--on-grom);
+  font-style: normal;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1;
+}
+.nav .badge {
+  box-shadow: 0 0 0 2px var(--noc);
+}
+
+/* „Dobierz komputer”: gold gradient, sheen on hover */
+.nav .nav__cta {
+  position: relative;
+  overflow: hidden;
+  flex: none;
+  gap: 9px;
+  min-height: 44px;
+  padding: 0 20px 0 22px;
+  background: var(--gold-grad);
+  font-size: 14.5px;
+  box-shadow:
+    0 8px 24px -10px var(--gold-cta-shadow),
+    inset 0 1px 0 var(--gold-cta-inset);
+}
+.nav .nav__cta::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -60%;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(100deg, transparent, var(--gold-sheen), transparent);
+  transform: skewX(-20deg);
+  transition: left 0.6s;
+  pointer-events: none;
+}
+.nav .nav__cta:hover::before {
+  left: 120%;
+}
+@media (prefers-reduced-motion: reduce) {
+  .nav .nav__cta::before {
+    display: none;
+  }
+}
+
+.burg {
+  display: none;
+  flex: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid var(--nav-ico-line);
+  background: var(--nav-ico-bg);
+  cursor: pointer;
+}
+.burg i {
+  display: block;
+  width: 16px;
+  height: 1.5px;
+  background: var(--kosc);
+}
+
+/* A light page (Dla rodziców) marks its top section with [data-nav-light]: dark text while the
+   header floats over it; once the page moves, the glass header has the normal colours. */
+body:has([data-nav-light]) .nav:not([data-top='false']) {
+  --nav-link: var(--par-nav);
+  --kosc: var(--par-nav);
+  --mgla: var(--par-logo-sub);
+  --kosc-hi: var(--par-head);
+  --line: var(--par-ico-line);
+  --nav-ico-line: var(--par-ico-line);
+  --nav-ico-bg: var(--par-ico-bg);
+  --nav-caps-bg: var(--par-caps-bg);
+  --nav-caps-line: var(--par-caps-line);
+  --nav-link-hover-bg: var(--par-caps-line);
+}
+/* Glass over light sections would let dark headings show through: solid dark instead. */
+body:has([data-nav-light]) .nav[data-top='false'] {
+  background: linear-gradient(180deg, var(--nav-solid-from), var(--nav-solid-to));
+}
+body:has([data-nav-light]) .nav:not([data-top='false']) .logo b {
+  color: var(--par-head);
+}
+body:has([data-nav-light]) .nav:not([data-top='false']) .logo__sub {
+  color: var(--par-logo-sub);
+}
+body:has([data-nav-light]) .nav:not([data-top='false']) .nav__caps a[aria-current='page'] {
+  color: var(--par-on-text);
+  background: var(--par-on-bg);
+  box-shadow: none;
+}
+
+/* widths (NAWIGACJA.md §2.3, measured): the full header needs ~1432 px with the spec's gaps, so
+   below 1440 the gaps and link padding tighten; „Odpowiadamy” needs ≥ 1400 px (spec said 1280 —
+   ~1384 px of content does not fit there); 761–1199 hamburger. */
+@media (max-width: 1439px) {
+  .nav {
+    gap: 14px;
+  }
+  .nav__caps a {
+    padding: 0 12px;
+  }
+}
+@media (max-width: 1399px) {
+  .nav__phone {
+    display: none;
+  }
+}
+/* GN-3: the magnifier (42 px) joins the header up to 1399 px; at 1200–1279 the header gets a bit
+   denser so it still fits (measured: +39 px over at 1200 without this). */
+@media (max-width: 1279px) {
+  .nav {
+    gap: 10px;
+  }
+  /* 9 px, not 10: Linux fonts in CI are a little wider (1200 px was 1.4 px over). */
+  .nav__caps a {
+    padding: 0 9px;
+  }
+}
+@media (max-width: 1199px) {
+  .nav__caps {
+    display: none;
+  }
+  .nav .logo {
+    margin-right: auto;
+  }
+  .burg {
+    display: flex;
+  }
+}
+
+/* Sticky bars and side panels sit under the header while it is shown (--nav-offset = its current
+   height, 0 when hidden or on the phone, where the bars have their own rules). */
+:root {
+  --nav-offset: 0px;
+}
+@media (min-width: 761px) {
+  body:has(.nav:not([data-hidden='true'])) {
+    --nav-offset: var(--nav-h);
+  }
+  body:has(.nav[data-scrolled='true']:not([data-hidden='true'])) {
+    --nav-offset: var(--nav-h-scrolled);
+  }
+}
+
+/* ---------- phone (≤ 760 px): compact header that hides, bottom tab bar ---------- */
+.tabbar {
+  display: none;
+}
+@media (max-width: 760px) {
+  /* In the flow on a normal page (as before GN-1); fixed over a scene. */
+  .nav {
+    position: sticky;
+    top: 0;
+    gap: 8px;
+    height: auto;
+    padding: 12px 16px;
+  }
+  body:not(:has([data-scene-top])) {
+    padding-top: 0;
+  }
+  body:has([data-scene-top]) .nav {
+    position: fixed;
+  }
+  .nav .nav__cta,
+  .nav .burg {
+    display: none;
+  }
+  /* 36 px look (board), 44 px touch area (ADR-G003 §4). GN-3 adds the search button here. */
+  .nav .ico {
+    width: 36px;
+    height: 36px;
+  }
+  .nav .ico::after {
+    inset: -4px;
+  }
+  .nav .badge {
+    top: -3px;
+    right: -3px;
+  }
+  .nav .logo b {
+    font-size: 19px;
+  }
+  .nav .logo__sub {
+    font-size: 9px;
+  }
+  body {
+    padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom));
+  }
+  .tabbar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 250;
+    display: flex;
+    height: calc(var(--tabbar-h) + env(safe-area-inset-bottom));
+    padding: 0 6px env(safe-area-inset-bottom);
+    background: var(--tabbar-glass);
+    /* -webkit- first: Lightning CSS keeps only the last of the pair, Chrome needs the plain one. */
+    -webkit-backdrop-filter: blur(18px);
+    backdrop-filter: blur(18px);
+    border-top: 1px solid var(--tabbar-line);
+  }
+}
+.tabbar__item {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--mgla);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.tabbar__item svg {
+  width: 21px;
+  height: 21px;
+}
+.tabbar__item[aria-current='page'] {
+  color: var(--grom2);
+}
+.tabbar__item[aria-current='page']::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 28%;
+  right: 28%;
+  height: 2px;
+  border-radius: 0 0 2px 2px;
+  background: var(--grom);
+  box-shadow: 0 0 10px var(--nav-on-glow);
+}
+.tabbar__item .badge {
+  top: 8px;
+  right: auto;
+  left: calc(50% + 6px);
+  min-width: 17px;
+  height: 17px;
+  font-size: 10.5px;
+}
+/* Konfigurator: the gold orb, 18 px above the bar. */
+.tabbar__main i {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  margin-top: -18px;
+  border-radius: 50%;
+  color: var(--on-grom);
+  background: var(--gold-grad);
+  box-shadow:
+    0 0 0 4px var(--noc),
+    0 10px 24px -8px var(--orb-shadow);
+}
+.tabbar__main[aria-current='page']::before {
+  display: none;
+}
+
+/* ---------- bottom sheet (<dialog>) ---------- */
+.sheet {
+  position: fixed;
+  inset: auto 0 0 0;
+  width: 100%;
+  max-width: none;
+  max-height: min(92dvh, 900px);
+  margin: 0;
+  padding: 8px 18px calc(24px + env(safe-area-inset-bottom));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  color: var(--kosc);
+  background: linear-gradient(180deg, var(--sheet-from), var(--panel-to) 40%);
+  border: 0;
+  border-top: 1px solid color-mix(in srgb, var(--grom) 28%, transparent);
+  border-radius: var(--radius-sheet) var(--radius-sheet) 0 0;
+  box-shadow: 0 -30px 80px -20px var(--shadow);
+  transform: translateY(104%);
+  transition:
+    transform 0.34s cubic-bezier(0.2, 0.8, 0.2, 1),
+    overlay 0.34s allow-discrete,
+    display 0.34s allow-discrete;
+}
+.sheet[open] {
+  transform: translateY(var(--drag, 0px));
+}
+@starting-style {
+  .sheet[open] {
+    transform: translateY(104%);
+  }
+}
+.sheet[data-dragging='true'] {
+  transition: none;
+}
+.sheet::backdrop {
+  background: var(--backdrop);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+  opacity: 0;
+  transition:
+    opacity 0.25s,
+    overlay 0.25s allow-discrete,
+    display 0.25s allow-discrete;
+}
+.sheet[open]::backdrop {
+  opacity: 1;
+}
+@starting-style {
+  .sheet[open]::backdrop {
+    opacity: 0;
+  }
+}
+/* Tablet and up: the same sheet as a panel from the right (ADR-G003 §4). */
+@media (min-width: 761px) {
+  .sheet--side {
+    inset: 0 0 0 auto;
+    width: 420px;
+    height: 100dvh;
+    max-height: none;
+    border-top: 0;
+    border-left: 1px solid color-mix(in srgb, var(--grom) 28%, transparent);
+    border-radius: 0;
+    transform: translateX(104%);
+  }
+  .sheet--side[open] {
+    transform: none;
+  }
+  @starting-style {
+    .sheet--side[open] {
+      transform: translateX(104%);
+    }
+  }
+}
+.sheet__grab {
+  display: block;
+  width: 44px;
+  height: 5px;
+  margin: 4px auto 10px;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--kosc) 25%, transparent);
+  touch-action: none;
+}
+.sheet__close {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--kosc) 18%, transparent);
+  background: none;
+  color: var(--kosc);
+  cursor: pointer;
+}
+html:has(dialog[open]) {
+  overflow: hidden;
+}
+
+/* ---------- menu (content of the menu sheet) ---------- */
+.sheet__drag {
+  touch-action: none;
+  user-select: none;
+}
+.sheet__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 0 14px;
+}
+.menu__search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 48px;
+  margin: 0 0 18px;
+  padding: 0 16px;
+  border: 1px solid color-mix(in srgb, var(--grom) 42%, transparent);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--grom) 6%, transparent);
+  color: var(--mgla);
+  font: inherit;
+  font-size: 15px;
+  text-align: left;
+  cursor: pointer;
+}
+.menu__search svg {
+  color: var(--grom);
+}
+.menu__sec {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin: 6px 0 10px;
+}
+.menu__sec h2 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--kosc-strong);
+}
+.menu__sec a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--grom);
+}
+.menu__creatures {
+  margin: 0 -18px;
+  padding: 2px 18px 14px;
+  list-style: none;
+  scroll-padding-inline: 18px;
+}
+.menu__creature {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 92px;
+  padding: 12px 8px 10px;
+  text-align: center;
+  border: 1px solid
+    color-mix(in srgb, var(--c) 35%, color-mix(in srgb, var(--kosc) 8%, transparent));
+  border-radius: 16px;
+  background: radial-gradient(
+    120% 80% at 50% 0,
+    color-mix(in srgb, var(--c) 18%, transparent),
+    transparent 70%
+  );
+}
+.menu__creature b {
+  font-size: 12.5px;
+  color: var(--kosc-strong);
+  letter-spacing: 0.03em;
+}
+.menu__creature small {
+  font-size: 11.5px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.menu__tiles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.menu__tile {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  height: 100%;
+  min-height: 92px;
+  padding: 14px;
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--kosc) 4.5%, transparent);
+  border: 1px solid color-mix(in srgb, var(--kosc) 9%, transparent);
+}
+.menu__tile svg {
+  margin-bottom: 6px;
+  color: var(--grom);
+}
+.menu__tile b {
+  font-size: 14.5px;
+  line-height: 1.25;
+  color: var(--kosc-strong);
+}
+.menu__tile small {
+  font-size: 12.5px;
+  color: var(--mgla);
+}
+.menu__links {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid color-mix(in srgb, var(--kosc) 10%, transparent);
+}
+.menu__links a {
+  display: block;
+  padding: 13px 2px;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--nav-text);
+  border-bottom: 1px solid color-mix(in srgb, var(--kosc) 7%, transparent);
+}
+.menu__tile[aria-current='page'],
+.menu__links a[aria-current='page'] {
+  color: var(--grom2);
+  background: linear-gradient(180deg, var(--nav-on-from), var(--nav-on-to));
+  border-color: var(--nav-on-line);
+}
+.menu__links a[aria-current='page'] {
+  padding-inline: 14px;
+  border-radius: var(--radius-pill);
+  border-bottom-color: transparent;
+  box-shadow: inset 0 0 0 1px var(--nav-on-line);
+}
+.menu__tile[aria-current='page'] b {
+  color: var(--grom2);
+}
+.menu__contact {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+  padding: 16px;
+  border-radius: 18px;
+  border: 1px solid color-mix(in srgb, var(--grom) 30%, transparent);
+  background: color-mix(in srgb, var(--grom) 6%, transparent);
+}
+.menu__contact b {
+  display: block;
+  font-size: 15px;
+  color: var(--kosc-strong);
+}
+.menu__contact small {
+  font-size: 13px;
+  color: var(--muted);
+}
+.menu__contact-actions {
+  display: flex;
+  gap: 10px;
+}
+.menu__contact-actions .btn {
+  flex: 1;
+  min-height: 46px;
+  padding: 0 16px;
+  font-size: 15px;
+}
+
+/* ---------- footer ---------- */
+.foot {
+  padding: 70px 0 30px;
+  background: var(--foot);
+  border-top: 1px solid color-mix(in srgb, var(--grom) 20%, transparent);
+}
+.foot__grid {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr 1fr 1fr 1.3fr;
+  gap: 36px;
+}
+.foot p {
+  margin: 18px 0 0;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--foot-text);
+}
+.foot .foot__tight {
+  margin-top: 8px;
+}
+.foot h2 {
+  margin: 0 0 14px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--foot-head);
+}
+.foot ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.foot__links a {
+  display: block;
+  margin-top: 8px;
+  font-size: 14px;
+  color: var(--mgla);
+}
+.foot .foot__cta {
+  color: var(--grom);
+  font-weight: 700;
+}
+.foot__bar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 14px 30px;
+  margin-top: 50px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+  font-size: 13px;
+  color: var(--foot-text);
+}
+.foot__bar a {
+  color: var(--mgla);
+}
+.foot__bar ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+.foot__brand {
+  flex-basis: 100%;
+  margin: 0;
+}
+/* A link inside a sentence: underlined, not told apart by colour alone (WCAG 1.4.1). */
+.foot__brand a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+@media (max-width: 1000px) {
+  .foot__grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media (max-width: 760px) {
+  .foot {
+    padding: 40px 0 26px;
+  }
+  .foot__grid {
+    gap: 26px 18px;
+  }
+  .foot__grid > :first-child,
+  .foot__grid > :last-child {
+    grid-column: 1 / -1;
+  }
+  /* 44 px touch targets (ADR-G003 §4): the list is taller than on the board (5 px padding). */
+  .foot__links a,
+  .foot .foot__cta,
+  .foot__bar a {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    margin-top: 0;
+    padding: 0;
+  }
+  .foot__bar {
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 28px;
+  }
+  /* A link inside a sentence stays inline (WCAG 2.5.8 exception for inline targets). */
+  .foot__bar .foot__brand a {
+    display: inline;
+    min-height: 0;
+  }
+}
+
+/* ---------- cookie banner ---------- */
+.ckb {
+  position: fixed;
+  left: 24px;
+  bottom: 24px;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: min(400px, calc(100vw - 32px));
+  padding: 20px 22px;
+  border: 1px solid color-mix(in srgb, var(--grom) 35%, transparent);
+  background: var(--banner-bg);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 30px 70px -20px var(--shadow);
+  animation: ck-in 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) 1.2s both;
+}
+@keyframes ck-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+.ckb h2 {
+  margin: 0;
+  font-size: 15.5px;
+  font-weight: 700;
+  color: var(--kosc-strong);
+}
+.ckb p {
+  margin: 6px 0 0;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--banner-text);
+}
+.ckb a {
+  color: var(--grom);
+  text-decoration: underline;
+}
+.ckb__actions {
+  display: flex;
+  gap: 10px;
+}
+.ckb__actions .btn {
+  flex: 1;
+  min-height: 44px;
+  font-size: 14px;
+}
+@media (max-width: 640px) {
+  .ckb {
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    width: auto;
+  }
+}
+@media (max-width: 760px) {
+  .ckb {
+    bottom: calc(74px + env(safe-area-inset-bottom));
+  }
+}
+
+/* ---------- 404 ---------- */
+.e404 {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 100svh;
+  height: clamp(720px, 56vw, 960px);
+  overflow: hidden;
+  isolation: isolate;
+}
+.e404__veil {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      60% 60% at 50% 55%,
+      color-mix(in srgb, var(--scene-bg) 30%, transparent),
+      color-mix(in srgb, var(--scene-bg) 90%, transparent)
+    ),
+    linear-gradient(0deg, var(--scene-fade), transparent 30%);
+}
+.e404__in {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 60px;
+  text-align: center;
+}
+.e404__sigil {
+  color: var(--c-licho);
+  filter: drop-shadow(0 0 30px var(--c-licho));
+  animation: e404-blink 5s ease-in-out infinite;
+}
+@keyframes e404-blink {
+  0%,
+  92%,
+  100% {
+    opacity: 1;
+  }
+  95% {
+    opacity: 0.25;
+  }
+}
+.e404__num {
+  margin-top: 10px;
+  font-size: 150px;
+  line-height: 1;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--c-licho) 12%, var(--kosc-hi)),
+    var(--c-licho) 60%,
+    color-mix(in srgb, var(--c-licho) 25%, var(--smola))
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 40px color-mix(in srgb, var(--c-licho) 40%, transparent));
+}
+.e404 h1 {
+  margin: 12px 0 0;
+  font-size: 54px;
+  color: var(--kosc-hi);
+}
+.e404 p {
+  max-width: 560px;
+  margin: 14px auto 0;
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--lead);
+}
+.e404__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 30px;
+}
+.e404__links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px 26px;
+  margin: 28px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.e404__links a {
+  display: inline-flex;
+  align-items: flex-end;
+  min-height: 44px;
+  padding: 10px 0 2px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--link-text);
+  border-bottom: 1px solid color-mix(in srgb, var(--kosc) 30%, transparent);
+}
+@media (max-width: 700px) {
+  .e404__num {
+    font-size: 96px;
+  }
+  .e404 h1 {
+    font-size: 34px;
+  }
+  .e404__actions {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+/* ---------- FPS list (board Zestaw „Ile klatek”, panels of board Gra) ---------- */
+.src {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.src i {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+.src--pk {
+  color: var(--src-pk-text);
+}
+.src--pk i {
+  background: var(--src-pk);
+}
+.src--ind {
+  color: var(--src-ind-text);
+}
+.src--ind i {
+  background: var(--src-ind);
+}
+.src--est {
+  color: var(--src-est-text);
+}
+.src--est i {
+  background: var(--src-est);
+}
+.fps h2 {
+  margin: 0;
+  font-size: 40px;
+}
+.fps__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+.fps__note {
+  margin: 10px 0 0;
+  font-size: 14px;
+  color: var(--note);
+}
+.fps__list {
+  margin: 20px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.fps__row {
+  display: grid;
+  grid-template-columns: 220px 1fr 130px 170px;
+  gap: 18px;
+  align-items: center;
+  padding: 11px 0;
+  border-top: 1px solid var(--fps-row-line);
+}
+.fps__game {
+  font-size: 15px;
+  font-weight: 600;
+}
+.fps__game small {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--mgla);
+}
+.fps__bar {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--fps-track);
+}
+.fps__bar s {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+  background: var(--c);
+  box-shadow: 0 0 12px var(--c);
+  transition: width 0.6s;
+}
+.fps__row b {
+  text-align: right;
+  font-size: 15px;
+}
+.fps__row .src {
+  justify-content: flex-end;
+}
+.fps__how {
+  margin-top: 16px;
+  /* `.lnk` look on a <button>: only the bottom line, 44 px touch height. */
+  min-height: 44px;
+  padding: 0 0 3px;
+  border-top: 0;
+  border-left: 0;
+  border-right: 0;
+  background: none;
+  cursor: pointer;
+}
+@media (max-width: 1000px) {
+  .fps__row {
+    grid-template-columns: 1fr auto;
+    gap: 6px 12px;
+    padding: 12px 0;
+  }
+  /* Board order on a phone: game | FPS, then the bar, then the source label under it. */
+  .fps__game {
+    order: 1;
+  }
+  .fps__row b {
+    order: 2;
+  }
+  .fps__bar {
+    order: 3;
+    grid-column: 1 / -1;
+  }
+  .fps__row .src {
+    order: 4;
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+    font-size: 11.5px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fps__bar s {
+    transition: none;
+  }
+}
+.how h3 {
+  margin: 28px 0 0;
+  font-size: 28px;
+}
+.how h3:first-child {
+  margin-top: 0;
+}
+.how__note {
+  margin: 6px 0 10px;
+  font-size: 14px;
+  color: var(--note);
+}
+.how dl {
+  margin: 0;
+}
+.how dl div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+  font-size: 14px;
+}
+.how dt {
+  color: var(--mgla);
+}
+.how dd {
+  margin: 0;
+  text-align: right;
+  font-weight: 600;
+}
+.how p.src {
+  display: flex;
+  align-items: baseline;
+  margin: 10px 0 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.how__sources {
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 14px;
+}
+.how__sources li {
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+}
+.how__sources b {
+  display: block;
+}
+.how__sources span {
+  color: var(--mgla);
+}
+.how__sources a {
+  color: var(--link-text);
+  border-bottom: 1px solid var(--line);
+}

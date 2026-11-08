@@ -1,0 +1,24 @@
+# Keep the build context small and free of secrets and local data.
+.git
+.github
+.claude
+.husky
+.next
+node_modules
+media
+backups
+docs
+# The seed's JSON stays: src/lib/site.ts imports creatures.json (shell data). Photos are seed-only.
+seed/*/media
+# Fixtures stay: `next build` type-checks the unit tests, and they (and src/seed/offer.ts) import them.
+tests/*
+!tests/fixtures
+playwright-report
+test-results
+coverage
+.env
+.env.*
+!.env.example
+*.log
+Dockerfile
+# docker/ and scripts/ stay: the image carries the deploy files of its commit (/deploy, G16).

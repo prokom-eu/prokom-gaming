@@ -1,0 +1,19 @@
+# pnpm settings (pnpm 11 reads them from here, not from package.json).
+# Only these dependencies may run install/build scripts.
+allowBuilds:
+  esbuild: true
+  sharp: true
+  unrs-resolver: true
+
+# Security fixes for transitive dependencies (pnpm audit 08.11.2026), exact versions like the rest
+# of the repo. Next, React and Payload stay pinned together with prokom-web (ADR-G001); these only
+# lift packages *inside* them to a patched release. Remove an entry once its parent ships the fix.
+overrides:
+  # payload@3.91.0 pins 7.29.1 (several advisories, fixed in 7.30.1).
+  'payload>undici': 7.30.2
+  # monaco-editor@0.57.0 (code fields in the panel) pins 3.4.15 (XSS, fixed in 3.4.17).
+  'monaco-editor>dompurify': 3.4.17
+  # @lexical/headless (rich text) and vitest: fixed only in the 21 line.
+  happy-dom: 21.0.4
+  # mailparser@3.9.40 pins 10.1.2 (fixed in 10.1.4); the direct dependency is bumped too.
+  'mailparser>nodemailer': 10.1.4

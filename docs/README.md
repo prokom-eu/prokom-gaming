@@ -5,8 +5,11 @@
 | `STAN.md` | co zrobione, co w toku, następny krok — czytany na początku każdej sesji |
 | `strony/prokomgaming.md` | **specyfikacja strony** (źródło prawdy treści i zakresu) |
 | `zadania/prokomgaming.md` | plan sesji G0–G16, kalendarz, prompty, plan cięcia |
-| `decyzje/ADR-G001…G005` | repo i stos · cennik i konfigurator · wygląd i telefon · dane FPS · zapytania, egzemplarze, konto |
+| `strony/prokomgaming-panel.md` | **specyfikacja panelu `/admin`** (źródło prawdy dla panelu; §2a — panel na telefonie jak aplikacja) |
+| `zadania/prokomgaming-panel.md` | plan sesji panelu P0–P8, kolejność względem G13–G16, prompty, dopiski do G14–G16 |
+| `decyzje/ADR-G001…G010` | repo i stos · cennik i konfigurator · wygląd i telefon · dane FPS · zapytania, egzemplarze, konto · panel jako własne widoki · sprawdzanie cen (Claude) · poczta zapytań · statystyki (Umami) · panel na telefonie (PWA, push) |
 | `design/prokomgaming/` | wzorzec wyglądu v36: README, tokeny, zrzuty 1440/414, stany telefonu, plansze, grafiki |
+| `design/prokomgaming/panel/` | wzorzec wyglądu panelu (v8, 30.10.2026): README, zrzuty 1440/414, stany telefonu `stany/tel-*`, plansze |
 | `jakosc.md` | Definition of Done |
 | `sposob-pracy.md` | jak pracujemy obok `prokom-web` na jednym komputerze |
 | `wzorce-prokom-web/` | kopie plików z `prokom-web` (25.10.2026) do wzorowania w G1 i G16 — **nie są konfiguracją tego repo** |

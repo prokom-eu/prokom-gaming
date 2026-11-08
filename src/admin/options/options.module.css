@@ -1,0 +1,197 @@
+/* Opcje konfiguratora (panel spec §10): panel tokens only (panel-tokens.css). */
+
+.mu {
+  color: var(--p-tx2);
+}
+
+.table :global(td.pn-r) {
+  white-space: nowrap;
+}
+
+.tabs {
+  margin: 20px 0 16px;
+  overflow-x: auto;
+}
+
+.message {
+  margin-bottom: 16px;
+}
+
+.item {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.item > span:last-child {
+  display: grid;
+  gap: 2px;
+}
+
+.item b {
+  font-weight: 700;
+}
+
+.item small,
+.params small {
+  color: var(--p-mu);
+  font-size: 12px;
+}
+
+.thumb {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 44px;
+  border-radius: 10px;
+  border: 1px solid var(--p-ln);
+  background: var(--p-s2);
+}
+
+.thumb img {
+  max-height: 40px;
+  width: auto;
+  object-fit: contain;
+}
+
+.params {
+  display: grid;
+  gap: 2px;
+  color: var(--p-tx2);
+  font-size: 13px;
+  max-width: 260px;
+}
+
+.acts {
+  display: inline-flex;
+  gap: 6px;
+}
+
+.foot {
+  margin: 0;
+  padding-top: 14px;
+  color: var(--p-mu);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.confirm {
+  display: grid;
+  gap: 12px;
+}
+
+.confirm h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.confirm p {
+  margin: 0;
+}
+
+.confirmActions,
+.addActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+}
+
+.add {
+  border-color: color-mix(in srgb, var(--p-gold) 45%, transparent);
+  margin-bottom: 16px;
+}
+
+.addHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.addHead h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.addGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px 16px;
+}
+
+.wide {
+  grid-column: span 1;
+}
+
+.addGrid > .wide:nth-child(-n + 2) {
+  grid-column: span 1;
+}
+
+.addLower {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
+  gap: 16px;
+  margin: 18px 0;
+  align-items: start;
+}
+
+.price {
+  display: flex;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--p-gold) 35%, transparent);
+  background: color-mix(in srgb, var(--p-gold) 7%, var(--p-s2));
+}
+
+.price > span {
+  display: grid;
+  gap: 4px;
+}
+
+.price b {
+  font-size: 15px;
+}
+
+.price small,
+.hint {
+  color: var(--p-tx2);
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+
+.list {
+  margin: 6px 0 0;
+  padding-left: 18px;
+}
+
+.addActions {
+  margin-top: 16px;
+}
+
+@media (max-width: 1180px) {
+  .addGrid,
+  .addLower {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .addGrid,
+  .addLower {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .params {
+    max-width: none;
+  }
+
+  .addActions :global(.pn-btn) {
+    flex: 1 1 auto;
+    justify-content: center;
+    min-height: 48px;
+  }
+}

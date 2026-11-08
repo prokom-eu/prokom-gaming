@@ -51,7 +51,7 @@
         },
         {
           "q": "Mogę odebrać osobiście?",
-          "a": "Tak, w sklepie w Rabce-Zdroju, a po umówieniu w Zakopanem. Przy odbiorze włączymy komputer przy Tobie.",
+          "a": "Tak, w sklepie w Rabce-Zdroju. Przy odbiorze włączymy komputer przy Tobie.",
           "onHome": false
         },
         {
@@ -121,7 +121,7 @@
         },
         {
           "q": "Jak sprawdzić, że jesteście prawdziwą firmą?",
-          "a": "PRO-KOM działa od 2004 roku, NIP 735-251-14-47. Sprawdzisz nas w CEIDG i na białej liście VAT, a sklepy odwiedzisz w Rabce i Zakopanem.",
+          "a": "PRO-KOM działa od 2004 roku, NIP 735-251-14-47. Sprawdzisz nas w CEIDG i na białej liście VAT, a sklep odwiedzisz w Rabce-Zdroju.",
           "onHome": false
         },
         {

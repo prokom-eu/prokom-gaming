@@ -1,0 +1,327 @@
+/* Klienci and the client card (panel spec §6, board Klient): panel tokens only. */
+
+.mu {
+  color: var(--p-mu);
+  font-size: 13px;
+}
+
+.selectable {
+  user-select: all;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin: 8px 0 20px;
+}
+
+.avatar {
+  width: 64px;
+  height: 64px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--p-s3);
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: 20px;
+  color: var(--p-gold);
+}
+
+.headText {
+  flex: 1;
+  min-width: 0;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.name {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--p-tx);
+}
+
+.sub {
+  margin: 4px 0 0;
+  font-size: 14px;
+  color: var(--p-tx2);
+}
+
+.headActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.phoneM {
+  display: none;
+}
+
+.phoneD {
+  display: contents;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 16px;
+  margin-top: 20px;
+  align-items: start;
+}
+
+.main {
+  padding: 0;
+  overflow: hidden;
+}
+
+.side {
+  display: grid;
+  gap: 16px;
+}
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  padding: 0 12px;
+  border-bottom: 1px solid var(--p-ln);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.tab {
+  flex: none;
+  min-height: 48px;
+  padding: 0 14px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--p-tx2);
+  background: none;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.tab[aria-selected='true'] {
+  color: var(--p-tx);
+  border-bottom-color: var(--p-gold);
+}
+
+.panel {
+  padding: 18px 20px 20px;
+}
+
+.feed,
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.event {
+  display: flex;
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--p-ln);
+}
+
+.event:last-child,
+.item:last-child {
+  border-bottom: 0;
+}
+
+.event p {
+  margin: 0 0 2px;
+  font-size: 14px;
+  color: var(--p-tx2);
+}
+
+.event b {
+  color: var(--p-tx);
+}
+
+.eventIcon {
+  width: 32px;
+  height: 32px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: var(--p-s2);
+  color: var(--p-gold);
+}
+
+.item {
+  display: grid;
+  gap: 4px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--p-ln);
+  font-size: 14px;
+  color: var(--p-tx2);
+}
+
+.item a {
+  color: var(--p-tx);
+}
+
+.unit + .unit {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid var(--p-ln);
+}
+
+.unit p {
+  margin: 0 0 6px;
+}
+
+.part {
+  display: contents;
+}
+
+.note {
+  margin-bottom: 12px;
+  padding: 12px;
+  border: 1px solid color-mix(in srgb, var(--p-info) 35%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--p-info) 8%, var(--p-s1));
+  font-size: 14px;
+}
+
+.note small {
+  color: var(--p-mu);
+}
+
+.note p {
+  margin: 6px 0 0;
+  white-space: pre-wrap;
+  color: var(--p-tx2);
+}
+
+.noteForm {
+  display: grid;
+  gap: 8px;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--p-tx2);
+}
+
+.field {
+  width: 100%;
+  padding: 10px 12px;
+  font: inherit;
+  font-size: 14px;
+  color: var(--p-tx);
+  background: var(--p-s2);
+  border: 1px solid var(--p-ln2);
+  border-radius: 10px;
+  resize: vertical;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.danger {
+  color: var(--p-bad);
+}
+
+.dangerSolid {
+  color: #1a0d0b;
+  background: var(--p-bad);
+  border-color: var(--p-bad);
+}
+
+.dangerSolid:disabled {
+  opacity: 0.5;
+}
+
+.sheetTitle {
+  margin: 0 0 10px;
+  font-size: 20px;
+  color: var(--p-tx);
+}
+
+.sheetText {
+  margin: 0 0 14px;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--p-tx2);
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  font-size: 15px;
+  color: var(--p-tx);
+}
+
+.check input {
+  width: 22px;
+  height: 22px;
+  accent-color: var(--p-bad);
+}
+
+@media (max-width: 1100px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Phone (spec §2a, stany/tel-09-klient): one column, tabs swiped in one row, fields 16 px. */
+@media (max-width: 760px) {
+  .head {
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+  .avatar {
+    width: 56px;
+    height: 56px;
+    font-size: 18px;
+  }
+  .name {
+    font-size: 31px;
+  }
+  .headActions {
+    width: 100%;
+  }
+  .headActions :global(.pn-btn) {
+    min-height: 48px;
+  }
+  .phoneD {
+    display: none;
+  }
+  .phoneM {
+    display: contents;
+  }
+  .main {
+    border-radius: 18px;
+  }
+  .panel {
+    padding: 14px 16px 18px;
+  }
+  .field {
+    font-size: 16px;
+  }
+}

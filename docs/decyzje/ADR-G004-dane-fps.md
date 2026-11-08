@@ -1,6 +1,6 @@
 # ADR-G004: Dane FPS — prawdziwe testy z etykietą źródła, strona nie liczy klatek
 
-- **Status:** przyjęta
+- **Status:** przyjęta (uzupełnienia: G0 25.10.2026 — źródło rekordów `p`, §5; G5 26.10.2026 — `games.settingNote`, §5–§6, etykiety źródeł z nazwą platformy testowej, §6)
 - **Data:** 2026-10-25
 - **Dane:** `seed/prokomgaming/fps.json` (wartości) i `seed/prokomgaming/fps-sources.json` (źródło każdej liczby); arkusz kontrolny u Krystiana: `dane/PRO-KOM_FPS_zestawow_2026-10-25.xlsx`.
 
@@ -29,10 +29,14 @@ Stan 25.10.2026 (po przeglądzie): 33 gry × 16 zestawów × 3 rozdzielczości =
 ## 5. Model w Payload
 - `games`: `name`, `slug`, `kind` (esport | aaa | capped), `fpsCap`, `setting`, `popularRank`, `seoPage`, `requirements { min, recommended, max, source, checkedAt }` (puste do uzupełnienia ze strony gry).
 - `fps-results`: `build`, `game`, `resolution` (fullhd | qhd | uhd), `fps`, `kind` (p | m | r | e), `sourceLabel`, `sourceUrl`, `setting`, `measuredAt` i `unit` (dla `p`). Import z `fps-sources.json`: `source` → `sourceLabel`, `url` → `sourceUrl`, `game` (nazwa) → relacja do `games` po `name`, `build` (slug) → relacja do `builds`; pola `cpu`, `gpu` tylko do podglądu w panelu.
-- Priorytet wyświetlania: `p` > `m` > `r` > `e` (najnowszy `p` wygrywa). Funkcja `lib/fps.ts → fpsFor(build, game, resolution)`.
+- **`games.settingNote` (G5, decyzja Krystiana 26.10.2026):** opcjonalny dopisek przy grze na stronie, gdy ustawienia odbiegają od standardu (§6). W seedzie tylko dwa przypadki: Gothic 1 Remake „ze skalowaniem DLSS/FSR Balanced”, Call of Duty: Warzone „z testu Black Ops 7”. Pełne ustawienia każdej liczby (`fps-results.setting`) pokazuje „Jak liczymy?”.
+- Jeden rekord `m`/`r`/`e` na zestaw × grę × rozdzielczość (hak w kolekcji; seed aktualizuje go w miejscu); rekordów `p` może być kilka. Gry i zestawu z wynikami nie da się usunąć.
+- Priorytet wyświetlania: `p` > `m` > `r` > `e` (najnowszy `p` wygrywa). `lib/fps.ts → fpsFor(table, build, game, resolution)` — tabela z `lib/fps.server.ts → loadFpsTable()` (jedno zapytanie na stronę, ta sama tabela działa w przeglądarce w konfiguratorze).
+- **Skąd `p` (G0, 25.10.2026):** rekord `p` dla zestawu powstaje tylko z egzemplarza (`units`, ADR-G005), którego konfiguracja jest **identyczna z przepisem zestawu** (poziom, obudowa, chłodzenie, RAM, dysk). Pomiar egzemplarza ze zmianami (np. inny RAM) zostaje wyłącznie na jego metryce. Powód: jeden egzemplarz zmieniony pod klienta nie może przestawić liczb na stronie zestawu dla wszystkich.
 - Konfigurator: klatki poziomu = klatki jego zestawu wiodącego (`power-levels.leadBuild`); obudowa, chłodzenie, RAM i dysk nie zmieniają klatek.
 
 ## 6. Na stronie
 - Przy każdej liczbie etykieta z tabeli 2 (kolory z ADR-G003). Gdy `setting` gry różni się od standardu (najwyższe, natywnie) — pokazujemy go przy grze (np. Gothic 1 Remake: DLSS/FSR Balanced; Warzone: „z testu Black Ops 7”). Panel „Jak liczymy?” (karta zestawu, porównywarka, strony gier): źródła, ustawienia, linki.
+- **Etykiety źródeł z nazwą platformy testowej — świadomy wyjątek (G5, decyzja Krystiana 26.10.2026).** `sourceLabel` i `sourceUrl` podają test bazowy tak, jak go opisał portal, razem z kartą i procesorem platformy testowej (np. „recenzja PNY RTX 5080 Slim OC … Ryzen 7 9800X3D”). To wyjątek od zasady „bez producentów części poziomu” (ADR-G002 §8.7, CLAUDE.md): bez nazwy testu źródło nie byłoby sprawdzalne. Warunki: (1) żaden `internalModel` z bazy nie trafia do HTML ani API (test e2e `offer-api` dalej obowiązuje); (2) w „Jak liczymy?” stoi dopisek, że karta i procesor w nazwie testu to sprzęt platformy testowej, nie części zestawu (treść do potwierdzenia — `TODO(krystian)` w `HowWeMeasure.tsx`).
 - Telefon: lista gier z paskiem i liczbą, etykieta pod spodem; przełącznik FullHD / 2K / 4K jako segmenty przyklejone do góry listy.
 - Teksty bez obietnic, których dane nie potwierdzają (np. Bazyliszek: „CS2 i Call of Duty grubo powyżej 144 klatek w 2K” — z testów).

@@ -1,0 +1,224 @@
+'use server'
+
+import { revalidatePath } from 'next/cache'
+import { z } from 'zod'
+
+import { queueMarginAlarm } from '../../jobs/queue'
+import { errorFields, log } from '../../lib/logger'
+import { CatalogError } from '../../lib/pricing/catalog'
+import { previewCostImport, type ImportPreview } from '../../lib/pricing/csv'
+import { configLabel, previewPublication, type ClientView } from '../../lib/pricing/preview'
+import { planPublication, problemMessage } from '../../lib/pricing/publish'
+import {
+  applyCostImport,
+  loadBatch,
+  loadImportData,
+  loadOffer,
+  StalePublicationError,
+  writeBatch,
+} from '../../lib/pricing/store'
+import { panelActionSession } from '../session'
+
+export type PublishResult =
+  { ok: true; batch: number; changed: number } | { ok: false; messages: string[] }
+
+const input = z.object({
+  // `level:P01`, `option:R16`, `service:SERVICE`: only keys, never prices. The code part is not
+  // restricted further — codes are free text in the panel; unknown keys end as a stale queue.
+  keys: z
+    .array(
+      z
+        .string()
+        .max(120)
+        .regex(/^(level|option|service):.+$/),
+    )
+    .max(500),
+})
+
+/**
+ * "Sprawdź marżę i opublikuj" on the prices screen (ADR-G002 §4). Everything is computed again on
+ * the server from the database; the guard blocks a publication under the minimum margin.
+ */
+export async function publishPrices(raw: unknown): Promise<PublishResult> {
+  const session = await panelSession()
+  if (!session) return { ok: false, messages: [NO_ACCESS] }
+  const { payload, user } = session
+  const parsed = input.safeParse(raw)
+  if (!parsed.success) return { ok: false, messages: ['Nieprawidłowe dane z formularza.'] }
+
+  try {
+    const [offer, current] = await Promise.all([loadOffer(payload), loadBatch(payload)])
+    if (!current) return { ok: false, messages: ['Brak opublikowanych cen — uruchom seed.'] }
+
+    const plan = planPublication(offer.catalog, current.snapshot, parsed.data.keys)
+    if (!plan.ok) {
+      const { minMargin } = offer.catalog.settings
+      return { ok: false, messages: plan.problems.map((p) => problemMessage(p, minMargin)) }
+    }
+
+    const { batch } = await writeBatch(payload, plan, user, current.snapshot.batch)
+    log.info(
+      { batch, rows: plan.rows.length, changed: plan.changes.length, userId: user.id },
+      'prices published',
+    )
+    revalidatePath('/', 'layout')
+    return { ok: true, batch, changed: plan.changes.length }
+  } catch (error) {
+    if (error instanceof CatalogError) return { ok: false, messages: [error.message] }
+    if (error instanceof StalePublicationError || isUniqueViolation(error)) {
+      return { ok: false, messages: [STALE] }
+    }
+    log.error({ ...errorFields(error) }, 'price publication failed')
+    return {
+      ok: false,
+      messages: ['Publikacja nie powiodła się — nic nie zmieniono. Szczegóły w logach.'],
+    }
+  }
+}
+
+export type SelectionPreview =
+  | {
+      ok: true
+      canPublish: boolean
+      messages: string[]
+      count: number
+      compatible: number | null
+      lowest: { margin: number; config: string } | null
+      client: ClientView
+    }
+  | { ok: false; messages: string[] }
+
+/**
+ * The live guard of „Do zatwierdzenia” (panel spec §8): the same check as publishing, for the
+ * items ticked right now. Nothing is written.
+ */
+export async function previewSelection(raw: unknown): Promise<SelectionPreview> {
+  const session = await panelSession()
+  if (!session) return { ok: false, messages: [NO_ACCESS] }
+  const parsed = input.safeParse(raw)
+  if (!parsed.success) return { ok: false, messages: ['Nieprawidłowe dane z formularza.'] }
+  try {
+    const [offer, current] = await Promise.all([
+      loadOffer(session.payload),
+      loadBatch(session.payload),
+    ])
+    if (!current) return { ok: false, messages: ['Brak opublikowanych cen — uruchom seed.'] }
+    const preview = previewPublication(
+      offer.catalog,
+      current.snapshot,
+      offer.builds,
+      parsed.data.keys,
+    )
+    return {
+      ok: true,
+      canPublish: preview.ok,
+      messages: preview.messages,
+      count: preview.count,
+      compatible: preview.compatible,
+      lowest: preview.lowest
+        ? { margin: preview.lowest.margin, config: configLabel(preview.lowest.config) }
+        : null,
+      client: preview.client,
+    }
+  } catch (error) {
+    if (error instanceof CatalogError) return { ok: false, messages: [error.message] }
+    log.error({ ...errorFields(error) }, 'publication preview failed')
+    return { ok: false, messages: ['Nie udało się sprawdzić marży. Szczegóły w logach.'] }
+  }
+}
+
+const STALE =
+  'W międzyczasie ktoś opublikował ceny — nic nie zmieniono. Odśwież stronę i sprawdź kolejkę jeszcze raz.'
+
+/** Postgres unique violation (23505) anywhere in the cause chain: an exact race of two publications. */
+function isUniqueViolation(error: unknown): boolean {
+  for (let e: unknown = error, depth = 0; e && depth < 5; depth++) {
+    if ((e as { code?: unknown }).code === '23505') return true
+    e = (e as { cause?: unknown }).cause
+  }
+  return false
+}
+
+// --- Cost import (ADR-G002 §4.1) ---
+
+export type CostImportPreviewResult =
+  { ok: true; preview: ImportPreview } | { ok: false; messages: string[] }
+
+/** done = checked now; pending = the cron is running this very check; failed = see the logs. */
+export type MarginCheck = 'done' | 'pending' | 'failed'
+
+export type CostImportResult =
+  | { ok: true; options: number; levels: number; check: MarginCheck }
+  | { ok: false; messages: string[] }
+
+// ~2000 rows of "code;cost" fit easily; anything bigger is not a cost list.
+const csvInput = z.object({ text: z.string().min(1).max(200_000) })
+
+/** "Pokaż zmiany": parse and match the pasted CSV against today's offer. Nothing is written. */
+export async function previewCosts(raw: unknown): Promise<CostImportPreviewResult> {
+  const session = await panelSession()
+  if (!session) return { ok: false, messages: [NO_ACCESS] }
+  const parsed = csvInput.safeParse(raw)
+  if (!parsed.success) return { ok: false, messages: ['Wklej listę kosztów (maks. 200 KB).'] }
+
+  const { options, levels } = await loadImportData(session.payload)
+  return { ok: true, preview: previewCostImport(parsed.data.text, options, levels) }
+}
+
+/**
+ * "Zapisz koszty": the same text is parsed and matched again (the preview in the browser is not
+ * trusted) and written only when every row is valid.
+ */
+export async function importCosts(raw: unknown): Promise<CostImportResult> {
+  const session = await panelSession()
+  if (!session) return { ok: false, messages: [NO_ACCESS] }
+  const parsed = csvInput.safeParse(raw)
+  if (!parsed.success) return { ok: false, messages: ['Wklej listę kosztów (maks. 200 KB).'] }
+  const { payload, user } = session
+
+  try {
+    const { options, levels } = await loadImportData(payload)
+    const preview = previewCostImport(parsed.data.text, options, levels)
+    if (preview.errors.length > 0) {
+      return {
+        ok: false,
+        messages: ['Popraw błędne wiersze — nic nie zapisano.', ...preview.errors.map(rowMessage)],
+      }
+    }
+    if (preview.changes.length === 0) {
+      return { ok: false, messages: ['Wszystkie koszty są już takie same — nic do zapisania.'] }
+    }
+    const written = await applyCostImport(payload, preview.changes, user)
+    log.info({ ...written, rows: preview.changes.length, userId: user.id }, 'costs imported')
+    revalidatePath('/admin/ceny')
+    // Margin alarm right away, not at the next cron tick: the person who
+    // imported is looking at the screen. A failed check never undoes the saved costs.
+    let check: MarginCheck
+    try {
+      const jobId = await queueMarginAlarm(payload, 'csv import')
+      const run = await payload.jobs.runByID({ id: jobId, overrideAccess: true })
+      // No status for our job = the cron picked it up first and is running it right now.
+      const status = run.jobStatus?.[String(jobId)]?.status
+      check = status === undefined ? 'pending' : status === 'success' ? 'done' : 'failed'
+    } catch (error) {
+      check = 'failed'
+      log.error({ ...errorFields(error) }, 'margin alarm after import failed')
+    }
+    return { ok: true, ...written, check }
+  } catch (error) {
+    if (error instanceof CatalogError) return { ok: false, messages: [error.message] }
+    log.error({ ...errorFields(error) }, 'cost import failed')
+    return {
+      ok: false,
+      messages: ['Import nie powiódł się — nic nie zmieniono. Szczegóły w logach.'],
+    }
+  }
+}
+
+const NO_ACCESS = 'Brak uprawnień — zaloguj się do panelu.'
+
+const rowMessage = (e: { line: number; message: string }) =>
+  e.line > 0 ? `Wiersz ${e.line}: ${e.message}` : e.message
+
+/** The signed-in admin (`users`, role `admin`), or `null`. */
+const panelSession = () => panelActionSession('admin')

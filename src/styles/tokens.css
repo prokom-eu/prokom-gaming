@@ -1,0 +1,540 @@
+/* PRO-KOM Gaming — tokeny wizualizacji v36 (25.10.2026). Źródło: plansze .dc.html (BASE_CSS).
+   Do przeniesienia 1:1 do src/styles/tokens.css (ADR-G003). Nazwy słowiańskie jak w planszach;
+   w kodzie można dodać aliasy semantyczne (--bg, --text, --accent), ale wartości zostają. */
+:root {
+  /* tło i powierzchnie */
+  --smola: #040706; /* tło strony */
+  --noc: #07100e; /* sekcje */
+  --mech: #0c1613; /* karty, panele */
+  --panel-from: #0c1512;
+  --panel-to: #070c0a; /* gradient paneli */
+  --foot: #030504; /* stopka */
+  /* tekst */
+  --kosc: #ece4d0; /* tekst główny */
+  --kosc2: #cdc3ab; /* tekst drugorzędny jasny */
+  --mgla: #9a9583; /* tekst pomocniczy (min. AA na --smola) */
+  --line: rgba(236, 228, 208, 0.13);
+  /* akcja: złoto Grom — tylko przyciski, aktywne stany i droga „od Skrzata do Peruna” */
+  --grom: #f2c230;
+  --grom2: #ffe08a; /* jasny koniec gradientu przycisku */
+  --on-grom: #1a1305; /* tekst na złotym */
+  /* etykiety źródeł klatek (ADR-G004) */
+  --src-pk: #5bc23e;
+  --src-pk-text: #7fd56a; /* zmierzone w PRO-KOM */
+  --src-ind: #6e9bf2;
+  --src-ind-text: #8fb0f5; /* test niezależny, przeliczone z testów */
+  --src-est: #a8b0ba;
+  --src-est-text: #b6bcc4; /* szacunek */
+  /* kroje (next/font ustawia zmienne) */
+  --font-name: 'Cinzel', Georgia, serif; /* imiona istot, liczby rytualne */
+  --font-head: 'Cormorant Garamond', Georgia, serif; /* nagłówki, podania (kursywa) */
+  --font-text: 'Manrope', system-ui, sans-serif; /* interfejs i tekst */
+  --font-logo: 'Archivo', sans-serif; /* tylko znak PRO-KOM (szerokość 118, 800) */
+  /* kształt */
+  --cut: 14px; /* ścięcie narożników kart (.cut) */
+  --radius-pill: 999px;
+  --radius-sheet: 24px;
+  --tabbar-h: 66px; /* dolny pasek telefonu (+ env(safe-area-inset-bottom)) */
+  --container: 1440px;
+  --gutter-desktop: 80px;
+  --gutter-mobile: 22px;
+  /* kolory 16 istot (seed/prokomgaming/creatures.json) */
+  --c-skrzat: #e0a64b; /* Skrzat */
+  --c-licho: #7cf26b; /* Licho */
+  --c-bies: #c3f25b; /* Bies */
+  --c-wodnik: #7fb6ff; /* Wodnik */
+  --c-strzyga: #ff4d8d; /* Strzyga */
+  --c-kikimora: #b26bff; /* Kikimora */
+  --c-zmora: #ff6a55; /* Zmora */
+  --c-rusalka: #9fe7ff; /* Rusałka */
+  --c-baba-jaga: #b26bff; /* Baba Jaga */
+  --c-bazyliszek: #59e0c5; /* Bazyliszek */
+  --c-pani-zimy: #9fe7ff; /* Pani Zimy */
+  --c-wilkolak: #c0c7d1; /* Wilkołak */
+  --c-wampir: #e0322b; /* Wampir */
+  --c-weles: #ffb04d; /* Weles */
+  --c-zmij: #ff7a1a; /* Żmij */
+  --c-perun: #f2c230; /* Perun */
+}
+
+/* ---------------------------------------------------------------------------------------------
+   Uzupełnienie (G2): wartości wpisane wprost w planszach .dc.html (BASE_CSS, nawigacja, stopka,
+   menu, baner cookies), których nie ma w bloku wyżej. Tylko wartości z planszy — bez nowych kolorów.
+   Wyjątek dostępności: pasek prawny stopki na planszy ma #77746a (kontrast 4,37 na --foot, poniżej
+   AA przy 13 px), więc używa --foot-text (5,9).
+   --------------------------------------------------------------------------------------------- */
+:root {
+  /* tekst */
+  --kosc-hi: #f6efdd; /* nagłówki na scenach (h1 404, nagłówki podstron) */
+  --kosc-strong: #f2ead6; /* pogrubienia w panelach, kafelki menu, baner */
+  --nav-text: #d6cdb7; /* linki nagłówka, chipy, linki menu */
+  --link-text: #d8cfb8; /* linki z podkreśleniem (404) */
+  --lead: #c4bba5; /* tekst pod nagłówkiem */
+  --banner-text: #b4ab95; /* tekst banera cookies */
+  --muted: #a49e8a; /* podpisy w menu (ceny, opisy kontaktu) */
+  --foot-head: #ddd4bf; /* nagłówki kolumn stopki */
+  --foot-text: #8d8a7c; /* opis i pasek prawny stopki */
+  /* tła */
+  --nav-solid-from: #030605;
+  --nav-solid-to: #06100d; /* nagłówek pełny (.nav.solid) */
+  --sheet-from: #0e1915; /* arkusz menu (gradient do --panel-to) */
+  --scene-bg: #030505; /* tło kontenera sceny */
+  --scene-fade: #050807; /* dolne wygaszenie sceny */
+  --banner-bg: rgba(7, 12, 10, 0.96);
+  --backdrop: rgba(2, 4, 3, 0.62); /* tło pod arkuszem */
+  --shadow: #000;
+}
+
+/* ---------------------------------------------------------------------------------------------
+   Uzupełnienie (G5): lista klatek — wartości wpisane wprost w planszach Zestaw i Gra.
+   --------------------------------------------------------------------------------------------- */
+:root {
+  --note: #8d8a7c; /* opis pod nagłówkiem sekcji (.muted) */
+  --fps-row-line: rgba(236, 228, 208, 0.07); /* linia między wierszami listy klatek */
+  --fps-track: rgba(236, 228, 208, 0.08); /* tor paska klatek */
+}
+
+/* ---------------------------------------------------------------------------------------------
+   Uzupełnienie (G7): hero strony głównej i taśma — wartości wpisane wprost w planszy Main
+   (`.hero6`, `.card6`, `.strip6`, `.tick5`).
+   --------------------------------------------------------------------------------------------- */
+:root {
+  --white: #fff; /* blask i jasne końce materiałów */
+  --hero-realm: #e6dcc5; /* kraina nad imieniem, nagłówek karty (z kolorem istoty) */
+  --hero-kicker: #d9cfb6; /* „Rabka-Zdrój, od 2004 roku” */
+  --hero-lead: #d0c7b0; /* tekst pod nagłówkiem hero */
+  --hero-trust: #c9bfa6; /* trzy obietnice pod przyciskami */
+  --hero-dim: #a59e8a; /* podpisy w karcie i pod medalionami */
+  --hero-tab: #d9d0b9; /* imiona w zakładkach karty */
+  --hero-look: #b4ab95; /* „Obudowa czarna, …” */
+  --hero-card-text: #cbc2ab; /* opis w karcie */
+  --hero-spec: #efe6d0; /* wartości w karcie */
+  --hero-note: #8f8a78; /* dopisek pod ceną */
+  --hero-tier-name: #cfc6b0; /* istoty pod medalionem */
+  --hero-cap: #f3ecd9; /* „Od Skrzata do Peruna” */
+  --card-glass-from: rgba(9, 14, 13, 0.78);
+  --card-glass-to: rgba(5, 8, 8, 0.88); /* szkło karty istoty */
+  --hero-strip: rgba(2, 4, 4, 0.92); /* wygaszenie pod medalionami */
+  /* droga „od Skrzata do Peruna”: linia postępu pod medalionami */
+  --tier-line: linear-gradient(
+    90deg,
+    #7cf26b,
+    #ff4d8d,
+    #3ddc97,
+    #b26bff,
+    #e0322b,
+    #ff7a1a,
+    #f2c230
+  );
+  --tick-bg: #050907; /* taśma „Teraz w warsztacie” */
+  --tick-text: #bdb39b;
+  --live: #5bc23e; /* kropka „na żywo” (plansza Main, `.live`) */
+}
+
+/* Materiał imienia istoty (plansza Main, `--m1…--m4`): cztery przystanki gradientu od światła do
+   cienia. Ustawiany na elemencie z `data-material`, bo część przystanków bierze kolor istoty (--c). */
+[data-material='kosc'] {
+  --m1: #fbfff2;
+  --m2: color-mix(in srgb, var(--c) 40%, #fff);
+  --m3: var(--c);
+  --m4: color-mix(in srgb, var(--c) 30%, #000);
+}
+[data-material='krew'] {
+  --m1: #fff2ee;
+  --m2: #ffb0a0;
+  --m3: var(--c);
+  --m4: #3a0505;
+}
+[data-material='lod'] {
+  --m1: #fff;
+  --m2: #e4f7ff;
+  --m3: #8fd8f5;
+  --m4: #22566c;
+}
+[data-material='ogien'] {
+  --m1: #fffbe6;
+  --m2: #ffd27a;
+  --m3: var(--c);
+  --m4: #4a1404;
+}
+[data-material='zloto'] {
+  --m1: #fffdf2;
+  --m2: #ffe9a6;
+  --m3: #f2c230;
+  --m4: #5a3a06;
+}
+
+/* ---------------------------------------------------------------------------------------------
+   Uzupełnienie (G8): sekcje strony głównej — wartości wpisane wprost w planszy Main (`.paths`,
+   `.best5`, `.scale`, `.bc`, `.how`, `.games`, `.proc`, `.doc`).
+   --------------------------------------------------------------------------------------------- */
+:root {
+  /* tła sekcji (gradienty pionowe) */
+  --sec-a: #050807;
+  --sec-b: #07100d; /* „Szesnaście istot” */
+  --sec-c: #081109; /* „Jak kupić” */
+  --sec-d: #08110e; /* „W co grasz?” */
+  --sec-proc: #060a08; /* „Zanim komputer wyjedzie” */
+  --sec-glow: rgba(242, 194, 48, 0.07);
+  /* tekst */
+  --sec-text: #b9b19c; /* opisy dróg i kroków */
+  --sec-desc: #a9a18c; /* opis karty istoty, kroków procesu */
+  --sec-bold: #e6ddc8; /* pogrubienia w opisach, imiona ludzi */
+  --sec-epithet: #e9e0ca; /* przydomek karty (miesza się z kolorem istoty) */
+  /* karty i panele */
+  --path-from: #0b1210;
+  --path-to: #060a09; /* karta drogi */
+  --card-bg: #070b0a; /* karta istoty */
+  --card-fade: rgba(5, 9, 8, 0.92);
+  --step-bg: #0b120f; /* koło numeru kroku */
+  --step-ring: #070d0b;
+  --avatar-bg: #0e1714;
+  --avatar-icon: #5c594d;
+  /* papier metryki */
+  --paper: #efe6d0;
+  --paper-ink: #2a241a;
+  --paper-strong: #1d1912;
+  --paper-label: #6d6149; /* plansza: #7a6d55 — 4,1:1 przy 12 px, poniżej AA; ciemniej (4,9:1) */
+  --paper-em: #6d6149;
+  --paper-small: #4b4232;
+  --paper-line: rgba(80, 60, 30, 0.25);
+  --paper-track: rgba(80, 60, 30, 0.15);
+  --paper-light: rgba(255, 255, 255, 0.35);
+  --paper-shade: rgba(120, 90, 40, 0.18);
+  --paper-bar: #3f8a2e;
+  /* „Kupujesz komputer dla dziecka?” — jasna sekcja (`.par`) */
+  --par-bg: #ece3cc;
+  --par-ink: #231e16;
+  --par-head: #1b1710;
+  --par-text: #4a4131;
+  --par-rule: #b08a2e;
+  --par-btn: #141a17;
+  --par-line: rgba(35, 30, 22, 0.35);
+  /* „W cenie” i „Zanim zapytasz” */
+  --sec-e: #07100c;
+  --fin-glow: rgba(242, 194, 48, 0.25);
+}
+
+/* ---------------------------------------------------------------------------------------------
+   Uzupełnienie (G9): lista zestawów — wartości wpisane wprost w planszy Zestawy (`.phead`, `.zc`,
+   `.filters`, `.zmb`).
+   --------------------------------------------------------------------------------------------- */
+:root {
+  --phead-glow: rgba(242, 194, 48, 0.1); /* poświata nagłówka podstrony */
+  --zc-from: #0b1411; /* karta zestawu (gradient do --panel-to) */
+  --zc-short: #d4cbb5; /* jedno zdanie pod imieniem */
+  --zc-spec: #c9bfa6; /* części w ramkach */
+  --flt-label: #9a9583; /* „Monitor”, „Budżet”, „Rodzaj” */
+  --zmb-bg: rgba(5, 8, 7, 0.94); /* przyklejony pasek filtrów na telefonie */
+}
+
+/* ---------------------------------------------------------------------------------------------
+   Uzupełnienie (G9): karta zestawu — wartości wpisane wprost w planszy Zestaw (`.zh5`, `.an7`,
+   `.bpl`, `.dp7`, `.tr7`, `LIGHTS`).
+   --------------------------------------------------------------------------------------------- */
+:root {
+  /* kolory światła w „Dopasuj” (plansza: LIGHTS) */
+  --light-piorun: #f2c230;
+  --light-krew: #e0322b;
+  --light-las: #3ddc97;
+  --light-czary: #b26bff;
+  --light-lod: #9fe7ff;
+  --light-ogien: #ff7a1a;
+  /* tła */
+  --bp-panel: #08100d; /* kafle części, opcje, kroki, pudełko, gwarancja */
+  --bp-frame-from: #081210;
+  --bp-frame-to: #050a09; /* ramka planu wnętrza */
+  --bp-up-to: #060b0a; /* pasek „Miejsce na rozbudowę” */
+  --bp-photo-to: #080d0b; /* tło zdjęcia poglądowego (od --avatar-bg) */
+  --bp-step-bg: #0a120f; /* koło etapu */
+  /* plan wnętrza (rysunek) */
+  --bp-line: #6f7d79;
+  --bp-case: #4d5956;
+  --bp-mark-bg: #071010;
+  --bp-mark-text: #cfd6d3;
+  --bp-plan-label: #5f6b68;
+  /* tekst */
+  --bp-strong: #e6ddc7; /* etykiety grup „Dopasuj”, podpisy testów */
+  --bp-min: #a49d89; /* „Minimum, którego pilnujemy” */
+
+  /* -------------------------------------------------------------------------------------------
+     Uzupełnienie (G10): konfigurator — wartości wpisane wprost w planszy Konfigurator (`.k2`,
+     `.k2-st`, `.tr`, `.oc`, `.mc`, `.sb`, `.toast`, `.mbar`).
+     ------------------------------------------------------------------------------------------- */
+  --cf-lead: #bdb49e; /* podtytuł strony */
+  --cf-step-bg: rgba(8, 14, 12, 0.6);
+  --cf-step-name: #e3dac4; /* nazwa kroku, wartości w podglądzie */
+  --cf-pill: #cfc6b1; /* numer kroku, warianty, chipy */
+  --cf-dim: #8f8a7a; /* drobne podpisy, „od” */
+  --cf-end: #080e0c; /* koniec gradientów kafli */
+  --cf-tile: #0b1411; /* początek kafli opcji */
+  --cf-img-to: #0a110e; /* tło zdjęcia opcji */
+  --cf-stage-from: #0d1714; /* tło podglądu obudowy */
+  --cf-spec: #bfb69f; /* parametry opcji, opis pamięci */
+  --cf-err: #e58a6e; /* powód wyszarzenia */
+  --cf-small: #8f8a7a; /* notka pod klatkami (plansza #77746a: 4,0:1 < AA przy 11,5 px) */
+  --cf-ink: #0b0f0d; /* tekst na kolorze istoty */
+  --cf-toast-bg: #0d1512;
+  --cf-toast-text: #e7dcc0;
+  --cf-mbar-bg: rgba(5, 8, 7, 0.96);
+
+  /* -------------------------------------------------------------------------------------------
+     Uzupełnienie (G11): dobór pod grę i strony gier — wartości wpisane wprost w planszach Gra
+     (`.gpk`, `.gt`, `.gbx`) i KomputerDo (`.kd7-*`).
+     ------------------------------------------------------------------------------------------- */
+  --gm-card-from: #0b1411; /* karta polecanego zestawu */
+  --gm-card-to: #070c0a;
+  --gm-tag-bg: rgba(5, 8, 7, 0.78); /* plakietka „Najtaniej płynnie” */
+  --gm-names: #8f8a78; /* istoty poziomu w tabeli */
+  --gm-value: #f2ead6; /* liczba klatek w tabeli */
+  --gm-smooth: #8ff0b5; /* „płynnie” */
+  --gm-low: #ff9a8f; /* „poniżej 60” */
+  --gm-dt: #9a9583; /* etykiety w panelach */
+  --gm-muted: #8d8a7c; /* podpisy w panelach */
+  --gm-lore: #cfc6b1; /* poziom pod imieniem na karcie */
+
+  /* -------------------------------------------------------------------------------------------
+     Uzupełnienie (G11): porównywarka — wartości wpisane wprost w planszy Porownywarka (`.ph6`,
+     `.bar6`, `.slot6`, `.vd6`, `.ch6`, `.up6`, `.mx6`, `.cl`, `.sp6`, `.sh6x`).
+     ------------------------------------------------------------------------------------------- */
+  --cmp-lead: #c9c0a9; /* podtytuł strony */
+  --cmp-bar-bg: rgba(5, 8, 7, 0.9); /* przyklejony pasek gry i monitora */
+  --cmp-label: #a49d89; /* etykiety paska, podpisy liczb */
+  --cmp-select-bg: #0b1210;
+  --cmp-toggle-knob: #e9e1cc;
+  --cmp-slot-tier: #d9cfb7; /* kraina w rogu karty */
+  --cmp-ok-bg: #173d2a; /* plakietka „Wystarczy” */
+  --cmp-ok-text: #9ef2b9;
+  --cmp-text: #d0c7b0; /* tekst werdyktu */
+  --cmp-soft: #bdb49e; /* drugie zdanie werdyktu, legenda, linie wykresu */
+  --cmp-strong: #efe6d0; /* pogrubienie w opisie karty */
+  --cmp-panel: #08100d; /* tło werdyktu */
+  --cmp-step-bg: #09110e; /* „Z A na B”, „Wyślij to porównanie” */
+  --cmp-head-bg: #060a09; /* przyklejony nagłówek tabel na telefonie */
+  /* macierz: poniżej 60 / płynnie / wykorzystuje monitor / blokada */
+  --cmp-low-bg: #2a1513;
+  --cmp-low-line: rgba(180, 72, 63, 0.55);
+  --cmp-low-key: #3a1a18;
+  --cmp-low-key-line: #b4483f;
+  --cmp-ok-cell-bg: #22220f;
+  --cmp-ok-cell-text: #f2d47a;
+  --cmp-ok-cell-line: rgba(201, 164, 58, 0.45);
+  --cmp-ok-key: #2a2a14;
+  --cmp-ok-key-line: #c9a43a;
+  --cmp-full-bg: #0f2a1c;
+  --cmp-full-line: rgba(79, 210, 138, 0.5);
+  --cmp-full-key: #123222;
+  --cmp-full-key-line: #4fd28a;
+  --cmp-cap-bg: #141c19;
+  --cmp-low-verdict: #ff8a5b; /* werdykt „Za mało mocy” */
+
+  /* ---------- G12: zapytanie (plansze Formularz, Zapytanie) ---------- */
+  --iq-lead: #c9c0a9; /* podtytuł strony */
+  --iq-panel-from: #0b1411; /* karta formularza */
+  --iq-panel-to: #070c0a;
+  --iq-panel-line: rgba(236, 228, 208, 0.12);
+  --iq-label: #e6ddc7; /* etykiety pól */
+  --iq-muted: #8f8a78; /* „(opcjonalnie)”, kroki, etykiety podsumowania */
+  --iq-hint: #a49d89; /* podpowiedzi pod nagłówkami */
+  --iq-h3: #efe6d0;
+  --iq-input-bg: #0a110f;
+  --iq-input-line: rgba(236, 228, 208, 0.18);
+  --iq-placeholder: #8a8576; /* rozjaśniony z #6f6c61 planszy: podpowiedzi ≥ 4,5:1 */
+  --iq-ring: rgba(242, 194, 48, 0.18); /* fokus pola */
+  --iq-err-line: #e0675b;
+  --iq-err-ring: rgba(224, 103, 91, 0.15);
+  --iq-err-text: #ff9a8f;
+  --iq-check-text: #cfc6b0;
+  --iq-check-line: rgba(236, 228, 208, 0.35);
+  --iq-opt-text: #d8cfb8;
+  --iq-opt-hover: rgba(242, 194, 48, 0.5);
+  --iq-step-line: rgba(236, 228, 208, 0.25);
+  --iq-step-done: #cfc6b0;
+  --iq-step-done-line: rgba(242, 194, 48, 0.45);
+  --iq-step-done-bg: rgba(242, 194, 48, 0.15);
+  --iq-step-glow: rgba(242, 194, 48, 0.5);
+  --iq-card: #08100d; /* pieczęć zestawu, podsumowanie */
+  --iq-card-line: rgba(236, 228, 208, 0.1);
+  --iq-card-on: #0a120f;
+  --iq-card-name: #e9e1cc;
+  --iq-sum-line: rgba(242, 194, 48, 0.28);
+  --iq-sum-glow: rgba(242, 194, 48, 0.08);
+  --iq-nav-bg: rgba(7, 12, 10, 0.95); /* przyklejony pasek „Dalej” na telefonie */
+  --iq-page: #050807;
+  --iq-shadow: #000;
+  --iq-sent-lead: #d0c7b1; /* „Zapytanie wysłane”: tekst pod nagłówkiem */
+  --iq-sent-nr: #a9a18c; /* „Numer zapytania”, opisy etapów */
+  --iq-sent-veil: rgba(5, 8, 7, 0.55); /* przyciemnienie sceny */
+  --iq-sent-veil-top: rgba(5, 8, 7, 0.35);
+  --iq-sent-vignette: rgba(3, 6, 5, 0.7);
+  --iq-ok-glow: rgba(242, 194, 48, 0.6); /* znaczek ✓ przy pieczęci */
+  --iq-tl-dot: rgba(236, 228, 208, 0.25); /* oś „Co będzie dalej” */
+  --iq-tl-line: rgba(236, 228, 208, 0.1);
+  --iq-tl-now: rgba(242, 194, 48, 0.15);
+  --iq-card-muted: #9a9583;
+
+  /* ---------- G13: strony treści (plansze FAQ, Kontakt, OFirmie, Rodzice, Poradniki, Regulamin) ---------- */
+  --ct-page: #050807; /* tło sekcji pod nagłówkiem */
+  --ct-title: #f6efdd; /* nagłówki stron i sekcji */
+  --ct-lead: #d0c7b0; /* tekst pod nagłówkiem strony */
+  --ct-text: #b9b19c; /* tekst sekcji, odpowiedzi */
+  --ct-strong: #efe6d0; /* pytania, wyróżnienia */
+  --ct-muted: #8f8a78; /* liczniki, podpisy */
+  --ct-soft: #a9a18c; /* tekst w ramkach pomocy */
+  --ct-nav-text: #cfc6b0; /* przyciski grup pytań */
+  --ct-card: #08100d; /* przyciski grup, karty */
+  --ct-card-line: rgba(236, 228, 208, 0.1);
+  --ct-help-bg: #09110e; /* ramka „Nie znalazłeś odpowiedzi?” */
+  --ct-help-line: rgba(242, 194, 48, 0.3);
+  --ct-veil: rgba(3, 5, 5, 0.92); /* zasłona sceny nagłówka od strony tekstu */
+  --ct-veil-mid: rgba(3, 5, 5, 0.7);
+  --ct-veil-low: rgba(3, 5, 5, 0.15);
+  --ct-veil-clear: rgba(3, 5, 5, 0);
+  --ct-veil-foot: #050807;
+  --ct-veil-foot-clear: rgba(5, 8, 7, 0);
+  --ct-veil-phone: rgba(5, 8, 7, 0.8);
+  --ct-veil-phone-top: rgba(5, 8, 7, 0.4);
+  --ct-shadow: rgba(0, 0, 0, 0.6);
+  --ct-channel-bg: rgba(8, 14, 12, 0.92); /* kafle kanałów kontaktu nad sceną */
+  --ct-channel-line: rgba(236, 228, 208, 0.12);
+  --ct-channel-hl-line: rgba(242, 194, 48, 0.5);
+  --ct-channel-hl-glow: rgba(242, 194, 48, 0.12);
+  --ct-channel-hl-shadow: rgba(242, 194, 48, 0.35);
+  --ct-icon-line: rgba(242, 194, 48, 0.45);
+  --ct-body: #cfc6b0; /* tekst kafli, godziny */
+  --ct-ask-to: #081009; /* tło sekcji „Krótkie pytanie?” na dole */
+  --ct-ok-line: rgba(79, 210, 138, 0.45); /* „Wiadomość wysłana” */
+  --ct-ok-bg: #0d2219;
+  --ct-ok-head: #c9f7d9;
+  --ct-ok-text: #9ccfb0;
+  --ct-map-ground: #0a1310; /* rysunek mapy sklepu */
+  --ct-map-road: #1d2b26;
+  --ct-map-street: #15211d;
+  --ct-map-glow: rgba(242, 194, 48, 0.14);
+  --ct-map-shade: rgba(0, 0, 0, 0.35);
+  --ct-map-halo: rgba(242, 194, 48, 0.12);
+  --ct-gold-line: rgba(242, 194, 48, 0.45);
+  --par-nav: #3a3226; /* nagłówek strony nad jasną sekcją (Dla rodziców) */
+  --par-logo-sub: #5a4d33;
+  --par-ico-line: rgba(35, 30, 22, 0.2);
+  --par-ico-bg: rgba(255, 255, 255, 0.3);
+  --par-hero-light: rgba(255, 255, 255, 0.45); /* jasna strona: poświata nagłówka */
+  --par-hero-shade: rgba(120, 90, 40, 0.16);
+  --par-steps-bg: #f4ecd8; /* „Jak to wygląda, krok po kroku” */
+  --par-card: #fbf6ea; /* „Sprawdź nas, zanim zapłacisz” */
+  --par-card-line: rgba(35, 30, 22, 0.12);
+  --par-card-shadow: rgba(80, 60, 30, 0.25);
+  --par-check: #3f8a2e;
+  --par-game-bg: #10180f; /* kafle „W co gra Twoje dziecko?” */
+  --par-game-label: #9a9583;
+  --par-game-text: #b9b19c;
+  --par-btn-text: #efe6d0;
+  --par-safe-lead: #c4bba5;
+  --ct-band-bg: rgba(7, 12, 10, 0.88); /* O nas: pas liczb nad sceną */
+  --ct-band-line: rgba(242, 194, 48, 0.28);
+  --ct-band-text: #c9c0a9;
+  --ct-tl-from: #f2c230; /* oś historii */
+  --ct-tl-to: rgba(242, 194, 48, 0.1);
+  --ct-tl-glow: rgba(242, 194, 48, 0.5);
+  --ct-line-hover: rgba(242, 194, 48, 0.5);
+  --ct-final-glow: rgba(242, 194, 48, 0.12);
+  --ct-draft-line: rgba(242, 194, 48, 0.4); /* „Projekt do weryfikacji przez prawnika” */
+  --ct-draft-bg: rgba(242, 194, 48, 0.06);
+  --ct-draft-text: #e6ddc7;
+  --ct-doc-text: #c4bba5; /* treść regulaminu i polityki */
+  --ct-summary-text: #d8cfb8;
+  --ct-toc-label: #9a9583;
+  --ct-toc-line: rgba(236, 228, 208, 0.06);
+  --ct-article-text: #ddd4bf; /* treść poradnika (Cormorant) */
+  --ct-article-lead: #f2ead6;
+  --ct-crumbs: #a9a18c;
+  --ct-guide-fade: rgba(8, 16, 13, 0); /* przejście sceny karty poradnika w tło */
+  --ct-more-to: #07100c; /* „Czytaj dalej” */
+
+  /* ---------- G13: bon i gotowe od ręki (plansze Bon, Gotowe) ---------- */
+  --bn-card-from: #141d1a; /* karta bonu */
+  --bn-card-to: #060a09;
+  --bn-card-shine: rgba(255, 255, 255, 0.14);
+  --bn-card-edge: rgba(255, 255, 255, 0.15);
+  --bn-card-text: #cfc6b0;
+  --bn-card-code: #9a9583;
+  --bn-opt-line: rgba(236, 228, 208, 0.14); /* przyciski kwoty i wyglądu */
+  --bn-step-line: rgba(242, 194, 48, 0.6);
+  --gt-badge-bg: #0f2a1c; /* „wysyłka w 1–2 dni robocze” */
+  --gt-badge-text: #8ff0b5;
+  --gt-badge-line: rgba(79, 210, 138, 0.5);
+
+  /* ---------- G14: metryka i konto (plansze Metryka, Konto) ---------- */
+  --mt-page: #050807; /* tło strony */
+  --mt-page-glow: rgba(242, 194, 48, 0.07);
+  --mt-tl-todo: #8a8576; /* oś etapów: jeszcze nie (plansza #7f7c70 — za słaby kontrast) */
+  --mt-tl-done: #cfc6b1;
+  --mt-tl-now: #ffffff;
+  --mt-tl-track: rgba(236, 228, 208, 0.12);
+  --mt-label: #9a9583; /* etykiety: Czas, Wynik, CPU maks. */
+  --mt-ok: #7fd56a; /* „bez błędów” */
+  --mt-bad: #ff8a7a; /* błędy w teście */
+  --mt-bar: #5bc23e; /* pasek klatek zmierzonych na egzemplarzu */
+  --mt-bar-track: rgba(236, 228, 208, 0.08);
+  --mt-dd: #cfc6b1; /* producent, model */
+  --mt-small: #8d8a7c; /* SN, gwarancja do */
+  --mt-gw-line: rgba(242, 194, 48, 0.3); /* ramka gwarancji PRO-KOM */
+  --mt-gw-bg: rgba(242, 194, 48, 0.06);
+  --mt-gw-text: #d8cfb8;
+  --kt-menu-on: rgba(242, 194, 48, 0.1); /* konto: wybrana pozycja menu */
+  --kt-sub: #a9a18c; /* konto: „Egzemplarz nr …”, zgoda na pomoc zdalną */
+  --kt-input-bg: rgba(0, 0, 0, 0.25);
+  --print-ink: #000000; /* metryka do druku (wkładka do pudełka) */
+  --print-line: #999999;
+  --print-line-soft: #cccccc;
+}
+
+/* ---------------------------------------------------------------------------------------------
+   Nawigacja (GN-1, ADR-G012): nagłówek, pasek przewijania, dolny pasek telefonu.
+   Wartości z NAWIGACJA.md §1 i planszy 10 (GamingNawigacja.dc.html) — przezroczystości istniejących
+   kolorów (--kosc, --grom, --noc, --mech), bez nowych barw.
+   --------------------------------------------------------------------------------------------- */
+:root {
+  /* wymiary */
+  --nav-h: 76px; /* nagłówek nad sceną i u góry strony */
+  --nav-h-scrolled: 66px; /* nagłówek po przewinięciu (szkło) */
+  --rail-w: 64px; /* szyna zwinięta (GN-2) */
+  --rail-w-open: 258px; /* szyna rozwinięta (GN-2) */
+  /* nagłówek */
+  --nav-glass: rgba(7, 16, 14, 0.8); /* tło po przewinięciu + blur(14px) */
+  --nav-thread: rgba(242, 194, 48, 0.55); /* złota nitka u dołu (środek gradientu) */
+  --nav-caps-bg: rgba(12, 22, 19, 0.62); /* kapsuła z linkami */
+  --nav-caps-line: rgba(236, 228, 208, 0.11);
+  --nav-caps-shine: rgba(236, 228, 208, 0.05); /* górna krawędź kapsuły (inset) */
+  --nav-link: #cdc3ab; /* = --kosc2 */
+  --nav-link-hover-bg: rgba(236, 228, 208, 0.06);
+  --nav-on-from: rgba(242, 194, 48, 0.16); /* aktywny link: gradient tła */
+  --nav-on-to: rgba(242, 194, 48, 0.07);
+  --nav-on-line: rgba(242, 194, 48, 0.38); /* aktywny link: obwódka */
+  --nav-on-glow: rgba(242, 194, 48, 0.8); /* romb pod aktywnym linkiem, kreska dolnego paska */
+  --nav-ico-line: rgba(236, 228, 208, 0.16); /* okrągłe Porównanie, Konto */
+  --nav-ico-bg: rgba(12, 22, 19, 0.5);
+  --nav-ico-hover: rgba(242, 194, 48, 0.6);
+  --gold-grad: linear-gradient(
+    180deg,
+    #ffd75a,
+    #f2c230 55%,
+    #d9a91a
+  ); /* „Dobierz komputer”, kula */
+  --gold-cta-shadow: rgba(242, 194, 48, 0.7);
+  --gold-cta-inset: rgba(255, 255, 255, 0.45);
+  --gold-sheen: rgba(255, 255, 255, 0.55); /* odblask przycisku na hover */
+  /* nagłówek nad jasną sekcją (Dla rodziców) */
+  --par-caps-bg: rgba(255, 255, 255, 0.55);
+  --par-caps-line: rgba(26, 19, 5, 0.12);
+  --par-on-bg: rgba(242, 194, 48, 0.22);
+  --par-on-text: #5a4d33; /* = --par-logo-sub */
+  /* pasek przewijania */
+  --scroll-thumb: linear-gradient(#ffe08a, #f2c230 45%, #b8860b);
+  /* dolny pasek telefonu */
+  --tabbar-glass: rgba(7, 16, 14, 0.86);
+  --tabbar-line: rgba(236, 228, 208, 0.1);
+  --orb-shadow: rgba(242, 194, 48, 0.8);
+  /* szyna (GN-2) */
+  --rail-num: #8a8574; /* liczby rzymskie (5,2:1 na --noc) */
+}

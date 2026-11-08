@@ -19,7 +19,7 @@ Jesteś recenzentem kodu w repo prokom-gaming (Next.js + Payload CMS 3, sklep z 
 
 ## Lista kontrolna
 1. **Zakres:** dokładnie to, co sesja — nie mniej, nie więcej.
-2. **Pieniądze:** cena tylko z `lib/pricing/` i `published-prices`; brak drugiej implementacji zaokrąglenia; serwer przelicza cenę i zgodność; koszty, `internalModel`, `components`, marża nie trafiają do HTML ani API publicznego; brak producentów części poziomu na stronie; brak rat.
+2. **Pieniądze:** cena tylko z `lib/pricing/` i `published-prices`; brak drugiej implementacji zaokrąglenia; serwer przelicza cenę i zgodność; koszty, `internalModel` (części poziomu, RAM, dyski — obudowy i chłodzenia celowo z pełną nazwą, ADR-G002 §8.7), `components`, marża nie trafiają do HTML ani API publicznego; brak producentów części poziomu na stronie; brak rat.
 3. **Klatki:** tylko z `fps-results`, zawsze z etykietą źródła; brak obietnic „gwarantujemy”.
 4. **Poprawność:** przypadki brzegowe, puste dane z panelu, błędy sieci/bazy.
 5. **Baza:** zmiana schematu ma migrację; migracja bezpieczna na danych produkcyjnych.

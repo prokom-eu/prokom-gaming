@@ -1,0 +1,75 @@
+# Staging deploy (G16; a copy of prokom-web's pipeline): after the image of a develop commit is in
+# GHCR, that commit goes to staging. The server accepts only `deploy staging <sha>` from this key
+# (scripts/server/deploy-gate.sh): it takes the deploy files out of that image and runs
+# scripts/deploy.sh — pull, health, smoke test, automatic rollback (then this run is red).
+# Nothing but the SHA is sent. Manual run (Actions → Deploy staging → Run workflow) with a commit
+# SHA = redeploy or rollback to an older image (docs/runbook.md). Secrets and variables:
+# environment `staging` (docs/runbook.md „Klucze pipeline'u”).
+
+name: Deploy staging
+
+on:
+  workflow_run:
+    workflows: [Image]
+    types: [completed]
+    branches: [develop]
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: 'Full commit SHA from develop (its image must be in GHCR)'
+        required: true
+
+concurrency:
+  group: deploy-staging
+  cancel-in-progress: false # deploys go one after another, the newest last
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: deploy · smoke · rollback
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30 # lock wait + health + smoke + rollback
+    environment: staging
+    steps:
+      - name: Commit to deploy
+        id: target
+        env:
+          INPUT_SHA: ${{ inputs.sha }}
+          RUN_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          sha="${INPUT_SHA:-$RUN_SHA}"
+          [[ "$sha" =~ ^[0-9a-f]{40}$ ]] || { echo "::error::not a full commit SHA: $sha"; exit 1; }
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+
+      - name: Only commits from develop
+        env:
+          SHA: ${{ steps.target.outputs.sha }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # develop...SHA: "identical" or "behind" = the commit is in develop's history.
+          status="$(gh api "repos/${{ github.repository }}/compare/develop...$SHA" --jq .status)"
+          case "$status" in identical | behind) ;; *) echo "::error::$SHA is not on develop ($status)"; exit 1 ;; esac
+
+      - name: SSH key and pinned host key
+        env:
+          SSH_KEY: ${{ secrets.STAGING_SSH_KEY }}
+          KNOWN_HOSTS: ${{ vars.STAGING_SSH_KNOWN_HOSTS }}
+        run: |
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy && chmod 600 ~/.ssh/deploy
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+
+      - name: Deploy (image + its deploy files, smoke test, rollback on failure)
+        env:
+          SHA: ${{ steps.target.outputs.sha }}
+          TARGET: ${{ vars.STAGING_SSH_TARGET }}
+        run: |
+          ssh -i ~/.ssh/deploy -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes \
+            -o ServerAliveInterval=30 "$TARGET" "deploy staging $SHA" </dev/null
+
+      - name: Remove the key
+        if: always()
+        run: rm -f ~/.ssh/deploy

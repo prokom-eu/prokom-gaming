@@ -1,0 +1,12 @@
+# Pre-commit: fast checks on staged files only (full tests run in CI).
+
+# 1. Secrets — block the commit if gitleaks finds anything in staged changes.
+if ! command -v gitleaks >/dev/null 2>&1; then
+  echo "pre-commit: gitleaks is not installed — commit blocked."
+  echo "Install it: winget install --id Gitleaks.Gitleaks."
+  exit 1
+fi
+gitleaks git --pre-commit --staged --redact --no-banner --verbose || exit 1
+
+# 2. Formatting and lint on staged files (no auto-fix: what you reviewed is what you commit).
+pnpm exec lint-staged

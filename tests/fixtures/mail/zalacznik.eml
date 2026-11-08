@@ -1,0 +1,21 @@
+From: klient@example.com
+To: formularz@example.test
+Subject: Re: [PKG-2026-0047] Wampir
+Date: Tue, 03 Nov 2026 11:00:00 +0100
+Message-ID: <reply-5@mail.example.com>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="b1"
+
+--b1
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+
+W załączniku potwierdzenie przelewu.
+
+--b1
+Content-Type: application/pdf; name="potwierdzenie.pdf"
+Content-Disposition: attachment; filename="potwierdzenie.pdf"
+Content-Transfer-Encoding: base64
+
+JVBERi0xLjQKJcOkw7zDtsOfCjEgMCBvYmoKPDwvVHlwZS9DYXRhbG9nPj4KZW5kb2JqCnRyYWlsZXIKPDwvUm9vdCAxIDAgUj4+CiUlRU9GCg==
+--b1--

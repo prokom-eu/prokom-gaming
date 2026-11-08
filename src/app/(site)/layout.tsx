@@ -1,0 +1,99 @@
+import type { Metadata, Viewport } from 'next'
+import { connection } from 'next/server'
+import type { ReactNode } from 'react'
+
+import { CookieBanner } from '@/components/CookieBanner'
+import { MenuSheet } from '@/components/MenuSheet'
+import { MobileTabBar } from '@/components/MobileTabBar'
+import { ShellProvider } from '@/components/shell/ShellProvider'
+import { SiteFooter } from '@/components/SiteFooter'
+import { SiteRail } from '@/components/rail/SiteRail'
+import { SearchHost } from '@/components/search/SearchHost'
+import { SiteHeader } from '@/components/SiteHeader'
+import { analyticsScript, UMAMI_BEFORE_SEND, umamiBeforeSend } from '@/lib/analytics'
+import { getEnv } from '@/lib/env'
+import { features } from '@/lib/features'
+import { loadResponseHours } from '@/lib/responseHours.server'
+import { DESCRIPTIONS, isIndexable, OPEN_GRAPH, SITE_NAME } from '@/lib/seo'
+import { company, cookieBannerEnabled, menuCreatures } from '@/lib/site'
+
+import { fontVariables } from './fonts'
+import './globals.css'
+
+/**
+ * Defaults of every page (spec. §23). Per request, not at build time: one image serves staging and
+ * production, so the site address (canonical links, Open Graph) and `noindex` come from the
+ * server's environment — a page rendered in `docker build` would keep the build's values.
+ * Pages set their own title, description and `alternates.canonical` (relative to `metadataBase`).
+ */
+export async function generateMetadata(): Promise<Metadata> {
+  await connection()
+  const env = getEnv()
+  return {
+    metadataBase: new URL(env.SITE_URL),
+    title: { default: SITE_NAME, template: `%s | ${SITE_NAME}` },
+    description: DESCRIPTIONS.home,
+    openGraph: OPEN_GRAPH,
+    // Large preview on X and in apps that read Twitter tags; the picture is the page's
+    // `opengraph-image` (runda v2 §1.2) — X falls back to og:image without `twitter:image`.
+    twitter: { card: 'summary_large_image' },
+    // Staging and local runs never get indexed; a page's own `robots` (account, certificate…)
+    // replaces this object, and those pages are `noindex` everywhere anyway.
+    ...(isIndexable(env.SITE_ENV) ? {} : { robots: { index: false, follow: false } }),
+  }
+}
+
+// `cover`: lets env(safe-area-inset-bottom) lift the tab bar above the iPhone home bar.
+export const viewport: Viewport = { viewportFit: 'cover' }
+
+export default async function SiteLayout({ children }: { children: ReactNode }) {
+  // Per request, like the metadata: the statistics script belongs to this server's environment.
+  await connection()
+  const flags = features()
+  const stats = analyticsScript(getEnv())
+  const hours = await loadResponseHours()
+  return (
+    <html lang="pl" className={fontVariables}>
+      <body>
+        <a className="skip-link" href="#tresc">
+          Przejdź do treści
+        </a>
+        <ShellProvider>
+          <SiteHeader hours={hours} />
+          <SiteRail creatures={menuCreatures} />
+          <SearchHost />
+          <main id="tresc">{children}</main>
+          <SiteFooter features={flags} />
+          <MobileTabBar />
+          <MenuSheet
+            creatures={menuCreatures}
+            phone={{ label: company.phone, href: company.phoneHref }}
+            features={flags}
+          />
+          <CookieBanner enabled={cookieBannerEnabled} />
+        </ShellProvider>
+        {/* Umami without cookies (ADR-G009): deferred, never blocks the page; `track()` works
+            without it. Only on production and staging. No query, hash, account page or
+            certificate code ever reaches it (`umamiBeforeSend`, review G15); the hook is
+            defined before the tracker reads it. */}
+        {stats && (
+          <>
+            <script
+              dangerouslySetInnerHTML={{
+                __html: `window.${UMAMI_BEFORE_SEND}=${umamiBeforeSend.toString()};`,
+              }}
+            />
+            <script
+              defer
+              src={stats.src}
+              data-website-id={stats.websiteId}
+              data-exclude-search="true"
+              data-exclude-hash="true"
+              data-before-send={UMAMI_BEFORE_SEND}
+            />
+          </>
+        )}
+      </body>
+    </html>
+  )
+}

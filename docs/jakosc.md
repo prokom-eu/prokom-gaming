@@ -8,7 +8,7 @@
 
 ## Pieniądze i dane
 - [ ] Ceny tylko z `lib/pricing/` i `published-prices`; testy z `tests/fixtures/pricing-expected.json` zielone.
-- [ ] Żaden `internalModel`, koszt, `components` ani marża nie trafiają do HTML ani API publicznego (test porównuje z listą `internalModel` z bazy).
+- [ ] Żaden `internalModel`, koszt, `components` ani marża nie trafiają do HTML ani API publicznego (test porównuje z listą `internalModel` z bazy: części poziomu, RAM i dyski — obudowy i chłodzenia wyłączone, ADR-G002 §8.7).
 - [ ] Klatki tylko z `fps-results`, każda z etykietą źródła.
 - [ ] Brak oferty rat i słowa „Santander”; „raty” jako całe słowo tylko w pytaniu FAQ „Czy mogę kupić na raty?” (test na całe słowa).
 
@@ -20,6 +20,7 @@
 - [ ] Zgodność ze zrzutami `docs/design/prokomgaming/screens/<Plansza>-1440` i `-414` oraz `stany/`.
 - [ ] Telefon jak aplikacja: dolny pasek, arkusze (fokus, Esc, tło), paski przyklejone nad dolnym paskiem, cele dotyku ≥ 44 px, bez poziomego przewijania strony (360–414 px).
 - [ ] Sprawdzone na prawdziwym Androidzie i iPhonie.
+- [ ] Panel: zgodność ze zrzutami `docs/design/prokomgaming/panel/screens/<Ekran>-1440` i `-414` oraz stanami telefonu `stany/tel-*` (spec. panelu §2a, §18); test e2e dostępu (niezalogowany, rola `serwis`) dla każdego nowego widoku i akcji; koszty i marże nie pojawiają się w odpowiedziach dla strony.
 - [ ] Kolory i kroje tylko z tokenów; teksty z planszy; zero nawiasów kwadratowych na produkcji.
 
 ## SEO

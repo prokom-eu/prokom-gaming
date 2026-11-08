@@ -1,0 +1,43 @@
+# Dependabot: weekly, grouped PRs to develop. Next.js / Payload / React majors are ignored — a planned
+# upgrade together with prokom-web, after reading the docs of the new version (ADR-G001 §2).
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    target-branch: develop
+    schedule: { interval: weekly, day: monday, time: '06:00', timezone: Europe/Warsaw }
+    open-pull-requests-limit: 5
+    commit-message: { prefix: chore, include: scope }
+    groups:
+      payload: { patterns: ['payload', '@payloadcms/*'] }
+      next-react:
+        {
+          patterns:
+            [
+              'next',
+              'eslint-config-next',
+              'react',
+              'react-dom',
+              '@types/react',
+              '@types/react-dom',
+            ],
+        }
+      dev-tools: { dependency-type: development, update-types: [minor, patch] }
+      production: { dependency-type: production, update-types: [minor, patch] }
+    ignore:
+      - { dependency-name: 'next', update-types: ['version-update:semver-major'] }
+      - { dependency-name: 'eslint-config-next', update-types: ['version-update:semver-major'] }
+      - { dependency-name: 'payload', update-types: ['version-update:semver-major'] }
+      - { dependency-name: '@payloadcms/*', update-types: ['version-update:semver-major'] }
+      - { dependency-name: 'react', update-types: ['version-update:semver-major'] }
+      - { dependency-name: 'react-dom', update-types: ['version-update:semver-major'] }
+      - { dependency-name: '@types/react', update-types: ['version-update:semver-major'] }
+      - { dependency-name: '@types/react-dom', update-types: ['version-update:semver-major'] }
+      - { dependency-name: '@types/node', update-types: ['version-update:semver-major'] }
+  - package-ecosystem: github-actions
+    directory: /
+    target-branch: develop
+    schedule: { interval: monthly, timezone: Europe/Warsaw }
+    commit-message: { prefix: ci }
+    groups:
+      actions: { patterns: ['*'] }

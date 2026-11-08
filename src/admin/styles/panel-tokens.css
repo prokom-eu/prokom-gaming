@@ -1,0 +1,28 @@
+/* Panel tokens (panel spec §2, wizualizacja v8). The only place with the panel's colour values;
+   the site keeps its own in src/styles/tokens.css (creature colours come from there). */
+:root {
+  --p-bg: #080c0b;
+  --p-side: #050807;
+  --p-s1: #0f1613;
+  --p-s2: #141d19;
+  --p-s3: #1a2520;
+  --p-field: #0b110f; /* input background (plansza .fld input) */
+  --p-ln: rgba(236, 228, 208, 0.09);
+  --p-ln2: rgba(236, 228, 208, 0.16);
+  --p-tx: #ece4d0;
+  --p-tx2: #c2baa4;
+  --p-mu: #9a9583;
+  --p-gold: #f2c230;
+  --p-gold2: #ffe08a;
+  --p-gold-top: #ffd452; /* top of the gold button gradient (plansza .btn.gold) */
+  --p-on-gold: #171104;
+  --p-ok: #63d296;
+  --p-warn: #f2a54a;
+  --p-bad: #ff7a6b;
+  --p-on-bad: #1a0703;
+  --p-info: #86b8f7;
+
+  --p-radius: 14px;
+  --p-radius-m: 18px; /* cards on a phone (spec §2a pt 5) */
+  --p-appbar-h: 56px;
+}
