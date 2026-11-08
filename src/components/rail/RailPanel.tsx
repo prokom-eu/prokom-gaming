@@ -35,7 +35,7 @@ export function RailPanel({
   pathname: string
   creatures: readonly { slug: string; name: string }[]
 }) {
-  const { compareCount, openSearch } = useShell()
+  const { compareCount, compareBump, openSearch } = useShell()
   const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform)
   const isHome = pathname === routes.home
   const names = useMemo(() => new Map(creatures.map((c) => [c.slug, c.name])), [creatures])
@@ -213,12 +213,17 @@ export function RailPanel({
         <Link
           className="rail__item rail__item--action"
           href={routes.compare}
+          data-fly="compare"
           aria-label={compareCount > 0 ? `Porównanie, ${compareCount} w porównaniu` : 'Porównanie'}
         >
           <RailSvg icon="porownaj" />
           <span className="rail__lbl">Porównanie</span>
           {compareCount > 0 && (
-            <span className="rail__badge" aria-hidden="true">
+            <span
+              key={compareBump}
+              className={compareBump ? 'rail__badge is-bump' : 'rail__badge'}
+              aria-hidden="true"
+            >
               {compareCount}
             </span>
           )}

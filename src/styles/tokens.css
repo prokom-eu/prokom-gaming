@@ -543,6 +543,12 @@
   --dur-4: 900ms; /* wejście sceny, przejście istoty */
   --ease-enter: cubic-bezier(0.16, 1, 0.3, 1); /* wysuw: szybki start, miękkie lądowanie */
   --ease-exit: cubic-bezier(0.7, 0, 0.84, 0); /* wyjście: powolny start, szybki koniec */
+  --ease-spring: cubic-bezier(
+    0.32,
+    0.72,
+    0,
+    1
+  ); /* arkusze: długie, sprężyste lądowanie bez odbicia */
   --stagger: 50ms; /* opóźnienie kolejnych elementów kaskady (max 6, src/lib/motion.ts) */
   --motion-scale: 1; /* wariant „spokojny” (Krystian 08.11, nagrania E2) */
   /* warstwa ruchu scen (SceneFx, PREMIUM §2.4): mgła, śnieg, żar, błysk burzy, odbicie wody */

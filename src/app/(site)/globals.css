@@ -82,6 +82,14 @@ a {
   outline: 3px solid var(--grom2);
   outline-offset: 3px;
 }
+/* Keyboard focus lands with a short flash (runda v3 PREMIUM §2.3): the gold ring starts wide and
+   contracts onto the element. A transition, so it never replaces an element's own animation. */
+@media (prefers-reduced-motion: no-preference) {
+  :where(a, button, input, select, summary, [tabindex]) {
+    outline-offset: 10px;
+    transition: outline-offset var(--dur-2) var(--ease-enter);
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -407,6 +415,8 @@ a {
 
 /* ---------- buttons, chips, segmented ---------- */
 .btn {
+  position: relative;
+  overflow: hidden;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -426,7 +436,35 @@ a {
     0 12px 40px -10px color-mix(in srgb, var(--grom) 60%, transparent);
   transition:
     transform 0.2s,
-    box-shadow 0.2s;
+    box-shadow 0.2s,
+    scale var(--dur-1),
+    translate var(--dur-2) var(--ease-enter);
+  /* Pulled towards the cursor, at most 4 px (components/motion/Magnetic, desktop only). */
+  translate: var(--mx, 0) var(--my, 0);
+}
+.btn:active {
+  scale: 0.98;
+}
+/* Gold buttons: one sheen runs across on hover (as on „Dobierz komputer”, PREMIUM §2.3). The
+   dark and outlined buttons of the parents' sections stay calm (trust pages, PREMIUM §2.3). */
+.btn:not(.btn--ghost, .pr-btn-line, .pr-btn-dark, .hm-par__btn, .hm-par__call)::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -60%;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(100deg, transparent, var(--gold-sheen), transparent);
+  transform: skewX(-20deg);
+  pointer-events: none;
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .btn:not(.btn--ghost, .pr-btn-line, .pr-btn-dark, .hm-par__btn, .hm-par__call)::before {
+    transition: left 0.6s var(--ease-enter);
+  }
+  .btn:not(.btn--ghost, .pr-btn-line, .pr-btn-dark, .hm-par__btn, .hm-par__call):hover::before {
+    left: 120%;
+  }
 }
 .btn:hover {
   transform: translateY(-1px);
@@ -816,6 +854,27 @@ button.ico {
 .nav .badge {
   box-shadow: 0 0 0 2px var(--noc);
 }
+/* A counter that grew jumps once (ShellProvider `…Bump`, keyed so each rise replays it). */
+.is-bump {
+  animation: badge-bump var(--dur-3) var(--ease-enter);
+}
+@keyframes badge-bump {
+  35% {
+    scale: 1.45;
+    box-shadow: 0 0 14px color-mix(in srgb, var(--grom) 80%, transparent);
+  }
+}
+/* The dot that flies from an added build to the comparison counter (lib/fly.ts). */
+.fly-dot {
+  position: fixed;
+  z-index: 200;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--c);
+  box-shadow: 0 0 18px var(--c);
+  pointer-events: none;
+}
 
 /* „Dobierz komputer”: gold gradient, sheen on hover */
 .nav .nav__cta {
@@ -1097,13 +1156,20 @@ body:has([data-nav-light]) .nav:not([data-top='false']) .nav__caps a[aria-curren
   border-radius: var(--radius-sheet) var(--radius-sheet) 0 0;
   box-shadow: 0 -30px 80px -20px var(--shadow);
   transform: translateY(104%);
+  /* Closing: out quickly. */
   transition:
-    transform 0.34s cubic-bezier(0.2, 0.8, 0.2, 1),
-    overlay 0.34s allow-discrete,
-    display 0.34s allow-discrete;
+    transform var(--dur-2) var(--ease-exit),
+    overlay var(--dur-2) allow-discrete,
+    display var(--dur-2) allow-discrete;
 }
 .sheet[open] {
   transform: translateY(var(--drag, 0px));
+  /* Opening: a long, springy landing (runda v3 PREMIUM §2.3) — no overshoot, the sheet is
+     anchored to the bottom edge and must never show a gap under it. */
+  transition:
+    transform var(--dur-3) var(--ease-spring),
+    overlay var(--dur-3) allow-discrete,
+    display var(--dur-3) allow-discrete;
 }
 @starting-style {
   .sheet[open] {
@@ -1115,11 +1181,11 @@ body:has([data-nav-light]) .nav:not([data-top='false']) .nav__caps a[aria-curren
 }
 .sheet::backdrop {
   background: var(--backdrop);
-  -webkit-backdrop-filter: blur(3px);
-  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
   opacity: 0;
   transition:
-    opacity 0.25s,
+    opacity var(--dur-2),
     overlay 0.25s allow-discrete,
     display 0.25s allow-discrete;
 }
