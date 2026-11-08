@@ -1,5 +1,7 @@
 # Sceny istot — brief do nowych grafik (R4)
 
+> **08.11.2026:** sceny zrobione kodem zamiast generatora AI (`scripts/scenes/`, `ZMIANY.md` §3.2). Miejsca z §4 i szablon z §2 obowiązują dalej — także przy przyszłej podmianie na obrazy malarskie.
+
 Po co: obecne tła w hero i w karcie zestawu są przeciętne (płaskie, mało głębi, za mało różnią się między istotami). Kodem (R3) poprawimy światło, warstwy i ruch, ale **prawdziwy skok jakości wymaga nowych obrazów**. Ten plik to instrukcja dla Krystiana do ich wygenerowania i dla Claude Code do obróbki.
 
 ## 1. Czym generować i prawa
