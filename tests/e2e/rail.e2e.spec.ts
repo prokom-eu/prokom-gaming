@@ -15,7 +15,7 @@ test.beforeEach(async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 })
 })
 
-test('home: 11 sections, hover opens, a click jumps, the active one follows the scroll', async ({
+test('home: 11 sections, hover opens, a click glides there, the active one follows the scroll', async ({
   page,
 }) => {
   await page.goto('/')
@@ -30,6 +30,8 @@ test('home: 11 sections, hover opens, a click jumps, the active one follows the 
     .getByRole('link', { name: /Jak kupić/ })
     .click()
   await expect(page).toHaveURL(/#jak-kupic$/)
+  // The page glides there (F2); the section takes focus once it has arrived.
+  await expect(page.locator('#jak-kupic')).toBeFocused()
   await expect(page.locator('#jak-kupic')).toBeInViewport()
   await expect(rail(page).getByRole('link', { name: /Jak kupić/ })).toHaveAttribute(
     'aria-current',

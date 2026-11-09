@@ -8,6 +8,7 @@ import { MobileTabBar } from '@/components/MobileTabBar'
 import { Magnetic } from '@/components/motion/Magnetic'
 import { NavPending } from '@/components/motion/NavPending'
 import { RevealObserver } from '@/components/motion/RevealObserver'
+import { SmoothAnchors } from '@/components/motion/SmoothAnchors'
 import { ShellProvider } from '@/components/shell/ShellProvider'
 import { SiteFooter } from '@/components/SiteFooter'
 import { SiteRail } from '@/components/rail/SiteRail'
@@ -59,7 +60,7 @@ export default async function SiteLayout({ children }: { children: ReactNode }) 
   return (
     <html lang="pl" className={fontVariables}>
       <body>
-        <a className="skip-link" href="#tresc">
+        <a className="skip-link" href="#tresc" data-instant="">
           Przejdź do treści
         </a>
         <ShellProvider>
@@ -69,6 +70,7 @@ export default async function SiteLayout({ children }: { children: ReactNode }) 
           <RevealObserver />
           <Magnetic />
           <NavPending creatures={menuCreatures} />
+          <SmoothAnchors />
           <main id="tresc">{children}</main>
           <SiteFooter features={flags} />
           <MobileTabBar />
