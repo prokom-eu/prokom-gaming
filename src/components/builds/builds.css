@@ -64,8 +64,16 @@
   color: var(--sec-desc);
 }
 .bl-count b {
+  display: inline-block;
   font-size: 20px;
   color: var(--kosc);
+}
+/* Named only while a filter change runs (BuildsBrowser sets data-vt on <html>). */
+:root[data-vt='filter'] .bl-count b {
+  view-transition-name: bl-count;
+}
+:root[data-vt='filter'] .bl-grid > li {
+  view-transition-name: var(--vt);
 }
 
 .bl-grid {
@@ -78,6 +86,54 @@
 }
 .bl-grid > li {
   display: flex;
+  view-transition-class: bl-card;
+}
+
+/* Filtering (BuildsBrowser, View Transitions): the cards that stay move to their places, the
+   ones that leave fade and shrink, new ones grow in; the count rolls its digits. */
+::view-transition-group(*.bl-card) {
+  animation-duration: var(--dur-3);
+  animation-timing-function: var(--ease-enter);
+}
+::view-transition-old(*.bl-card):only-child {
+  animation: bl-card-out var(--dur-2) var(--ease-exit) both;
+}
+::view-transition-new(*.bl-card):only-child {
+  animation: bl-card-in var(--dur-3) var(--ease-enter) both;
+}
+::view-transition-group(bl-count) {
+  overflow: hidden;
+  animation-duration: var(--dur-2);
+}
+::view-transition-old(bl-count) {
+  animation: bl-count-out var(--dur-2) var(--ease-exit) both;
+}
+::view-transition-new(bl-count) {
+  animation: bl-count-in var(--dur-3) var(--ease-enter) both;
+}
+@keyframes bl-card-out {
+  to {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+}
+@keyframes bl-card-in {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+}
+@keyframes bl-count-out {
+  to {
+    opacity: 0;
+    transform: translateY(-70%);
+  }
+}
+@keyframes bl-count-in {
+  from {
+    opacity: 0;
+    transform: translateY(70%);
+  }
 }
 
 /* ---------- card ---------- */
@@ -87,7 +143,7 @@
   flex-direction: column;
   width: 100%;
   background: linear-gradient(180deg, var(--zc-from), var(--panel-to));
-  transition: transform 0.35s;
+  transition: transform var(--dur-3) var(--ease-enter);
 }
 .bl-card::after {
   content: '';
@@ -97,8 +153,14 @@
   border: 1px solid color-mix(in srgb, var(--kosc) 10%, transparent);
   clip-path: inherit;
 }
-.bl-card:hover {
-  transform: translateY(-6px);
+/* Hover and keyboard focus on the name link look the same (runda v3 PREMIUM §2.3). */
+.bl-card:has(:focus-visible) {
+  transform: translateY(calc(-6px * var(--motion-scale)));
+}
+@media (hover: hover) {
+  .bl-card:hover {
+    transform: translateY(calc(-6px * var(--motion-scale)));
+  }
 }
 .bl-card__art {
   /* Runda v2 §3.3: 20 px taller than the board, so the case can take ~75% of it. */
@@ -108,6 +170,15 @@
   height: var(--art-h);
   overflow: hidden;
   container-type: inline-size;
+  /* The pedestal is the same in all 16 card scenes (1680×960, aspect 1.75): centre at x 1125
+     (67% of the width), top face at 26.5% of the height above the bottom. It goes to the middle
+     of the card (runda v3 §1.1), so the 33% of the scene right of it must cover half the card:
+     scene height ≥ 100cqw / 2 / 0.33 / 1.75 ≈ 86.6cqw. The extra height is cut at the top (sky)
+     and a little at the bottom; the pedestal's top sits at 21% of the art. The scene must also
+     reach the top of the art: 0.21 × art + 0.735 × scene ≥ art → scene ≥ 1.075 × art (narrow
+     3-column cards at 1001–1130 px). */
+  --scene-h: max(calc(var(--art-h) * 1.075), 86.6cqw);
+  --case-base: calc(var(--art-h) * 0.21);
 }
 .bl-card__art::after {
   content: '';
@@ -117,28 +188,72 @@
 }
 .bl-card__scene {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  /* The card scenes (1680×960) have the pedestal at ~67% of the width. */
-  object-fit: cover;
-  object-position: 67% 100%;
-  transition: transform 0.8s;
+  left: 50%;
+  bottom: calc(var(--case-base) - var(--scene-h) * 0.265);
+  width: auto;
+  max-width: none;
+  height: var(--scene-h);
+  transform: translateX(-67%);
+  transform-origin: 67% 73.5%;
+  transition: transform var(--dur-4) var(--ease-enter);
 }
-.bl-card:hover .bl-card__scene {
-  transform: scale(1.08);
+/* The scene drifts a few px against the lifting case: a hint of depth (parallax). */
+.bl-card:has(:focus-visible) .bl-card__scene {
+  transform: translateX(calc(-67% - 6px * var(--motion-scale))) scale(1.03);
+}
+@media (hover: hover) {
+  .bl-card:hover .bl-card__scene {
+    transform: translateX(calc(-67% - 6px * var(--motion-scale))) scale(1.03);
+  }
 }
 .bl-card__photo {
-  /* Height of the scene as drawn by `cover` (aspect 1.75, anchored 67% / bottom). The pedestal is
-     the same in all 16 card scenes (1680×960): centre at x 1125 (67%), top face at ~26.5% of the
-     height above the bottom. The case stands on it, ~75% of the art, never cut at the top. */
-  --scene-h: max(var(--art-h), 100cqw / 1.75);
-  --case-cx: 67cqw;
-  --case-base: calc(var(--scene-h) * 0.265);
-  --case-h-max: min(var(--art-h) * 0.75, var(--art-h) - var(--case-base) - 10px);
-  --case-w-max: 62cqw;
+  /* The case stands on the middle of the pedestal, ~72% of the art, ≥ 10 px below the top. */
+  --case-h-max: min(var(--art-h) * 0.72, var(--art-h) - var(--case-base) - 10px);
+  --case-w-max: 86cqw;
   position: absolute;
   inset: 0;
+  transform-origin: 50% calc(100% - var(--case-base));
+  transition: transform var(--dur-3) var(--ease-enter);
+}
+.bl-card:has(:focus-visible) .bl-card__photo {
+  transform: translateY(calc(-4px * var(--motion-scale))) scale(1.04);
+}
+@media (hover: hover) {
+  .bl-card:hover .bl-card__photo {
+    transform: translateY(calc(-4px * var(--motion-scale))) scale(1.04);
+  }
+}
+/* The pedestal brightens in the creature's colour under the case. Only opacity moves. */
+.bl-card__photo::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--case-base) - 22px);
+  width: min(64cqw, 260px);
+  height: 44px;
+  translate: -50% 0;
+  border-radius: 50%;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--c) 70%, transparent),
+    transparent
+  );
+  opacity: 0;
+  transition: opacity var(--dur-3);
+  pointer-events: none;
+}
+.bl-card:has(:focus-visible) .bl-card__photo::before {
+  opacity: 0.85;
+}
+@media (hover: hover) {
+  .bl-card:hover .bl-card__photo::before {
+    opacity: 0.85;
+  }
+}
+@media (hover: none) {
+  .bl-card:active {
+    transform: scale(0.985);
+  }
 }
 .bl-card__tx {
   display: flex;
@@ -452,11 +567,15 @@
 @media (prefers-reduced-motion: reduce) {
   .bl-quick,
   .bl-card,
-  .bl-card__scene {
+  .bl-card__scene,
+  .bl-card__photo {
     transition: none;
   }
-  .bl-card:hover,
-  .bl-card:hover .bl-card__scene {
+  .bl-card:is(:hover, :has(:focus-visible), :active),
+  .bl-card:is(:hover, :has(:focus-visible)) .bl-card__photo {
     transform: none;
+  }
+  .bl-card:is(:hover, :has(:focus-visible)) .bl-card__scene {
+    transform: translateX(-67%);
   }
 }

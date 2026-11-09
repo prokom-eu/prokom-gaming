@@ -2,6 +2,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import { CasePhoto } from '@/components/CasePhoto'
+import { FadeImage } from '@/components/motion/FadeImage'
+import { SharedCase } from '@/components/motion/SharedCase'
 import { IconArrow } from '@/components/icons'
 import { SourceLabel } from '@/components/SourceLabel'
 import type { BuildCard } from '@/lib/builds'
@@ -14,25 +16,32 @@ import { zl } from '@/lib/pricing/format'
  * link; it covers the whole card, so the card is one tab stop with a short accessible name.
  */
 export function BuildCardView({ card, eager = false }: { card: BuildCard; eager?: boolean }) {
+  // A lazy scene emerges once loaded (runda v3 PREMIUM §2.3); an eager one may be the LCP.
+  const SceneImg = eager ? Image : FadeImage
   return (
-    <article className="bl-card cut" style={{ ['--c' as string]: `var(--c-${card.slug})` }}>
+    <article
+      className="bl-card card-sweep cut"
+      style={{ ['--c' as string]: `var(--c-${card.slug})` }}
+    >
       <span className="bl-card__art" aria-hidden="true">
-        <Image
+        <SceneImg
           className="bl-card__scene"
           src={`/scenes/${card.key}-card.webp`}
           alt=""
           width={580}
           height={331}
-          // One column up to 1000 px, three of ~420 px above. Without `sizes` a phone took the
-          // 1200 px variant for a ~400 px card — the biggest item before LCP (Lighthouse G15).
-          sizes="(max-width: 1000px) 100vw, 420px"
+          // Drawn ~1.52× the card's width (pedestal in the middle, runda v3 §1.1): one column up to
+          // 1000 px (card = 100vw - 2 × 22 px gutter), three of ~420 px above (LCP on a phone, G15).
+          sizes="(max-width: 1000px) calc(152vw - 67px), 640px"
           loading={eager ? 'eager' : 'lazy'}
         />
         {card.photo && (
           <span className="bl-card__photo">
-            {/* The file is drawn at most ~190 px wide (~110 px on a phone). */}
+            {/* The case is at most 180 px tall (72% of the 250 px art); file width from its box. */}
             {/* Lazy, as before: the scene above is the LCP element, the photo must not compete. */}
-            <CasePhoto photo={card.photo} drawnWidth={190} />
+            <SharedCase slug={card.slug}>
+              <CasePhoto photo={card.photo} caseHeight={180} />
+            </SharedCase>
           </span>
         )}
       </span>

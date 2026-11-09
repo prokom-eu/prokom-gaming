@@ -183,8 +183,6 @@ function OrderPanel({
           <dd>{card.stageText}</dd>
           <dt>Termin</dt>
           <dd>{card.due ?? '—'}</dd>
-          <dt>Na tablicy na stronie</dt>
-          <dd>{card.strip ? `„${card.strip}”` : '—'}</dd>
         </dl>
         <label className={styles.noteLabel} htmlFor={noteId}>
           Notatka warsztatu

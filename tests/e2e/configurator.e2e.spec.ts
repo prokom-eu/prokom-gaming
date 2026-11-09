@@ -149,6 +149,7 @@ test('the address is a link to the state; without one the last configuration ret
   page,
 }) => {
   const custom = k({ ...wampir.config, ram: 'R64', ssd: 'NM2' })
+  // An old link with a light colour (removed in runda v3 §1.4) still opens the same state.
   await page.goto(`/konfigurator?k=${custom}&krok=pamiec&swiatlo=lod&monitor=4k`)
   await expect(page.getByRole('button', { name: /^64 GB/ })).toHaveAttribute('aria-pressed', 'true')
   await expect(page.getByRole('button', { name: /^2 TB/ })).toHaveAttribute('aria-pressed', 'true')
@@ -158,7 +159,7 @@ test('the address is a link to the state; without one the last configuration ret
   await expect(page).toHaveURL(new RegExp(`k=${custom.replace(/\./g, '\\.')}`), {
     timeout: 15_000,
   })
-  await expect(page).toHaveURL(/swiatlo=lod/)
+  await expect(page).not.toHaveURL(/swiatlo/)
   await expect(page).toHaveURL(/monitor=4k/)
   await expect(page.getByRole('heading', { level: 2, name: 'Pamięć i dysk' })).toBeVisible()
 })
@@ -175,16 +176,39 @@ test('a stored start configuration does not freeze the address (review G10)', as
   expect(await page.evaluate(() => localStorage.getItem('pkg:config'))).toContain('monitor=4k')
 })
 
-test('the summary passes the light and the other part to the inquiry', async ({ page }) => {
+test('the summary passes the other part to the inquiry', async ({ page }) => {
   await page.goto(`/konfigurator?zestaw=wampir&krok=podsumowanie`)
   await expect(page.getByText('To dokładnie Wampir, nasz gotowy zestaw')).toBeVisible()
-  await page.locator('.cf-step').getByRole('button', { name: 'Lód' }).click()
   await page
     .getByLabel('Chcesz obudowę albo chłodzenie, których nie ma na liście?')
     .fill('Lian Li O11')
   await expect(
     page.locator('.cf-fin').getByRole('link', { name: 'Zapytaj o tę konfigurację' }),
-  ).toHaveAttribute('href', `/zapytanie?k=${k(wampir.config)}&swiatlo=lod&inne=Lian+Li+O11`)
+  ).toHaveAttribute('href', `/zapytanie?k=${k(wampir.config)}&inne=Lian+Li+O11`)
+})
+
+// Runda v3 §1.4: every case is ARGB — no light colour, one sentence instead; old links still work.
+test('no light colour: the case step says ARGB, the summary has no „Światło”', async ({ page }) => {
+  await page.goto('/konfigurator?zestaw=wampir&krok=obudowa')
+  const step = page.locator('.cf-step')
+  await expect(step).toContainText('Podświetlenie ARGB: kolor i efekty ustawisz sam')
+  await expect(step).not.toContainText('Kolor światła')
+  await page.goto('/konfigurator?zestaw=wampir&krok=podsumowanie')
+  await expect(page.locator('.cf-sum')).not.toContainText(/światło/i)
+  await expect(page.locator('.cf')).not.toContainText('Kolor światła')
+})
+
+test('an old ?swiatlo= link breaks nothing: same price for all 16 builds', async ({ page }) => {
+  test.setTimeout(180_000)
+  const errors: string[] = []
+  page.on('pageerror', (e) => errors.push(e.message))
+  for (const build of pricingExpected.builds) {
+    await page.goto(`/konfigurator?zestaw=${build.slug}&krok=podsumowanie&swiatlo=lod`)
+    const total = page.locator('.cf-sum__row.is-total .cf-sum__p')
+    await expect(total, build.slug).toBeVisible()
+    expect(price(await total.textContent()), build.slug).toBe(build.price)
+  }
+  expect(errors).toEqual([])
 })
 
 test.describe('phone', () => {

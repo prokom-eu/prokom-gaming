@@ -14,10 +14,10 @@ export function CompareTeaser({ data }: { data: CompareData | null }) {
     <section className="hm-sec hm-cmp" id="porownaj-istoty" aria-labelledby="cmp-title">
       <div className="wrap hm-cmp__grid">
         <div>
-          <h2 id="cmp-title" className="h">
+          <h2 id="cmp-title" className="h" data-reveal="">
             Ile klatek kupujesz za dopłatę?
           </h2>
-          <p className="hm-lead">
+          <p className="hm-lead" data-reveal="">
             Trzy istoty obok siebie, każda o krok mocniejsza. Wybierz grę i monitor, a zobaczysz,
             ile kosztuje każdy krok i ile klatek daje. Dowolne istoty porównasz w porównywarce i
             wyślesz rodzicowi albo koledze jednym linkiem.

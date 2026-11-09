@@ -36,6 +36,11 @@ test.describe('signed in as admin', () => {
     await expect(page.getByRole('radio', { name: 'Obudowy 24' })).toBeChecked()
     const rows = page.locator('[data-options-screen] tbody tr')
     await expect(rows).toHaveCount(24)
+    // Runda v3 §1.2: a case photo cut at the source is flagged, a good one is not.
+    const warning = 'Zdjęcie ucięte lub za małe'
+    await expect(rows.filter({ hasText: 'Krux Exo RGB czarna' })).toContainText(warning)
+    // EXO, LB500 (cut), PANO130, PANO100, PANOR5 (files under 900 px).
+    await expect(rows.filter({ hasText: warning })).toHaveCount(5)
 
     // A case used in a build: delete is off with the builds as a hint.
     const used = rows.filter({ hasNotText: 'tylko w konfiguratorze' }).first()

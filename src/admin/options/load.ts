@@ -2,6 +2,7 @@ import 'server-only'
 
 import type { Payload } from 'payload'
 
+import { caseBoxOf, casePhotoIssues, type CasePhotoIssue } from '../../lib/caseBox'
 import { lookupPrice } from '../../lib/pricing/snapshot'
 import { loadBatch } from '../../lib/pricing/store'
 import type { OptionType } from '../../lib/pricing/types'
@@ -16,6 +17,8 @@ export type OptionRow = {
   label: string
   internalModel: string | null
   photo: string | null
+  /** Why the case photo should be replaced (runda v3 §1.2); empty when fine or not a case. */
+  photoIssues: CasePhotoIssue[]
   /** Compatibility parameters in two lines, like the board. */
   params: string
   paramsNote: string | null
@@ -40,8 +43,21 @@ const AIO: Record<string, string> = {
 
 const trusted = { overrideAccess: true, depth: 0, pagination: false } as const
 
-type MediaRef = { url?: string | null } | number | null | undefined
+type MediaRef =
+  | {
+      url?: string | null
+      width?: number | null
+      height?: number | null
+      box?: { x?: number | null; y?: number | null; w?: number | null; h?: number | null } | null
+    }
+  | number
+  | null
+  | undefined
 const urlOf = (m: MediaRef) => (m && typeof m === 'object' && m.url ? m.url : null)
+const issuesOf = (m: MediaRef): CasePhotoIssue[] =>
+  m && typeof m === 'object' && m.url
+    ? casePhotoIssues({ width: m.width, height: m.height, box: caseBoxOf(m.box) })
+    : []
 
 /** Everything the options screen shows, read once. */
 export async function loadOptions(payload: Payload): Promise<OptionRow[]> {
@@ -50,7 +66,7 @@ export async function loadOptions(payload: Payload): Promise<OptionRow[]> {
       collection: 'options',
       // Seed order = board order.
       sort: 'id',
-      populate: { media: { url: true, filename: true } },
+      populate: { media: { url: true, filename: true, width: true, height: true, box: true } },
       ...trusted,
       depth: 1,
     }),
@@ -108,6 +124,7 @@ export async function loadOptions(payload: Payload): Promise<OptionRow[]> {
       label: o.publicLabel,
       internalModel: o.internalModel ?? null,
       photo: urlOf(o.image as MediaRef),
+      photoIssues: o.type === 'case' ? issuesOf(o.image as MediaRef) : [],
       params,
       paramsNote,
       cost: o.cost ?? null,
@@ -128,6 +145,7 @@ export async function loadOptions(payload: Payload): Promise<OptionRow[]> {
       label: `${l.code} · Moc ${l.tierRoman} ${l.tierLabel}${l.variant ? ` (${l.variant})` : ''}`,
       internalModel: parts.map((p) => p.internalModel).join(', ') || null,
       photo: null,
+      photoIssues: [],
       params: `${l.platform} · ${l.ramType} · karta ${l.gpuLengthMm} mm`,
       paramsNote: `min. ${l.minRamGb} GB RAM, ${l.minSsdGb} GB dysku · obudowa kl. ${l.minCaseClass} · chłodzenie kl. ${l.minCoolerClass}${l.requiresAio ? ' · AIO 360' : ''}`,
       cost: parts.reduce((sum, p) => sum + p.cost, 0),

@@ -77,22 +77,22 @@ export function BeforeShipping({
   inWorkshop = 0,
 }: {
   metric: MetricSample | null
-  /** Paid orders not shipped yet (`loadWorkshop()`); 0 = the line is hidden. */
+  /** Paid orders not shipped yet (`loadInWorkshopCount()`); 0 = the line is hidden. */
   inWorkshop?: number
 }) {
   return (
     <section className="hm-sec hm-proc" id="metryka" aria-labelledby="proc-title">
       <div className="wrap hm-proc__grid">
         <div>
-          <h2 id="proc-title" className="h">
+          <h2 id="proc-title" className="h" data-reveal="">
             Zanim komputer wyjedzie z Rabki
           </h2>
-          <p className="hm-lead">
+          <p className="hm-lead" data-reveal="">
             Nie wysyłamy pudełek z magazynu. Każdy komputer przechodzi przez ręce konkretnych ludzi
             w Rabce i wyjeżdża z metryką: dokumentem, który mówi, jak naprawdę działa ten jeden
             egzemplarz.
           </p>
-          <ol className="hm-proc__steps">
+          <ol className="hm-proc__steps" data-reveal="">
             {STAGES.map((stage, i) => (
               <li key={stage.title}>
                 <span className="hm-proc__icon">{stage.icon}</span>

@@ -6,10 +6,12 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 
 import { Sigil } from '@/components/Sigil'
+import { Count } from '@/components/motion/Count'
 import { SourceLabel } from '@/components/SourceLabel'
 import { ButtonLink } from '@/components/ui/Button'
 import { Segmented } from '@/components/ui/Segmented'
 import { track } from '@/lib/analytics'
+import { flyTo } from '@/lib/fly'
 import {
   compareQuery,
   compareView,
@@ -85,6 +87,16 @@ export function Compare({
   const router = useRouter()
   // While that navigation runs, this (default) state must not overwrite the saved builds.
   const restoring = useRef(false)
+  const slotsRef = useRef<HTMLDivElement>(null)
+  // An added build: its sigil flies to the comparison counter once it is drawn (PREMIUM §2.3).
+  const flyNew = useRef(false)
+  useEffect(() => {
+    if (!flyNew.current) return
+    flyNew.current = false
+    const slot = slotsRef.current?.querySelector<HTMLElement>('.cmp-slot:last-of-type')
+    const sigil = slot?.querySelector('.cmp-slot__sigil')
+    if (slot && sigil) flyTo(sigil, 'compare', getComputedStyle(slot).getPropertyValue('--c'))
+  }, [state.slots.length])
   // Statistics (ADR-G009): the comparison was opened.
   useEffect(() => track('compare_open'), [])
 
@@ -116,10 +128,15 @@ export function Compare({
   }
   const add = () => {
     const next = nextBuild(state.slots, data.builds)
-    if (next) update({ slots: [...state.slots, next] })
+    if (!next) return
+    flyNew.current = true
+    update({ slots: [...state.slots, next] })
   }
   const insertSuggestion = (slug: string) => {
-    if (state.slots.length < MAX_SLOTS) return update({ slots: [...state.slots, slug] })
+    if (state.slots.length < MAX_SLOTS) {
+      flyNew.current = true
+      return update({ slots: [...state.slots, slug] })
+    }
     // Full: the suggestion replaces the cheapest build (board `addSugg`).
     let lowest = 0
     view.builds.forEach((b, i) => {
@@ -209,7 +226,11 @@ export function Compare({
 
       <section className="cmp" aria-label="Porównanie">
         <div className="wrap">
-          <div className={`cmp-slots cmp-slots--${n}`} style={{ '--n': n } as CSSProperties}>
+          <div
+            ref={slotsRef}
+            className={`cmp-slots cmp-slots--${n}`}
+            style={{ '--n': n } as CSSProperties}
+          >
             {view.builds.map((b, i) => {
               const num = view.numbers[i]
               const badge = view.badges[i]
@@ -276,7 +297,11 @@ export function Compare({
                     <strong className="nm">{b.name}</strong>
                     <div className="cmp-slot__fps">
                       <b>
-                        {num ? (view.capped ? String(view.game.fpsCap ?? num.fps) : num.fps) : '—'}
+                        {num ? (
+                          <Count value={view.capped ? (view.game.fpsCap ?? num.fps) : num.fps} />
+                        ) : (
+                          '—'
+                        )}
                       </b>
                       <span>
                         klatek, {view.game.name}, {res}
@@ -386,10 +411,14 @@ export function Compare({
                   >
                     <span className="cmp-chart__name">{b.name}</span>
                     <span className="cmp-chart__track" aria-hidden="true">
-                      {point !== null && <i style={{ left: `${point}%` }} />}
+                      {point !== null && <i style={{ '--p': point } as CSSProperties} />}
                     </span>
                     <b>
-                      {num ? (view.capped ? String(view.game.fpsCap ?? num.fps) : num.fps) : '—'}
+                      {num ? (
+                        <Count value={view.capped ? (view.game.fpsCap ?? num.fps) : num.fps} />
+                      ) : (
+                        '—'
+                      )}
                       {num && (
                         <span
                           className={`cmp-dot cmp-dot--${sourceOf(num.kind).tone}`}

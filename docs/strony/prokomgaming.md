@@ -67,10 +67,10 @@ Adresy w linkach plansz (`*.dc.html`) zamień na adresy z tej tabeli.
 - **Baner cookies:** przy pierwszej wizycie, „Odrzuć” i „Akceptuję” tej samej wagi, link do ustawień; pokazujemy tylko, gdy w ustawieniach strony włączone są narzędzia wymagające zgody (§24).
 - **404:** scena Licha, „Licho tu było i stronę zabrało”, 2 przyciski i 4 linki.
 
-## 4. Strona główna `/` (G7 hero i taśma, G8 sekcje)
+## 4. Strona główna `/` (G7 hero, G8 sekcje)
 Kolejność sekcji (plansza Main, telefon: Telefon):
 1. **Hero** — „Komputery do gier. Sprawdzone w grach.”; scena wybranej istoty (domyślnie Wampir), ogromne imię krojem Cinzel z materiałem istoty, przydomek, zdjęcie komputera na podstawie, karta istoty po prawej (pieczęć, legenda „Z podań” ze źródłem, „Moc istoty”, procesor i karta, klatki w CS2 i Cyberpunku z etykietą źródła, cena, „Poznaj {istotę}”), przełącznik istot z tego samego poziomu, na dole 9 medalionów poziomów („od Skrzata do Peruna”). Autoprzełączanie 7 s tylko na komputerze (ADR-G003 §5). Na telefonie: imię → komputer → nagłówek i przyciski → medaliony (przewijane) → karta.
-2. **Taśma „Teraz w warsztacie w Rabce”** — etapy bieżących zamówień (tylko nazwa zestawu i kolor) z `GET /api/warsztat`; bez danych → stały tekst z procesu (G14 podłącza dane).
+2. ~~Taśma „Teraz w warsztacie w Rabce”~~ — **usunięta na stałe (ADR-G015, 08.11.2026): ma jej nigdy nie być**, także `GET /api/warsztat`.
 3. **Od czego zaczynasz?** — 3 drogi: Kupuję dla dziecka (→ `/dla-rodzicow`), Wiem, w co gram (→ `/dobor-pod-gre`), Znam się na częściach (→ `/konfigurator`). Telefon: karuzela.
 4. **Szesnaście istot. Każda gra po swojemu.** — 16 kart (scena, zdjęcie, pieczęć, imię, poziom, klatki, cena) w kolejności ceny; skala mocy; „Wszystkie zestawy z filtrami”. Telefon: przewijany rząd.
 5. **Jak kupić, skoro nie ma przycisku „Kup”** — 4 kroki z czasem (Wysyłasz zapytanie · Dostajesz ofertę · Płacisz, jak Ci wygodnie [przelew albo BLIK] · Składamy i wysyłamy) + „Wyślij zapytanie”.
@@ -94,12 +94,12 @@ Kolejność sekcji (plansza Main, telefon: Telefon):
 ## 6. Karta zestawu `/zestawy/[slug]` (G9)
 Sekcje (plansza Zestaw):
 1. Hero: scena istoty, imię, przydomek, poziom; „Wyróżnik” — tytuł i 1–2 zdania o samym komputerze, bez źródła (ADR-G013, R2; do R2 legenda „Z podań” ze źródłem); „W grach” (dar); przełącznik poprzedni/następny (16 istot). Galeria: przód, wnętrze, w ciemności, film z testu — prawdziwe zdjęcia naszego egzemplarza (do sesji zdjęciowej: poglądowe z podpisem).
-2. **Dlaczego {istota}?** + wygląd (kolor światła; zmiana koloru przyciskiem na obudowie — tekst z planszy).
+2. **Dlaczego {istota}?** + wygląd (obudowa, „na zdjęciu …” i zdanie o podświetleniu ARGB — bez wyboru koloru, ADR-G014 §4).
 3. Cena (z `lib/pricing/`), „z montażem, Windows 11 i wysyłką”, data ceny (= data ostatniej publikacji cen, ADR-G002 §2), „Listę części potwierdzimy w ofercie ważnej 48 godzin”; **Zapytaj o {istotę}** · Zmień części (→ konfigurator z przepisem) · Porównaj · Wyślij rodzicowi ze specyfikacją (link + mail/SMS przez `mailto:`/`sms:`); obietnice (gotowy w 5–10 dni roboczych, wysyłka w cenie albo odbiór, metryka, 2 lata gwarancji z odbiorem). Na jaki monitor: FullHD / 2K / 4K z oceną jak w JS planszy Zestaw (z klatek zestawu).
 4. **Ile klatek w Twojej grze** — 12+ gier, segmenty FullHD/2K/4K, etykiety źródeł, „Jak liczymy?”.
 5. **Co jest w środku {istoty}** — plan wnętrza z 8 ponumerowanymi częściami (klik/dotyk podświetla część, opis, „Minimum, którego pilnujemy”), klasy części; obudowa i chłodzenie z pełną nazwą.
 6. **Miejsce na rozbudowę** (`power-levels.upgrade`: wolne gniazda RAM, M.2, gniazdo procesora, moc zasilacza — `TODO(krystian)`: potwierdzić z modelem płyty przed publikacją).
-7. **Dopasuj {istotę} pod siebie** — RAM, dysk, kolor światła; cena na żywo z `lib/pricing/`; „Zapytaj o tę wersję” (przekazuje konfigurację) i „Więcej zmian w konfiguratorze”.
+7. **Dopasuj {istotę} pod siebie** — RAM, dysk (bez koloru światła — ADR-G014 §4); cena na żywo z `lib/pricing/`; „Zapytaj o tę wersję” (przekazuje konfigurację) i „Więcej zmian w konfiguratorze”.
 8. **Od zapytania do Twojego biurka** — 8 etapów z czasem; **Zanim wyjedzie z Rabki** (60 min, 3 gry, 100% pamięci, BIOS) + przykładowa metryka.
 9. **Co znajdziesz w pudełku** (8 pozycji — [serwis] potwierdzić listę).
 10. **Gwarancja i opieka** (4 kafle) + **Co, jeśli…** (3 sytuacje).
@@ -112,7 +112,7 @@ Sekcje (plansza Zestaw):
 
 ## 7. Konfigurator `/konfigurator` (G10)
 Logika i zachowanie: **ADR-G002 §5–§6** (kroki, wyszarzenia z powodem, zmiana poziomu z zachowaniem wyboru, rozpoznanie gotowca, najbliższy gotowiec, ostrzeżenia, „Inna obudowa / chłodzenie”). Wygląd: plansza Konfigurator (1440) i Konfigurator-telefon, `stany/tel-07`, `tel-08`, `stany/konf-*`.
-- Podgląd: zdjęcie wybranej obudowy, kolor światła; nazwa poziomu, najbliższy gotowiec, klatki na żywo (3 gry wybrane w kroku 1), cena.
+- Podgląd: zdjęcie wybranej obudowy w poświacie istoty (bez wyboru koloru światła — ADR-G014 §4; w kroku obudowy zdanie o ARGB); nazwa poziomu, najbliższy gotowiec, klatki na żywo (3 gry wybrane w kroku 1), cena.
 - Podsumowanie: klasy części + pełne nazwy obudowy i chłodzenia, cena z Windows 11, montażem, testem i wysyłką, czas realizacji, gwarancja; **„Zapytaj o tę konfigurację”** (→ `/zapytanie?k=…`). Marży nigdzie nie pokazujemy.
 - Stan w adresie i w `localStorage` (powrót do konfiguracji); „Zapisz na koncie” po zalogowaniu (G14).
 
@@ -140,7 +140,7 @@ Plansza Bon: podgląd bonu na żywo (kwota, wygląd jednej z 4 istot, dla kogo, 
 Plansza Metryka: „{Istota}, egzemplarz nr …”, kto złożył i przetestował, data, test obciążeniowy (czas, wynik), temperatury maks., klatki zmierzone (3 gry), części z producentem, modelem, SN i gwarancją, gwarancja PRO-KOM do daty, „Pobierz PDF”. Bez danych klienta. `/metryka` bez kodu: pole „Wpisz kod z naklejki”. Nieznany kod → 404. `noindex`.
 
 ## 14. Warsztat (G14)
-Taśma na głównej (§4 pkt 2) z `orders` (etap, nazwa zestawu, kolor). Pełna strona `/warsztat` — **poza zakresem 20.11** (brak planszy; ewentualnie w grudniu wg wzoru taśmy).
+Bez publicznej taśmy i bez strony `/warsztat` (ADR-G015): etapy zamówień widać tylko w panelu, w koncie klienta i w metryce.
 
 ## 15. Konto `/konto` (G14)
 Plansza Konto: „Cześć, {imię}”, **Moje komputery** (oś etapów zamówienia, metryka, faktura), **Gwarancje** (PRO-KOM + części), **Zgłoś problem** (egzemplarz, kategoria, opis, zgoda na pomoc zdalną), historia zgłoszeń, **Zapisane konfiguracje** (otwórz w konfiguratorze), dane i zgody, wyloguj. Logowanie: e-mail + hasło (Payload auth, weryfikacja e-maila, reset hasła). Pierwszy cel do cięcia (ADR-G005).

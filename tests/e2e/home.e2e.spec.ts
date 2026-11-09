@@ -2,12 +2,13 @@ import { expect, test, type Page } from '@playwright/test'
 import { expectNoHiddenOffer, panelInternalModels } from './helpers/hiddenOffer'
 
 /**
- * Home hero and workshop strip (G7, spec. §4 pt 1–2, ADR-G003 §5): Wampir first, medallions and
+ * Home hero (G7, spec. §4 pt 1, ADR-G003 §5): Wampir first, medallions and
  * the tier switcher, the automatic switch only on desktop and never with reduced motion, and no
  * cost or internal model in the page (ADR-G002 §8.7).
  */
 
-const name = (page: Page) => page.locator('.hero__name')
+// The current name: on a switch the old one stays a moment (`is-gone`) while it fades away.
+const name = (page: Page) => page.locator('.hero__title:not(.is-gone) .hero__name')
 const card = (page: Page) => page.locator('.hero-card')
 
 async function gotoHome(page: Page) {
@@ -33,7 +34,8 @@ test('starts with Wampir: name, card, price and FPS with their source', async ({
     'href',
     '/zestawy/wampir',
   )
-  await expect(page.getByRole('heading', { name: 'Teraz w warsztacie w Rabce' })).toBeVisible()
+  // ADR-G015: the strip of orders under the hero is gone for good.
+  await expect(page.getByText('Teraz w warsztacie')).toHaveCount(0)
 })
 
 test('a medallion picks the lead creature of its tier, the switcher its sibling', async ({
@@ -78,6 +80,40 @@ test.describe('automatic switch', () => {
     await page.mouse.move(0, 0)
     await page.clock.runFor(30_000)
     await expect(name(page)).toHaveText('Licho')
+  })
+
+  // Runda v3 PREMIUM §2.3: a pause, not a skipped tick — the time left survives, the ring
+  // around the active medallion freezes with the clock.
+  test('pauses while the cursor is in the hero, then goes on with the time left', async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(isMobile, 'desktop behaviour')
+    await page.clock.install()
+    await gotoHome(page)
+    const hero = page.locator('.hero')
+    await expect(hero).toHaveAttribute('data-rotating', 'true')
+    await page.clock.runFor(4000)
+
+    await card(page).hover()
+    await expect(hero).toHaveAttribute('data-paused', 'true')
+    const ringState = () =>
+      page
+        .locator('.hero-tiers__ring-run')
+        .evaluate((el) => el.getAnimations().map((a) => a.playState))
+    await expect.poll(ringState).toEqual(['paused'])
+    await page.clock.runFor(20_000)
+    await expect(name(page)).toHaveText('Wampir')
+
+    const box = await hero.boundingBox()
+    if (!box) throw new Error('no hero box')
+    await page.mouse.move(box.x + 10, box.y + box.height + 40)
+    await expect(hero).toHaveAttribute('data-paused', 'false')
+    await expect.poll(ringState).toEqual(['running'])
+    await page.clock.runFor(2000)
+    await expect(name(page)).toHaveText('Wampir')
+    await page.clock.runFor(1500)
+    await expect(name(page)).toHaveText('Weles')
   })
 
   test('never on a phone', async ({ page, isMobile }) => {

@@ -97,8 +97,8 @@ export const LIGHTING_CHOICES = [
 ] as const satisfies readonly Choice<string>[]
 
 /**
- * Light colour picked on the build page („Dopasuj”) or in the configurator (spec. §7). Empty = the
- * creature's own light. Labels 1:1 from the board `LIGHTS`; `lib/buildPage.ts` reads this list.
+ * Light colour once picked on the build page or in the configurator — removed in runda v3 §1.4
+ * (every case is ARGB). Kept only as the options of `inquiries.lightColor` for old inquiries.
  */
 export const LIGHT_COLOR_CHOICES = [
   { value: 'piorun', label: 'Piorun' },
@@ -108,11 +108,6 @@ export const LIGHT_COLOR_CHOICES = [
   { value: 'lod', label: 'Lód' },
   { value: 'ogien', label: 'Ogień' },
 ] as const satisfies readonly Choice<string>[]
-export type LightColor = (typeof LIGHT_COLOR_CHOICES)[number]['value']
-
-/** One of the six light colours (an address or a stored value may hold anything). */
-export const isLight = (value: unknown): value is LightColor =>
-  LIGHT_COLOR_CHOICES.some((c) => c.value === value)
 
 export const EXTRA_CHOICES = [
   { value: 'monitor', label: 'Monitor' },

@@ -535,6 +535,7 @@
 }
 .cmp-chart__track {
   position: relative;
+  container-type: inline-size;
   height: 16px;
   border-radius: 999px;
   background: color-mix(in srgb, var(--kosc) 6%, transparent);
@@ -543,12 +544,15 @@
   position: absolute;
   top: 0;
   bottom: 0;
+  left: 0;
   width: 16px;
   margin-left: -8px;
   border-radius: 999px;
   background: var(--c);
   box-shadow: 0 0 22px color-mix(in srgb, var(--c) 60%, transparent);
-  transition: left 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
+  /* Moves by transform on a switch (runda v3 PREMIUM §2.1): --p is the point in % of the track. */
+  translate: calc(var(--p) * 1cqi) 0;
+  transition: translate var(--dur-4) var(--ease-enter);
 }
 .cmp-chart__row b {
   display: flex;

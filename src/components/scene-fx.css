@@ -1,0 +1,157 @@
+/* Animated layer of a creature scene (components/SceneFx, runda v3 PREMIUM §2.4). Positions in %
+   of the scene picture: the horizon sits at ~82% of its height in all 16 scenes
+   (scripts/scenes, hz 880 of 1067). Only transform and opacity move. Hidden unless the width is
+   a desktop one and motion is allowed (ADR-G003 §5) — like the fireflies. */
+.scene-fx {
+  display: none;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+  .scene-fx {
+    display: block;
+  }
+}
+
+/* Mist: two soft bands over the horizon, drifting slowly against each other. */
+.scene-fx__mist {
+  position: absolute;
+  left: -10%;
+  right: -10%;
+  top: 70%;
+  height: 20%;
+  background: radial-gradient(
+    ellipse 50% 50% at 50% 50%,
+    color-mix(in srgb, var(--c) 10%, var(--fx-mist)),
+    transparent 70%
+  );
+  background-size: 50% 100%;
+  opacity: 0.8;
+  animation: fx-mist 48s ease-in-out infinite alternate;
+}
+.scene-fx__mist--back {
+  top: 64%;
+  height: 16%;
+  opacity: 0.5;
+  animation-duration: 66s;
+  animation-direction: alternate-reverse;
+}
+@keyframes fx-mist {
+  from {
+    transform: translateX(-4%);
+  }
+  to {
+    transform: translateX(4%);
+  }
+}
+
+/* Snow (Pani Zimy) and embers (Żmij): small dots with their own speed, delay and drift. */
+.scene-fx__snow span,
+.scene-fx__embers span {
+  position: absolute;
+  width: var(--fx-size);
+  height: var(--fx-size);
+  border-radius: 50%;
+  animation: var(--fx-dur) linear var(--fx-delay) infinite;
+}
+.scene-fx__snow span {
+  top: -2%;
+  background: var(--fx-snow);
+  animation-name: fx-snow;
+}
+@keyframes fx-snow {
+  from {
+    transform: translate(0, 0);
+  }
+  to {
+    transform: translate(var(--fx-drift), 105cqh);
+  }
+}
+.scene-fx__snow,
+.scene-fx__embers {
+  position: absolute;
+  inset: 0;
+  container-type: size;
+}
+.scene-fx__embers span {
+  top: 96%;
+  background: color-mix(in srgb, var(--c) 60%, var(--fx-ember));
+  box-shadow: 0 0 6px color-mix(in srgb, var(--c) 80%, var(--fx-ember-glow));
+  animation-name: fx-ember;
+}
+@keyframes fx-ember {
+  from {
+    opacity: 0;
+    transform: translate(0, 0);
+  }
+  15% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    transform: translate(var(--fx-drift), -45cqh);
+  }
+}
+
+/* Storm (Perun): one short double flash every ~11 s. */
+.scene-fx__flash {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 60% 70% at 50% 20%, var(--fx-flash), transparent);
+  opacity: 0;
+  animation: fx-flash 11s linear infinite 3s;
+}
+@keyframes fx-flash {
+  0%,
+  90%,
+  92.5%,
+  95%,
+  100% {
+    opacity: 0;
+  }
+  91% {
+    opacity: 1;
+  }
+  93.5% {
+    opacity: 0.6;
+  }
+}
+
+/* Water (Wodnik, Rusałka, Weles): a band of light below the horizon that trembles. `#000` in the
+   mask counts only as alpha, not a colour (ADR-G003 §2). */
+.scene-fx__water {
+  position: absolute;
+  left: 15%;
+  right: 15%;
+  top: 84%;
+  height: 10%;
+  background: repeating-linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--c) 30%, var(--fx-water)) 0 1px,
+    transparent 1px 7px
+  );
+  -webkit-mask: radial-gradient(ellipse 50% 50% at 50% 50%, #000, transparent);
+  mask: radial-gradient(ellipse 50% 50% at 50% 50%, #000, transparent);
+  mix-blend-mode: screen;
+  opacity: 0.5;
+  animation: fx-water 3.2s ease-in-out infinite alternate;
+}
+@keyframes fx-water {
+  from {
+    transform: translateX(-6px) scaleY(1);
+    opacity: 0.35;
+  }
+  to {
+    transform: translateX(6px) scaleY(1.15);
+    opacity: 0.6;
+  }
+}
+
+/* One animated layer per scene besides the mist (PREMIUM §2.4): a scene with its own effect
+   drops the fireflies. */
+.hero:has(.hero__scene[data-on='true'] .scene-fx:not([data-fx='mist'])) .fireflies,
+.bp-hero:has(> .scene-fx:not([data-fx='mist'])) .fireflies {
+  display: none;
+}

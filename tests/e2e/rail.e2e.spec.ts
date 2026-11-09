@@ -127,6 +127,33 @@ test('„O nas” and a game page have their own „Na tej stronie”', async ({
   await expect(rail(page).locator('a[href^="#gm-"]')).toHaveCount(3)
 })
 
+test('nothing sticks out of the open rail (runda v3 §1.3)', async ({ page }) => {
+  await page.goto('/')
+  await rail(page).hover()
+  await expect(rail(page)).toHaveAttribute('data-open', 'true')
+  // Wait for the 64 → 258 px width transition.
+  await expect.poll(() => rail(page).evaluate((el) => el.getBoundingClientRect().width)).toBe(258)
+  const overflow = await rail(page).evaluate((nav) => {
+    const box = nav.getBoundingClientRect()
+    return [...nav.querySelectorAll('a, button, kbd')]
+      .filter((el) => el.getBoundingClientRect().width > 0)
+      .flatMap((el) => {
+        const r = el.getBoundingClientRect()
+        const name = (el.getAttribute('aria-label') ?? el.textContent ?? '').trim().slice(0, 30)
+        const out: string[] = []
+        if (el.scrollWidth > el.clientWidth + 0.5 && el.tagName !== 'KBD')
+          out.push(`${name}: scrollWidth`)
+        if (r.right > box.right - 1)
+          out.push(`${name}: past the right edge by ${Math.round(r.right - box.right + 1)} px`)
+        return out
+      })
+  })
+  expect(overflow).toEqual([])
+  await expect(rail(page).getByRole('button', { name: 'Szukaj zestawu lub gry' })).toContainText(
+    'Szukaj',
+  )
+})
+
 test('the open rail passes axe', async ({ page }) => {
   await page.goto('/')
   await rail(page).hover()

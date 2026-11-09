@@ -101,7 +101,12 @@ export function LoginForm() {
         />
       </Field>
       <Message status={status} />
-      <button type="submit" className="btn" disabled={status.kind === 'sending'}>
+      <button
+        type="submit"
+        className="btn"
+        disabled={status.kind === 'sending'}
+        aria-busy={status.kind === 'sending'}
+      >
         {status.kind === 'sending' ? 'Loguję…' : 'Zaloguj się'}
       </button>
     </form>
@@ -214,7 +219,12 @@ export function RegisterForm({ formToken }: { formToken: string }) {
         </span>
       </label>
       <Message status={status} />
-      <button type="submit" className="btn" disabled={status.kind === 'sending'}>
+      <button
+        type="submit"
+        className="btn"
+        disabled={status.kind === 'sending'}
+        aria-busy={status.kind === 'sending'}
+      >
         {status.kind === 'sending' ? 'Zakładam…' : 'Załóż konto'}
       </button>
     </form>
@@ -260,7 +270,12 @@ export function ForgotForm() {
         />
       </Field>
       <Message status={status} />
-      <button type="submit" className="btn" disabled={status.kind === 'sending'}>
+      <button
+        type="submit"
+        className="btn"
+        disabled={status.kind === 'sending'}
+        aria-busy={status.kind === 'sending'}
+      >
         {status.kind === 'sending' ? 'Wysyłam…' : 'Wyślij link'}
       </button>
     </form>
@@ -312,7 +327,12 @@ export function ResetForm({ token }: { token: string }) {
         />
       </Field>
       <Message status={status} />
-      <button type="submit" className="btn" disabled={status.kind === 'sending'}>
+      <button
+        type="submit"
+        className="btn"
+        disabled={status.kind === 'sending'}
+        aria-busy={status.kind === 'sending'}
+      >
         {status.kind === 'sending' ? 'Zapisuję…' : 'Ustaw hasło'}
       </button>
     </form>
@@ -413,7 +433,12 @@ export function TicketForm({ units }: { units: readonly { id: number; label: str
         <span>Zgadzam się na pomoc zdalną przy tym zgłoszeniu.</span>
       </label>
       <Message status={status} />
-      <button type="submit" className="btn" disabled={status.kind === 'sending'}>
+      <button
+        type="submit"
+        className="btn"
+        disabled={status.kind === 'sending'}
+        aria-busy={status.kind === 'sending'}
+      >
         {status.kind === 'sending' ? 'Wysyłam…' : 'Wyślij zgłoszenie'}
       </button>
       {status.kind === 'ok' && (
@@ -476,7 +501,12 @@ export function ProfileForm({ name, phone }: { name: string; phone: string }) {
         </Field>
       </div>
       <Message status={status} />
-      <button type="submit" className="btn btn--ghost" disabled={status.kind === 'sending'}>
+      <button
+        type="submit"
+        className="btn btn--ghost"
+        disabled={status.kind === 'sending'}
+        aria-busy={status.kind === 'sending'}
+      >
         Zapisz dane
       </button>
       {status.kind === 'ok' && (

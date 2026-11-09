@@ -9,7 +9,7 @@ export function HomeFaq({ questions }: { questions: HomeQuestion[] }) {
   return (
     <section className="hm-sec hm-faq" id="pytania" aria-labelledby="faq-title">
       <div className="wrap hm-faq__in">
-        <h2 id="faq-title" className="h">
+        <h2 id="faq-title" className="h" data-reveal="">
           Zanim zapytasz
         </h2>
         {questions.map((q, i) => (

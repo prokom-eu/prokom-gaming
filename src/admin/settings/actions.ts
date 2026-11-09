@@ -156,7 +156,7 @@ export async function savePriceCheckSettings(
   return { status: 'saved', at: new Date().toISOString() }
 }
 
-export type SwitchName = 'stageEmail' | 'workshopStrip'
+export type SwitchName = 'stageEmail'
 
 /**
  * Section „Zamówienia i klienci” (panel spec §13): one switch saved at once, like the switches
@@ -169,7 +169,7 @@ export async function setOrderSwitch(
   const session = await panelActionSession('admin')
   // TODO(krystian): texts of the results — not on the board.
   if (!session) return { ok: false, message: 'Brak uprawnień — zaloguj się do panelu.' }
-  if ((name !== 'stageEmail' && name !== 'workshopStrip') || typeof value !== 'boolean') {
+  if (name !== 'stageEmail' || typeof value !== 'boolean') {
     return { ok: false, message: 'Nie udało się zapisać.' }
   }
   try {
@@ -185,8 +185,6 @@ export async function setOrderSwitch(
     return { ok: false, message: 'Nie udało się zapisać. Spróbuj ponownie.' }
   }
   revalidatePath('/admin/ustawienia')
-  // The strip is on the home page and in GET /api/warsztat.
-  if (name === 'workshopStrip') revalidatePath('/')
   return { ok: true }
 }
 

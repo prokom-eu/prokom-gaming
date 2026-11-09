@@ -48,7 +48,7 @@ function useNavScroll() {
 /** `hours`: „codziennie 8–22” from the panel settings (lib/responseHours.server.ts). */
 export function SiteHeader({ hours }: { hours: string }) {
   const pathname = usePathname()
-  const { compareCount, openMenu, menuOpen, openSearch } = useShell()
+  const { compareCount, compareBump, openMenu, menuOpen, openSearch } = useShell()
   const [{ top, scrolled, hidden }, show] = useNavScroll()
 
   const compareLabel =
@@ -94,10 +94,15 @@ export function SiteHeader({ hours }: { hours: string }) {
       >
         <IconSearch size={18} />
       </button>
-      <Link className="ico" href={routes.compare} aria-label={compareLabel}>
+      <Link className="ico" href={routes.compare} aria-label={compareLabel} data-fly="compare">
         <IconBars size={18} />
         {compareCount > 0 && (
-          <em className="badge" aria-hidden="true">
+          // Keyed by the bump: a new key replays the jump (globals.css `.is-bump`).
+          <em
+            key={compareBump}
+            className={compareBump ? 'badge is-bump' : 'badge'}
+            aria-hidden="true"
+          >
             {compareCount}
           </em>
         )}

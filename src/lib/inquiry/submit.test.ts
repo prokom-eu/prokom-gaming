@@ -143,7 +143,6 @@ describe('submitInquiryWith', () => {
       config: wampir.config,
       priceAtInquiry: wampir.price,
       priceBatch: 2,
-      lightColor: 'lod',
       games: [7],
       consent: {
         accepted: true,
@@ -152,6 +151,8 @@ describe('submitInquiryWith', () => {
       },
       marketingConsent: false,
     })
+    // Runda v3 §1.4: an old client's light colour never reaches the record.
+    expect(saved).not.toHaveProperty('lightColor')
 
     expect(sent.map((e) => e.to)).toEqual(['gaming@example.test', personal.email])
     expect(sent[0]?.replyTo).toBe(personal.email)

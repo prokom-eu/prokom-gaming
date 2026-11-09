@@ -4,10 +4,12 @@ import { useEffect, useRef, useState } from 'react'
 
 import { CasePhoto } from '@/components/CasePhoto'
 import { Sigil } from '@/components/Sigil'
+import { Count } from '@/components/motion/Count'
 import { SourceLabel } from '@/components/SourceLabel'
 import { Segmented } from '@/components/ui/Segmented'
 import { RESOLUTION_LABELS, type Resolution } from '@/lib/fps'
 import { compareStepText, type CompareData } from '@/lib/home'
+import { prefersReducedMotion } from '@/lib/motion'
 import { zl } from '@/lib/pricing/format'
 
 /**
@@ -28,7 +30,7 @@ export function CompareChart({ data }: { data: CompareData }) {
     if (!el || typeof IntersectionObserver === 'undefined') return
     // Already on screen: no growth (it would flash). Below the fold: hide, then grow into view.
     if (el.getBoundingClientRect().top < window.innerHeight) return
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    if (prefersReducedMotion()) return
     el.dataset.shown = 'false'
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -96,9 +98,11 @@ export function CompareChart({ data }: { data: CompareData }) {
             </span>
             <span className="hm-cmp__price">{zl(card.price)}</span>
             <span className="hm-cmp__bar" aria-hidden="true">
-              <s style={{ ['--h' as string]: `${card.percent}%` }} />
+              <s style={{ ['--k' as string]: card.percent / 100 }} />
             </span>
-            <b>{card.fps} FPS</b>
+            <b>
+              <Count value={card.fps} /> FPS
+            </b>
             <SourceLabel kind={card.kind} />
             <em>{card.step ? compareStepText(card.step) : 'punkt wyjścia'}</em>
           </li>

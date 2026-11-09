@@ -9,7 +9,7 @@ type Playwright = PlaywrightWorkerArgs['playwright']
 
 /**
  * Access rules of G14 (ADR-G005, panel spec §15):
- * - nothing about orders, units, tickets or accounts is public; the workshop strip has no personal data,
+ * - nothing about orders, units, tickets or accounts is public; the old strip feed is gone (ADR-G015),
  * - a `serwis` panel account runs the workshop but sees no inquiries, costs or settings,
  * - a customer sees only their own records, and only after verifying the e-mail,
  * - nobody can open a "verified" customer account through the REST API.
@@ -102,18 +102,9 @@ test('nobody opens a verified customer account through REST, signed in or not', 
   await context.dispose()
 })
 
-test('the workshop strip shows build, colour and stage only', async ({ request }) => {
-  const build = await anyBuildId()
-  await create('orders', { build, stage: 'assembly', name: 'Zofia', email: mail('strip') })
-  const response = await request.get('/api/warsztat')
-  expect(response.status()).toBe(200)
-  const body = await response.text()
-  expect(body).not.toContain('@')
-  expect(body).not.toContain('Zofia')
-  const { items } = JSON.parse(body) as { items: Record<string, unknown>[] }
-  expect(items.length).toBeGreaterThan(0)
-  for (const item of items)
-    expect(Object.keys(item).sort()).toEqual(['key', 'name', 'slug', 'stage', 'text'])
+// ADR-G015: no public feed of orders at all — the strip and its endpoint are gone for good.
+test('there is no public workshop strip feed', async ({ request }) => {
+  expect((await request.get('/api/warsztat')).status()).toBe(404)
 })
 
 test('serwis runs the workshop but sees no inquiries, costs or settings', async ({

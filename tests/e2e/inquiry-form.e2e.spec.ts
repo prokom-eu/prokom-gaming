@@ -113,7 +113,7 @@ async function send(page: Page, openedAt: number): Promise<string> {
   return number
 }
 
-test('from a build page: changes and light colour reach the record, both e-mails', async ({
+test('from a build page: changes reach the record, an old ?swiatlo= is ignored, both e-mails', async ({
   page,
   request,
 }, testInfo) => {
@@ -122,7 +122,8 @@ test('from a build page: changes and light colour reach the record, both e-mails
 
   const summary = page.locator('.iq-sum')
   await expect(summary).toContainText('Wampir')
-  await expect(summary).toContainText('światło Lód')
+  // Runda v3 §1.4: no light colour any more (ARGB) — an old link still opens, without it.
+  await expect(summary).not.toContainText(/światło/i)
   await expect(page.getByRole('button', { name: /Wampir/, pressed: true })).toBeVisible()
 
   await next(page, 'Dalej: gry i wygląd')
@@ -150,7 +151,7 @@ test('from a build page: changes and light colour reach the record, both e-mails
   await next(page, 'Dalej: sprawdź')
   const review = page.locator('.iq-review')
   await expect(review).toContainText('Wampir, Moc VII, 4K, pamięć')
-  await expect(review).toContainText('światło Lód')
+  await expect(review).not.toContainText(/światło/i)
   await expect(review).toContainText(customer)
   await expectNoAxeViolations(page)
 
@@ -161,7 +162,8 @@ test('from a build page: changes and light colour reach the record, both e-mails
   await expectNoAxeViolations(page)
 
   const saved = await inquiryByNumber(request, number)
-  expect(saved).toMatchObject({ type: 'build', lightColor: 'lod', monitor: 'qhd' })
+  expect(saved).toMatchObject({ type: 'build', monitor: 'qhd' })
+  expect(saved.lightColor ?? null).toBeNull()
   expect(saved.config?.ram).toBe('R64')
   await expectEmails(request, customer, number)
 })

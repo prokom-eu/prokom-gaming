@@ -7,6 +7,7 @@ const json = (body: unknown, status: number) => Response.json(body, { status })
 /** Most saved configurations per account (the collection allows the same). */
 const MAX_SAVED = 20
 
+// `light`: old rows only (light colour removed in runda v3 §1.4) — kept as saved, never written.
 type Row = { id?: string | null; label: string; k: string; light?: string | null; savedAt: string }
 
 /** `POST /api/konto/konfiguracje` — „Zapisz na koncie” in the configurator (spec. §7). */
@@ -21,7 +22,6 @@ export async function POST(request: Request) {
   const row: Row = {
     label: parsed.data.label,
     k: parsed.data.k,
-    light: parsed.data.light ?? null,
     savedAt: new Date().toISOString(),
   }
   try {

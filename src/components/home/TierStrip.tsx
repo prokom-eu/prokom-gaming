@@ -43,6 +43,26 @@ export function TierStrip({ tiers, builds, activeTier, onPick }: Props) {
             >
               <span className="hero-tiers__medal" aria-hidden="true">
                 <Sigil id={lead.key} size={54} />
+                {/* Active medallion: its outline lights up at the entry; during the autoswitch a
+                    second arc fills it in 7 s (Hero `data-rotating`, paused with `data-paused`). */}
+                {tier.tier === activeTier && (
+                  <svg className="hero-tiers__ring" viewBox="0 0 64 64">
+                    <circle
+                      className="hero-tiers__ring-base"
+                      cx="32"
+                      cy="32"
+                      r="30"
+                      pathLength="100"
+                    />
+                    <circle
+                      className="hero-tiers__ring-run"
+                      cx="32"
+                      cy="32"
+                      r="30"
+                      pathLength="100"
+                    />
+                  </svg>
+                )}
               </span>
               {/* The visible text is the button's name (WCAG 2.5.3): "Moc I Skrzat FullHD". */}
               <span className="hero-tiers__text">

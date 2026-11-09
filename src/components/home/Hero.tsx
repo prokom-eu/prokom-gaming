@@ -14,22 +14,26 @@ import {
 
 import { CasePhoto } from '@/components/CasePhoto'
 import { Fireflies } from '@/components/Fireflies'
+import { Letters } from '@/components/motion/Letters'
+import { SceneFx } from '@/components/SceneFx'
+import { SceneLayers } from '@/components/SceneLayers'
 import { IconClock, IconRosette, IconShield, IconShop } from '@/components/icons'
 import { ButtonLink } from '@/components/ui/Button'
 import { HERO_DEFAULT, HERO_INTERVAL_MS, rotationOf, type HeroData } from '@/lib/home'
+import {
+  DESKTOP,
+  FINE_POINTER,
+  matchesMedia as matches,
+  REDUCED_MOTION as CALM,
+} from '@/lib/motion'
+import { useMediaQuery, useReducedMotion } from '@/lib/useMotion'
 
 import { HeroCard } from './HeroCard'
 import { Pedestal } from './Pedestal'
 import { TierStrip } from './TierStrip'
 
-/** Autoswitch and parallax only here (ADR-G003 §5): desktop width, a mouse, motion allowed. */
-const DESKTOP = '(min-width: 1024px)'
-const MOUSE = '(hover: hover) and (pointer: fine)'
-const CALM = '(prefers-reduced-motion: reduce)'
 /** The next creature of the rotation is fetched this long before it shows. */
 const PRELOAD_AFTER_MS = 3000
-
-const matches = (query: string) => typeof window !== 'undefined' && window.matchMedia(query).matches
 
 /**
  * Home hero (spec. §4 pt 1, ADR-G003 §5, board Main `.hero6`). Only the first creature's scene and
@@ -46,12 +50,24 @@ export function Hero({ data }: { data: HeroData }) {
   // Number of switches: the first paint has no entry animation (it would delay LCP).
   const [switches, setSwitches] = useState(0)
   const [stopped, setStopped] = useState(false)
+  // The creature that just left: its name fades up and away over the new one, then goes.
+  const [leaving, setLeaving] = useState<string | null>(null)
+  const [hovered, setHovered] = useState(false)
+  const [focused, setFocused] = useState(false)
+  const [hidden, setHidden] = useState(false)
 
   const section = useRef<HTMLElement>(null)
   const activeRef = useRef(first)
-  const hover = useRef(false)
-  const focus = useRef(false)
   const frame = useRef(0)
+  // Time left until the next switch: a pause keeps it, a new creature starts it again.
+  const remaining = useRef(HERO_INTERVAL_MS)
+
+  // Autoswitch only on a desktop width with motion allowed (ADR-G003 §5), until a pick by hand.
+  const desktop = useMediaQuery(DESKTOP)
+  const calm = useReducedMotion()
+  const rotating = !stopped && rotation.length > 1 && desktop && !calm
+  // Paused, not skipped (runda v3 PREMIUM §2.3): the cursor or focus in the hero, a hidden tab.
+  const paused = hovered || focused || hidden
 
   const mount = useCallback((slug: string) => {
     setMounted((list) => (list.includes(slug) ? list : [...list, slug]))
@@ -60,6 +76,8 @@ export function Hero({ data }: { data: HeroData }) {
   const show = useCallback(
     (slug: string) => {
       if (slug === activeRef.current || !builds.has(slug)) return
+      // With reduced motion there is no fade-out to wait for: the old name just goes.
+      if (!matches(CALM)) setLeaving(activeRef.current)
       activeRef.current = slug
       mount(slug)
       setActive(slug)
@@ -82,17 +100,34 @@ export function Hero({ data }: { data: HeroData }) {
     return rotation[(index + 1) % rotation.length]
   }, [rotation])
 
-  // Every 7 s on desktop; skipped while the cursor or focus is in the hero or the tab is hidden.
   useEffect(() => {
-    if (stopped || rotation.length < 2) return
-    const timer = window.setInterval(() => {
-      if (!matches(DESKTOP) || matches(CALM)) return
-      if (document.hidden || hover.current || focus.current) return
+    const onVisibility = () => setHidden(document.hidden)
+    // A page opened in a background tab starts hidden.
+    onVisibility()
+    document.addEventListener('visibilitychange', onVisibility)
+    return () => document.removeEventListener('visibilitychange', onVisibility)
+  }, [])
+
+  // A new creature, or the rotation coming back (width, reduced motion), gets the full 7 s —
+  // the ring restarts then too. Declared before the timer: it runs first.
+  useEffect(() => {
+    remaining.current = HERO_INTERVAL_MS
+  }, [active, rotating])
+
+  // Every 7 s; a pause stops the clock and keeps what is left, in step with the ring around the
+  // active medallion (TierStrip), which CSS pauses at the same moment.
+  useEffect(() => {
+    if (!rotating || paused) return
+    const started = performance.now()
+    const timer = window.setTimeout(() => {
       const next = nextInRotation()
       if (next) show(next)
-    }, HERO_INTERVAL_MS)
-    return () => window.clearInterval(timer)
-  }, [stopped, rotation.length, nextInRotation, show])
+    }, remaining.current)
+    return () => {
+      window.clearTimeout(timer)
+      remaining.current = Math.max(0, remaining.current - (performance.now() - started))
+    }
+  }, [rotating, paused, active, nextInRotation, show])
 
   // Fetch the next creature's scene and photo shortly before its turn.
   useEffect(() => {
@@ -108,7 +143,7 @@ export function Hero({ data }: { data: HeroData }) {
 
   const onMouseMove = (event: MouseEvent<HTMLElement>) => {
     const el = section.current
-    if (!el || !matches(DESKTOP) || !matches(MOUSE) || matches(CALM)) return
+    if (!el || !matches(DESKTOP) || !matches(FINE_POINTER) || matches(CALM)) return
     const { clientX, clientY } = event
     cancelAnimationFrame(frame.current)
     frame.current = requestAnimationFrame(() => {
@@ -119,14 +154,14 @@ export function Hero({ data }: { data: HeroData }) {
   }
 
   const onMouseLeave = () => {
-    hover.current = false
+    setHovered(false)
     cancelAnimationFrame(frame.current)
     section.current?.style.setProperty('--mx', '0')
     section.current?.style.setProperty('--my', '0')
   }
 
   const onBlur = (event: FocusEvent<HTMLElement>) => {
-    if (!event.currentTarget.contains(event.relatedTarget as Node | null)) focus.current = false
+    if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setFocused(false)
   }
 
   const build = builds.get(active)
@@ -142,24 +177,31 @@ export function Hero({ data }: { data: HeroData }) {
   }
   const siblings = data.builds.filter((b) => b.tier === build.tier)
   const animationKey = switches > 0 ? `${active}-${switches}` : null
+  const left = leaving ? builds.get(leaving) : undefined
 
   return (
     <section
       ref={section}
-      className="hero"
+      // The entry (runda v3 PREMIUM §2.3) runs once, from the first paint, in CSS alone; a
+      // switch to another creature has its own animation.
+      className={switches === 0 ? 'hero hero--intro' : 'hero'}
       id="start"
       data-scene-top
       data-material={build.material}
+      data-rotating={rotating}
+      data-paused={paused}
       style={
         {
-          '--c': `var(--c-${build.slug})`,
+          // A registered colour (home.css @property): the scene's light glides to the new one.
+          '--hero-c': `var(--c-${build.slug})`,
           '--fs': build.nameSize,
+          '--hero-interval': `${HERO_INTERVAL_MS}ms`,
         } as CSSProperties
       }
-      onMouseEnter={() => (hover.current = true)}
+      onMouseEnter={() => setHovered(true)}
       onMouseLeave={onMouseLeave}
       onMouseMove={onMouseMove}
-      onFocus={() => (focus.current = true)}
+      onFocus={() => setFocused(true)}
       onBlur={onBlur}
     >
       <div className="hero__frame">
@@ -169,17 +211,17 @@ export function Hero({ data }: { data: HeroData }) {
             if (!b) return null
             return (
               <div key={slug} className="hero__scene" data-on={slug === active}>
-                <Image
-                  src={`/scenes/${b.key}-hero.webp`}
-                  alt=""
-                  fill
+                <SceneLayers
+                  id={b.key}
                   sizes="(max-width: 1023px) 450vw, 300vw"
-                  loading={slug === first ? 'eager' : 'lazy'}
+                  eager={slug === first}
                 />
+                <SceneFx id={b.key} />
               </div>
             )
           })}
         </div>
+        <div className="hero__horizon" aria-hidden="true" />
         <div className="hero__veil" aria-hidden="true" />
         <Fireflies />
         <div className="hero__fgs" aria-hidden="true">
@@ -194,7 +236,34 @@ export function Hero({ data }: { data: HeroData }) {
           })}
         </div>
         <div className="hero__edge" aria-hidden="true" />
+        {/* Black that lifts at the entry: over the scene, under the name, the computer and the text. */}
+        <div className="hero__dawn" aria-hidden="true" />
 
+        {left && animationKey && !calm && (
+          <div
+            key={`gone-${animationKey}`}
+            className="hero__title is-gone"
+            data-material={left.material}
+            style={{ '--fs': left.nameSize, '--c': `var(--c-${left.slug})` } as CSSProperties}
+            aria-hidden="true"
+            onAnimationEnd={(event) => {
+              if (event.target === event.currentTarget) setLeaving(null)
+            }}
+          >
+            <span className="hero__realm">
+              <b>Moc {left.tierRoman}</b>
+              <i>{left.tierLabel}</i>
+            </span>
+            <span className="hero__epithet">
+              <span className="hero__flourish" />
+              {left.epithet}
+              <span className="hero__flourish hero__flourish--r" />
+            </span>
+            <span className="hero__name">
+              <Letters text={left.name} />
+            </span>
+          </div>
+        )}
         <div
           key={`title-${animationKey}`}
           className={animationKey ? 'hero__title is-new' : 'hero__title'}
@@ -209,7 +278,9 @@ export function Hero({ data }: { data: HeroData }) {
             {build.epithet}
             <span className="hero__flourish hero__flourish--r" />
           </span>
-          <span className="hero__name">{build.name}</span>
+          <span className="hero__name">
+            <Letters text={build.name} />
+          </span>
         </div>
 
         <div className="hero__stage">

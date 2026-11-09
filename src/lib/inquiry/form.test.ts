@@ -74,21 +74,21 @@ const send = (state: FormState) => toPayload(state, context)
 const accepted = (state: FormState) => parseInquiryInput(send(state)).success
 
 describe('initialState: entry from the address', () => {
-  it('build page: build, its changes and the light colour', () => {
+  it('build page: build and its changes; an old light colour (runda v3 §1.4) is ignored', () => {
     const state = start('zestaw=wampir&ram=R64&ssd=NM2&swiatlo=lod')
     expect(state).toMatchObject({
       mode: 'build',
       build: 'wampir',
       changes: { ram: 'R64', ssd: 'NM2' },
-      light: 'lod',
     })
+    expect(state).not.toHaveProperty('light')
     expect(inquiryType(state)).toBe('build')
     expect(send(contact(state))).toMatchObject({
       type: 'build',
       build: 'wampir',
       config: { ram: 'R64', ssd: 'NM2' },
-      lightColor: 'lod',
     })
+    expect(send(contact(state))).not.toHaveProperty('lightColor')
     expect(accepted(contact(state))).toBe(true)
   })
 
@@ -112,7 +112,7 @@ describe('initialState: entry from the address', () => {
 
   it('ignores unknown builds, malformed codes and colours', () => {
     const state = start('zestaw=nie-ma&k=P13.LB500&swiatlo=neon&ram=R64;DROP')
-    expect(state).toMatchObject({ build: null, config: null, light: null, changes: {} })
+    expect(state).toMatchObject({ build: null, config: null, changes: {} })
     expect(start('zestaw=wampir&ram=R64;DROP').changes).toEqual({})
   })
 
@@ -138,7 +138,8 @@ describe('draft (inquiry counter)', () => {
 
   it('keeps the address of the picked computer and opens it again', () => {
     const state = start('zestaw=wampir&ram=R64&swiatlo=lod')
-    expect(restore(state)).toMatchObject({ build: 'wampir', changes: { ram: 'R64' }, light: 'lod' })
+    expect(restore(state)).toMatchObject({ build: 'wampir', changes: { ram: 'R64' } })
+    expect(draftOf(state).join('&')).not.toContain('swiatlo')
     const config = start('k=P13.LB500.PL3LX.R32.NM1')
     expect(restore(config).config).toEqual(wampir.config)
     // A comparison keeps all builds, the one now picked first.
@@ -158,12 +159,11 @@ describe('draft (inquiry counter)', () => {
 })
 
 describe('type and payload per mode', () => {
-  it('advice and a custom list carry no computer, colour or recipe changes', () => {
-    const picked = contact(start('zestaw=wampir&swiatlo=lod'))
+  it('advice and a custom list carry no computer or recipe changes', () => {
+    const picked = contact(start('zestaw=wampir'))
     const advice = { ...picked, mode: 'advice' as const, forWhom: 'child' as const }
     expect(send(advice)).toMatchObject({ type: 'advice', forWhom: 'child' })
     expect(send(advice).build).toBeUndefined()
-    expect(send(advice).lightColor).toBeUndefined()
     expect(accepted(advice)).toBe(true)
 
     const list = {
@@ -274,7 +274,7 @@ describe('summary, review and the sent page', () => {
     expect(summary).toMatchObject({
       key: 'wampir',
       title: 'Wampir',
-      sub: 'Moc VII, 4K, światło Lód',
+      sub: 'Moc VII, 4K',
     })
     expect(summary.price).toBeGreaterThan(wampir.price)
     expect(summary.rows).toEqual([
@@ -289,7 +289,7 @@ describe('summary, review and the sent page', () => {
     const rows = reviewOf(state, data)
     expect(rows[0]).toEqual({
       label: 'Komputer',
-      value: 'Wampir, Moc VII, 4K, pamięć 64 GB DDR5, światło Lód',
+      value: 'Wampir, Moc VII, 4K, pamięć 64 GB DDR5',
       step: 0,
     })
     expect(rows.find((r) => r.label === 'Kontakt')).toEqual({

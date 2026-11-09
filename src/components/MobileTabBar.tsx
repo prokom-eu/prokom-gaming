@@ -15,7 +15,7 @@ import { useShell } from './shell/ShellProvider'
  */
 export function MobileTabBar() {
   const pathname = usePathname()
-  const { inquiryCount, openMenu, menuOpen } = useShell()
+  const { inquiryCount, inquiryBump, openMenu, menuOpen } = useShell()
   const current = (href: string) => (isCurrent(pathname, href) ? 'page' : undefined)
 
   return (
@@ -45,7 +45,7 @@ export function MobileTabBar() {
       <Link className="tabbar__item" href={routes.inquiry} aria-current={current(routes.inquiry)}>
         <IconMail />
         {inquiryCount > 0 && (
-          <em className="badge">
+          <em key={inquiryBump} className={inquiryBump ? 'badge is-bump' : 'badge'}>
             {inquiryCount}
             <span className="sr-only">
               {' '}

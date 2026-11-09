@@ -175,7 +175,7 @@ export default function ParentsPage() {
           <h2 id="pr-q-h" className="h">
             Cztery pytania, które zadaje każdy rodzic
           </h2>
-          <div className="pr-q">
+          <div className="pr-q" data-reveal="">
             {/* Prices stream in: the rest of the page is sent before the offer is read. */}
             <Suspense fallback={<BudgetCardFallback />}>
               <BudgetCard />
@@ -213,7 +213,7 @@ export default function ParentsPage() {
           <h2 id="pr-proof-h" className="h">
             Sprawdź nas, zanim zapłacisz
           </h2>
-          <ul className="pr-proof">
+          <ul className="pr-proof" data-reveal="">
             <li>
               <span className="pr-ico" aria-hidden="true">
                 <IconDoc size={22} />
@@ -269,7 +269,7 @@ export default function ParentsPage() {
           <h2 id="pr-steps-h" className="h">
             Jak wygląda zakup
           </h2>
-          <ol className="pr-steps">
+          <ol className="pr-steps" data-reveal="">
             {STEPS.map(({ icon: Icon, title, text }) => (
               <li key={title}>
                 <span className="pr-ico" aria-hidden="true">
@@ -293,7 +293,7 @@ export default function ParentsPage() {
               Sześć słów, które padają w każdej ofercie. Po jednym zdaniu, bez żargonu.
             </p>
           </div>
-          <dl>
+          <dl data-reveal="">
             {GLOSSARY.map(([term, text]) => (
               <div key={term}>
                 <dt>{term}</dt>

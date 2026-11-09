@@ -1,6 +1,7 @@
 import Image from 'next/image'
 
-import { caseVars, type CasePhoto as CasePhotoData } from '@/lib/caseBox'
+import { FadeImage } from '@/components/motion/FadeImage'
+import { caseVars, drawnWidthOf, type CasePhoto as CasePhotoData } from '@/lib/caseBox'
 
 import './case-photo.css'
 
@@ -13,6 +14,11 @@ type Props = {
    * srcset instead of every device width, which keeps 16 cards from bloating the page HTML.
    */
   drawnWidth?: number
+  /**
+   * …or the largest height of the case itself (CSS px). The file's drawn width follows from the
+   * case's box, so a case with a wide transparent margin still gets a sharp 2x file.
+   */
+  caseHeight?: number
   /** Empty when the picture is decorative (the cards); the hero passes the photo's own text. */
   alt?: string
   eager?: boolean
@@ -30,16 +36,21 @@ export function CasePhoto({
   photo,
   sizes,
   drawnWidth,
+  caseHeight,
   alt = '',
   eager = false,
   priority = false,
 }: Props) {
-  // With `drawnWidth` the width/height props only carry the aspect; CSS sets the real size.
-  const width = drawnWidth ?? photo.width
-  const height = drawnWidth ? Math.round((drawnWidth * photo.height) / photo.width) : photo.height
+  // With a drawn size the width/height props only carry the aspect (and the 1x/2x srcset); CSS
+  // sets the real size.
+  const drawn = drawnWidth ?? (caseHeight ? drawnWidthOf(photo, caseHeight) : undefined)
+  const width = drawn ?? photo.width
+  const height = drawn ? Math.round((drawn * photo.height) / photo.width) : photo.height
+  // A lazy photo emerges once loaded (runda v3 PREMIUM §2.3); an eager one may be the LCP.
+  const Img = eager || priority ? Image : FadeImage
   return (
     <span className="case" style={caseVars(photo)}>
-      <Image
+      <Img
         className="case__img"
         src={photo.src}
         alt={alt}

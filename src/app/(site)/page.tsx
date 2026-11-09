@@ -12,14 +12,13 @@ import { HomeFaq } from '@/components/home/HomeFaq'
 import { HowToBuy } from '@/components/home/HowToBuy'
 import { Included } from '@/components/home/Included'
 import { StartPaths } from '@/components/home/StartPaths'
-import { WorkshopStrip } from '@/components/home/WorkshopStrip'
 import { JsonLd } from '@/components/JsonLd'
 import { getEnv } from '@/lib/env'
 import { EMPTY_HOME, type HomeData } from '@/lib/home'
 import { loadHome } from '@/lib/home.server'
 import { errorFields, log } from '@/lib/logger'
 import { DESCRIPTIONS, HOME_TITLE, organizationJsonLd, websiteJsonLd } from '@/lib/seo'
-import { EMPTY_WORKSHOP, loadWorkshop, type Workshop } from '@/lib/workshop.server'
+import { loadInWorkshopCount } from '@/lib/workshop.server'
 
 import '@/components/home/home.css'
 import '@/components/home/sections.css'
@@ -37,16 +36,16 @@ export default async function HomePage() {
   // build (`docker build`) has none. A few Local API queries cost milliseconds.
   await connection()
   // Both reads at once; each falls back on its own, so one failing never takes the page down.
-  const [home, workshop] = await Promise.all([
+  const [home, inWorkshop] = await Promise.all([
     loadHome().catch((error: unknown): HomeData => {
       // A database hiccup must not take the home page down: text and buttons stay.
       log.error({ ...errorFields(error) }, 'home data failed')
       return EMPTY_HOME
     }),
-    loadWorkshop().catch((error: unknown): Workshop => {
-      // Without orders the strip shows the fixed process — as before G14.
-      log.error({ ...errorFields(error) }, 'workshop strip failed')
-      return EMPTY_WORKSHOP
+    loadInWorkshopCount().catch((error: unknown): number => {
+      // No count, no line: the section stands without it.
+      log.error({ ...errorFields(error) }, 'workshop count failed')
+      return 0
     }),
   ])
   return (
@@ -55,12 +54,11 @@ export default async function HomePage() {
           Google (WebSite, runda v2 §1.1). */}
       <JsonLd data={[...organizationJsonLd(getEnv().SITE_URL), websiteJsonLd(getEnv().SITE_URL)]} />
       <Hero data={home.hero} />
-      <WorkshopStrip items={workshop.items} />
       <StartPaths />
       <Bestiary hero={home.hero} games={home.panel?.games ?? []} />
       <HowToBuy />
       <Games panel={home.panel} />
-      <BeforeShipping metric={home.metric} inWorkshop={workshop.inWorkshop} />
+      <BeforeShipping metric={home.metric} inWorkshop={inWorkshop} />
       {/* §4 pt 8 "Co mówią o nas klienci" stays hidden until real Google reviews exist (only
           genuine ones, 1:1, dated). TODO(krystian): rating and reviews in `site-settings`. */}
       <ForParents />

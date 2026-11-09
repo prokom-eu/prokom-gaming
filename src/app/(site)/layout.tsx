@@ -5,6 +5,9 @@ import type { ReactNode } from 'react'
 import { CookieBanner } from '@/components/CookieBanner'
 import { MenuSheet } from '@/components/MenuSheet'
 import { MobileTabBar } from '@/components/MobileTabBar'
+import { Magnetic } from '@/components/motion/Magnetic'
+import { NavPending } from '@/components/motion/NavPending'
+import { RevealObserver } from '@/components/motion/RevealObserver'
 import { ShellProvider } from '@/components/shell/ShellProvider'
 import { SiteFooter } from '@/components/SiteFooter'
 import { SiteRail } from '@/components/rail/SiteRail'
@@ -19,6 +22,7 @@ import { company, cookieBannerEnabled, menuCreatures } from '@/lib/site'
 
 import { fontVariables } from './fonts'
 import './globals.css'
+import '../../styles/font-fallbacks.css'
 
 /**
  * Defaults of every page (spec. §23). Per request, not at build time: one image serves staging and
@@ -62,6 +66,9 @@ export default async function SiteLayout({ children }: { children: ReactNode }) 
           <SiteHeader hours={hours} />
           <SiteRail creatures={menuCreatures} />
           <SearchHost />
+          <RevealObserver />
+          <Magnetic />
+          <NavPending creatures={menuCreatures} />
           <main id="tresc">{children}</main>
           <SiteFooter features={flags} />
           <MobileTabBar />

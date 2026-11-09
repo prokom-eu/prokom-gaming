@@ -26,7 +26,7 @@ const PAGES = [
   { path: '/porownaj?z=baba-jaga,wampir,weles&gra=cyberpunk-2077&rozdz=2k&hz=144', status: 200 },
   { path: '/porownaj?z=skrzat,licho&gra=elden-ring&rozdz=4k&hz=60&roznice=1', status: 200 },
   { path: '/zapytanie?zestaw=wampir', status: 200 },
-  { path: '/zapytanie?k=P13.LB500.PL3LX.R32.NM1&swiatlo=lod', status: 200 },
+  { path: '/zapytanie?k=P13.LB500.PL3LX.R32.NM1', status: 200 },
   { path: '/zapytanie/wyslane?nr=PKG-2026-0001&istota=wampir', status: 200 },
   { path: '/pytania', status: 200 },
   { path: '/kontakt', status: 200 },
@@ -50,15 +50,20 @@ const WCAG = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']
 test.describe('accessibility (axe)', () => {
   for (const { path, status } of PAGES) {
     test(path, async ({ page }) => {
+      // axe checks what a reader ends up seeing: with reduced motion nothing waits hidden for
+      // its entry below the fold (runda v3 E3 reveals sections, numbers and icons on scroll).
+      await page.emulateMedia({ reducedMotion: 'reduce' })
       const response = await page.goto(path)
       expect(response?.status()).toBe(status)
       // Entrance animations first (e.g. the FAQ fading in from opacity 0): mid-fade, axe measures
       // a blended colour and reports contrast that no reader sees. On `next start` the page is
-      // ready before the 0.4 s fade ends (G15). Endless ones (pulses) are skipped.
+      // ready before the 0.4 s fade ends (G15). Endless ones (pulses) are skipped, and so are the
+      // scroll-driven ones (scene planes, E2): they follow the scroll, never „finish” in time.
       await page.evaluate(() =>
         Promise.all(
           document
             .getAnimations()
+            .filter((a) => a.timeline instanceof DocumentTimeline)
             .filter((a) => a.effect?.getTiming().iterations !== Infinity)
             .map((a) => a.finished.catch(() => undefined)),
         ),

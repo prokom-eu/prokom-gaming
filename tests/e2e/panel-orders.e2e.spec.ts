@@ -104,7 +104,8 @@ test('board: checklist is saved, moving a stage records it and e-mails the custo
   await expect(page.getByRole('heading', { level: 1, name: 'Zamówienia i warsztat' })).toBeVisible()
   const panel = page.getByRole('region', { name: `Zamówienie ${o.number}` })
   await expect(panel).toBeVisible()
-  await expect(panel).toContainText('„Skrzat: Opłacone”')
+  // ADR-G015: no public strip, so no „Na tablicy na stronie” preview either.
+  await expect(panel).not.toContainText('Na tablicy na stronie')
 
   // Checklist: saved on the server, still ticked after a reload.
   await panel.getByRole('checkbox', { name: 'BIOS i sterowniki zaktualizowane' }).check()

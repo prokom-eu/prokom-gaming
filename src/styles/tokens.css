@@ -95,8 +95,8 @@
 }
 
 /* ---------------------------------------------------------------------------------------------
-   Uzupełnienie (G7): hero strony głównej i taśma — wartości wpisane wprost w planszy Main
-   (`.hero6`, `.card6`, `.strip6`, `.tick5`).
+   Uzupełnienie (G7): hero strony głównej — wartości wpisane wprost w planszy Main
+   (`.hero6`, `.card6`, `.strip6`).
    --------------------------------------------------------------------------------------------- */
 :root {
   --white: #fff; /* blask i jasne końce materiałów */
@@ -126,8 +126,6 @@
     #ff7a1a,
     #f2c230
   );
-  --tick-bg: #050907; /* taśma „Teraz w warsztacie” */
-  --tick-text: #bdb39b;
   --live: #5bc23e; /* kropka „na żywo” (plansza Main, `.live`) */
 }
 
@@ -233,13 +231,9 @@
    `.bpl`, `.dp7`, `.tr7`, `LIGHTS`).
    --------------------------------------------------------------------------------------------- */
 :root {
-  /* kolory światła w „Dopasuj” (plansza: LIGHTS) */
-  --light-piorun: #f2c230;
-  --light-krew: #e0322b;
+  /* zieleń z dawnego wyboru światła (plansza: LIGHTS) — została tylko w „O nas”; wybór usunięty
+     w rundzie v3 §1.4 */
   --light-las: #3ddc97;
-  --light-czary: #b26bff;
-  --light-lod: #9fe7ff;
-  --light-ogien: #ff7a1a;
   /* tła */
   --bp-panel: #08100d; /* kafle części, opcje, kroki, pudełko, gwarancja */
   --bp-frame-from: #081210;
@@ -537,4 +531,31 @@
   --orb-shadow: rgba(242, 194, 48, 0.8);
   /* szyna (GN-2) */
   --rail-num: #8a8574; /* liczby rzymskie (5,2:1 na --noc) */
+}
+
+/* Ruch (runda v3 PREMIUM §2.1, ADR-G014): czasy, krzywe i kaskada wspólne dla całej strony.
+   `--motion-scale` mnoży odległości wjazdów i uniesień (wariant intensywności). Przy
+   `prefers-reduced-motion: reduce` globals.css sprowadza wszystko do stanu końcowego. */
+:root {
+  --dur-1: 120ms; /* drobne: kolor, obwódka */
+  --dur-2: 240ms; /* hover, wciśnięcie */
+  --dur-3: 480ms; /* wejście elementu */
+  --dur-4: 900ms; /* wejście sceny, przejście istoty */
+  --ease-enter: cubic-bezier(0.16, 1, 0.3, 1); /* wysuw: szybki start, miękkie lądowanie */
+  --ease-exit: cubic-bezier(0.7, 0, 0.84, 0); /* wyjście: powolny start, szybki koniec */
+  --ease-spring: cubic-bezier(
+    0.32,
+    0.72,
+    0,
+    1
+  ); /* arkusze: długie, sprężyste lądowanie bez odbicia */
+  --stagger: 50ms; /* opóźnienie kolejnych elementów kaskady (max 6, src/lib/motion.ts) */
+  --motion-scale: 1; /* wariant „spokojny” (Krystian 08.11, nagrania E2) */
+  /* warstwa ruchu scen (SceneFx, PREMIUM §2.4): mgła, śnieg, żar, błysk burzy, odbicie wody */
+  --fx-mist: rgba(200, 210, 205, 0.16);
+  --fx-snow: rgba(240, 246, 255, 0.85);
+  --fx-ember: #ffd27a;
+  --fx-ember-glow: #ff9a3c;
+  --fx-flash: rgba(220, 230, 255, 0.55);
+  --fx-water: rgba(255, 255, 255, 0.18);
 }

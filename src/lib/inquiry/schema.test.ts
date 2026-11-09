@@ -140,13 +140,13 @@ describe('parseInquiryInput', () => {
       const advice = { ...base, type: 'advice' }
       expect(fields({ ...advice, build: 'wampir' })).toContain('build')
       expect(fields({ ...advice, config: full })).toContain('config')
-      expect(fields({ ...advice, lightColor: 'lod' })).toContain('lightColor')
     })
 
-    it('light colour: one of six, optional, only with a computer', () => {
+    it('an old client’s light colour (runda v3 §1.4) is dropped, never an error', () => {
       expect(fields({ ...build, lightColor: 'lod' })).toEqual([])
-      expect(fields({ ...build, lightColor: '' })).toEqual([])
-      expect(fields({ ...build, lightColor: 'neon' })).toContain('lightColor')
+      expect(fields({ ...build, lightColor: 'neon' })).toEqual([])
+      const parsed = parseInquiryInput({ ...build, lightColor: 'lod' })
+      expect(parsed.success && 'lightColor' in parsed.data).toBe(false)
     })
   })
 

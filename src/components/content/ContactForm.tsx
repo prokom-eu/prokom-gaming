@@ -189,7 +189,7 @@ export function ContactForm({ token }: { token: string }) {
           {CONTACT_SEND_ERRORS[sendError]}
         </p>
       )}
-      <Button type="submit" size="lg" disabled={sending}>
+      <Button type="submit" size="lg" disabled={sending} aria-busy={sending}>
         {/* TODO(krystian): „Wysyłam…” is not on the board (as in the G12 form). */}
         {sending ? 'Wysyłam…' : 'Wyślij wiadomość'}
       </Button>

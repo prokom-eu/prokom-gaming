@@ -5,6 +5,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -22,6 +23,9 @@ type Shell = {
   compareCount: number
   /** Items in the inquiry. */
   inquiryCount: number
+  /** Grows each time the count rises in this visit: the badges „jump” (keyed by it). 0 = never. */
+  compareBump: number
+  inquiryBump: number
   /** The search dialog (NAWIGACJA §5): open from the rail, the header, Ctrl K, „/”, the menu. */
   searchOpen: boolean
   openSearch: () => void
@@ -83,6 +87,9 @@ export function ShellProvider({ children }: { children: ReactNode }) {
     zero,
   )
 
+  const compareBump = useBump(storageKeys.compare, 3)
+  const inquiryBump = useBump(storageKeys.inquiry)
+
   const value = useMemo(
     () => ({
       menuOpen,
@@ -90,6 +97,8 @@ export function ShellProvider({ children }: { children: ReactNode }) {
       closeMenu,
       compareCount,
       inquiryCount,
+      compareBump,
+      inquiryBump,
       searchOpen,
       openSearch,
       closeSearch,
@@ -100,12 +109,32 @@ export function ShellProvider({ children }: { children: ReactNode }) {
       closeMenu,
       compareCount,
       inquiryCount,
+      compareBump,
+      inquiryBump,
       searchOpen,
       openSearch,
       closeSearch,
     ],
   )
   return <ShellContext.Provider value={value}>{children}</ShellContext.Provider>
+}
+
+/**
+ * Counts rises of a stored list (runda v3 PREMIUM §2.3: the counter jumps when something is
+ * added). The starting value is read after hydration, so a reload or a new page never jumps —
+ * only an addition made while the visitor is here.
+ */
+function useBump(key: string, max?: number): number {
+  const [bump, setBump] = useState(0)
+  useEffect(() => {
+    let last = readCount(key, max)
+    return subscribeStorage(() => {
+      const now = readCount(key, max)
+      if (now > last) setBump((b) => b + 1)
+      last = now
+    })
+  }, [key, max])
+  return bump
 }
 
 export function useShell(): Shell {

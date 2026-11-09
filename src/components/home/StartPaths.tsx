@@ -24,7 +24,7 @@ const PATHS = [
     icon: 'parts',
     color: 'var(--c-kikimora)',
     title: 'Znam się na częściach',
-    text: 'Konfigurator z trybem eksperta: zasilacz, chłodzenie, płyta, światło. Licznik klatek przelicza się przy każdej zmianie.',
+    text: 'Konfigurator z trybem eksperta: zasilacz, chłodzenie, płyta. Licznik klatek przelicza się przy każdej zmianie.',
     link: 'Otwórz konfigurator',
     href: '/konfigurator',
   },
@@ -35,10 +35,12 @@ export function StartPaths() {
     <section className="hm-sec hm-paths" id="od-czego-zaczynasz" aria-labelledby="paths-title">
       <div className="wrap">
         <div className="hm-head hm-head--center">
-          <h2 id="paths-title" className="h">
+          <h2 id="paths-title" className="h" data-reveal="">
             Od czego zaczynasz?
           </h2>
-          <p>Trzy drogi, ten sam cel: komputer dobrany do gier, w które naprawdę grasz.</p>
+          <p data-reveal="">
+            Trzy drogi, ten sam cel: komputer dobrany do gier, w które naprawdę grasz.
+          </p>
         </div>
         {/* A row that scrolls on a phone (≤ 760 px), a grid of three above. */}
         <HScroll as="ul" className="hm-paths__list">

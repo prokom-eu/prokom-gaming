@@ -4,6 +4,7 @@ import { useState, type CSSProperties } from 'react'
 
 import { RESOLUTIONS, RESOLUTION_LABELS, type FpsListRows, type Resolution } from '@/lib/fps'
 
+import { CountText } from './motion/Count'
 import { HowWeMeasure } from './HowWeMeasure'
 import { SourceLabel } from './SourceLabel'
 import { Segmented } from './ui/Segmented'
@@ -41,7 +42,7 @@ export function FpsListClient({ title, color, defaultResolution, rows }: Props) 
         Średnia liczba klatek na sekundę, ustawienia wysokie lub najwyższe, bez generatora klatek.
         Przy każdym wyniku piszemy, skąd pochodzi.
       </p>
-      <ul className="fps__list">
+      <ul className="fps__list" data-reveal="">
         {current.map((row) => (
           <li key={row.game} className="fps__row">
             <span className="fps__game">
@@ -51,7 +52,9 @@ export function FpsListClient({ title, color, defaultResolution, rows }: Props) 
             <span className="fps__bar" aria-hidden="true">
               <s style={{ width: `${row.percent}%` }} />
             </span>
-            <b>{row.text}</b>
+            <b>
+              <CountText text={row.text} />
+            </b>
             <SourceLabel kind={row.kind} />
           </li>
         ))}
