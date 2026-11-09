@@ -511,3 +511,21 @@ test.describe('reduced motion (F2)', () => {
     expect(await offLanding(page, '#w-cenie')).toBeLessThan(3)
   })
 })
+
+test('the mouse moves the hero planes on the home and build pages (one shared parallax)', async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, 'a mouse on a desktop only')
+  for (const [path, hero] of [
+    ['/', '.hero'],
+    ['/zestawy/wampir', '.bp-hero'],
+  ] as const) {
+    await page.goto(path)
+    const box = (await page.locator(hero).boundingBox())!
+    await page.mouse.move(box.x + box.width * 0.9, box.y + box.height * 0.5)
+    await expect
+      .poll(() => page.locator(hero).evaluate((el) => Number(el.style.getPropertyValue('--mx'))))
+      .toBeGreaterThan(0.3)
+  }
+})

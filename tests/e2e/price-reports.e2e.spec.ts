@@ -116,7 +116,10 @@ test.describe('a price check on the fake Claude', () => {
     startedChecks.push(Number(page.url().split('/').pop()))
 
     // The run is in the background; the report page refreshes itself while it runs.
-    await expect(page.getByText('Zakończone', { exact: true })).toBeVisible({ timeout: 120_000 })
+    // The status chip in the header (an alert like „Ceneo nie odpowiada” may say „Zakończone” too).
+    await expect(page.locator('header .pn-chip').filter({ hasText: /^Zakończone$/ })).toBeVisible({
+      timeout: 120_000,
+    })
 
     const changes = page.getByRole('region', { name: 'Zmiany cen części' })
     await changes.getByRole('button', { name: /^Do zatwierdzenia/ }).click()
