@@ -229,9 +229,38 @@ a {
 ::view-transition-group(root) {
   animation-duration: var(--dur-2);
 }
+/* The shell stays above the page rising in (its group would otherwise paint under it, later in
+   the DOM, and the header would vanish for the length of the transition). */
+::view-transition-group(site-header),
+::view-transition-group(site-rail),
+::view-transition-group(site-tabbar) {
+  z-index: 100;
+}
 ::view-transition-group(*.case-morph) {
   animation-duration: var(--dur-3);
   animation-timing-function: var(--ease-enter);
+}
+/* Every page change (components/motion/PageTransition, F2): the page you leave fades and drifts
+   up quickly, the next one rises from below a beat later. Only translate and opacity (ADR-G014
+   §1 — a blur over a whole page is the costliest thing a mid-range phone could animate); the
+   shell (named above) stays put. */
+::view-transition-old(.page-out) {
+  animation: page-out var(--dur-2) var(--ease-exit) both;
+}
+::view-transition-new(.page-in) {
+  animation: page-in 560ms var(--ease-enter) 120ms both;
+}
+@keyframes page-out {
+  to {
+    opacity: 0;
+    translate: 0 -14px;
+  }
+}
+@keyframes page-in {
+  from {
+    opacity: 0;
+    translate: 0 28px;
+  }
 }
 /* The flight softens mid-way, which hides the photo being scaled between two sizes. */
 ::view-transition-image-pair(*.case-morph) {
@@ -248,6 +277,23 @@ a {
   ::view-transition-new(*),
   ::view-transition-image-pair(*) {
     animation: none !important;
+  }
+}
+/* Arrival at a section (components/motion/SmoothAnchors): the heading glows once in gold —
+   „you are here” — instead of a focus ring around the whole section. */
+[data-glide-target]:focus {
+  outline: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .is-arrived {
+    animation: arrived 1.4s var(--ease-enter) both;
+  }
+}
+@keyframes arrived {
+  25% {
+    text-shadow:
+      0 0 18px color-mix(in srgb, var(--grom2) 55%, transparent),
+      0 0 2px color-mix(in srgb, var(--grom2) 70%, transparent);
   }
 }
 /* A slow page change (components/motion/NavPending): the sigil of the next creature lights up

@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type MouseEvent } from 'react'
 
 import { useShell } from '@/components/shell/ShellProvider'
+import { glideToTop } from '@/lib/glide'
 import { prefersReducedMotion } from '@/lib/motion'
 import { routes } from '@/lib/nav'
 
@@ -127,7 +128,8 @@ export function RailPanel({
     // The button disappears at the top: hand focus to the first entry, so the keyboard keeps its
     // place instead of falling back to the page start.
     nav.current?.querySelector<HTMLElement>('.rail__cta')?.focus({ preventScroll: true })
-    window.scrollTo({ top: 0, behavior: calm ? 'auto' : 'smooth' })
+    if (calm) window.scrollTo(0, 0)
+    else glideToTop()
   }
 
   const groupSections = group?.sections.filter((s) => m.present.has(s.id)) ?? []

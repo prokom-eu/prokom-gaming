@@ -86,7 +86,8 @@ test.describe('phone', () => {
     const quick = page.locator('.bl-quick')
     await quick.getByRole('button', { name: 'FullHD' }).click()
     await expect(page).toHaveURL(/\?monitor=fullhd$/)
-    expect(await names(page)).toHaveLength(5)
+    // The list re-renders a moment after the address changes.
+    await expect.poll(async () => (await names(page)).length).toBe(5)
 
     // Sticky while the cards scroll under it.
     await scrollTo(page, 1500)

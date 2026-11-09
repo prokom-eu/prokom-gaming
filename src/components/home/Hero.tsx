@@ -9,23 +9,18 @@ import {
   useState,
   type CSSProperties,
   type FocusEvent,
-  type MouseEvent,
 } from 'react'
 
 import { CasePhoto } from '@/components/CasePhoto'
 import { Fireflies } from '@/components/Fireflies'
 import { Letters } from '@/components/motion/Letters'
+import { MouseParallax } from '@/components/motion/MouseParallax'
 import { SceneFx } from '@/components/SceneFx'
 import { SceneLayers } from '@/components/SceneLayers'
 import { IconClock, IconRosette, IconShield, IconShop } from '@/components/icons'
 import { ButtonLink } from '@/components/ui/Button'
 import { HERO_DEFAULT, HERO_INTERVAL_MS, rotationOf, type HeroData } from '@/lib/home'
-import {
-  DESKTOP,
-  FINE_POINTER,
-  matchesMedia as matches,
-  REDUCED_MOTION as CALM,
-} from '@/lib/motion'
+import { DESKTOP, matchesMedia as matches, REDUCED_MOTION as CALM } from '@/lib/motion'
 import { useMediaQuery, useReducedMotion } from '@/lib/useMotion'
 
 import { HeroCard } from './HeroCard'
@@ -58,7 +53,6 @@ export function Hero({ data }: { data: HeroData }) {
 
   const section = useRef<HTMLElement>(null)
   const activeRef = useRef(first)
-  const frame = useRef(0)
   // Time left until the next switch: a pause keeps it, a new creature starts it again.
   const remaining = useRef(HERO_INTERVAL_MS)
 
@@ -139,27 +133,6 @@ export function Hero({ data }: { data: HeroData }) {
     return () => window.clearTimeout(timer)
   }, [active, stopped, nextInRotation, mount])
 
-  useEffect(() => () => cancelAnimationFrame(frame.current), [])
-
-  const onMouseMove = (event: MouseEvent<HTMLElement>) => {
-    const el = section.current
-    if (!el || !matches(DESKTOP) || !matches(FINE_POINTER) || matches(CALM)) return
-    const { clientX, clientY } = event
-    cancelAnimationFrame(frame.current)
-    frame.current = requestAnimationFrame(() => {
-      const box = el.getBoundingClientRect()
-      el.style.setProperty('--mx', ((clientX - box.left) / box.width - 0.5).toFixed(3))
-      el.style.setProperty('--my', ((clientY - box.top) / box.height - 0.5).toFixed(3))
-    })
-  }
-
-  const onMouseLeave = () => {
-    setHovered(false)
-    cancelAnimationFrame(frame.current)
-    section.current?.style.setProperty('--mx', '0')
-    section.current?.style.setProperty('--my', '0')
-  }
-
   const onBlur = (event: FocusEvent<HTMLElement>) => {
     if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setFocused(false)
   }
@@ -199,11 +172,12 @@ export function Hero({ data }: { data: HeroData }) {
         } as CSSProperties
       }
       onMouseEnter={() => setHovered(true)}
-      onMouseLeave={onMouseLeave}
-      onMouseMove={onMouseMove}
+      onMouseLeave={() => setHovered(false)}
       onFocus={() => setFocused(true)}
       onBlur={onBlur}
     >
+      {/* The cursor's place in the section as --mx/--my (the same parallax as the build page). */}
+      <MouseParallax />
       <div className="hero__frame">
         <div className="hero__scenes" aria-hidden="true">
           {mounted.map((slug) => {

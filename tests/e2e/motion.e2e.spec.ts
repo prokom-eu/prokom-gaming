@@ -340,3 +340,192 @@ test('the skip link (a hash, same page) never shows the slow-page sigil', async 
   await page.waitForTimeout(600)
   await expect(page.locator('.nav-pending')).toHaveCount(0)
 })
+
+/* F2: smooth travel between sections and a transition on every page change. */
+
+/** Where a section's top sits in the window. */
+const topOf = (page: Page, selector: string) =>
+  page
+    .locator(selector)
+    .first()
+    .evaluate((el) => Math.round(el.getBoundingClientRect().top))
+/** Where the browser's own jump would put it: scroll padding of the page + margin of the target. */
+const landingOf = (page: Page, selector: string) =>
+  page
+    .locator(selector)
+    .first()
+    .evaluate(
+      (el) =>
+        (parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0) +
+        (parseFloat(getComputedStyle(el).scrollMarginTop) || 0),
+    )
+const offLanding = async (page: Page, selector: string) =>
+  Math.abs((await topOf(page, selector)) - (await landingOf(page, selector)))
+const scrollY = (page: Page) => page.evaluate(() => window.scrollY)
+const railLink = (page: Page, href: string) =>
+  page.getByRole('navigation', { name: 'Sekcje strony' }).locator(`a[href="${href}"]`)
+/** Counts `document.startViewTransition` calls in `window.vtCount`. */
+const countViewTransitions = (page: Page) =>
+  page.addInitScript(() => {
+    const start = document.startViewTransition?.bind(document)
+    if (!start) return
+    const w = window as unknown as { vtCount: number }
+    w.vtCount = 0
+    document.startViewTransition = ((arg: Parameters<typeof start>[0]) => {
+      w.vtCount += 1
+      return start(arg)
+    }) as typeof document.startViewTransition
+  })
+const vtCount = (page: Page) =>
+  page.evaluate(() => (window as unknown as { vtCount: number }).vtCount)
+
+test('a rail link glides to its section and lands exactly below the header', async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, 'the rail is a wide-desktop element')
+  await page.goto('/')
+  await railLink(page, '#w-cenie').click()
+  // On the way: the page has moved, the section is not there yet.
+  await expect.poll(() => scrollY(page)).toBeGreaterThan(0)
+  expect(await offLanding(page, '#w-cenie')).toBeGreaterThan(50)
+  // Lands below the header, the address names the section, its heading glows once.
+  await expect(page.locator('#inc-title')).toHaveClass(/is-arrived/)
+  expect(await offLanding(page, '#w-cenie')).toBeLessThan(3)
+  await expect(page).toHaveURL(/#w-cenie$/)
+  await expect(page.locator('#w-cenie')).toBeFocused()
+})
+
+test('build page: a rail link lands below the sticky price bar, as the jump did', async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, 'the rail is a wide-desktop element')
+  await page.goto('/zestawy/wampir')
+  await railLink(page, '#gwarancja').click()
+  await expect(page.locator('#gwarancja')).toBeFocused()
+  expect(await offLanding(page, '#gwarancja')).toBeLessThan(3)
+  expect(await landingOf(page, '#gwarancja')).toBeGreaterThan(150)
+})
+
+test('legal page on a phone: a contents link keeps the heading below the fixed header', async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(!isMobile, 'the phone header is fixed only on a phone')
+  await page.goto('/regulamin')
+  const link = page.locator('.ct-toc a[href^="#"]').nth(3)
+  const id = ((await link.getAttribute('href')) ?? '').slice(1)
+  await link.click()
+  await expect(page).toHaveURL(new RegExp(`#${id}$`))
+  await expect.poll(() => offLanding(page, `[id="${id}"]`)).toBeLessThan(3)
+  const header = await page.locator('.nav').evaluate((el) => el.getBoundingClientRect().bottom)
+  expect(await topOf(page, `[id="${id}"]`)).toBeGreaterThanOrEqual(Math.floor(header))
+})
+
+test('the wheel stops a glide where it is', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'the rail is a wide-desktop element')
+  await page.goto('/')
+  await page.mouse.move(700, 450)
+  await railLink(page, '#napisz').click()
+  await expect.poll(() => scrollY(page)).toBeGreaterThan(0)
+  await page.mouse.wheel(0, 1)
+  await page.waitForTimeout(50)
+  const stopped = await scrollY(page)
+  await page.waitForTimeout(400)
+  expect(Math.abs((await scrollY(page)) - stopped)).toBeLessThan(5)
+  await expect(page.locator('#fin-title')).not.toHaveClass(/is-arrived/)
+})
+
+test('„Do góry” glides back to the top', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'the rail is a wide-desktop element')
+  await page.goto('/')
+  await page.evaluate(() => window.scrollTo(0, 5000))
+  const nav = page.getByRole('navigation', { name: 'Sekcje strony' })
+  await nav.getByRole('button', { name: /Do góry/ }).click()
+  // On the way up, not a jump.
+  await expect.poll(() => scrollY(page)).toBeLessThan(5000)
+  expect(await scrollY(page)).toBeGreaterThan(0)
+  await expect.poll(() => scrollY(page)).toBe(0)
+})
+
+test('a home section from another page: the home page opens, then the page glides to it', async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, 'the rail is a wide-desktop element')
+  await page.goto('/zestawy/wampir')
+  const nav = page.getByRole('navigation', { name: 'Sekcje strony' })
+  await nav.hover()
+  await nav.getByRole('button', { name: /Sekcje strony głównej/ }).click()
+  await railLink(page, '/#jak-kupic').click()
+  await expect(page.locator('#buy-title')).toHaveClass(/is-arrived/, { timeout: 30_000 })
+  await expect(page).toHaveURL(/\/#jak-kupic$/)
+  expect(await offLanding(page, '#jak-kupic')).toBeLessThan(3)
+  // Back: the build page again (the hash entry was replaced, not added).
+  await page.goBack()
+  await expect(page).toHaveURL(/\/zestawy\/wampir$/)
+})
+
+test('every page change runs one View Transition, also from one creature to another', async ({
+  page,
+}) => {
+  await countViewTransitions(page)
+  await page.goto('/kontakt')
+  await page.locator('footer a[href="/dla-rodzicow"]').first().click()
+  await expect(page).toHaveURL(/\/dla-rodzicow$/, { timeout: 30_000 })
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+  expect(await vtCount(page)).toBe(1)
+
+  await page.goto('/zestawy/wampir')
+  await page.locator('main a[href^="/zestawy/"]:not([href="/zestawy/wampir"])').first().click()
+  await expect(page).not.toHaveURL(/\/zestawy\/wampir$/, { timeout: 30_000 })
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+  expect(await vtCount(page)).toBe(1)
+})
+
+test('a filter on /zestawy runs its own single transition (no page transition on top)', async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, 'the desktop filter bar')
+  await countViewTransitions(page)
+  await page.goto('/zestawy')
+  await page
+    .getByRole('group', { name: 'Monitor' })
+    .getByRole('button', { name: 'FullHD', exact: true })
+    .click()
+  await expect(page).toHaveURL(/monitor=fullhd/)
+  await expect.poll(() => page.locator('.bl-card__name').count()).toBe(5)
+  expect(await vtCount(page)).toBe(1)
+})
+
+test.describe('reduced motion (F2)', () => {
+  test.use({ reducedMotion: 'reduce' })
+
+  test('a rail link jumps at once', async ({ page, isMobile }) => {
+    test.skip(isMobile, 'the rail is a wide-desktop element')
+    await page.goto('/')
+    await railLink(page, '#w-cenie').click()
+    await page.waitForTimeout(60)
+    expect(await offLanding(page, '#w-cenie')).toBeLessThan(3)
+  })
+})
+
+test('the mouse moves the hero planes on the home and build pages (one shared parallax)', async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, 'a mouse on a desktop only')
+  for (const [path, hero] of [
+    ['/', '.hero'],
+    ['/zestawy/wampir', '.bp-hero'],
+  ] as const) {
+    await page.goto(path)
+    const box = (await page.locator(hero).boundingBox())!
+    await page.mouse.move(box.x + box.width * 0.9, box.y + box.height * 0.5)
+    await expect
+      .poll(() => page.locator(hero).evaluate((el) => Number(el.style.getPropertyValue('--mx'))))
+      .toBeGreaterThan(0.3)
+  }
+})

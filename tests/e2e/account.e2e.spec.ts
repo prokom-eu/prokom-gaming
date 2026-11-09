@@ -155,6 +155,9 @@ test('sign up, verify, see the order, report a problem, reset the password', asy
     `/metryka/${String(unit.code)}`,
   )
   await expect(page.getByText('24 miesiące, do 20.11.2028')).toBeVisible()
+  // After a client navigation Next streams the <title> on its own; the page transition (F2) can
+  // put it a moment behind the content.
+  await expect(page).toHaveTitle(/\S/)
 
   const { violations } = await new AxeBuilder({ page }).withTags(WCAG).analyze()
   expect(violations.map((v) => ({ rule: v.id, targets: v.nodes.map((n) => n.target) }))).toEqual([])
