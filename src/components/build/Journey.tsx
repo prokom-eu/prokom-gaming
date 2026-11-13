@@ -23,7 +23,7 @@ const STEPS = [
     icon: IconDoc,
     title: 'Oferta',
     time: 'zwykle w godzinę',
-    text: 'Imienna lista części, cena i termin, codziennie 8–22.',
+    text: 'Imienna lista części, cena i termin, codziennie 9–22.',
   },
   {
     icon: IconLock,
@@ -58,7 +58,7 @@ const STEPS = [
   {
     icon: IconTruck,
     title: 'U Ciebie',
-    time: '1–2 dni kurierem',
+    time: '24 h kurierem',
     text: 'Kurier z ubezpieczeniem albo odbiór w Rabce-Zdroju.',
   },
 ]

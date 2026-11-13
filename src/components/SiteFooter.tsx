@@ -65,7 +65,7 @@ export function SiteFooter({ features }: { features: Features }) {
           </p>
           <p className="foot__tight">
             <Link className="foot__cta" href={routes.inquiry}>
-              Odpowiadamy codziennie 8–22
+              Odpowiadamy codziennie 9–22
             </Link>
           </p>
         </div>

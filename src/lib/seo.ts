@@ -155,8 +155,14 @@ export function organizationJsonLd(siteUrl: string): object[] {
       // Spec. §1: transfer or BLIK after a pro forma invoice — no instalments, no cash on delivery.
       paymentAccepted: 'przelew, BLIK',
       parentOrganization: { '@id': orgId },
-      // TODO(krystian): opening hours (`openingHoursSpecification`) and map coordinates (`geo`) of
-      // the shop [SZEF] — added when known; a shop photo can then replace the logo in `image`.
+      openingHoursSpecification: {
+        '@type': 'OpeningHoursSpecification',
+        dayOfWeek: company.shopHours.days.map((d) => `https://schema.org/${d}`),
+        opens: company.shopHours.opens,
+        closes: company.shopHours.closes,
+      },
+      // TODO(krystian): map coordinates (`geo`) of the shop — Google takes them from the
+      // Business Profile anyway; a shop photo can then replace the logo in `image`.
     },
   ]
 }

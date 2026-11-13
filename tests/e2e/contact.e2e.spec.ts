@@ -39,6 +39,8 @@ test('the phone number and the e-mail are links, at least 44 px tall', async ({ 
 test('the shop, owners and the company data come from the company record', async ({ page }) => {
   await page.goto('/kontakt')
   await expect(page.locator('.ct-store__address')).toHaveText('ul. Orkana 16B, 34-700 Rabka-Zdrój')
+  await expect(page.locator('.ct-store__hours')).toHaveText('Otwarte pon.–pt. 9–17')
+  await expect(page.getByText('Odbieramy codziennie 9–22')).toBeVisible()
   await expect(page.getByRole('link', { name: 'Prowadź do sklepu' })).toHaveAttribute(
     'href',
     /google\.com\/maps/,

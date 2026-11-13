@@ -45,7 +45,7 @@ function useNavScroll() {
  * with a hamburger opening the menu panel. Phone: mark, comparison and account — the rest is in
  * the tab bar. Widths are CSS-only.
  */
-/** `hours`: „codziennie 8–22” from the panel settings (lib/responseHours.server.ts). */
+/** `hours`: „codziennie 9–22” from the panel settings (lib/responseHours.server.ts). */
 export function SiteHeader({ hours }: { hours: string }) {
   const pathname = usePathname()
   const { compareCount, compareBump, openMenu, menuOpen, openSearch } = useShell()

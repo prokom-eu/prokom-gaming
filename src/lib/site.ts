@@ -16,6 +16,15 @@ export const company = {
   email: 'kontakt@prokomgaming.pl',
   phone: '+48 883 200 151',
   phoneHref: 'tel:+48883200151',
+  // Krystian 14.11.2026: the phone and the Gaming site are served every day 9–22; the shop in
+  // Rabka is open Monday–Friday 9–17.
+  phoneHours: 'codziennie 9–22',
+  shopHours: {
+    label: 'pon.–pt. 9–17',
+    days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+    opens: '09:00',
+    closes: '17:00',
+  },
   // Gaming is a product brand of PRO-KOM (docs/zadania/gaming-marka-prokom.md).
   parentSite: { label: 'pro-kom.eu', href: 'https://pro-kom.eu' },
 } as const

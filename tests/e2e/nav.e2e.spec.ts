@@ -56,7 +56,7 @@ test.describe('desktop header', () => {
       'aria-current',
     )
     await expect(
-      page.getByRole('link', { name: 'Odpowiadamy w godzinę codziennie 8–22' }),
+      page.getByRole('link', { name: 'Odpowiadamy w godzinę codziennie 9–22' }),
     ).toBeVisible()
     await expect(page.locator('header.nav')).toHaveCSS('height', '76px')
     expect(await headerRight(page)).toBeLessThanOrEqual(1440 - EDGE)

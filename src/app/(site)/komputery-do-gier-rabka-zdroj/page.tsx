@@ -137,7 +137,7 @@ export default async function LocalShopPage() {
             </div>
             <div>
               <dt>Odpowiadamy</dt>
-              <dd>codziennie 8–22, zwykle w godzinę</dd>
+              <dd>codziennie 9–22, zwykle w godzinę</dd>
             </div>
             <div>
               <dt>Dojazd</dt>
@@ -218,7 +218,7 @@ export default async function LocalShopPage() {
           </h2>
           <p>
             Pokażemy komputer na żywo, odpalimy grę i odpowiemy na każde pytanie. Odpisujemy
-            codziennie od 8 do 22.
+            codziennie od 9 do 22.
           </p>
           <div className="ct-cta ct-cta--center">
             <ButtonLink href={routes.inquiry} size="lg">

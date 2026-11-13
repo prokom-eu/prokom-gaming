@@ -324,7 +324,7 @@ function HeroCopy() {
       <ul className="hero__trust">
         <li>
           <IconClock size={17} />
-          <span>Odpowiedź w godzinę, 8–22</span>
+          <span>Odpowiedź w godzinę, 9–22</span>
         </li>
         <li>
           <IconShield size={17} />

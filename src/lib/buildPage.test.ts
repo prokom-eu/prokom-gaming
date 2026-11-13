@@ -301,7 +301,10 @@ describe('structured data', () => {
         shippingDetails: {
           shippingRate: { value: 0, currency: 'PLN' },
           shippingDestination: { addressCountry: 'PL' },
-          deliveryTime: { handlingTime: { minValue: 5, maxValue: 10, unitCode: 'DAY' } },
+          deliveryTime: {
+            handlingTime: { minValue: 5, maxValue: 10, unitCode: 'DAY' },
+            transitTime: { minValue: 1, maxValue: 1, unitCode: 'DAY' },
+          },
         },
         hasMerchantReturnPolicy: {
           applicableCountry: 'PL',

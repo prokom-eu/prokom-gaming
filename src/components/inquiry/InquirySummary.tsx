@@ -4,7 +4,7 @@ import type { Summary } from '@/lib/inquiry/form'
 import { zl } from '@/lib/pricing/format'
 
 const PROMISES = [
-  { icon: IconClock, text: 'Odpowiedź zwykle w godzinę, codziennie 8–22' },
+  { icon: IconClock, text: 'Odpowiedź zwykle w godzinę, codziennie 9–22' },
   { icon: IconShield, text: 'Zapytanie do niczego nie zobowiązuje' },
   { icon: IconDoc, text: 'Płacisz dopiero po akceptacji oferty' },
 ]
