@@ -6,6 +6,7 @@
 import { checkCompat, indexOffer, resolveParts } from './compat'
 import { fpsFor, RESOLUTION_LABELS, RESOLUTIONS, type FpsTable, type Resolution } from './fps'
 import type { HeroBuild } from './home'
+import { OFFER_TERMS, organizationId } from './offerTerms'
 import { priceFromSnapshot, surcharge, type PriceList } from './pricing/snapshot'
 import type { CompatLevel, CompatOption, Config } from './pricing/types'
 
@@ -320,6 +321,7 @@ export function buildJsonLd(input: {
     name: `Komputer do gier ${input.name}`,
     description: input.description,
     brand: { '@type': 'Brand', name: 'PRO-KOM Gaming' },
+    sku: input.slug,
     url: page,
     ...(input.image ? { image: url(input.image) } : {}),
   }
@@ -332,7 +334,12 @@ export function buildJsonLd(input: {
       priceValidUntil: new Date(Date.parse(input.pricedAt) + 7 * DAY_MS).toISOString().slice(0, 10),
       availability: 'https://schema.org/MadeToOrder',
       url: page,
-      seller: { '@type': 'Organization', name: 'PRO-KOM' },
+      seller: {
+        '@type': 'Organization',
+        '@id': organizationId(input.siteUrl),
+        name: 'PRO-KOM Gaming',
+      },
+      ...OFFER_TERMS,
     }
   }
   const breadcrumbs = {

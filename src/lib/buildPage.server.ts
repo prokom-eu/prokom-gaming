@@ -46,7 +46,8 @@ export type BuildPageData = {
   } | null
   tune: { ram: TuneChoice[]; ssd: TuneChoice[] }
   monitor: MonitorFit[]
-  fps: { games: FpsListGame[]; table: FpsTable }
+  /** Slugs of the listed games that have their own page `/komputer-do/{gra}` (links). */
+  fps: { games: FpsListGame[]; table: FpsTable; pages: string[] }
   pricedAt: string | null
   neighbours: HeroBuild[]
   switcher: { position: number; total: number; prev: HeroBuild; next: HeroBuild } | null
@@ -87,7 +88,7 @@ export async function loadBuildPage(slug: string): Promise<BuildPageData | null>
   if (!doc) return null
   const levelId = typeof doc.level === 'number' ? doc.level : doc.level.id
 
-  const [offer, catalog, batch, level, parts, faq] = await Promise.all([
+  const [offer, catalog, batch, level, parts, faq, gamePages] = await Promise.all([
     loadOffer(payload),
     loadInquiryOffer(payload),
     loadBatch(payload),
@@ -109,6 +110,13 @@ export async function loadBuildPage(slug: string): Promise<BuildPageData | null>
       where: { group: { equals: 'build' } },
       select: { question: true, answer: true },
       sort: 'order',
+      ...asVisitor,
+    }),
+    // Games with their own page: the names in „Ile klatek w Twojej grze” link there (SEO).
+    payload.find({
+      collection: 'games',
+      where: { seoPage: { not_equals: false } },
+      select: { slug: true },
       ...asVisitor,
     }),
   ])
@@ -182,7 +190,7 @@ export async function loadBuildPage(slug: string): Promise<BuildPageData | null>
         }
       : { ram: [], ssd: [] },
     monitor: monitorFit(offer.fps.table, slug),
-    fps: { games, table: offer.fps.table },
+    fps: { games, table: offer.fps.table, pages: gamePages.docs.map((g) => g.slug) },
     pricedAt: snapshot?.publishedAt ?? null,
     neighbours: neighbours(offer.hero.builds, slug),
     switcher: prevNext(offer.hero.builds, slug),

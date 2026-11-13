@@ -51,6 +51,7 @@ export function BuyBlock({ data, pageUrl }: { data: BuildPageData; pageUrl: stri
             color={`var(--c-${build.slug})`}
             games={data.fps.games}
             table={data.fps.table}
+            linkedGames={data.fps.pages}
           />
         </div>
 

@@ -21,10 +21,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       log.error({ ...errorFields(error), what }, 'sitemap data failed')
       return []
     })
-  const [builds, games, guides] = await Promise.all([
-    safe('builds', async () => (await loadPublicOffer()).hero.builds.map((b) => b.slug)),
+  const [offer, games, guides] = await Promise.all([
+    safe('builds', async () => {
+      const { hero } = await loadPublicOffer()
+      return [{ slugs: hero.builds.map((b) => b.slug), pricedAt: hero.pricedAt }]
+    }),
     safe('games', loadGameSlugs),
     safe('guides', async () => (await loadGuideCards()).map((g) => g.slug)),
   ])
-  return sitemapEntries({ siteUrl: getEnv().SITE_URL, builds, games, guides, features: features() })
+  return sitemapEntries({
+    siteUrl: getEnv().SITE_URL,
+    builds: offer[0]?.slugs ?? [],
+    pricedAt: offer[0]?.pricedAt ?? null,
+    games,
+    guides,
+    features: features(),
+  })
 }

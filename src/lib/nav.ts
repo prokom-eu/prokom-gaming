@@ -18,6 +18,8 @@ export const routes = {
   parents: '/dla-rodzicow',
   about: '/o-nas',
   contact: '/kontakt',
+  // Buying in Rabka-Zdrój and Podhale (SEO session 13.11.2026) — linked from the footer and /kontakt.
+  local: '/komputery-do-gier-rabka-zdroj',
   faq: '/pytania',
   guides: '/poradniki',
   terms: '/regulamin',

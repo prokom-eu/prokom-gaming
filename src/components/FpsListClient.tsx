@@ -1,8 +1,10 @@
 'use client'
 
+import Link from 'next/link'
 import { useState, type CSSProperties } from 'react'
 
 import { RESOLUTIONS, RESOLUTION_LABELS, type FpsListRows, type Resolution } from '@/lib/fps'
+import { gamePath } from '@/lib/games'
 
 import { CountText } from './motion/Count'
 import { HowWeMeasure } from './HowWeMeasure'
@@ -16,9 +18,11 @@ type Props = {
   defaultResolution: Resolution
   /** Rows computed on the server for every resolution — switching is instant, no request. */
   rows: FpsListRows
+  /** Games with their own page — the name links there. */
+  linkedGames: readonly string[]
 }
 
-export function FpsListClient({ title, color, defaultResolution, rows }: Props) {
+export function FpsListClient({ title, color, defaultResolution, rows, linkedGames }: Props) {
   const [resolution, setResolution] = useState<Resolution>(defaultResolution)
   const current = rows[resolution]
   const options = RESOLUTIONS.map((r) => ({
@@ -46,7 +50,11 @@ export function FpsListClient({ title, color, defaultResolution, rows }: Props) 
         {current.map((row) => (
           <li key={row.game} className="fps__row">
             <span className="fps__game">
-              {row.name}
+              {linkedGames.includes(row.game) ? (
+                <Link href={gamePath(row.game)}>{row.name}</Link>
+              ) : (
+                row.name
+              )}
               {row.note && <small>{row.note}</small>}
             </span>
             <span className="fps__bar" aria-hidden="true">

@@ -33,6 +33,7 @@ test.describe('seo', () => {
         '/komputer-do/cyberpunk-2077',
         '/poradniki/rodzice',
         '/regulamin',
+        '/komputery-do-gier-rabka-zdroj',
       ]),
     )
     expect(urls.filter((u) => u.startsWith('/zestawy/'))).toHaveLength(16)
@@ -58,14 +59,25 @@ test.describe('seo', () => {
     await page.goto('/')
     const items = await jsonLd(page)
     expect(types(items)).toEqual(
-      expect.arrayContaining(['Organization', 'ComputerStore', 'WebSite']),
+      expect.arrayContaining(['Organization', 'ComputerStore', 'WebSite', 'FAQPage']),
     )
+    // Local SEO: the shop serves Podhale and Małopolska; its address stays Rabka-Zdrój only.
+    const store = items.find((i) => i['@type'] === 'ComputerStore') as {
+      address: unknown
+      areaServed: { name: string }[]
+    }
+    expect(store.areaServed.map((a) => a.name)).toEqual(
+      expect.arrayContaining(['Rabka-Zdrój', 'Nowy Targ', 'Podhale', 'Polska']),
+    )
+    expect(JSON.stringify(store.address)).toMatch(/Rabka-Zdrój/)
     const site = items.find((i) => i['@type'] === 'WebSite')
     expect(site).toMatchObject({
       name: 'PRO-KOM Gaming',
       alternateName: 'PRO-KOM Gaming Rabka-Zdrój',
     })
-    expect(JSON.stringify(items)).not.toMatch(/Zakopane/)
+    expect(JSON.stringify(items.filter((i) => i['@type'] !== 'ComputerStore'))).not.toMatch(
+      /Zakopane/,
+    )
   })
 
   test('home: icons Google can read and the large link preview (runda v2 §1.1–1.2)', async ({
@@ -100,8 +112,17 @@ test.describe('seo', () => {
     )
     const items = await jsonLd(page)
     expect(types(items)).toEqual(expect.arrayContaining(['Product', 'BreadcrumbList', 'FAQPage']))
-    const product = items.find((i) => i['@type'] === 'Product') as { offers: { price: unknown } }
+    const product = items.find((i) => i['@type'] === 'Product') as {
+      offers: { price: unknown; shippingDetails: unknown; hasMerchantReturnPolicy: unknown }
+    }
     expect(Number(product.offers.price)).toBeGreaterThan(0)
+    // Merchant listing: delivery and returns (spec. §1), so Search Console has nothing to miss.
+    expect(product.offers.shippingDetails).toBeTruthy()
+    expect(product.offers.hasMerchantReturnPolicy).toBeTruthy()
+    // The game names in „Ile klatek w Twojej grze” lead to the game pages.
+    await expect(page.locator('.fps__game a[href^="/komputer-do/"]').first()).toBeVisible()
+    const description = await page.locator('meta[name="description"]').getAttribute('content')
+    expect(description?.length ?? 0).toBeLessThanOrEqual(160)
   })
 
   test('JSON-LD of the other page types', async ({ page }) => {
@@ -110,11 +131,61 @@ test.describe('seo', () => {
       ['/pytania', ['FAQPage', 'BreadcrumbList']],
       ['/poradniki/rodzice', ['Article', 'BreadcrumbList']],
       ['/regulamin', ['BreadcrumbList']],
-      ['/zestawy', ['BreadcrumbList']],
+      ['/zestawy', ['BreadcrumbList', 'ItemList']],
+      ['/konfigurator', ['BreadcrumbList']],
+      ['/dobor-pod-gre', ['BreadcrumbList']],
+      ['/porownaj', ['BreadcrumbList']],
+      ['/komputery-do-gier-rabka-zdroj', ['ComputerStore', 'FAQPage', 'BreadcrumbList']],
     ]
     for (const [path, want] of expected) {
       await page.goto(path)
       expect(types(await jsonLd(page)), path).toEqual(expect.arrayContaining(want))
     }
+  })
+
+  test('titles and descriptions fit search results', async ({ page }) => {
+    for (const path of [
+      '/',
+      '/zestawy',
+      '/zestawy/skrzat',
+      '/komputer-do/fortnite',
+      '/komputer-do/cyberpunk-2077',
+      '/komputery-do-gier-rabka-zdroj',
+      '/kontakt',
+    ]) {
+      await page.goto(path)
+      const title = await page.title()
+      const description = await page.locator('meta[name="description"]').getAttribute('content')
+      expect(title.length, path).toBeLessThanOrEqual(65)
+      expect(description?.length ?? 0, path).toBeGreaterThan(50)
+      expect(description?.length ?? 0, path).toBeLessThanOrEqual(160)
+    }
+  })
+
+  test('llms.txt: facts for AI assistants, prices of the 16 builds, no costs', async ({
+    request,
+  }) => {
+    const res = await request.get('/llms.txt')
+    expect(res.status()).toBe(200)
+    expect(res.headers()['content-type']).toMatch(/^text\/plain/)
+    const text = await res.text()
+    expect(text.startsWith('# PRO-KOM Gaming\n')).toBe(true)
+    expect(text).toContain('ul. Orkana 16B, 34-700 Rabka-Zdrój')
+    expect(
+      text.match(/^- \[[^\]]+\]\([^)]*\/zestawy\/[^)]+\): [\d\s]+ zł, monitor .+\)$/gm),
+    ).toHaveLength(16)
+    expect(text.match(/^- \[Komputer do .+\]\(.*\/komputer-do\/[^)]+\)$/gm)).toHaveLength(33)
+    expect(text).not.toMatch(/internalModel|marż|Santander/i)
+  })
+
+  test('local page: one shop, Podhale, linked from every page', async ({ page }) => {
+    await page.goto('/')
+    await page.locator('footer a[href="/komputery-do-gier-rabka-zdroj"]').click()
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(
+      'Komputery do gier w Rabce-Zdroju i na Podhalu',
+    )
+    await expect(page.locator('main')).toContainText('ul. Orkana 16B')
+    await page.goto('/o-nas')
+    await expect(page.locator('main')).not.toContainText('Dwa sklepy')
   })
 })

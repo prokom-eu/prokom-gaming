@@ -123,7 +123,11 @@ export default async function ContactPage() {
             <h2 id="ct-stores" className="h ct-h2">
               Nasz sklep
             </h2>
-            <p className="ct-p">Komputery składamy i testujemy w Rabce-Zdroju.</p>
+            <p className="ct-p">
+              Komputery składamy i testujemy w Rabce-Zdroju.{' '}
+              {/* TODO(krystian): link sentence added in the SEO session 13.11.2026 — to accept. */}
+              <Link href={routes.local}>Odbiór z Podhala i dostawa do całej Polski</Link>.
+            </p>
           </div>
           <div className="ct-stores" data-reveal="">
             {STORES.map((store) => (

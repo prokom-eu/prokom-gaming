@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import gamesSeed from '../../seed/prokomgaming/games.json'
 import { fpsSeed } from '../seed/fps'
 import { buildFpsTable, fpsFor, RESOLUTIONS, type FpsResult, type Resolution } from './fps'
 import {
@@ -8,6 +9,7 @@ import {
   gameJsonLd,
   gameDescription,
   gameLead,
+  gameTitle,
   hasRequirements,
   parsePicker,
   pickerQuery,
@@ -176,6 +178,32 @@ describe('texts', () => {
     expect(gameDescription({ name: 'Cyberpunk 2077', intro: 'Night City jest ciężkie.' })).toBe(
       gameLead({ intro: 'Night City jest ciężkie.' }),
     )
+  })
+
+  it('meta description fits a search snippet for every seeded game (SEO, ≤ 160)', () => {
+    for (const g of gamesSeed.items) {
+      expect(gameDescription({ name: g.name, intro: null }).length).toBeLessThanOrEqual(160)
+    }
+    const mid = 'Night City to jeden z najcięższych testów dla karty graficznej.'
+    expect(gameDescription({ name: 'Cyberpunk 2077', intro: mid })).toBe(
+      `${mid} Sprawdź, ile klatek da każdy nasz komputer.`,
+    )
+    const long =
+      'Bardzo długi wstęp o grze, który sam zajmuje prawie cały opis w wynikach. '.repeat(2)
+    expect(gameDescription({ name: 'Cyberpunk 2077', intro: long })).toBe(long.trim())
+  })
+
+  it('title: spec. §23 template, the brand only while it fits 65 characters', () => {
+    expect(gameTitle('GTA V')).toBe(
+      'Komputer do GTA V: ile klatek w FullHD, 2K i 4K | PRO-KOM Gaming',
+    )
+    expect(gameTitle('Cyberpunk 2077')).toBe(
+      'Komputer do Cyberpunk 2077: ile klatek w FullHD, 2K i 4K',
+    )
+    // Without the brand the longest seeded name (Assassin's Creed Shadows) stays ≤ 75.
+    for (const g of gamesSeed.items) {
+      expect(gameTitle(g.name).length, g.name).toBeLessThanOrEqual(75)
+    }
   })
 
   it('requirements count only with a level, a source and a date', () => {

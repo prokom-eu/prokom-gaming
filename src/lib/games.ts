@@ -227,8 +227,14 @@ export function gameLead(game: { intro: string | null }): string {
  */
 export function gameDescription(game: { name: string; intro: string | null }): string {
   const intro = game.intro?.trim()
-  if (intro) return gameLead(game)
-  return `Ile klatek w ${game.name} da każdy nasz komputer w FullHD, 2K i 4K — liczby z niezależnych testów, z etykietą źródła. Sprawdź, który poziom mocy wystarczy na Twój monitor.`
+  if (intro) {
+    // The longest of: intro + the template, intro + a short call, the intro alone — that fits a
+    // search snippet (≤ 160 characters).
+    const candidates = [gameLead(game), `${intro} Sprawdź, ile klatek da każdy nasz komputer.`]
+    return candidates.find((c) => c.length <= 160) ?? intro
+  }
+  // SEO session 13.11.2026: shortened to fit a snippet (was 163–188 characters).
+  return `Ile klatek w ${game.name} da każdy nasz komputer w FullHD, 2K i 4K? Wyniki niezależnych testów z etykietą źródła i zestaw na Twój monitor.`
 }
 
 export type GameQuestion = { question: string; answer: string }
@@ -288,7 +294,12 @@ export function gameFaq(game: GameInfo, hero: HeroData): GameQuestion[] {
 
 /** Page title (spec. §23). */
 export function gameTitle(name: string): string {
-  return `Komputer do ${name}: ile klatek w FullHD, 2K i 4K | PRO-KOM Gaming`
+  // TODO(krystian): spec. §23 template, with the brand only when the title still fits ≤ 65
+  // characters (Google cuts longer ones and shows the site name above the title anyway) —
+  // SEO session 13.11.2026, to accept as a change of spec. §23.
+  const title = `Komputer do ${name}: ile klatek w FullHD, 2K i 4K`
+  const branded = `${title} | PRO-KOM Gaming`
+  return branded.length <= 65 ? branded : title
 }
 
 export const gamePath = (slug: string) => `/komputer-do/${slug}`

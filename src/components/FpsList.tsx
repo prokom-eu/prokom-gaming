@@ -19,6 +19,8 @@ type Props = {
   table: FpsTable
   defaultResolution?: Resolution
   title?: string
+  /** Games with their own page: their names link to `/komputer-do/{gra}`. */
+  linkedGames?: readonly string[]
 }
 
 /**
@@ -35,6 +37,7 @@ export function FpsList({
   table,
   defaultResolution = 'qhd',
   title = 'Ile klatek w Twojej grze',
+  linkedGames = [],
 }: Props) {
   const rows = fpsListRows(table, build, games)
   if (!rows) return null
@@ -44,6 +47,7 @@ export function FpsList({
       color={color}
       defaultResolution={initialResolution(rows, defaultResolution)}
       rows={rows}
+      linkedGames={linkedGames}
     />
   )
 }

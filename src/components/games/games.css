@@ -529,3 +529,8 @@
     font-size: 40px;
   }
 }
+
+/* Link to the game's own page under the tier table (SEO session 13.11.2026). */
+.gm-pagelink {
+  margin: 20px 0 0;
+}

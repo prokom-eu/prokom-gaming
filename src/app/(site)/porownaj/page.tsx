@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { connection } from 'next/server'
 
+import { BreadcrumbJsonLd } from '@/components/BreadcrumbJsonLd'
 import { Compare } from '@/components/compare/Compare'
 import { compareQuery, parseCompare, type CompareData } from '@/lib/compare'
 import { loadCompare } from '@/lib/compare.server'
@@ -41,6 +42,7 @@ export default async function ComparePage({ searchParams }: Props) {
 
   return (
     <>
+      <BreadcrumbJsonLd crumbs={[{ name: 'Porównywarka', path: routes.compare }]} />
       <header className="cmp-headline" data-scene-top>
         <div className="wrap">
           <h1 className="h">Postaw istoty obok siebie</h1>
