@@ -120,7 +120,7 @@ test('section „Zapytania i poczta” saves the alarm and the signature (P3)', 
 
   const after = await panel.get('/api/globals/mail-settings', { headers })
   expect(await after.json()).toMatchObject({
-    replyHours: { from: 8, to: 22 },
+    replyHours: { from: 9, to: 22 },
     replyAlarmMinutes: 40,
     signature: TEST_SIGNATURE,
   })
