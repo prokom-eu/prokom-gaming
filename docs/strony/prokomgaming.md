@@ -54,6 +54,8 @@
 | 404 | 404 / 404-telefon | G2 |
 | `/admin` | panel Payload — specyfikacja: `docs/strony/prokomgaming-panel.md` (P0–P8) | G3–G15, P0–P8 |
 | `/sitemap.xml`, `/robots.txt` | — | G15 |
+| `/komputery-do-gier-rabka-zdroj` | brak planszy — części stron treści (OFirmie, Kontakt); teksty `TODO(krystian)` do akceptacji | SEO (13.11.2026) |
+| `/llms.txt` | — (tekst dla czatów AI z danych, `lib/llms.ts`) | SEO (13.11.2026) |
 
 Adresy w linkach plansz (`*.dc.html`) zamień na adresy z tej tabeli.
 
@@ -172,6 +174,7 @@ Grupy w panelu: **Sprzedaż** (Zapytania, Zamówienia, Egzemplarze, Zgłoszenia,
 - Meta `title`/`description` unikalne (szablony: zestaw — „{Istota} — komputer do gier {rozdzielczość}, {cena} zł | PRO-KOM Gaming”; gra — „Komputer do {gry}: ile klatek w FullHD, 2K i 4K | PRO-KOM Gaming”).
 - JSON-LD: `Organization` + `LocalBusiness` (sklep w Rabce-Zdroju; salonu w Zakopanem nie ma — Krystian, 01.11.2026), `Product`/`Offer` (zestawy), `FAQPage`, `BreadcrumbList`, `Article` (poradniki).
 - `sitemap.xml` (strony, 16 zestawów, 33 gry, opublikowane poradniki), `robots.txt`; staging `noindex`. Metryka, konto, zapytanie: `noindex`.
+- **Sesja SEO 13.11.2026 (do akceptacji Krystiana):** tytuł gry bez „| PRO-KOM Gaming”, gdy przekracza 65 znaków; opisy ≤ 160 znaków; `ComputerStore` z `areaServed` (Rabka-Zdrój, Nowy Targ, Zakopane, Kraków, powiat nowotarski, Podhale, Małopolska, Polska); `Offer` z wysyłką i zasadami zwrotu; `ItemList` na `/zestawy`; jedna strona lokalna `/komputery-do-gier-rabka-zdroj` (bez stron na każde miasto); `/llms.txt`. Działania poza kodem: `docs/seo/poza-kodem.md`.
 - Frazy: komputer do gier, komputer do Fortnite / CS2 / Minecrafta, komputer gamingowy do 5000 / 8000 zł, biały komputer gamingowy, komputer do gier dla dziecka.
 - Obrazy WebP/AVIF, LCP < 2,5 s na telefonie (hero nie blokuje renderu).
 

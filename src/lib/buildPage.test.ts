@@ -292,6 +292,26 @@ describe('structured data', () => {
     expect(JSON.stringify(ld)).not.toMatch(/cost|internalModel/)
   })
 
+  it('offer: new, sold by the brand, insured courier included, 14-day return (merchant listing)', () => {
+    expect(ld[0]).toMatchObject({
+      sku: 'wampir',
+      offers: {
+        itemCondition: 'https://schema.org/NewCondition',
+        seller: { '@id': 'https://prokomgaming.pl/#organizacja' },
+        shippingDetails: {
+          shippingRate: { value: 0, currency: 'PLN' },
+          shippingDestination: { addressCountry: 'PL' },
+          deliveryTime: { handlingTime: { minValue: 5, maxValue: 10, unitCode: 'DAY' } },
+        },
+        hasMerchantReturnPolicy: {
+          applicableCountry: 'PL',
+          merchantReturnDays: 14,
+          returnFees: 'https://schema.org/ReturnFeesCustomerResponsibility',
+        },
+      },
+    })
+  })
+
   it('has no offer without a published price', () => {
     const [product] = buildJsonLd({
       siteUrl: 'https://prokomgaming.pl',

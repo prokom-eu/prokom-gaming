@@ -1,12 +1,13 @@
 'use client'
 
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
 import { HScroll } from '@/components/HScroll'
 import { Segmented } from '@/components/ui/Segmented'
 import { track } from '@/lib/analytics'
 import { fpsText, RESOLUTIONS, RESOLUTION_LABELS, type Resolution } from '@/lib/fps'
-import { pickerQuery, type PickerState } from '@/lib/games'
+import { gamePath, pickerQuery, type PickerState } from '@/lib/games'
 import type { PickerData } from '@/lib/games.server'
 import { panelRows } from '@/lib/home'
 
@@ -111,6 +112,14 @@ export function GamePicker({ data, initial }: { data: PickerData; initial: Picke
 
           <h3 className="h gm-tiers__title">Wszystkie poziomy mocy w {RESOLUTION_LABELS[shown]}</h3>
           <TierTable rows={rows} />
+          {current.seoPage && (
+            // TODO(krystian): link text added in the SEO session 13.11.2026 (not on the board).
+            <p className="gm-pagelink">
+              <Link className="lnk" href={gamePath(current.slug)}>
+                Komputer do {current.name}: klatki i pytania graczy
+              </Link>
+            </p>
+          )}
 
           <div className="gm-boxes">
             {current.requirements && <RequirementsBox requirements={current.requirements} />}

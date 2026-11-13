@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { connection } from 'next/server'
 
+import { BreadcrumbJsonLd } from '@/components/BreadcrumbJsonLd'
 import { Configurator } from '@/components/configurator/Configurator'
 import { parseState, stateQuery } from '@/lib/configurator'
 import { loadConfigurator } from '@/lib/configurator.server'
@@ -75,15 +76,18 @@ export default async function ConfiguratorPage({ searchParams }: Props) {
   }
 
   return (
-    <Configurator
-      // A new address from the server (a restored configuration) starts a fresh state.
-      key={stateQuery(parsed.state)}
-      data={{ ...data, prices: data.prices }}
-      initial={parsed.state}
-      initialChanges={parsed.changes}
-      // Any parameter is a link someone followed: it wins over the stored configuration.
-      fromAddress={Object.keys(raw).length > 0}
-      siteUrl={getEnv().SITE_URL}
-    />
+    <>
+      <BreadcrumbJsonLd crumbs={[{ name: 'Konfigurator', path: routes.configurator }]} />
+      <Configurator
+        // A new address from the server (a restored configuration) starts a fresh state.
+        key={stateQuery(parsed.state)}
+        data={{ ...data, prices: data.prices }}
+        initial={parsed.state}
+        initialChanges={parsed.changes}
+        // Any parameter is a link someone followed: it wins over the stored configuration.
+        fromAddress={Object.keys(raw).length > 0}
+        siteUrl={getEnv().SITE_URL}
+      />
+    </>
   )
 }

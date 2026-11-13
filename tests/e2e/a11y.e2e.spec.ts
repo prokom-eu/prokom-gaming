@@ -32,6 +32,7 @@ const PAGES = [
   { path: '/kontakt', status: 200 },
   { path: '/dla-rodzicow', status: 200 },
   { path: '/o-nas', status: 200 },
+  { path: '/komputery-do-gier-rabka-zdroj', status: 200 },
   { path: '/regulamin', status: 200 },
   { path: '/polityka-prywatnosci', status: 200 },
   { path: '/poradniki', status: 200 },

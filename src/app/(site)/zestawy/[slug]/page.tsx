@@ -16,7 +16,7 @@ import { loadBuildPage } from '@/lib/buildPage.server'
 import { getEnv } from '@/lib/env'
 import { RESOLUTION_LABELS } from '@/lib/fps'
 import { buildHref } from '@/lib/nav'
-import { buildTitle, OPEN_GRAPH } from '@/lib/seo'
+import { buildDescription, buildTitle, OPEN_GRAPH } from '@/lib/seo'
 
 import '@/components/build/build.css'
 
@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { build } = data
   return {
     title: { absolute: buildTitle(build.name, RESOLUTION_LABELS[build.resolution], build.price) },
-    description: build.why,
+    description: buildDescription(build.why, RESOLUTION_LABELS[build.resolution], build.price),
     alternates: { canonical: buildHref(build.slug) },
     // The picture is this segment's `opengraph-image` (scene, name, price — runda v2 §1.2).
     openGraph: OPEN_GRAPH,

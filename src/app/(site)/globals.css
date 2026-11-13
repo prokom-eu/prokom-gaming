@@ -1923,6 +1923,16 @@ html:has(dialog[open]) {
   font-size: 15px;
   font-weight: 600;
 }
+.fps__game a {
+  /* Name of a game with its own page: quiet underline, the row keeps its look. */
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, currentColor 45%, transparent);
+  text-underline-offset: 3px;
+}
+.fps__game a:hover {
+  text-decoration-color: currentColor;
+}
 .fps__game small {
   display: block;
   font-size: 12px;

@@ -2,8 +2,9 @@ import type { MetadataRoute } from 'next'
 
 import type { Features } from './features'
 import { routes } from './nav'
+import { organizationId } from './offerTerms'
 import { zl } from './pricing/format'
-import { company, social } from './site'
+import { company, shopDirections, social } from './site'
 
 /**
  * SEO of the site (spec. §23): titles, descriptions, structured data, sitemap and robots rules.
@@ -18,14 +19,22 @@ export const SITE_NAME = 'PRO-KOM Gaming'
  */
 export const OPEN_GRAPH = { siteName: SITE_NAME, locale: 'pl_PL', type: 'website' } as const
 
+/** Longest meta description we write: Google cuts snippets at about 155–160 characters. */
+export const DESCRIPTION_MAX = 160
+
+/** Longest title we write: Google cuts titles at about 60–65 characters (≈ 600 px). */
+export const TITLE_MAX = 65
+
 // TODO(krystian): the home title and the descriptions below are a draft from the phrases of
 // spec. §23 and the board texts (no copy for them in the boards) — to accept before G16.
-export const HOME_TITLE = 'Komputery do gier składane w Rabce-Zdroju | PRO-KOM Gaming'
+// SEO session 13.11.2026: „komputery gamingowe”, Podhale and delivery to all of Poland added
+// (the phrases people search for, written once, not stuffed).
+export const HOME_TITLE = 'Komputery gamingowe do gier z Rabki-Zdroju | PRO-KOM Gaming'
 
 export const DESCRIPTIONS = {
-  home: 'Komputery do gier składane ręcznie w Rabce-Zdroju: 16 gotowych zestawów od FullHD do 4K, konfigurator z ceną na żywo i klatki w 33 grach z niezależnych testów. Każdy z metryką.',
+  home: 'Komputery gamingowe składane w Rabce-Zdroju na Podhalu: 16 zestawów od FullHD do 4K, konfigurator z ceną na żywo i klatki w 33 grach. Wysyłka w całej Polsce.',
   builds:
-    '16 komputerów do gier od FullHD do 4K, z ceną brutto i klatkami w popularnych grach. Wybierz po monitorze, budżecie i rodzaju — od komputera dla dziecka po biały komputer gamingowy.',
+    '16 komputerów do gier od FullHD do 4K z ceną brutto i klatkami w grach. Wybierz po monitorze i budżecie — od komputera dla dziecka po biały komputer gamingowy.',
 } as const
 
 /** Search engines index only production; staging and local runs stay out (spec. §23). */
@@ -38,6 +47,21 @@ export const isIndexable = (siteEnv: string): boolean => siteEnv === 'production
 export function buildTitle(name: string, resolution: string, price: number | null): string {
   const priced = price === null ? '' : `, ${zl(price)}`
   return `${name} — komputer do gier ${resolution}${priced} | ${SITE_NAME}`
+}
+
+/**
+ * Meta description of a build page: the build's own line plus what a searcher asks — resolution,
+ * price, where it is made, warranty. The longest variant that fits `DESCRIPTION_MAX` wins.
+ * TODO(krystian): the added sentences are a draft (no copy in the boards) — to accept.
+ */
+export function buildDescription(why: string, resolution: string, price: number | null): string {
+  const priced = price === null ? '' : ` za ${zl(price)}`
+  const candidates = [
+    `${why} Komputer do gier ${resolution}${priced}, składany w Rabce-Zdroju, z metryką i 24 mies. gwarancji.`,
+    `${why} Komputer do gier ${resolution}${priced}, składany w Rabce-Zdroju.`,
+    `${why} Komputer do gier ${resolution}${priced}.`,
+  ]
+  return candidates.find((c) => c.length <= DESCRIPTION_MAX) ?? why
 }
 
 export type Crumb = { name: string; path: string }
@@ -57,6 +81,24 @@ export function breadcrumbJsonLd(siteUrl: string, crumbs: readonly Crumb[]): obj
   }
 }
 
+/** The year PRO-KOM started (boards OFirmie, Rodzice: „od 2004 roku”). */
+export const FOUNDED = '2004'
+
+/**
+ * Where the shop serves customers: pickup in Rabka-Zdrój and nearby towns of Podhale, courier to
+ * the whole country (spec. §1). Structured data only — no visible copy.
+ */
+export const AREA_SERVED = [
+  { '@type': 'City', name: 'Rabka-Zdrój' },
+  { '@type': 'City', name: 'Nowy Targ' },
+  { '@type': 'City', name: 'Zakopane' },
+  { '@type': 'City', name: 'Kraków' },
+  { '@type': 'AdministrativeArea', name: 'powiat nowotarski' },
+  { '@type': 'Place', name: 'Podhale' },
+  { '@type': 'AdministrativeArea', name: 'województwo małopolskie' },
+  { '@type': 'Country', name: 'Polska' },
+] as const
+
 const postalAddress = {
   '@type': 'PostalAddress',
   streetAddress: company.postal.street,
@@ -71,7 +113,7 @@ const postalAddress = {
  */
 export function organizationJsonLd(siteUrl: string): object[] {
   const home = new URL(routes.home, siteUrl).toString()
-  const orgId = `${home}#organizacja`
+  const orgId = organizationId(siteUrl)
   const sameAs = social.map((s) => s.href).filter(Boolean)
   return [
     {
@@ -85,7 +127,9 @@ export function organizationJsonLd(siteUrl: string): object[] {
       email: company.email,
       telephone: company.phone,
       vatID: `PL${company.nip.replace(/\D/g, '')}`,
+      foundingDate: FOUNDED,
       address: postalAddress,
+      areaServed: { '@type': 'Country', name: 'Polska' },
       parentOrganization: {
         '@type': 'Organization',
         name: company.name,
@@ -99,12 +143,20 @@ export function organizationJsonLd(siteUrl: string): object[] {
       '@type': 'ComputerStore',
       '@id': `${home}#sklep`,
       name: `${SITE_NAME} — sklep w Rabce-Zdroju`,
-      url: new URL(routes.contact, siteUrl).toString(),
+      url: new URL(routes.local, siteUrl).toString(),
+      image: new URL('/logo-512.png', siteUrl).toString(),
       email: company.email,
       telephone: company.phone,
+      foundingDate: FOUNDED,
       address: postalAddress,
+      hasMap: shopDirections,
+      areaServed: AREA_SERVED,
+      currenciesAccepted: 'PLN',
+      // Spec. §1: transfer or BLIK after a pro forma invoice — no instalments, no cash on delivery.
+      paymentAccepted: 'przelew, BLIK',
       parentOrganization: { '@id': orgId },
-      // TODO(krystian): opening hours and map coordinates of the shop [SZEF] — added when known.
+      // TODO(krystian): opening hours (`openingHoursSpecification`) and map coordinates (`geo`) of
+      // the shop [SZEF] — added when known; a shop photo can then replace the logo in `image`.
     },
   ]
 }
@@ -137,6 +189,7 @@ const STATIC_PAGES = [
   routes.parents,
   routes.about,
   routes.contact,
+  routes.local,
   routes.faq,
   routes.guides,
   routes.terms,
@@ -150,19 +203,26 @@ const STATIC_PAGES = [
 export function sitemapEntries(input: {
   siteUrl: string
   builds: readonly string[]
+  /** ISO date-time of the published prices — the last change of every build page. */
+  pricedAt?: string | null
   games: readonly string[]
   guides: readonly string[]
   features: Pick<Features, 'ready' | 'voucher'>
 }): MetadataRoute.Sitemap {
-  const paths = [
-    ...STATIC_PAGES,
-    ...(input.features.ready ? [routes.stock] : []),
-    ...(input.features.voucher ? [routes.voucher] : []),
-    ...input.builds.map((slug) => `${routes.builds}/${slug}`),
-    ...input.games.map((slug) => `/komputer-do/${slug}`),
-    ...input.guides.map((slug) => `${routes.guides}/${slug}`),
+  const url = (path: string) => new URL(path, input.siteUrl).toString()
+  const plain = (path: string) => ({ url: url(path) })
+  const lastModified = input.pricedAt ?? undefined
+  return [
+    ...STATIC_PAGES.map(plain),
+    ...(input.features.ready ? [plain(routes.stock)] : []),
+    ...(input.features.voucher ? [plain(routes.voucher)] : []),
+    ...input.builds.map((slug) => ({
+      url: url(`${routes.builds}/${slug}`),
+      ...(lastModified ? { lastModified } : {}),
+    })),
+    ...input.games.map((slug) => plain(`/komputer-do/${slug}`)),
+    ...input.guides.map((slug) => plain(`${routes.guides}/${slug}`)),
   ]
-  return paths.map((path) => ({ url: new URL(path, input.siteUrl).toString() }))
 }
 
 /** robots.txt: production lets crawlers in except the panel and the API; elsewhere nothing. */
@@ -171,5 +231,24 @@ export function robotsRules(siteUrl: string, siteEnv: string): MetadataRoute.Rob
   return {
     rules: { userAgent: '*', allow: '/', disallow: ['/admin', '/api/'] },
     sitemap: new URL('/sitemap.xml', siteUrl).toString(),
+  }
+}
+
+/** `ItemList` of the builds on `/zestawy`, in the order shown (price order). */
+export function buildListJsonLd(
+  siteUrl: string,
+  builds: readonly { slug: string; name: string }[],
+): object {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Komputery do gier PRO-KOM Gaming',
+    numberOfItems: builds.length,
+    itemListElement: builds.map((b, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: `Komputer do gier ${b.name}`,
+      url: new URL(`${routes.builds}/${b.slug}`, siteUrl).toString(),
+    })),
   }
 }

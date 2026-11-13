@@ -14,6 +14,7 @@ import { Included } from '@/components/home/Included'
 import { StartPaths } from '@/components/home/StartPaths'
 import { JsonLd } from '@/components/JsonLd'
 import { getEnv } from '@/lib/env'
+import { homeFaqJsonLd } from '@/lib/faq'
 import { EMPTY_HOME, type HomeData } from '@/lib/home'
 import { loadHome } from '@/lib/home.server'
 import { errorFields, log } from '@/lib/logger'
@@ -53,6 +54,8 @@ export default async function HomePage() {
       {/* The brand and the shop (spec. §23): Organization + LocalBusiness; the site name for
           Google (WebSite, runda v2 §1.1). */}
       <JsonLd data={[...organizationJsonLd(getEnv().SITE_URL), websiteJsonLd(getEnv().SITE_URL)]} />
+      {/* The questions of „Zanim zapytasz”, readable for search engines and AI assistants. */}
+      {home.faq.length > 0 && <JsonLd data={homeFaqJsonLd(home.faq)} />}
       <Hero data={home.hero} />
       <StartPaths />
       <Bestiary hero={home.hero} games={home.panel?.games ?? []} />

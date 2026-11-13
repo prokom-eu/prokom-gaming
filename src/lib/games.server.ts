@@ -136,9 +136,14 @@ export async function loadGamePage(slug: string): Promise<GamePageData | null> {
   }
 }
 
-/** Slugs of games with a page (sitemap in G15, e2e). */
-export async function loadGameSlugs(): Promise<string[]> {
+/** Games with a page, slug and name (`/llms.txt`). */
+export async function loadGameLinks(): Promise<{ slug: string; name: string }[]> {
   const payload = await getPayload({ config })
   const games = await loadGames(payload)
-  return games.filter((g) => g.seoPage).map((g) => g.slug)
+  return games.filter((g) => g.seoPage).map((g) => ({ slug: g.slug, name: g.name }))
+}
+
+/** Slugs of games with a page (sitemap in G15, e2e). */
+export async function loadGameSlugs(): Promise<string[]> {
+  return (await loadGameLinks()).map((g) => g.slug)
 }

@@ -66,7 +66,9 @@ const VALUES = [
     sigil: 'licho',
     color: 'var(--light-las)',
     title: 'Jesteśmy na miejscu',
-    text: 'Dwa sklepy na Podhalu i prawdziwy adres. Gdy coś nie działa, kurier odbierze komputer na nasz koszt.',
+    // TODO(krystian): the board says „Dwa sklepy na Podhalu” — one shop since 01.11.2026, so the
+    // sentence is changed (SEO session 13.11.2026: one consistent address everywhere) — to accept.
+    text: 'Sklep w Rabce-Zdroju i prawdziwy adres. Gdy coś nie działa, kurier odbierze komputer na nasz koszt.',
   },
 ] as const
 

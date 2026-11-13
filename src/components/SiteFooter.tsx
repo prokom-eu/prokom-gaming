@@ -35,6 +35,8 @@ const allColumns = [
     links: [
       { href: routes.about, label: 'O nas' },
       { href: routes.contact, label: 'Kontakt i dojazd' },
+      // TODO(krystian): link added in the SEO session 13.11.2026 (not on the board) — to accept.
+      { href: routes.local, label: 'Sklep w Rabce-Zdroju' },
       { href: routes.parents, label: 'Dla rodziców' },
       { href: routes.faq, label: 'Częste pytania' },
       { href: routes.guides, label: 'Poradniki' },
