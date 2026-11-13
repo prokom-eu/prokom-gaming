@@ -19,7 +19,7 @@ import '@/components/inquiry/inquiry.css'
 
 export const metadata: Metadata = {
   title: 'Kontakt',
-  description: `Zapytanie o komputer, telefon i e-mail PRO-KOM Gaming. Sklep w Rabce-Zdroju, ${company.postal.street}. Odpisujemy codziennie od 8 do 22.`,
+  description: `Zapytanie o komputer, telefon i e-mail PRO-KOM Gaming. Sklep w Rabce-Zdroju, ${company.postal.street}. Odpisujemy codziennie od 9 do 22.`,
   alternates: { canonical: routes.contact },
 }
 
@@ -48,7 +48,7 @@ const QUESTIONS = [
   },
   {
     q: 'Do której odpisujecie?',
-    a: 'Na zapytania o komputery codziennie od 8 do 22, także w weekendy. Wiadomość wysłaną w nocy przeczytamy rano.',
+    a: 'Na zapytania o komputery codziennie od 9 do 22, także w weekendy. Wiadomość wysłaną w nocy przeczytamy rano.',
   },
   {
     q: 'Coś nie działa w komputerze od Was. Co robić?',
@@ -72,7 +72,7 @@ export default async function ContactPage() {
         scene="licho"
         size="tall"
         title="Porozmawiajmy o Twoim komputerze"
-        lead="Odpowiadamy codziennie 8–22, zwykle w godzinę. Odpisuje człowiek, który zna każdy nasz zestaw."
+        lead="Odpowiadamy codziennie 9–22, zwykle w godzinę. Odpisuje człowiek, który zna każdy nasz zestaw."
       />
 
       <section className="ct-channels" aria-label="Jak się z nami skontaktować">
@@ -83,7 +83,7 @@ export default async function ContactPage() {
             </span>
             <h2 className="h">Zapytanie o komputer</h2>
             <p>Najszybsza droga do oferty z ceną. Trzy krótkie kroki.</p>
-            <small>Odpowiedź zwykle w godzinę, codziennie 8–22</small>
+            <small>Odpowiedź zwykle w godzinę, codziennie 9–22</small>
             <ButtonLink href={routes.inquiry}>Wypełnij formularz</ButtonLink>
           </article>
           <article className="ct-channel">
@@ -91,12 +91,11 @@ export default async function ContactPage() {
               <IconPhone size={24} strokeWidth={1.6} />
             </span>
             <h2 className="h">Telefon</h2>
-            {/* TODO(krystian): Gaming phone and its hours [SZEF] — until then the shop number
-                only, without the board's placeholders (spec. §27.7). */}
             <a className="ct-channel__big" href={company.phoneHref}>
               {company.phone}
             </a>
             <p>Wolisz porozmawiać o wyborze albo o zamówieniu? Zadzwoń.</p>
+            <small>Odbieramy {company.phoneHours}</small>
             <ButtonLink href={company.phoneHref} variant="ghost">
               Zadzwoń
             </ButtonLink>
@@ -109,7 +108,7 @@ export default async function ContactPage() {
             <a className="ct-channel__big" href={`mailto:${company.email}`}>
               {company.email}
             </a>
-            <small>Odpisujemy codziennie 8–22</small>
+            <small>Odpisujemy codziennie 9–22</small>
             <ButtonLink href={`mailto:${company.email}`} variant="ghost">
               Napisz
             </ButtonLink>
@@ -146,8 +145,7 @@ export default async function ContactPage() {
                   <h3 className="h">{store.title}</h3>
                   <p className="ct-store__address">{store.address}</p>
                   <p>{store.text}</p>
-                  {/* TODO(krystian): opening hours of the shop [SZEF] — the line with the
-                      clock comes back when they are known (no placeholders, spec. §27.7). */}
+                  <p className="ct-store__hours">Otwarte {company.shopHours.label}</p>
                   <ExternalLink href={store.maps} className="lnk ct-gold ct-store__go">
                     Prowadź do sklepu
                   </ExternalLink>

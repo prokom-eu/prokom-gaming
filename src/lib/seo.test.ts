@@ -82,6 +82,23 @@ describe('organizationJsonLd', () => {
     expect(JSON.stringify(org?.address)).not.toMatch(/Zakopane/)
   })
 
+  it('the shop is open Monday–Friday 9–17 (Krystian 14.11.2026)', () => {
+    expect(store).toMatchObject({
+      openingHoursSpecification: {
+        '@type': 'OpeningHoursSpecification',
+        dayOfWeek: [
+          'https://schema.org/Monday',
+          'https://schema.org/Tuesday',
+          'https://schema.org/Wednesday',
+          'https://schema.org/Thursday',
+          'https://schema.org/Friday',
+        ],
+        opens: '09:00',
+        closes: '17:00',
+      },
+    })
+  })
+
   it('the shop serves Podhale and Małopolska and ships to all of Poland (local SEO)', () => {
     expect(store).toMatchObject({
       areaServed: AREA_SERVED,

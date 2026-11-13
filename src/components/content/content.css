@@ -464,6 +464,11 @@
   font-weight: 700;
   color: var(--ct-strong);
 }
+.ct-store__body .ct-store__hours {
+  margin-top: 6px;
+  font-weight: 600;
+  color: var(--ct-strong);
+}
 .ct-store__go {
   margin-top: 16px;
 }

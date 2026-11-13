@@ -10,19 +10,19 @@ git grep -c "TODO(krystian)" -- src | awk -F: '{s+=$NF} END {print s}'
 
 ---
 
-## A. Szef [SZEF] — fakty o firmie, **blokują start**
+## A. Szef [SZEF] — fakty o firmie (odpowiedzi Krystiana 14.11.2026)
 
-| # | Co | Gdzie | Dziś na stronie |
+| # | Co | Decyzja | Stan |
 |---|---|---|---|
-| A1 | Numer telefonu Gaming i godziny, w których odbiera | `src/app/(site)/kontakt/page.tsx:94` | numer sklepu 883 200 151 |
-| A2 | Godziny otwarcia sklepu w Rabce | `kontakt/page.tsx:149`; `src/lib/seo.ts:158` (`openingHoursSpecification` w JSON-LD — ważne dla Google Maps i fraz „Rabka”) | tylko adres, bez godzin |
-| A3 | Współrzędne sklepu (`geo`) do danych strukturalnych | `src/lib/seo.ts:158` | brak |
-| A4 | Czas przewozu kurierem, gdy kurier będzie wybrany | `src/lib/offerTerms.ts:27` | „1–2 dni robocze” |
-| A5 | Rok, od którego firma serwisuje kasy (strona „O nas”) | `src/app/(site)/o-nas/page.tsx:26` | jak na planszy |
-| A6 | Zdjęcia i zgody ludzi: „Ludzie, którzy złożą Twój komputer” i „Warsztat w Rabce” | `o-nas/page.tsx:158`; `src/components/home/BeforeShipping.tsx:66` („[imię serwisanta] — składa i testuje”) | sekcje ukryte |
-| A7 | Bon: kwoty i ważność 12 miesięcy — **tylko jeśli bon rusza na start** (`FEATURE_VOUCHER`) | `src/lib/inquiry/types.ts:137` | strona wyłączona flagą |
+| A1 | Telefon Gaming i godziny | 883 200 151, **codziennie 9–22** — także godziny odpowiedzi na zapytania (wszędzie 8–22 → 9–22) | zrobione; **na stagingu/produkcji w panelu:** Ustawienia → „Odpowiedź na zapytanie” = „zwykle w godzinę, codziennie 9–22”, godziny odpowiedzi od 9 |
+| A2 | Godziny sklepu | **pon.–pt. 9–17**, ul. Orkana 16B, Rabka-Zdrój | zrobione: `/kontakt` + `openingHoursSpecification` w JSON-LD |
+| A3 | Współrzędne sklepu (`geo`) | Google weźmie je z Profilu Firmy | odłożone |
+| A4 | Termin i dostawa | montaż **5–10 dni roboczych** (bez zmian), kurier **24 h od nadania** | zrobione: karta zestawu „24 h kurierem”, JSON-LD, `llms.txt` |
+| A5 | Serwis kas na „O nas” | **bez informacji o kasach**, tylko „od 2004” | zrobione |
+| A6 | Ludzie i zdjęcia na „O nas” | **nigdy** | zrobione (znaczniki usunięte) |
+| A7 | Bon | **później** | strona wyłączona flagą |
 
-## B. Prawnik — **blokują start** (razem z regulaminem i polityką prywatności)
+## B. Prawnik — odłożone (Krystian 14.11.2026: „na razie nie”)
 
 | # | Co | Gdzie |
 |---|---|---|

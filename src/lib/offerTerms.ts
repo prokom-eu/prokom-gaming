@@ -13,7 +13,7 @@ export const organizationId = (siteUrl: string): string =>
 /**
  * Delivery and return terms of every offer (spec. §1), for Google's merchant listings:
  * insured courier included in the price, anywhere in Poland; assembly 5–10 working days after
- * payment; 14-day return by post at the customer's cost (stated neutrally, as on the site).
+ * payment, courier 24 h from dispatch (Krystian 14.11.2026); 14-day return by post at the customer's cost (stated neutrally, as on the site).
  */
 export const OFFER_TERMS = {
   itemCondition: 'https://schema.org/NewCondition',
@@ -24,9 +24,8 @@ export const OFFER_TERMS = {
     deliveryTime: {
       '@type': 'ShippingDeliveryTime',
       handlingTime: { '@type': 'QuantitativeValue', minValue: 5, maxValue: 10, unitCode: 'DAY' },
-      // TODO(krystian): courier transit time once the courier is chosen [SZEF] — 1–2 working
-      // days as on „Gotowe od ręki”.
-      transitTime: { '@type': 'QuantitativeValue', minValue: 1, maxValue: 2, unitCode: 'DAY' },
+      // 24 h from handing the parcel to the courier (Krystian 14.11.2026).
+      transitTime: { '@type': 'QuantitativeValue', minValue: 1, maxValue: 1, unitCode: 'DAY' },
     },
   },
   hasMerchantReturnPolicy: {

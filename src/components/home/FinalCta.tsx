@@ -48,7 +48,7 @@ export function FinalCta() {
         </h2>
         <p className="hm-lead" data-reveal="">
           Szesnaście istot czeka. Dobierzemy tę właściwą i odpiszemy z imienną listą części, ceną i
-          terminem. Zwykle w ciągu godziny, codziennie od 8 do 22.
+          terminem. Zwykle w ciągu godziny, codziennie od 9 do 22.
         </p>
         <div className="hm-cta">
           <Link className="btn btn--lg" href="/konfigurator">

@@ -161,7 +161,7 @@ export function MenuSheet({ creatures, phone, features }: Props) {
 
         <div className="menu__contact">
           <div>
-            <b>Odpowiadamy codziennie 8–22</b>
+            <b>Odpowiadamy codziennie 9–22</b>
             <small>Zwykle w godzinę. Sklep: Rabka-Zdrój.</small>
           </div>
           <div className="menu__contact-actions">

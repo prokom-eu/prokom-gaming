@@ -23,18 +23,12 @@ const NUMBERS = [
   { value: '2 lata', text: 'gwarancji na cały komputer, z odbiorem od Ciebie' },
 ] as const
 
-// TODO(krystian): year of the till service [SZEF] — the board has
-// „[rok]”; until then the entries show without a year (no placeholders, spec. §27.7).
+// Krystian 14.11.2026: no till-service story on the Gaming site — the shop since 2004, then Gaming.
 const HISTORY = [
   {
     year: '2004',
     title: 'Sklep w Rabce-Zdroju',
     text: 'Tadeusz Wójciak otwiera PRO-KOM przy ulicy Orkana. Od początku składamy komputery na zamówienie i naprawiamy sprzęt.',
-  },
-  {
-    year: '',
-    title: 'Serwis kas i opieka IT dla firm',
-    text: 'Zostajemy autoryzowanym serwisem kas Posnet i Elzab, wdrażamy programy InsERT i GoPOS. Dziś opiekujemy się ponad setką firm.',
   },
   {
     year: '2026',
@@ -54,7 +48,7 @@ const VALUES = [
     sigil: 'baba',
     color: 'var(--c-baba-jaga)',
     title: 'Odpisuje człowiek, nie bot',
-    text: 'Każde zapytanie czyta i odpisuje Krystian, codziennie od 8 do 22. Z imienną listą części i ceną.',
+    text: 'Każde zapytanie czyta i odpisuje Krystian, codziennie od 9 do 22. Z imienną listą części i ceną.',
   },
   {
     sigil: 'wampir',
@@ -75,7 +69,7 @@ const VALUES = [
 const LINES = [
   {
     name: 'PRO-KOM Biznes',
-    text: 'Kasy fiskalne, programy InsERT i GoPOS, opieka IT dla firm.',
+    text: 'Programy i opieka IT dla firm.',
     href: 'https://pro-kom.eu',
   },
   {
@@ -155,9 +149,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* TODO(krystian): „Ludzie, którzy złożą Twój komputer” (3 cards) and „Warsztat w Rabce”
-          (5 photos) come back with the photos and the consents of the people [SZEF] — the board
-          has only photo placeholders and „[imię serwisanta]” (spec. §17, §26, §27.7). */}
+      {/* No „Ludzie, którzy złożą Twój komputer” and no workshop photos (Krystian 14.11.2026). */}
 
       <section className="ct-sec" aria-labelledby="ab-values">
         <div className="wrap">
@@ -242,7 +234,7 @@ export default function AboutPage() {
           </h2>
           <p>
             Pokażemy komputer na żywo, odpalimy grę i odpowiemy na każde pytanie. Odpisujemy
-            codziennie od 8 do 22.
+            codziennie od 9 do 22.
           </p>
           <div className="ct-cta ct-cta--center">
             <ButtonLink href={routes.inquiry} size="lg">

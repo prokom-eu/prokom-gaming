@@ -47,7 +47,7 @@ export default async function FaqPage() {
             aside={
               <div className="ct-faq__help">
                 <b>Nie znalazłeś odpowiedzi?</b>
-                <p>Odpisujemy codziennie od 8 do 22.</p>
+                <p>Odpisujemy codziennie od 9 do 22.</p>
                 <ButtonLink href={routes.contact} className="ct-wide">
                   Napisz do nas
                 </ButtonLink>
