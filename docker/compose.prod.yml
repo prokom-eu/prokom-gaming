@@ -33,6 +33,9 @@ services:
       - '127.0.0.1:${APP_PORT:-3200}:3000'
     volumes:
       - media:/app/media
+      # Only the optimised images (`next.config.ts` images), not the rest of .next/cache: kept
+      # across deploys, so visitors after a deploy do not wait for every photo to be re-encoded.
+      - next-images:/app/.next/cache/images
     depends_on:
       postgres:
         condition: service_healthy
@@ -114,3 +117,4 @@ networks:
 volumes:
   pgdata:
   media:
+  next-images:
