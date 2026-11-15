@@ -23,3 +23,24 @@ test('the panel still asks for it (the admin theme follows the system)', async (
   expect(headers['accept-ch']?.toLowerCase()).toBe(CLIENT_HINT)
   expect(headers['critical-ch']?.toLowerCase()).toBe(CLIENT_HINT)
 })
+
+// The home hero's scene was re-encoded by the image optimiser on every cold request (1–1.7 s per
+// file on production, several per visit): it is sent from disk now, cached by the browser.
+test('the home hero scene comes straight from disk, with a cache lifetime', async ({ page }) => {
+  const optimised: string[] = []
+  page.on('request', (request) => {
+    const url = decodeURIComponent(request.url())
+    if (url.includes('/_next/image') && /\/scenes\/[^&]+-(back|near|hero|fg)\.webp/.test(url))
+      optimised.push(url)
+  })
+  await page.goto('/')
+  const scene = await page.locator('.hero__scene[data-on="true"] img').first().getAttribute('src')
+  expect(scene).toMatch(/^\/scenes\/[a-z]+-(hero|back)\.webp$/)
+  await page.waitForLoadState('load')
+  expect(optimised).toEqual([])
+
+  const response = await page.request.get(scene!)
+  expect(response.headers()['cache-control']).toBe(
+    'public, max-age=86400, stale-while-revalidate=2592000',
+  )
+})

@@ -40,6 +40,9 @@ ENV NODE_ENV=production NEXT_TELEMETRY_DISABLED=1 PORT=3000 HOSTNAME=0.0.0.0 MED
 RUN mkdir -p /app/media && chown node:node /app/media
 COPY --from=build --chown=node:node /app/.next/standalone ./
 COPY --from=build --chown=node:node /app/.next/static ./.next/static
+# The optimiser's cache, a volume in compose: created now so the volume belongs to `node` (a
+# directory Docker makes itself would be root's, and nothing could be cached).
+RUN mkdir -p /app/.next/cache/images && chown -R node:node /app/.next/cache
 COPY --from=build --chown=node:node /app/public ./public
 # Deploy files of this commit (G16, as in prokom-web S10b): the server's deploy gate copies them out
 # of the image, so the pipeline's SSH key can only pick an image built from develop — never send
