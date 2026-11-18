@@ -38,7 +38,12 @@ async function login(
   email: string,
   pass: string,
 ) {
-  const context = await playwright.request.newContext({ baseURL })
+  // The session lives in the cookie: with Payload `csrf` it counts only with the site's Origin
+  // (audit AB4); an API context sends no Origin by itself.
+  const context = await playwright.request.newContext({
+    baseURL,
+    extraHTTPHeaders: baseURL ? { Origin: new URL(baseURL).origin } : {},
+  })
   const response = await context.post(`/api/${collection}/login`, {
     data: { email, password: pass },
   })
