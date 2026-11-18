@@ -137,13 +137,23 @@ test('sign up, verify, see the order, report a problem, reset the password', asy
   const early = await request.post('/api/customers/login', { data: { email, password } })
   expect(early.status()).not.toBe(200)
 
+  // The link confirms the address and continues to setting the password (audit AB4, G-01):
+  // the sign-up password no longer works, only the mailbox owner's new one.
   await page.goto(await mailLink(request, email, 'Potwierdź adres', '/konto/weryfikacja'))
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Adres potwierdzony')
+  await expect(page).toHaveURL(/\/konto\/haslo\?token=/)
+  expect((await request.post('/api/customers/login', { data: { email, password } })).ok()).toBe(
+    false,
+  )
+  const ownerPassword = `${password}-wlasciciel`
+  await page.getByLabel(/^Nowe hasło/).fill(ownerPassword)
+  await page.getByRole('button', { name: 'Ustaw hasło' }).click()
+  await expect(page).toHaveURL(/\/konto$/)
 
-  // Sign-in → the account.
+  // Sign-in with the new password → the account.
+  await page.context().clearCookies()
   await page.goto('/konto/logowanie')
   await page.getByLabel('E-mail').fill(email)
-  await page.getByLabel('Hasło').fill(password)
+  await page.getByLabel('Hasło').fill(ownerPassword)
   await page.getByRole('button', { name: 'Zaloguj się' }).click()
   await expect(page).toHaveURL(/\/konto$/)
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Cześć, Ola')
@@ -179,6 +189,9 @@ test('sign up, verify, see the order, report a problem, reset the password', asy
 
   // Saving a configuration, then it opens in the configurator.
   const save = await page.request.post('/api/konto/konfiguracje', {
+    // APIRequestContext sends neither Origin nor Sec-Fetch-Site; with Payload `csrf` the session
+    // cookie counts only from the site's origin (audit AB4, G-05).
+    headers: { Origin: new URL(page.url()).origin },
     // An old client may still send a light colour (removed in runda v3 §1.4): dropped, saved.
     data: { label: 'Moc 4, biała', k: 'P13.LB500.PL3LX.R32.NM1', light: 'lod' },
   })
@@ -242,14 +255,13 @@ test('signing up again on an unverified address sends a fresh link and takes ove
     })
     .not.toBe(firstLink)
   await page.goto(await mailLink(request, email, 'Potwierdź adres', '/konto/weryfikacja'))
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Adres potwierdzony')
-  // The newest sign-up's password is the one that works.
-  expect(
-    (await request.post('/api/customers/login', { data: { email, password: first } })).ok(),
-  ).toBe(false)
-  expect(
-    (await request.post('/api/customers/login', { data: { email, password: second } })).ok(),
-  ).toBe(true)
+  await expect(page).toHaveURL(/\/konto\/haslo\?token=/)
+  // Neither sign-up password works: the owner sets one now (audit AB4, G-01).
+  for (const password of [first, second]) {
+    expect((await request.post('/api/customers/login', { data: { email, password } })).ok()).toBe(
+      false,
+    )
+  }
 
   const account = (await (
     await admin.get(`/api/customers?where[email][equals]=${encodeURIComponent(email)}&depth=0`, {

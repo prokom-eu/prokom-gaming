@@ -36,9 +36,8 @@ export async function verifyAndStartPasswordSetup(
     const customer = found.docs[0] as { id: number | string; email?: string | null } | undefined
     if (!customer?.email) return { ok: false }
 
-    const verified = await payload.verifyEmail({ collection: 'customers', token })
-    if (!verified) return { ok: false }
-
+    // Password first: if this fails the account is still unverified and the link still works,
+    // so it never ends up verified with the sign-up password.
     await payload.update({
       collection: 'customers',
       id: customer.id,
@@ -46,6 +45,8 @@ export async function verifyAndStartPasswordSetup(
       overrideAccess: true,
       depth: 0,
     })
+    const verified = await payload.verifyEmail({ collection: 'customers', token })
+    if (!verified) return { ok: false }
     try {
       const resetToken = await payload.forgotPassword({
         collection: 'customers',

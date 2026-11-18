@@ -55,10 +55,16 @@ describe('verifyAndStartPasswordSetup (audit AB4, G-01)', () => {
     )
   })
 
-  it('verification failure (used link): nothing else happens', async () => {
+  it('verification failure: no reset token is issued', async () => {
     const payload = fakePayload({ verifyEmail: vi.fn().mockRejectedValue(new Error('used')) })
     expect(await verifyAndStartPasswordSetup(payload.asPayload, TOKEN)).toEqual({ ok: false })
-    expect(payload.update).not.toHaveBeenCalled()
+    expect(payload.forgotPassword).not.toHaveBeenCalled()
+  })
+
+  it('the sign-up password is replaced before the account is verified', async () => {
+    const payload = fakePayload({ update: vi.fn().mockRejectedValue(new Error('db')) })
+    expect(await verifyAndStartPasswordSetup(payload.asPayload, TOKEN)).toEqual({ ok: false })
+    expect(payload.verifyEmail).not.toHaveBeenCalled()
   })
 
   it('verified, but the reset token could not be issued: still verified, no token', async () => {

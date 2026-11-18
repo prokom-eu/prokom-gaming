@@ -290,8 +290,10 @@ export default buildConfig({
     },
   }),
   secret: env.PAYLOAD_SECRET,
-  // Audit AB4 (G-05): with serverURL Payload accepts the session cookie only from this origin (CSRF).
-  serverURL: env.SITE_URL,
+  // Audit AB4 (G-05): the session cookie is accepted only from the site's own origin (CSRF).
+  // Not `serverURL`: it would make media URLs absolute (next/image has no remotePatterns) and
+  // pin the panel's API base to SITE_URL. SITE_URL must be the exact origin the site opens on.
+  csrf: [env.SITE_URL],
   // Production: Payload's own lines (migrations, jobs, errors) in the same JSON shape as
   // `lib/logger` (`level` as text, ISO `time`, `msg`); locally the readable default stays.
   ...(env.NODE_ENV === 'production' && {

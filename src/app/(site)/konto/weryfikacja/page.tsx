@@ -37,9 +37,10 @@ export default async function VerifyPage({ searchParams }: Props) {
   ) : (
     <AuthPage
       title="Link nie działa"
-      lead="Ten link wygasł albo adres jest już potwierdzony. Spróbuj się zalogować — jeśli się nie uda, załóż konto jeszcze raz albo napisz do nas."
+      lead="Ten link wygasł albo adres jest już potwierdzony. Jeśli jest potwierdzony, ustaw hasło przez „Nie pamiętam hasła” — wyślemy link na ten adres. Jeśli nie, załóż konto jeszcze raz albo napisz do nas."
       links={
         <>
+          <Link href={routes.accountPassword}>Ustaw hasło</Link>
           <Link href={routes.accountLogin}>Zaloguj się</Link>
           <Link href={routes.contact}>Kontakt</Link>
         </>
