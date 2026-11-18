@@ -31,7 +31,7 @@ Zostaje przełącznik **Jasny / Ciemny / Auto** (`MenuSheet`, Tech: `ThemeSegmen
 
 ### 1.5. Animacja zmiany (wszystkie linie)
 - **Koło** otwierające nowy motyw od środka klikniętego przycisku — mechanizm, który dziś mają Software i Instalacje (`lib/motion/themeReveal.ts`, View Transitions). **Rozszerzamy na Biznes i pro-kom.eu** (prokom-web), Tech ma już własne koło (`switchTechTheme`) — zostaje, dopasować czas.
-- Czas 600 ms, krzywa `cubic-bezier(.2,.8,.2,1)`; w prokom-web jedna stała w `motion.css`, w Tech w tokenach ruchu.
+- Czas 600 ms, krzywa `cubic-bezier(.2,.8,.2,1)`; w prokom-web jedna stała w `src/styles/motion.css`, w Tech w tokenach ruchu.
 - W przycisku: ikona obraca się o 90° i przenika (200 ms), napis przenika z przesunięciem 4 px w pionie (200 ms, opóźnienie 120 ms — zmienia się, gdy koło dociera do przycisku).
 - `<meta name="theme-color">` aktualizowane po zmianie (pasek przeglądarki na telefonie).
 - `prefers-reduced-motion: reduce` albo brak `document.startViewTransition` → zmiana natychmiastowa, bez koła i bez ruchu ikony.
