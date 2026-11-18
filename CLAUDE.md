@@ -86,6 +86,11 @@ tests/fixtures/              # oczekiwane ceny i wyniki zgodności (testy G4)
 - Przed wdrożeniem produkcji: kopia bazy. Każde wdrożenie da się cofnąć do poprzedniego obrazu.
 - Panel: każdy własny widok i każda akcja sprawdza dostęp po stronie serwera (ADR-G006); koszty i marże nigdy poza panelem; dane osobowe nigdy do Claude, do statystyk, do treści powiadomień ani do adresów.
 
+## Audyt bezpieczeństwa (11.2026)
+- Plan, zasady i polecenia sesji: `docs/bezpieczenstwo/AUDYT-PLAN.md`; wyniki w `docs/bezpieczenstwo/ZNALEZISKA-2026-11.md`, konta w `DOSTEPY.md`.
+- Sesje AB1–AB3 są **tylko do odczytu** — zero zmian w kodzie, na serwerze, w DNS i w bazie; naprawy dopiero w AB4 osobnymi PR-ami.
+- Sekrety nigdy nie trafiają do plików, PR-ów, commitów ani odpowiedzi — tylko nazwy kluczy albo wartości zamaskowane (`sk-…abcd`).
+
 ## Git
 - `main` = produkcja, `develop` = staging. Gałęzie: `feat/<opis>`, `fix/<opis>`, `chore/<opis>`, `docs/<opis>`; w nazwie numer sesji, np. `feat/g4-cennik`.
 - **Nigdy nie pushuj bezpośrednio na `main` ani `develop`** — tylko PR z zielonym CI, squash.
