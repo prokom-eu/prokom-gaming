@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { connection } from 'next/server'
 import type { ReactNode } from 'react'
 
+import { BrandBar } from '@/components/brandbar/BrandBar'
 import { CookieBanner } from '@/components/CookieBanner'
 import { MenuSheet } from '@/components/MenuSheet'
 import { MobileTabBar } from '@/components/MobileTabBar'
@@ -14,6 +15,7 @@ import { SiteFooter } from '@/components/SiteFooter'
 import { SiteRail } from '@/components/rail/SiteRail'
 import { SearchHost } from '@/components/search/SearchHost'
 import { SiteHeader } from '@/components/SiteHeader'
+import { ThemeParamCleanup } from '@/components/ThemeParamCleanup'
 import { analyticsScript, UMAMI_BEFORE_SEND, umamiBeforeSend } from '@/lib/analytics'
 import { getEnv } from '@/lib/env'
 import { features } from '@/lib/features'
@@ -63,6 +65,8 @@ export default async function SiteLayout({ children }: { children: ReactNode }) 
         <a className="skip-link" href="#tresc" data-instant="">
           Przejdź do treści
         </a>
+        <BrandBar hours={hours} />
+        <ThemeParamCleanup />
         <ShellProvider>
           <SiteHeader hours={hours} />
           <SiteRail creatures={menuCreatures} />

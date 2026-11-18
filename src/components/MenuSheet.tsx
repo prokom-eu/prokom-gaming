@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import type { CSSProperties, ReactNode } from 'react'
 
 import type { Features } from '@/lib/features'
+import { CURRENT_LINE, LINES } from '@/lib/lines'
 import { buildHref, isCurrent, routes } from '@/lib/nav'
 import type { MenuCreature } from '@/lib/site'
 
@@ -158,6 +159,28 @@ export function MenuSheet({ creatures, phone, features }: Props) {
             </Link>
           </li>
         </ul>
+
+        {/* PRO-KOM lines (MOTYW-PASEK-LINII §5): the brand bar's job below 1081 px. */}
+        <section aria-labelledby="menu-lines" className="menu__lines">
+          <h2 id="menu-lines">Linie PRO-KOM</h2>
+          <ul>
+            {LINES.map((line) => (
+              <li key={line.key} style={{ '--lc': line.color } as CSSProperties}>
+                {line.key === CURRENT_LINE ? (
+                  <Link className="menu__line" href={line.href} aria-current="page">
+                    <i aria-hidden="true" />
+                    {line.name}
+                  </Link>
+                ) : (
+                  <a className="menu__line" href={line.href}>
+                    <i aria-hidden="true" />
+                    {line.name}
+                  </a>
+                )}
+              </li>
+            ))}
+          </ul>
+        </section>
 
         <div className="menu__contact">
           <div>
