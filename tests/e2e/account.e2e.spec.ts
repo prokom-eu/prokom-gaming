@@ -206,8 +206,11 @@ test('sign up, verify, see the order, report a problem, reset the password', asy
   await page.getByRole('button', { name: 'Wyloguj' }).click()
   // The home page may compile first under `next dev`.
   await expect(page).toHaveURL(/\/$/, { timeout: 30_000 })
-  expect((await page.request.get('/api/customers/me')).ok()).toBe(true)
-  const me = (await (await page.request.get('/api/customers/me')).json()) as { user: unknown }
+  const origin = { headers: { Origin: new URL(page.url()).origin } } // Payload csrf (AB4)
+  expect((await page.request.get('/api/customers/me', origin)).ok()).toBe(true)
+  const me = (await (await page.request.get('/api/customers/me', origin)).json()) as {
+    user: unknown
+  }
   expect(me.user).toBeNull()
   await page.goto('/konto/haslo')
   await page.getByLabel('E-mail konta').fill(email)
