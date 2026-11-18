@@ -9,7 +9,8 @@ import { PANEL_RESET_SUBJECT, panelResetEmailHtml, panelResetUrl } from '../lib/
 import { getEnv } from '../lib/env'
 import { isAdmin, isPanelUser, USER_ROLES } from '../access/panel'
 import { enforcePasswordPolicy } from './passwordPolicy'
-import { GROUP_ADMIN } from './shared'
+import { limitForgotPassword } from './workshopGuards'
+import { authCookies, GROUP_ADMIN } from './shared'
 
 /**
  * A deleted panel account takes its push devices with it (P4): `push-subscriptions.user` is
@@ -56,6 +57,7 @@ export const Users: CollectionConfig = {
   },
   // ADR-G001 §3: login attempt limit and a short session.
   auth: {
+    cookies: authCookies,
     maxLoginAttempts: 5,
     lockTime: 15 * 60 * 1000,
     tokenExpiration: 2 * 60 * 60,
@@ -81,7 +83,8 @@ export const Users: CollectionConfig = {
     unlock: ({ req }) => isAdmin(req),
   },
   hooks: {
-    beforeOperation: [enforcePasswordPolicy('users')],
+    // Audit AB4 (G-03): the same per-IP limit on reset e-mails as for customers.
+    beforeOperation: [enforcePasswordPolicy('users'), limitForgotPassword],
     beforeChange: [firstUserIsAdmin],
     beforeDelete: [deleteDevices],
   },
