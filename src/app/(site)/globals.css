@@ -232,6 +232,7 @@ a {
 /* The shell stays above the page rising in (its group would otherwise paint under it, later in
    the DOM, and the header would vanish for the length of the transition). */
 ::view-transition-group(site-header),
+::view-transition-group(site-bbar),
 ::view-transition-group(site-rail),
 ::view-transition-group(site-tabbar) {
   z-index: 100;

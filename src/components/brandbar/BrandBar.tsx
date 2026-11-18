@@ -7,8 +7,12 @@ import { company } from '@/lib/site'
 import { BrandBarPill } from './BrandBarPill'
 import './brandbar.css'
 
-/** Marks the bar as already seen in this tab: the lines come in one after another once a session. */
-const SEEN_SCRIPT = `try{var b=document.currentScript.previousElementSibling;if(sessionStorage.getItem('pkg:bbar'))b.setAttribute('data-seen','');else sessionStorage.setItem('pkg:bbar','1')}catch(e){}`
+/**
+ * Before hydration: marks the bar as already seen in this tab (the lines come in one after another
+ * once a session), and puts the header where SiteHeader will (`--bbar-scroll`), so a reload in
+ * the middle of the page does not make it jump.
+ */
+const BOOT_SCRIPT = `try{document.documentElement.style.setProperty('--bbar-scroll',Math.min(Math.max(scrollY,0),38)+'px');var b=document.currentScript.previousElementSibling;if(sessionStorage.getItem('pkg:bbar'))b.setAttribute('data-seen','');else sessionStorage.setItem('pkg:bbar','1')}catch(e){}`
 
 /**
  * PRO-KOM brand bar above the header (MOTYW-PASEK-LINII §4–§5, runda 18.11): the lines of every
@@ -34,6 +38,7 @@ export function BrandBar({ hours }: { hours: string }) {
               <span
                 key={line.key}
                 className="bbar__item"
+                data-first={index === 0 ? '' : undefined}
                 style={{ '--lc': line.color, '--i': index } as CSSProperties}
               >
                 {isCurrent ? (
@@ -61,7 +66,7 @@ export function BrandBar({ hours }: { hours: string }) {
           </a>
         </section>
       </div>
-      <script dangerouslySetInnerHTML={{ __html: SEEN_SCRIPT }} />
+      <script dangerouslySetInnerHTML={{ __html: BOOT_SCRIPT }} />
     </>
   )
 }

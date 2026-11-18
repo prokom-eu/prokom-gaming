@@ -39,7 +39,8 @@ function useNavScroll() {
   return [state, () => setState((s) => ({ ...s, hidden: false }))] as const
 }
 
-/** Height of the PRO-KOM brand bar above the header (`--bbar-h`, tokens.css). */
+/** Height of the PRO-KOM brand bar above the header — keep equal to `--bbar-h` (tokens.css) and
+ * the 38 in BrandBar's boot script. */
 const BRAND_BAR_H = 38
 
 /**

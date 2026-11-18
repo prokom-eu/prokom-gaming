@@ -29,19 +29,30 @@ export function BrandBarPill() {
       element.style.width = `${box.width}px`
       element.setAttribute('data-on', '')
     }
+    // Back under the keyboard-focused line (not one left focused by a mouse click), else the
+    // current one.
+    const focused = () => {
+      const active = document.activeElement
+      return active && nav.contains(active) && active.matches(':focus-visible')
+        ? lineOf(active)
+        : null
+    }
     const home = () =>
-      show(
-        lineOf(nav.contains(document.activeElement) ? document.activeElement : null) ??
-          nav.querySelector<HTMLElement>('.bbar__line[aria-current="page"]'),
-      )
+      show(focused() ?? nav.querySelector<HTMLElement>('.bbar__line[aria-current="page"]'))
+    // The line under the pointer or focus: Esc's dismissal lasts until another line is reached
+    // (pointerover also fires moving between the dash and the text of the same link).
+    let shown: HTMLElement | null = null
     const onOver = (event: Event) => {
       const line = lineOf(event.target)
-      if (!line) return
+      if (!line || line === shown) return
+      shown = line
       nav.removeAttribute('data-tip-off')
       show(line)
     }
     const onOut = (event: FocusEvent | PointerEvent) => {
-      if (!nav.contains(event.relatedTarget as Node | null)) home()
+      if (nav.contains(event.relatedTarget as Node | null)) return
+      shown = null
+      home()
     }
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') nav.setAttribute('data-tip-off', '')
@@ -53,7 +64,8 @@ export function BrandBarPill() {
     element.getBoundingClientRect()
     element.removeAttribute('data-instant')
     // Fonts swapping in, zoom or a resized window change the lines' boxes.
-    const observer = new ResizeObserver(home)
+    // The pointed line's dash grows on hover, which resizes the list too: keep the pill under it.
+    const observer = new ResizeObserver(() => (shown ? show(shown) : home()))
     observer.observe(nav)
     nav.addEventListener('pointerover', onOver)
     nav.addEventListener('focusin', onOver)

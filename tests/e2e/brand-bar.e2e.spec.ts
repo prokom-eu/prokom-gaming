@@ -59,13 +59,41 @@ test.describe('desktop', () => {
     await expect(tip).toBeHidden()
   })
 
-  test('no axe errors in the bar', async ({ page }) => {
-    // Mid-entrance (opacity) axe would measure a faded colour.
-    await page.emulateMedia({ reducedMotion: 'reduce' })
+  // `/dla-rodzicow` starts under a light section: the bar switches to dark text there.
+  for (const path of ['/', '/dla-rodzicow']) {
+    test(`no axe errors in the bar on ${path}`, async ({ page }) => {
+      // Mid-entrance (opacity) axe would measure a faded colour.
+      await page.emulateMedia({ reducedMotion: 'reduce' })
+      await page.goto(path)
+      await expect(page.locator('[data-brand-bar]')).toBeVisible()
+      const results = await new AxeBuilder({ page }).include('[data-brand-bar]').analyze()
+      expect(results.violations).toEqual([])
+    })
+  }
+
+  test('after Esc the tooltip stays hidden while the pointer moves inside the same line', async ({
+    page,
+  }) => {
     await page.goto('/')
-    await expect(page.locator('[data-brand-bar]')).toBeVisible()
-    const results = await new AxeBuilder({ page }).include('[data-brand-bar]').analyze()
-    expect(results.violations).toEqual([])
+    const tech = page.locator('.bbar__line', { hasText: 'Tech' })
+    const tip = page.locator('#bbar-tip-tech')
+    const box = (await tech.boundingBox())!
+    await page.mouse.move(box.x + 12, box.y + box.height / 2)
+    await expect(tip).toBeVisible()
+    await page.keyboard.press('Escape')
+    await expect(tip).toBeHidden()
+    // From the dash onto the text of the same link.
+    await page.mouse.move(box.x + box.width - 8, box.y + box.height / 2, { steps: 5 })
+    await page.waitForTimeout(600)
+    await expect(tip).toBeHidden()
+  })
+
+  test('the first tooltip stays on screen', async ({ page }) => {
+    await page.goto('/')
+    await page.getByRole('link', { name: 'PRO-KOM', exact: true }).first().focus()
+    const tip = page.locator('#bbar-tip-prokom')
+    await expect(tip).toBeVisible()
+    expect((await tip.boundingBox())!.x).toBeGreaterThanOrEqual(0)
   })
 })
 

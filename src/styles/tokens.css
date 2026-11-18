@@ -569,5 +569,6 @@
   --pk-line-instalacje: #12b6d8;
   --pk-line-software: #9670ee;
   --pk-line-tech: #e2483a;
-  --bbar-h: 38px; /* wysokość paska (jak na pozostałych liniach) */
+  --pk-line-gaming-light: #8a6a0c; /* złota kreska Gaming na jasnej sekcji (Dla rodziców), §4 pkt 6 */
+  --bbar-h: 38px; /* wysokość paska (jak na pozostałych liniach); SiteHeader BRAND_BAR_H = to samo */
 }
