@@ -5,7 +5,8 @@
   position: fixed;
   z-index: 25;
   left: 18px;
-  top: max(92px, calc(var(--nav-h) + 16px));
+  /* Lower by the brand bar while it is on screen (--bbar-off, globals.css). */
+  top: calc(max(92px, calc(var(--nav-h) + 16px)) + var(--bbar-off));
   display: flex;
   flex-direction: column;
   width: var(--rail-w);

@@ -559,3 +559,15 @@
   --fx-flash: rgba(220, 230, 255, 0.55);
   --fx-water: rgba(255, 255, 255, 0.18);
 }
+
+/* Pasek linii PRO-KOM (runda 18.11, MOTYW-PASEK-LINII §4–§5): kolory linii z księgi znaku
+   prokom-web (`CompanyData.lines[].colorOnDark`, seed `src/seed/shared/company.ts`) — Gaming jest
+   ciemny, więc wersje na ciemne tło. Gaming = --grom. Zmiana koloru linii w prokom-web → tu też. */
+:root {
+  --pk-line-prokom: #4fb034;
+  --pk-line-biznes: #4a7be0;
+  --pk-line-instalacje: #12b6d8;
+  --pk-line-software: #9670ee;
+  --pk-line-tech: #e2483a;
+  --bbar-h: 38px; /* wysokość paska (jak na pozostałych liniach) */
+}

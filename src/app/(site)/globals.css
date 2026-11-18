@@ -844,6 +844,24 @@ a {
 body:not(:has([data-scene-top])) {
   padding-top: var(--nav-h);
 }
+/* From 1081 px the PRO-KOM brand bar (components/brandbar) sits above the header and scrolls away:
+   the header starts 38 px lower and rises with the first 38 px of scroll. `--bbar-scroll` =
+   min(scrollY, bar height), set on <html> by SiteHeader; without JavaScript the header stays
+   under the bar. */
+:root {
+  --bbar-off: 0px;
+}
+@media (min-width: 1081px) {
+  :root {
+    --bbar-off: max(0px, calc(var(--bbar-h) - var(--bbar-scroll, 0px)));
+  }
+  .nav {
+    top: var(--bbar-off);
+  }
+  body:not(:has([data-scene-top])) {
+    padding-top: calc(var(--nav-h) + var(--bbar-h));
+  }
+}
 @media print {
   body:not(:has([data-scene-top])) {
     padding-top: 0;
@@ -1162,10 +1180,10 @@ body:has([data-nav-light]) .nav:not([data-top='false']) .nav__caps a[aria-curren
 }
 @media (min-width: 761px) {
   body:has(.nav:not([data-hidden='true'])) {
-    --nav-offset: var(--nav-h);
+    --nav-offset: calc(var(--nav-h) + var(--bbar-off));
   }
   body:has(.nav[data-scrolled='true']:not([data-hidden='true'])) {
-    --nav-offset: var(--nav-h-scrolled);
+    --nav-offset: calc(var(--nav-h-scrolled) + var(--bbar-off));
   }
 }
 
@@ -1544,6 +1562,50 @@ html:has(dialog[open]) {
 }
 .menu__tile[aria-current='page'] b {
   color: var(--grom2);
+}
+/* PRO-KOM line chips (MOTYW-PASEK-LINII §5): a dash in the line's colour (--lc) and its name. */
+.menu__lines {
+  margin-top: 16px;
+}
+.menu__lines h2 {
+  margin: 0 0 10px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.menu__lines ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.menu__line {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: var(--radius-pill);
+  border: 1px solid color-mix(in srgb, var(--kosc) 12%, transparent);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--nav-text);
+}
+.menu__line i {
+  width: 14px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--lc);
+}
+.menu__line[aria-current='page'] {
+  color: var(--kosc);
+  font-weight: 800;
+  background: color-mix(in srgb, var(--lc) 11%, transparent);
+  border-color: color-mix(in srgb, var(--lc) 40%, transparent);
 }
 .menu__contact {
   display: flex;
