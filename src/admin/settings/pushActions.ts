@@ -8,6 +8,7 @@ import { notify } from '../../lib/notify'
 import { KIND_ROLES, PUSH_KINDS, type PushKind } from '../../lib/notify/kinds'
 import type { User } from '../../payload-types'
 import { panelActionSession } from '../session'
+import { isPushServiceEndpoint } from '@/lib/push/endpoint'
 
 /**
  * Settings → Powiadomienia na telefon (ADR-G010, panel spec §13): switch a device on, choose the
@@ -25,7 +26,10 @@ export type PushResult = { ok: boolean; message: string }
 
 const id = z.number().int().positive()
 const SaveInput = z.object({
-  endpoint: z.url({ protocol: /^https$/ }).max(1000),
+  endpoint: z
+    .url({ protocol: /^https$/ })
+    .max(1000)
+    .refine((url) => isPushServiceEndpoint(url), 'not a push service'),
   keys: z.object({ p256dh: z.string().min(1).max(200), auth: z.string().min(1).max(100) }),
   label: z.string().trim().min(1).max(60),
 })

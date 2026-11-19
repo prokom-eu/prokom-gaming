@@ -6,6 +6,7 @@ import { buildConfig } from 'payload'
 import sharp from 'sharp'
 import { fileURLToPath } from 'url'
 
+import { restrictLockedDocuments } from './access/lockedDocuments'
 import { isAdmin } from './access/panel'
 import { PANEL_APP } from './admin/brand'
 import { Builds } from './collections/Builds'
@@ -257,6 +258,8 @@ export default buildConfig({
   // `pnpm seed`, `payload migrate`, `pnpm start` next to `pnpm dev` — would release jobs that run.
   // A failure is logged, never stops the start.
   onInit: async (payload) => {
+    // Audit AB4 (G-02): customers must not read or change document locks of the panel.
+    restrictLockedDocuments(payload)
     if (env.NODE_ENV !== 'production' || env.SITE_ENV === 'local') return
     try {
       await releaseStuckJobs(payload)
@@ -287,6 +290,10 @@ export default buildConfig({
     },
   }),
   secret: env.PAYLOAD_SECRET,
+  // Audit AB4 (G-05): the session cookie is accepted only from the site's own origin (CSRF).
+  // Not `serverURL`: it would make media URLs absolute (next/image has no remotePatterns) and
+  // pin the panel's API base to SITE_URL. SITE_URL must be the exact origin the site opens on.
+  csrf: [env.SITE_URL],
   // Production: Payload's own lines (migrations, jobs, errors) in the same JSON shape as
   // `lib/logger` (`level` as text, ISO `time`, `msg`); locally the readable default stays.
   ...(env.NODE_ENV === 'production' && {

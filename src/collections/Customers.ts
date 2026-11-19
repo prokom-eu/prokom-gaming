@@ -13,7 +13,7 @@ import {
 import { getEnv } from '../lib/env'
 import { enforcePasswordPolicy } from './passwordPolicy'
 import { limitForgotPassword } from './workshopGuards'
-import { GROUP_SALES } from './shared'
+import { authCookies, GROUP_SALES } from './shared'
 
 /** Admins see every account, a customer only their own. */
 const adminOrSelf: Access = ({ req }) => {
@@ -45,6 +45,7 @@ export const Customers: CollectionConfig = {
   },
   defaultSort: '-createdAt',
   auth: {
+    cookies: authCookies,
     // Same limits as the panel (ADR-G001 §3); a longer session — a customer checks the order now and then.
     maxLoginAttempts: 5,
     lockTime: 15 * 60 * 1000,

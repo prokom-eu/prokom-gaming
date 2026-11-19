@@ -44,8 +44,15 @@ const limiter = (store[LIMITER_KEY] ??= createRateLimiter({ limit: 5, windowMs: 
  * Payload limits reset e-mails per account (15 s), not per sender: a script could flood any
  * customer's inbox. Same per-IP limit as the inquiry form (`X-Real-IP`, set by Nginx — G16).
  */
-export const limitForgotPassword: CollectionBeforeOperationHook = ({ args, operation, req }) => {
+export const limitForgotPassword: CollectionBeforeOperationHook = ({
+  args,
+  context,
+  operation,
+  req,
+}) => {
   if (operation !== 'forgotPassword') return args
+  // The verification page issues one reset token itself (audit AB4, G-01) — not an e-mail flood.
+  if (context?.accountVerification === true) return args
   const ip = req.headers?.get('x-real-ip')?.trim() || 'unknown'
   if (!limiter.hit(rateLimitKey(`forgot:${ip}`, getEnv().PAYLOAD_SECRET))) {
     refuse('Za dużo próśb o nowe hasło. Spróbuj za kilkanaście minut.', 429)

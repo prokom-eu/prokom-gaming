@@ -158,7 +158,7 @@ export function RegisterForm({ formToken }: { formToken: string }) {
   if (status.kind === 'ok') {
     return (
       <p className="kt-auth__msg" role="status">
-        Sprawdź skrzynkę: wysłaliśmy link do potwierdzenia adresu. Po kliknięciu zalogujesz się i
+        Sprawdź skrzynkę: wysłaliśmy link do potwierdzenia adresu. Po kliknięciu ustawisz hasło i
         zobaczysz swoje komputery.
       </p>
     )
