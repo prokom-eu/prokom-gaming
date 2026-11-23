@@ -144,9 +144,13 @@ test.describe('a price check on the fake Claude', () => {
     await expect(page.getByText('zapisano koszty: 1 opcji, 0 poziomów')).toBeVisible()
     // The page's own request (signed in as admin): the API context of `beforeAll` sat idle
     // during the run and its kept-alive socket may be closed by now (ECONNRESET in CI).
-    const saved = (await (
-      await page.request.get(`/api/options/${ram.id}?depth=0`)
-    ).json()) as Option
+    const saved =
+      (await // Origin: with Payload `csrf` the session cookie counts only from the site's origin (AB4).
+      (
+        await page.request.get(`/api/options/${ram.id}?depth=0`, {
+          headers: { Origin: new URL(page.url()).origin },
+        })
+      ).json()) as Option
     expect(saved.cost).toBe(Math.round(ram.cost * 1.08))
 
     await page.goto('/admin/ceny/zatwierdzanie')

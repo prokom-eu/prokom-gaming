@@ -37,6 +37,11 @@ export function faqSections(
 export const questionsCount = (n: number): string =>
   `${n} ${plural(n, ['pytanie', 'pytania', 'pytań'])}`
 
+/** `FAQPage` of the home section „Zanim zapytasz” — the same questions as shown. */
+export function homeFaqJsonLd(questions: readonly FaqQuestion[]): object {
+  return faqPageJsonLd([{ group: 'purchase', label: '', questions: [...questions] }])
+}
+
 /** `FAQPage` JSON-LD with every question of the page, not only the open group (spec. §19). */
 export function faqPageJsonLd(sections: readonly FaqSection[]): object {
   return {

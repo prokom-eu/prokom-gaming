@@ -62,10 +62,7 @@ const STAGES = [
   },
 ] as const
 
-/**
- * People from the board. TODO(krystian): "[imię serwisanta] — składa i testuje" comes back once
- * the technician agrees to be named (open question [SZEF]).
- */
+/** People from the board, without the technician (no people beyond these two, Krystian 14.11). */
 const PEOPLE = [
   { name: 'Krystian Potaczek', role: 'odpowiada na zapytania' },
   { name: 'Tadeusz Wójciak', role: 'prowadzi PRO-KOM od 2004' },

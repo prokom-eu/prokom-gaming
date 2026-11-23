@@ -77,3 +77,12 @@ export function requiredWhen<TValue, TField extends object>(
     return base(value, options)
   }
 }
+
+/**
+ * Session cookie of both auth collections (audit AB4, G-05): `Secure` on https sites (staging,
+ * production), plain on local http. Read at config load like the rest of the config.
+ */
+export const authCookies = {
+  secure: (process.env.SITE_URL ?? '').startsWith('https://'),
+  sameSite: 'Lax' as const,
+}

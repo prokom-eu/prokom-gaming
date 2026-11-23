@@ -189,6 +189,7 @@ export function Hero({ data }: { data: HeroData }) {
                   id={b.key}
                   sizes="(max-width: 1023px) 450vw, 300vw"
                   eager={slug === first}
+                  original
                 />
                 <SceneFx id={b.key} />
               </div>
@@ -204,7 +205,8 @@ export function Hero({ data }: { data: HeroData }) {
             if (!b) return null
             return (
               <div key={slug} className="hero__fg" data-on={slug === active}>
-                <Image src={`/scenes/${b.key}-fg.webp`} alt="" fill sizes="125vw" />
+                {/* As it is on disk, like the scene (SceneLayers `original`): no re-encoding per visit. */}
+                <Image src={`/scenes/${b.key}-fg.webp`} alt="" fill sizes="125vw" unoptimized />
               </div>
             )
           })}
@@ -324,7 +326,7 @@ function HeroCopy() {
       <ul className="hero__trust">
         <li>
           <IconClock size={17} />
-          <span>Odpowiedź w godzinę, 8–22</span>
+          <span>Odpowiedź w godzinę, 9–22</span>
         </li>
         <li>
           <IconShield size={17} />

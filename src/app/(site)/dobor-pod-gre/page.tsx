@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { connection } from 'next/server'
 
+import { BreadcrumbJsonLd } from '@/components/BreadcrumbJsonLd'
 import { GamePicker } from '@/components/games/GamePicker'
 import { getEnv } from '@/lib/env'
 import { parsePicker } from '@/lib/games'
@@ -62,5 +63,10 @@ export default async function GamePickerPage({ searchParams }: Props) {
   }
 
   const initial = parsePicker(await searchParams, data.games)
-  return <GamePicker data={data} initial={initial} />
+  return (
+    <>
+      <BreadcrumbJsonLd crumbs={[{ name: 'Dobór pod grę', path: routes.gamePicker }]} />
+      <GamePicker data={data} initial={initial} />
+    </>
+  )
 }

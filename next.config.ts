@@ -21,6 +21,11 @@ const nextConfig: NextConfig = {
     // with a 4320 px scene waited ~15 s). `next build` / `next start` — and so Lighthouse, CI and
     // the server — optimise as before.
     unoptimized: process.env.NODE_ENV === 'development',
+    // A cold re-encode costs the server 0.4–1.7 s per file (measured on production, 15.11.2026);
+    // with the default 4 h every busy image kept going cold. Uploads get new file names and the
+    // scenes change only with a deploy, so a month is safe. The cache lives on a volume
+    // (`next-images` in `docker/compose.prod.yml`), so a deploy no longer empties it either.
+    minimumCacheTTL: 2678400,
   },
   webpack: (webpackConfig) => {
     webpackConfig.resolve.extensionAlias = {
@@ -48,12 +53,26 @@ const payloadHeaders = config.headers
  */
 const PAYLOAD_ADMIN_PATHS = '/admin/:path*'
 
+/**
+ * Files of `public/scenes`, sent as they are to the home hero (`SceneLayers` `original`). Next
+ * gives `public/` files `max-age=0`, so every visit asked again; their names have no hash, so a
+ * day fresh, then a month of serving the cached copy while checking in the background.
+ */
+const SCENE_FILES = {
+  source: '/scenes/:path*',
+  headers: [
+    { key: 'Cache-Control', value: 'public, max-age=86400, stale-while-revalidate=2592000' },
+  ],
+}
+
 export default {
   ...config,
-  headers: async () =>
-    (payloadHeaders ? await payloadHeaders() : []).map((rule) =>
+  headers: async () => [
+    ...(payloadHeaders ? await payloadHeaders() : []).map((rule) =>
       rule.source === '/:path*' && rule.headers.some(({ key }) => key === 'Critical-CH')
         ? { ...rule, source: PAYLOAD_ADMIN_PATHS }
         : rule,
     ),
+    SCENE_FILES,
+  ],
 } satisfies NextConfig

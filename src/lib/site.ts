@@ -16,6 +16,15 @@ export const company = {
   email: 'kontakt@prokomgaming.pl',
   phone: '+48 883 200 151',
   phoneHref: 'tel:+48883200151',
+  // Krystian 14.11.2026: the phone and the Gaming site are served every day 9–22; the shop in
+  // Rabka is open Monday–Friday 9–17.
+  phoneHours: 'codziennie 9–22',
+  shopHours: {
+    label: 'pon.–pt. 9–17',
+    days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+    opens: '09:00',
+    closes: '17:00',
+  },
   // Gaming is a product brand of PRO-KOM (docs/zadania/gaming-marka-prokom.md).
   parentSite: { label: 'pro-kom.eu', href: 'https://pro-kom.eu' },
 } as const
@@ -36,6 +45,20 @@ export const social: { label: string; href: string }[] = [
   { label: 'Facebook', href: '' }, // TODO(krystian): Facebook profile address
   { label: 'TikTok', href: '' }, // TODO(krystian): TikTok profile address
 ]
+
+/**
+ * `sameAs` of the Organization besides the brand's own `social` profiles: the company profile and
+ * the other PRO-KOM sites (one legal entity, PRO-KOM Tadeusz Wójciak) — search engines and AI
+ * assistants tie Gaming to the company. The same list as prokom-web `src/lib/seo/social.ts`.
+ */
+export const companyProfiles = [
+  'https://www.facebook.com/prokomrabka',
+  'https://pro-kom.eu/',
+  'https://prokombiznes.pl/',
+  'https://prokominstalacje.pl/',
+  'https://prokomsoftware.pl/',
+  'https://prokomserwis.pl/',
+] as const
 
 // Cookie banner only when tools needing consent are on (spec. §3, §24): none at launch.
 export const cookieBannerEnabled = false

@@ -4,13 +4,15 @@ import { connection } from 'next/server'
 import { BreadcrumbJsonLd } from '@/components/BreadcrumbJsonLd'
 import { BuildCardView } from '@/components/builds/BuildCardView'
 import { BuildsBrowser, type BrowserItem } from '@/components/builds/BuildsBrowser'
+import { JsonLd } from '@/components/JsonLd'
 import { ButtonLink } from '@/components/ui/Button'
 import { buildCards, filtersQuery, parseFilters, type BuildCard } from '@/lib/builds'
+import { getEnv } from '@/lib/env'
 import { dateText } from '@/lib/home'
 import { errorFields, log } from '@/lib/logger'
 import { routes } from '@/lib/nav'
 import { loadPublicOffer } from '@/lib/offer.server'
-import { DESCRIPTIONS } from '@/lib/seo'
+import { buildListJsonLd, DESCRIPTIONS } from '@/lib/seo'
 
 import '@/components/builds/builds.css'
 
@@ -55,6 +57,7 @@ export default async function BuildsPage({
   return (
     <>
       <BreadcrumbJsonLd crumbs={[{ name: 'Zestawy', path: routes.builds }]} />
+      {cards.length > 0 && <JsonLd data={buildListJsonLd(getEnv().SITE_URL, cards)} />}
       {/* Background from CSS only (board: a faint forest at 55%): an image here was the LCP
           element and cost ~0.6 s on a phone (Lighthouse, G9). */}
       <header className="bl-head" data-scene-top>

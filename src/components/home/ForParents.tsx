@@ -103,7 +103,7 @@ export function ForParents() {
             <li>
               <IconMail size={22} />
               <span>
-                Odpisujemy z ceną i terminem <small>zwykle w godzinę, 8–22</small>
+                Odpisujemy z ceną i terminem <small>zwykle w godzinę, 9–22</small>
               </span>
             </li>
             <li>

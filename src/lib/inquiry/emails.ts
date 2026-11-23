@@ -481,7 +481,7 @@ export function notificationEmail(
 /** „Co będzie dalej” — the same four steps as `/zapytanie/wyslane` (board Zapytanie). */
 export const NEXT_STEPS = [
   ['Teraz', 'Zapytanie jest u nas. Kopia poszła na Twój e-mail.'],
-  ['W ciągu godziny', 'Krystian odpisze z imienną listą części, ceną i terminem. Codziennie 8–22.'],
+  ['W ciągu godziny', 'Krystian odpisze z imienną listą części, ceną i terminem. Codziennie 9–22.'],
   ['Gdy zaakceptujesz', 'Wystawimy fakturę pro forma. Płacisz przelewem albo BLIK-iem.'],
   ['5–10 dni roboczych', 'Montaż, test obciążeniowy, pomiary w grach, metryka i wysyłka.'],
 ] as const
@@ -490,12 +490,12 @@ export const NEXT_STEPS = [
 // from the Bon and Gotowe boards: PDF after payment, shipping in 1–2 working days).
 const VOUCHER_STEPS = [
   ['Teraz', 'Zamówienie bonu jest u nas. Kopia poszła na Twój e-mail.'],
-  ['W ciągu godziny', 'Odpiszemy z fakturą pro forma. Codziennie 8–22.'],
+  ['W ciągu godziny', 'Odpiszemy z fakturą pro forma. Codziennie 9–22.'],
   ['Gdy zapłacisz', 'Bon jako PDF do druku przyjdzie na e-mail albo czeka w kopercie w sklepie.'],
 ] as const
 const READY_STEPS = [
   ['Teraz', 'Egzemplarz jest zarezerwowany dla Ciebie na 24 godziny.'],
-  ['W ciągu godziny', 'Odpiszemy z fakturą pro forma i terminem odbioru. Codziennie 8–22.'],
+  ['W ciągu godziny', 'Odpiszemy z fakturą pro forma i terminem odbioru. Codziennie 9–22.'],
   ['Gdy zapłacisz', 'Wysyłka w 1–2 dni robocze albo odbiór w sklepie od ręki.'],
 ] as const
 

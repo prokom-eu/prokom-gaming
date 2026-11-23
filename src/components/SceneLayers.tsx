@@ -9,6 +9,12 @@ type Props = {
   sizes: string
   /** Above the fold: the picture loads at once with high priority (ADR-G003 §6). */
   eager?: boolean
+  /**
+   * The files as they are on disk, past the image optimiser. For the home hero: it draws the
+   * panorama 3–4.5 screens wide, so every width wants the whole 2880 px file anyway, and the
+   * optimiser only re-encoded it — 1–1.7 s per cold file on the server, several at once per visit.
+   */
+  original?: boolean
 }
 
 /**
@@ -18,10 +24,10 @@ type Props = {
  * ADR-G003 §5 asks — the `<picture>` source picks the file, so a phone never downloads the planes.
  * Both fill the parent, which must be `position: relative`. Decorative (empty `alt`).
  */
-export function SceneLayers({ id, sizes, eager = false }: Props) {
-  const common = { alt: '', fill: true, sizes }
+export function SceneLayers({ id, sizes, eager = false, original = false }: Props) {
+  const common = { alt: '', fill: true, sizes, unoptimized: original }
   const { props: backProps } = getImageProps({ ...common, src: `/scenes/${id}-back.webp` })
-  // `next dev` serves images unoptimised, without a srcSet: the plain file then.
+  // Unoptimised (`next dev`, `original`) there is no srcSet: the plain file then.
   const back = backProps.srcSet ?? backProps.src
   const { props: flat } = getImageProps({
     ...common,
@@ -38,7 +44,7 @@ export function SceneLayers({ id, sizes, eager = false }: Props) {
   return (
     <>
       <picture className="scene-plane scene-plane--back">
-        <source media={DESKTOP} srcSet={back} sizes={sizes} />
+        <source media={DESKTOP} srcSet={back} sizes={backProps.srcSet ? sizes : undefined} />
         {/* next/image's own props through getImageProps (Next docs: art direction). */}
         {/* eslint-disable-next-line jsx-a11y/alt-text */}
         <img {...flat} />

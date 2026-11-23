@@ -485,7 +485,7 @@ export function StepReview({
       </dl>
       <p className="iq-hint iq-hint--after">
         Po wysłaniu dostaniesz kopię zapytania na e-mail. Oferta przyjdzie zwykle w ciągu godziny,
-        codziennie od 8 do 22. Zapytania wysłane w nocy czytamy rano.
+        codziennie od 9 do 22. Zapytania wysłane w nocy czytamy rano.
       </p>
     </div>
   )

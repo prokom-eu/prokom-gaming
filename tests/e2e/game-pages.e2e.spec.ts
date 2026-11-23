@@ -21,9 +21,10 @@ test('all 33 game pages: heading, title, canonical, JSON-LD', async ({ request }
     expect(response.status(), game.slug).toBe(200)
     const html = await response.text()
     expect(html).toContain(`Komputer do ${game.name.replace(/'/g, '&#x27;')}</h1>`)
-    expect(html).toContain(
-      `<title>Komputer do ${game.name.replace(/'/g, '&#x27;')}: ile klatek w FullHD, 2K i 4K | PRO-KOM Gaming</title>`,
-    )
+    // Spec. §23 template; the brand only while the title fits 65 characters (SEO session 13.11).
+    const title = `Komputer do ${game.name}: ile klatek w FullHD, 2K i 4K`
+    const shown = `${title} | PRO-KOM Gaming`.length <= 65 ? `${title} | PRO-KOM Gaming` : title
+    expect(html).toContain(`<title>${shown.replace(/'/g, '&#x27;')}</title>`)
     expect(html).toMatch(new RegExp(`rel="canonical" href="[^"]*/komputer-do/${game.slug}"`))
     expect(html).toContain('"@type":"FAQPage"')
     expect(html).toContain('"@type":"BreadcrumbList"')

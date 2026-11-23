@@ -9,7 +9,7 @@ const STEPS = [
   },
   {
     title: 'Dostajesz ofertę',
-    text: 'Imienna lista części, aktualna cena i termin. Odpisujemy codziennie od 8 do 22.',
+    text: 'Imienna lista części, aktualna cena i termin. Odpisujemy codziennie od 9 do 22.',
     time: 'zwykle w godzinę',
   },
   {

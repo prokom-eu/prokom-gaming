@@ -39,17 +39,43 @@ function useNavScroll() {
   return [state, () => setState((s) => ({ ...s, hidden: false }))] as const
 }
 
+/** Height of the PRO-KOM brand bar above the header — keep equal to `--bbar-h` (tokens.css) and
+ * the 38 in BrandBar's boot script. */
+const BRAND_BAR_H = 38
+
+/**
+ * The header starts under the brand bar (≥ 1081 px) and rises with the first 38 px of scroll
+ * (globals.css `--bbar-off`). Set straight in the scroll handler, not a frame later, so the header
+ * stays glued to the bar; once past the bar nothing is written.
+ */
+function useBrandBarOffset() {
+  useEffect(() => {
+    const root = document.documentElement
+    let last = -1
+    const onScroll = () => {
+      const offset = Math.min(Math.max(window.scrollY, 0), BRAND_BAR_H)
+      if (offset === last) return
+      last = offset
+      root.style.setProperty('--bbar-scroll', `${offset}px`)
+    }
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+}
+
 /**
  * Site header (NAWIGACJA.md §2, §6). Desktop: mark, the 7 links in a capsule, „Odpowiadamy w
  * godzinę”, comparison and account, „Dobierz komputer”. 761–1199: the same without the capsule,
  * with a hamburger opening the menu panel. Phone: mark, comparison and account — the rest is in
  * the tab bar. Widths are CSS-only.
  */
-/** `hours`: „codziennie 8–22” from the panel settings (lib/responseHours.server.ts). */
+/** `hours`: „codziennie 9–22” from the panel settings (lib/responseHours.server.ts). */
 export function SiteHeader({ hours }: { hours: string }) {
   const pathname = usePathname()
   const { compareCount, compareBump, openMenu, menuOpen, openSearch } = useShell()
   const [{ top, scrolled, hidden }, show] = useNavScroll()
+  useBrandBarOffset()
 
   const compareLabel =
     compareCount > 0
