@@ -46,6 +46,20 @@ export const social: { label: string; href: string }[] = [
   { label: 'TikTok', href: '' }, // TODO(krystian): TikTok profile address
 ]
 
+/**
+ * `sameAs` of the Organization besides the brand's own `social` profiles: the company profile and
+ * the other PRO-KOM sites (one legal entity, PRO-KOM Tadeusz Wójciak) — search engines and AI
+ * assistants tie Gaming to the company. The same list as prokom-web `src/lib/seo/social.ts`.
+ */
+export const companyProfiles = [
+  'https://www.facebook.com/prokomrabka',
+  'https://pro-kom.eu/',
+  'https://prokombiznes.pl/',
+  'https://prokominstalacje.pl/',
+  'https://prokomsoftware.pl/',
+  'https://prokomserwis.pl/',
+] as const
+
 // Cookie banner only when tools needing consent are on (spec. §3, §24): none at launch.
 export const cookieBannerEnabled = false
 

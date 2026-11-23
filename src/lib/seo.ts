@@ -4,7 +4,7 @@ import type { Features } from './features'
 import { routes } from './nav'
 import { organizationId } from './offerTerms'
 import { zl } from './pricing/format'
-import { company, shopDirections, social } from './site'
+import { company, companyProfiles, shopDirections, social } from './site'
 
 /**
  * SEO of the site (spec. §23): titles, descriptions, structured data, sitemap and robots rules.
@@ -114,7 +114,7 @@ const postalAddress = {
 export function organizationJsonLd(siteUrl: string): object[] {
   const home = new URL(routes.home, siteUrl).toString()
   const orgId = organizationId(siteUrl)
-  const sameAs = social.map((s) => s.href).filter(Boolean)
+  const sameAs = [...social.map((s) => s.href).filter(Boolean), ...companyProfiles]
   return [
     {
       '@context': 'https://schema.org',
@@ -135,7 +135,7 @@ export function organizationJsonLd(siteUrl: string): object[] {
         name: company.name,
         url: company.parentSite.href,
       },
-      ...(sameAs.length ? { sameAs } : {}),
+      sameAs,
     },
     {
       '@context': 'https://schema.org',

@@ -124,8 +124,13 @@ describe('organizationJsonLd', () => {
     expect(String(store?.paymentAccepted)).not.toMatch(/rat/)
   })
 
-  it('no empty profile links', () => {
-    expect(org).not.toHaveProperty('sameAs')
+  it('sameAs: the company profile and the other PRO-KOM sites, no empty links (SEO 23.11)', () => {
+    const sameAs = (org as { sameAs: string[] }).sameAs
+    expect(sameAs).toContain('https://www.facebook.com/prokomrabka')
+    expect(sameAs).toContain('https://pro-kom.eu/')
+    expect(sameAs).toContain('https://prokomserwis.pl/')
+    expect(sameAs.every(Boolean)).toBe(true)
+    expect(sameAs.some((url) => url.includes('prokomgaming.pl'))).toBe(false)
   })
 })
 
